@@ -4,6 +4,9 @@
 
   * [http://java.sun.com/javase/6/docs/api/ Java 6 API]
   * [http://java.sun.com/javase/6/docs/jre/api/security/smartcardio/spec/javax/smartcardio/package-summary.html Java Smart Card I/O API]
+  * [http://java.sun.com/javase/6/docs/technotes/guides/security/p11guide.html SunPKCS11 Security Provider]
+  * [http://maven.apache.org/ Maven 2]
+  * [http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/package-summary.html Java Servlet API]
 
 
 == Smart Card ==
