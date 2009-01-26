@@ -3,3 +3,9 @@
 == Java ==
 
   * [http://java.sun.com/javase/6/docs/api/ Java 6 API]
+  * [http://java.sun.com/javase/6/docs/jre/api/security/smartcardio/spec/javax/smartcardio/package-summary.html Java Smart Card I/O API]
+
+
+== Smart Card ==
+
+  * [http://www.cardwerk.com/smartcards/smartcard_standard_ISO7816-4.aspx ISO 7816-4]]
