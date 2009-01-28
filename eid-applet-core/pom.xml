@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>be.fedict</groupId>
+		<artifactId>eid-applet</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+	<name>FedICT eID Applet Core</name>
+	<description>Core classes of the eID applet.</description>
+	<groupId>be.fedict.eid-applet</groupId>
+	<artifactId>eid-applet-core</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<!--
+						Despite the usage of javax.smartcardio, which is part of Java 6,
+						we compile for Java 5 to be able to load the eID Applet also on a
+						Mac OS X platform. Please be aware that your JDK should be 1.6
+						based since we need the javax.smartcardio from its rt.jar file.
+					-->
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<!--
+				<plugin> <artifactId>minijar-maven-plugin</artifactId>
+				<groupId>org.codehaus.mojo</groupId> <executions> <execution>
+				<phase>process-resources</phase> <goals> <goal>ueberjar</goal>
+				</goals> <configuration> <replaceArtifact>true</replaceArtifact>
+				<includeDependenciesInRelocation /> </configuration> </execution>
+				</executions> </plugin>
+			-->
+		</plugins>
+	</build>
+	<dependencies>
+		<!--
+			<dependency> <groupId>commons-logging</groupId>
+			<artifactId>commons-logging-api</artifactId> </dependency>
+		-->
+		<dependency>
+			<groupId>be.fedict.eid-applet</groupId>
+			<artifactId>eid-applet-shared</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>bouncycastle</groupId>
+			<artifactId>bcprov-jdk16</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>

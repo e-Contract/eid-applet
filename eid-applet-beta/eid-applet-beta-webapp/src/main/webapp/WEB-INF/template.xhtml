@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>eID Applet Beta Site</title>
+<link rel="stylesheet" type="text/css"
+	href="#{facesContext.externalContext.requestContextPath}/style.css" />
+</head>
+
+<body>
+<div id="header">
+<div id="fed">fed</div>
+<div id="ictegov">
+<div id="ict">ict</div>
+<div id="egov">e-gov</div>
+</div>
+<h1>eID Applet Beta Site</h1>
+</div>
+
+<f:view>
+	<h:form>
+		<div id="menu">
+		<ul>
+			<c:choose>
+				<c:when test="#{activeMenu == 'main'}">
+					<li class="selected"><a
+						href="#{facesContext.externalContext.requestContextPath}/main.seam">Home</a></li>
+				</c:when>
+				<c:otherwise>
+					<li><a
+						href="#{facesContext.externalContext.requestContextPath}/main.seam">Home</a></li>
+				</c:otherwise>
+			</c:choose>
+
+			<c:choose>
+				<c:when test="#{activeMenu == 'test'}">
+					<li class="selected"><a
+						href="#{facesContext.externalContext.requestContextPath}/tests.seam">eID
+					Applet Tests</a></li>
+				</c:when>
+				<c:otherwise>
+					<li><a
+						href="#{facesContext.externalContext.requestContextPath}/tests.seam">eID
+					Applet Tests</a></li>
+				</c:otherwise>
+			</c:choose>
+
+			<c:choose>
+				<c:when test="#{activeMenu == 'feedback'}">
+					<li class="selected"><a
+						href="#{facesContext.externalContext.requestContextPath}/feedback.seam">Feedback</a></li>
+				</c:when>
+				<c:otherwise>
+					<li><a
+						href="#{facesContext.externalContext.requestContextPath}/feedback.seam">Feedback</a></li>
+				</c:otherwise>
+			</c:choose>
+
+			<c:choose>
+				<c:when test="#{activeMenu == 'admin'}">
+					<li class="selected"><a
+						href="#{facesContext.externalContext.requestContextPath}/admin/admin.seam">Administrator</a></li>
+				</c:when>
+				<c:otherwise>
+					<li><a
+						href="#{facesContext.externalContext.requestContextPath}/admin/admin.seam">Administrator</a></li>
+				</c:otherwise>
+			</c:choose>
+
+			<c:if test="#{identity.isLoggedIn()}">
+				<li><h:commandLink value="Logout" action="#{identity.logout}" /></li>
+			</c:if>
+		</ul>
+		</div>
+	</h:form>
+
+	<div id="content"><ui:insert name="body">
+		<p>Default Body</p>
+	</ui:insert></div>
+</f:view>
+
+</body>
+
+</html>
