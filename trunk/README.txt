@@ -4,6 +4,7 @@ README for FedICT eID Applet Project
 === 1. Introduction
 
 This project contains the source core tree of the FedICT eID Applet.
+The source code is hosted at: http://code.google.com/p/eid-applet/
 
 
 === 2. Requirements
@@ -11,7 +12,6 @@ This project contains the source core tree of the FedICT eID Applet.
 The following is required for compiling the eID Applet software:
 * Sun Java 1.6.0_11
 * Apache Maven 2.0.9
-* eToken with code signing certificate
 
 
 === 3. Build
@@ -34,7 +34,10 @@ Missing dependencies can be added to your local Maven repository via:
 	-DgroupId=org.jboss -DartifactId=jboss-as-distribution \
 	-Dversion=5.0.0.GA -Dpackaging=zip -DgeneratePom=true -Dclassifier=jdk6
 
-During the build process an eToken is required to sign the applet JAR.
+During the build process a token is required to sign the applet JAR.
+By default the Maven build will use a software token to sign the applet JAR.
+One can configure the usage of an eToken via the following Maven property:
+	-Dtoken=etoken
 The eToken configuration is located in pom.xml under the eid-applet-package 
 artifact.
 
@@ -46,7 +49,7 @@ You can speed up the development build cycle by skipping the unit tests via:
 
 An SDK build can be performed via:
 	mvn -Dhttp.proxyHost=proxy.yourict.net -Dhttp.proxyPort=8080 -Denv=sdk
-clean install
+-Dtoken=etoken clean install
 
 The final artifact is located under:
 	eid-applet-sdk/target/
@@ -72,7 +75,3 @@ repository location. Do this via:
 
 The license conditions can be found in the file: LICENSE.txt
 
-
-=== 7. Contact
-
-The author can be contacted via: frank.cornelis@fedict.be

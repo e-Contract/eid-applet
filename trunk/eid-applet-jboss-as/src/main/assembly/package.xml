@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.1.0-SNAPSHOT.xsd">
+	<formats>
+		<format>zip</format>
+	</formats>
+	<baseDirectory>jboss-as-distribution</baseDirectory>
+	<fileSets>
+		<fileSet>
+			<directory>src/main/assembly</directory>
+			<includes>
+				<include>README.txt</include>
+			</includes>
+			<outputDirectory>/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>target/dependency/jboss-5.0.0.GA</directory>
+			<outputDirectory>/</outputDirectory>
+			<excludes>
+				<exclude>client/**</exclude>
+				<exclude>docs/**</exclude>
+				<exclude>server/all/**</exclude>
+				<exclude>server/minimal/**</exclude>
+				<exclude>server/standard/**</exclude>
+				<exclude>server/web/**</exclude>
+				<!-- el-api is provided by JBoss Seam -->
+				<exclude>common/lib/el-api.jar</exclude>
+				<!-- commons-collections via Richfaces -->
+				<exclude>common/lib/commons-collections.jar</exclude>
+				<!-- chmod+x on the UNIX scripts -->
+				<exclude>bin/run.sh</exclude>
+				<exclude>bin/shutdown.sh</exclude>
+			</excludes>
+		</fileSet>
+		<fileSet>
+			<directory>target/dependency/jboss-5.0.0.GA</directory>
+			<outputDirectory>/</outputDirectory>
+			<fileMode>0544</fileMode>
+			<includes>
+				<include>bin/run.sh</include>
+				<include>bin/shutdown.sh</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>target/dependency/jboss-5.0.0.GA</directory>
+			<outputDirectory>/</outputDirectory>
+			<includes>
+				<!-- required by shutdown.sh -->
+				<include>client/jbossall-client.jar</include>
+				<include>client/jboss-system-jmx-client.jar</include>
+				<include>client/jboss-j2se.jar</include>
+				<include>client/jnp-client.jar</include>
+				<include>client/jboss-logging-spi.jar</include>
+				<include>client/jmx-invoker-adaptor-client.jar</include>
+				<include>client/jboss-client.jar</include>
+				<include>client/jboss-serialization.jar</include>
+				<include>client/jboss-common-core.jar</include>
+				<include>client/jboss-remoting.jar</include>
+				<include>client/jboss-javaee.jar</include>
+				<include>client/jboss-security-spi.jar</include>
+				<include>client/jboss-integration.jar</include>
+			</includes>
+		</fileSet>
+	</fileSets>
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>server/default/lib</outputDirectory>
+			<excludes>
+				<!-- scope compile doesn't work... -->
+				<exclude>org.jboss:jboss-as-distribution</exclude>
+				<!-- Richfaces triggers commons-logging -->
+				<exclude>commons-logging:commons-logging</exclude>
+				<!-- Tomahawk12 -->
+				<exclude>javax.servlet:jstl</exclude>
+			</excludes>
+		</dependencySet>
+	</dependencySets>
+</assembly>

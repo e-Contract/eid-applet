@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>be.fedict</groupId>
+		<artifactId>eid-applet</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+	<name>FedICT eID Applet Package</name>
+	<description>Packaging of the eID applet.</description>
+	<groupId>be.fedict.eid-applet</groupId>
+	<artifactId>eid-applet-package</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<build>
+		<plugins>
+			<!--
+				<plugin> <groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId> <executions>
+				<execution> <id>unpack-dependencies</id>
+				<phase>process-resources</phase> <goals>
+				<goal>unpack-dependencies</goal> </goals> <configuration>
+				<includes>**/*.class</includes>
+				<outputDirectory>${project.build.directory}/classes</outputDirectory>
+				<excludeTransitive>true</excludeTransitive> </configuration>
+				</execution> </executions> </plugin> <plugin>
+				<artifactId>minijar-maven-plugin</artifactId>
+				<groupId>org.codehaus.mojo</groupId> <executions> <execution>
+				<phase>process-resources</phase> <goals> <goal>ueberjar</goal>
+				</goals> <configuration> <includeArtifact>false</includeArtifact>
+				<excludeDependenciesInRelocation>
+				<param>be.fedict.eid-applet:eid-applet-core</param>
+				</excludeDependenciesInRelocation>
+				<replaceArtifact>true</replaceArtifact> </configuration>
+				</execution> </executions> </plugin>
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack-dependencies</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<configuration>
+							<includes>**/*.class,**/Messages*.properties</includes>
+							<outputDirectory>${project.build.directory}/classes</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<profiles>
+		<profile>
+			<id>token-soft</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>keytool-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>genkey</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<keystore>target/sign.p12</keystore>
+							<dname><![CDATA[CN=Test Signer, OU=eID, L=Brussels, ST=Brussels, O=FedICT, C=BE]]></dname>
+							<alias>SIGN</alias>
+							<keypass>secret</keypass>
+							<storepass>secret</storepass>
+							<validity>365</validity>
+							<keyalg>RSA</keyalg>
+							<storetype>PKCS12</storetype>
+							<verbose>true</verbose>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jar-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<archive>
+								<addMavenDescriptor>false</addMavenDescriptor>
+							</archive>
+							<type>PKCS12</type>
+							<keystore>target/sign.p12</keystore>
+							<alias>SIGN</alias>
+							<storepass>secret</storepass>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>token-etoken</id>
+			<activation>
+				<property>
+					<name>token</name>
+					<value>etoken</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jar-plugin</artifactId>
+						<version>2.3-MJAR-112</version>
+						<!-- http://jira.codehaus.org/browse/MJAR-112 -->
+						<executions>
+							<execution>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<archive>
+								<addMavenDescriptor>false</addMavenDescriptor>
+							</archive>
+							<keystore>NONE</keystore>
+							<type>PKCS11</type>
+							<providerClass>sun.security.pkcs11.SunPKCS11</providerClass>
+							<providerArg>src/main/jar/etoken.config</providerArg>
+							<storepass>FedICT1234</storepass>
+							<alias>NEW</alias>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	<dependencies>
+		<dependency>
+			<groupId>be.fedict.eid-applet</groupId>
+			<artifactId>eid-applet-core</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+</project>

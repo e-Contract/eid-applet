@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core">
+<body>
+<ui:composition template="/WEB-INF/template.xhtml">
+	<ui:param name="activeMenu" value="test" />
+	<ui:define name="body">
+		<h2>eID Applet Tests</h2>
+		<p>Via this page you can test for correct functionality of the eID
+		Applet within your web browser.</p>
+		<rich:panel>
+			<f:facet name="header">eID Applet Identification</f:facet>
+			This test will execute an eID identification via the eID Applet.
+			<p><a
+				href="#{facesContext.externalContext.requestContextPath}/identification.seam">Click
+			here to run the eID Applet Identification test.</a></p>
+		</rich:panel>
+		<rich:spacer height="10" />
+		<rich:panel>
+			<f:facet name="header">eID Applet Authentication</f:facet>
+			This test will execute an eID authentication via the eID Applet.
+			<p><a
+				href="#{facesContext.externalContext.requestContextPath}/authentication.seam">Click
+			here to run the eID Applet Authentication test.</a></p>
+		</rich:panel>
+	</ui:define>
+</ui:composition>
+</body>
+</html>
