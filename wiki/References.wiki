@@ -15,3 +15,4 @@
 
   * [http://www.cardwerk.com/smartcards/smartcard_standard_ISO7816-4.aspx ISO 7816-4]
   * [http://www.rsa.com/rsalabs/node.asp?id=2133 PKCS#11]
+  * [http://www.usb.org/developers/devclass_docs/DWG_Smart-Card_CCID_Rev110.pdf CCID]
