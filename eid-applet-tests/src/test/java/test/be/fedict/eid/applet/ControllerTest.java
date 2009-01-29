@@ -18,12 +18,20 @@
 
 package test.be.fedict.eid.applet;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.awt.Component;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.URL;
@@ -43,11 +51,15 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.RSAKeyGenParameterSpec;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -65,7 +77,11 @@ import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mortbay.jetty.SessionManager;
 import org.mortbay.jetty.security.SslSocketConnector;
+import org.mortbay.jetty.servlet.HashSessionManager;
+import org.mortbay.jetty.servlet.ServletHolder;
+import org.mortbay.jetty.servlet.SessionHandler;
 import org.mortbay.jetty.testing.ServletTester;
 
 import be.fedict.eid.applet.Controller;
@@ -74,7 +90,15 @@ import be.fedict.eid.applet.Runtime;
 import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
 import be.fedict.eid.applet.service.AppletServiceServlet;
+import be.fedict.eid.applet.service.Identity;
+import be.fedict.eid.applet.service.spi.AuthenticationService;
 
+/**
+ * Integration tests for the eID Applet controller component.
+ * 
+ * @author fcorneli
+ * 
+ */
 public class ControllerTest {
 	private static final Log LOG = LogFactory.getLog(ControllerTest.class);
 
@@ -178,10 +202,13 @@ public class ControllerTest {
 		return port;
 	}
 
+	private ServletHolder servletHolder;
+
 	@Before
 	public void setUp() throws Exception {
 		this.servletTester = new ServletTester();
-		this.servletTester.addServlet(AppletServiceServlet.class, "/");
+		this.servletHolder = this.servletTester.addServlet(
+				AppletServiceServlet.class, "/");
 
 		Security.addProvider(new BouncyCastleProvider());
 
@@ -305,21 +332,153 @@ public class ControllerTest {
 
 		@Override
 		public void progressIndication(int max, int current) {
+			LOG.debug("progress: " + current + "/" + max);
 		}
 	}
 
 	@Test
-	public void controller() throws Exception {
+	public void controllerIdentification() throws Exception {
+		// setup
 		Messages messages = new Messages(Locale.getDefault());
 		Runtime runtime = new TestRuntime();
 		View view = new TestView();
 		Controller controller = new Controller(view, runtime, messages);
 
-		/*
-		 * This probably fails because the HttpsUrlConnection doesn't preserve
-		 * the 'browser' session cookie.
-		 */
+		// make sure that the session cookies are passed during conversations
+		CookieManager cookieManager = new CookieManager();
+		cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+		CookieHandler.setDefault(cookieManager);
 
+		// operate
 		controller.run();
+
+		// verify
+		LOG.debug("verify...");
+		SessionHandler sessionHandler = this.servletTester.getContext()
+				.getSessionHandler();
+		SessionManager sessionManager = sessionHandler.getSessionManager();
+		LOG.debug("session manager type: "
+				+ sessionManager.getClass().getName());
+		HashSessionManager hashSessionManager = (HashSessionManager) sessionManager;
+		LOG.debug("# sessions: " + hashSessionManager.getSessions());
+		assertEquals(1, hashSessionManager.getSessions());
+		Map<String, HttpSession> sessionMap = hashSessionManager
+				.getSessionMap();
+		LOG.debug("session map: " + sessionMap);
+		Entry<String, HttpSession> sessionEntry = sessionMap.entrySet()
+				.iterator().next();
+		HttpSession httpSession = sessionEntry.getValue();
+		assertNotNull(httpSession.getAttribute("eid"));
+		Identity identity = (Identity) httpSession.getAttribute("eid.identity");
+		assertNotNull(identity);
+		assertNotNull(identity.name);
+		LOG.debug("name: " + identity.name);
+		assertNull(httpSession.getAttribute("eid.identifier"));
+		assertNull(httpSession.getAttribute("eid.address"));
+		assertNull(httpSession.getAttribute("eid.photo"));
+	}
+
+	@Test
+	public void controllerIdentificationWithAddressAndPhoto() throws Exception {
+		// setup
+		Messages messages = new Messages(Locale.getDefault());
+		Runtime runtime = new TestRuntime();
+		View view = new TestView();
+		Controller controller = new Controller(view, runtime, messages);
+
+		// make sure that the session cookies are passed during conversations
+		CookieManager cookieManager = new CookieManager();
+		cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+		CookieHandler.setDefault(cookieManager);
+
+		this.servletHolder.setInitParameter("IncludeAddress", "true");
+		this.servletHolder.setInitParameter("IncludePhoto", "true");
+
+		// operate
+		controller.run();
+
+		// verify
+		LOG.debug("verify...");
+		SessionHandler sessionHandler = this.servletTester.getContext()
+				.getSessionHandler();
+		SessionManager sessionManager = sessionHandler.getSessionManager();
+		LOG.debug("session manager type: "
+				+ sessionManager.getClass().getName());
+		HashSessionManager hashSessionManager = (HashSessionManager) sessionManager;
+		LOG.debug("# sessions: " + hashSessionManager.getSessions());
+		assertEquals(1, hashSessionManager.getSessions());
+		Map<String, HttpSession> sessionMap = hashSessionManager
+				.getSessionMap();
+		LOG.debug("session map: " + sessionMap);
+		Entry<String, HttpSession> sessionEntry = sessionMap.entrySet()
+				.iterator().next();
+		HttpSession httpSession = sessionEntry.getValue();
+		assertNotNull(httpSession.getAttribute("eid"));
+		Identity identity = (Identity) httpSession.getAttribute("eid.identity");
+		assertNotNull(identity);
+		assertNotNull(identity.name);
+		LOG.debug("name: " + identity.name);
+		assertNull(httpSession.getAttribute("eid.identifier"));
+		assertNotNull(httpSession.getAttribute("eid.address"));
+		assertNotNull(httpSession.getAttribute("eid.photo"));
+	}
+
+	public static class TestAuthenticationService implements
+			AuthenticationService {
+
+		private static boolean called;
+
+		@Override
+		public void validateCertificateChain(
+				List<X509Certificate> certificateChain)
+				throws SecurityException {
+			called = true;
+		}
+	}
+
+	@Test
+	public void controllerAuthentication() throws Exception {
+		// setup
+		Messages messages = new Messages(Locale.getDefault());
+		Runtime runtime = new TestRuntime();
+		View view = new TestView();
+		Controller controller = new Controller(view, runtime, messages);
+
+		// make sure that the session cookies are passed during conversations
+		CookieManager cookieManager = new CookieManager();
+		cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+		CookieHandler.setDefault(cookieManager);
+
+		this.servletHolder.setInitParameter("AuthenticationServiceClass",
+				TestAuthenticationService.class.getName());
+		this.servletHolder.setInitParameter("Logoff", "true");
+
+		// operate
+		controller.run();
+
+		// verify
+		LOG.debug("verify...");
+		SessionHandler sessionHandler = this.servletTester.getContext()
+				.getSessionHandler();
+		SessionManager sessionManager = sessionHandler.getSessionManager();
+		LOG.debug("session manager type: "
+				+ sessionManager.getClass().getName());
+		HashSessionManager hashSessionManager = (HashSessionManager) sessionManager;
+		LOG.debug("# sessions: " + hashSessionManager.getSessions());
+		assertEquals(1, hashSessionManager.getSessions());
+		Map<String, HttpSession> sessionMap = hashSessionManager
+				.getSessionMap();
+		LOG.debug("session map: " + sessionMap);
+		Entry<String, HttpSession> sessionEntry = sessionMap.entrySet()
+				.iterator().next();
+		HttpSession httpSession = sessionEntry.getValue();
+		assertNotNull(httpSession.getAttribute("eid"));
+		assertNull(httpSession.getAttribute("eid.identity"));
+		assertNull(httpSession.getAttribute("eid.address"));
+		assertNull(httpSession.getAttribute("eid.photo"));
+		String identifier = (String) httpSession.getAttribute("eid.identifier");
+		assertNotNull(identifier);
+		LOG.debug("identifier: " + identifier);
+		assertTrue(TestAuthenticationService.called);
 	}
 }
