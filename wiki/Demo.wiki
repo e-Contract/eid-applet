@@ -1,0 +1,21 @@
+#summary eID Applet Demo
+
+= eID Applet Demo =
+
+The eID Applet Demo package contains a configured JBoss AS together with some eID Applet demo web applications.
+
+You'll need Java 6 to run the demo.
+
+Download and unzip the [http://eid-applet.googlecode.com/files/eid-applet-demo.zip eid-applet-demo.zip] package and execute
+{{{
+bin\run.bat
+}}}
+or
+{{{
+bin/run.sh
+}}}
+depending on your operating system.
+
+After JBoss AS has booted you can visit the eID Applet demo web application at:
+  * https://localhost:8443/eid-applet-test/
+  * https://localhost:8443/eid-applet-beta/
