@@ -303,10 +303,9 @@ public class Pkcs11Eid {
 
 	private SunPKCS11 pkcs11Provider;
 
-	public byte[] signAuthn(byte[] toBeSigned) throws IOException,
+	public PrivateKeyEntry getPrivateKeyEntry() throws IOException,
 			KeyStoreException, NoSuchAlgorithmException, CertificateException,
-			UnrecoverableEntryException, InvalidKeyException,
-			SignatureException {
+			UnrecoverableEntryException {
 		// setup configuration file
 		File tmpConfigFile = File.createTempFile("pkcs11-", "conf");
 		tmpConfigFile.deleteOnExit();
@@ -346,6 +345,14 @@ public class Pkcs11Eid {
 			throw new RuntimeException(
 					"private key entry for alias not found: " + alias);
 		}
+		return privateKeyEntry;
+	}
+
+	public byte[] signAuthn(byte[] toBeSigned) throws IOException,
+			KeyStoreException, NoSuchAlgorithmException, CertificateException,
+			UnrecoverableEntryException, InvalidKeyException,
+			SignatureException {
+		PrivateKeyEntry privateKeyEntry = getPrivateKeyEntry();
 		PrivateKey privateKey = privateKeyEntry.getPrivateKey();
 		X509Certificate[] certificateChain = (X509Certificate[]) privateKeyEntry
 				.getCertificateChain();

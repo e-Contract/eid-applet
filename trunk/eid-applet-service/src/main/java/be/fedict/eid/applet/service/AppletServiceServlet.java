@@ -95,9 +95,16 @@ public class AppletServiceServlet extends HttpServlet {
 
 	private Map<Class<?>, MessageHandler<?>> messageHandlers;
 
+	public AppletServiceServlet() {
+		super();
+		LOG.debug("constructor");
+	}
+
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
+
+		LOG.debug("init");
 
 		this.messageHandlers = new HashMap<Class<?>, MessageHandler<?>>();
 		// TODO: @HandlesMessage(MessageClass.class)
