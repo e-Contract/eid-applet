@@ -15,4 +15,18 @@
 
   * [http://www.cardwerk.com/smartcards/smartcard_standard_ISO7816-4.aspx ISO 7816-4]
   * [http://www.rsa.com/rsalabs/node.asp?id=2133 PKCS#11]
+  * [http://www.rsa.com/rsalabs/node.asp?id=2141 PKCS#15]
   * [http://www.usb.org/developers/devclass_docs/DWG_Smart-Card_CCID_Rev110.pdf CCID]
+
+
+== Belgian eID Card ==
+
+  * [http://homes.esat.kuleuven.be/~decockd/slides/20081015.belgian.eid.cards.introduction.pdf Belgian eID Card Introduction]
+  * [http://www.snelbalie.be/downloads/Belgian_Electronic_Identity_Card_content_v2.2_NL.pdf Belgian eID Card Content v2.2]
+
+
+== Other Projects ==
+
+  * [http://developer.novell.com/wiki/index.php/EID-belgium SUSE Linux eID toolkit]
+  * [http://code.google.com/p/eidlib/ Native Java e-ID library]
+  * [http://homes.esat.kuleuven.be/~decockd/wiki/bin/view.cgi eID Site of Danny De Cock]
