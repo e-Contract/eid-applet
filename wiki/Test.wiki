@@ -2,6 +2,8 @@
 
 = Test Page =
 
+== Google Code Gadgets ==
+
 <wiki:gadget url="http://google-code-project-hosting-gadgets.googlecode.com/svn/build/prod/info/gcInfo.xml" up_projectName="eid-applet" title="Project Info" />
 
 <wiki:gadget url="http://google-code-project-hosting-gadgets.googlecode.com/svn/build/prod/downloads/gcDownloads.xml" up_projectName="eid-applet" title="Downloads" />
@@ -13,3 +15,8 @@
 <wiki:gadget url="http://google-code-project-hosting-gadgets.googlecode.com/svn/build/prod/changes/gcChanges.xml" up_projectName="eid-applet" title="Code Changes" />
 
 <wiki:gadget url="http://google-code-project-hosting-gadgets.googlecode.com/svn/build/prod/codesearch/gcSearch.xml" up_projectName="eid-applet" title="Code Search" />
+
+
+== Other Gadgets ==
+
+<wiki:gadget url="http://www.ljmsite.com/google/gadgets/worldclocks.xml" title="World Clocks" up_mode="ana2" up_tz1="UTC" up_tz1name="UTC" up_tz2="BE" up_tz2name="Brussels" />
