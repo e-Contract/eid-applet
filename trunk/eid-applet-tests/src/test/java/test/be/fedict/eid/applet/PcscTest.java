@@ -198,7 +198,8 @@ public class PcscTest {
 		ByteArrayOutputStream verifyCommand = new ByteArrayOutputStream();
 		verifyCommand.write(30); // bTimeOut
 		verifyCommand.write(30); // bTimeOut2
-		verifyCommand.write(0x89); // bmFormatString: BCD PIN
+		verifyCommand.write(0x89); // bmFormatString: BCD PIN - SPR532 only,
+									// else 0x01
 		verifyCommand.write(0x47); // bmPINBlockString
 		verifyCommand.write(0x04); // bmPINLengthFormat
 		verifyCommand.write(new byte[] { 0x0C, 0x04 }); // wPINMaxExtraDigit

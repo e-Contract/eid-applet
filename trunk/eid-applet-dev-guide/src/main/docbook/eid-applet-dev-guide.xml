@@ -11,7 +11,7 @@
 			<year>2008-2009</year>
 			<holder>FedICT</holder>
 		</copyright>
-		<releaseinfo>draft 26 Jan 2009</releaseinfo>
+		<releaseinfo>draft 2 Feb 2009</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -376,6 +376,24 @@
 				<para>Then you can display the eID photo simply by putting next
 					HTML tag in your web page:</para>
 				<programlisting role="XML"><![CDATA[<img src="photo.jpg" />]]></programlisting>
+			</section>
+			<section>
+				<title>Output to PDF</title>
+				<para>The eID Applet SDK comes with a servlet component that
+					allows you to output the eID identity data to PDF. This can be
+					useful if you want to print the eID identity data from within your
+					web application pages. The PDF servlet can be configured as
+					follows:</para>
+				<programlisting role="XML"><![CDATA[<servlet>
+	<servlet-name>PdfServlet</servlet-name>
+	<servlet-class>be.fedict.eid.applet.service.PdfServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+	<servlet-name>PdfServlet</servlet-name>
+	<url-pattern>/identity.pdf</url-pattern>
+</servlet-mapping>]]></programlisting>
+				<para>The PDF can then be reached via:</para>
+				<programlisting role="XML"><![CDATA[<a href="identity.pdf" target="_blank">View as PDF</a>]]></programlisting>
 			</section>
 			<section>
 				<title>Identity Data Integrity</title>

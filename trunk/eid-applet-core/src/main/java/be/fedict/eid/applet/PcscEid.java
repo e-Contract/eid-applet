@@ -175,6 +175,14 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			setChanged();
 			notifyObservers();
 
+			/*
+			 * Introduce some delay for old Belpic V1 eID cards.
+			 */
+			// try {
+			// Thread.sleep(50);
+			// } catch (InterruptedException e) {
+			// throw new RuntimeException("sleep error: " + e.getMessage(), e);
+			// }
 			data = responseApdu.getData();
 			baos.write(data);
 			offset += data.length;
