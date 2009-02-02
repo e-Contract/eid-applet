@@ -2,4 +2,4 @@
 
 = Test Page =
 
-<wiki:gadget url="http://www.google.com/ig/modules/datetime.xml" height="200" border="0" /> 
+<wiki:gadget url="http://www.ohloh.net/p/gwt/widgets/project_basic_stats.xml" height="220" border="1" />
