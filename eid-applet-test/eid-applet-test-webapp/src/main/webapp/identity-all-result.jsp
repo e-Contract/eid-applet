@@ -149,6 +149,7 @@ National Registry Certificate:
 <pre>
 <%=session.getAttribute("NationalRegistryCertificate")%>
 </pre>
+<p><a href="identity.pdf">Identity in PDF</a></p>
 <a href="identify-all.jsp">Again</a>
 |
 <a href=".">Main Page</a>

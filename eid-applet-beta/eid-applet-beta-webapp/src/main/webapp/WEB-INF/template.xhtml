@@ -59,6 +59,17 @@
 						href="#{facesContext.externalContext.requestContextPath}/feedback.seam">Feedback</a></li>
 				</c:otherwise>
 			</c:choose>
+			
+			<c:choose>
+				<c:when test="#{activeMenu == 'devel'}">
+					<li class="selected"><a
+						href="#{facesContext.externalContext.requestContextPath}/devel.seam">Developers</a></li>
+				</c:when>
+				<c:otherwise>
+					<li><a
+						href="#{facesContext.externalContext.requestContextPath}/devel.seam">Developers</a></li>
+				</c:otherwise>
+			</c:choose>
 
 			<c:choose>
 				<c:when test="#{activeMenu == 'admin'}">

@@ -3,8 +3,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-	<groupId>be.fedict.eid-applet</groupId>
-	<artifactId>eid-applet-test</artifactId>
+		<groupId>be.fedict.eid-applet</groupId>
+		<artifactId>eid-applet-test</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet Test Web Application</name>
@@ -87,6 +87,11 @@
 		<dependency>
 			<groupId>javax.security</groupId>
 			<artifactId>jacc</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.lowagie</groupId>
+			<artifactId>itext</artifactId>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

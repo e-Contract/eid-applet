@@ -96,5 +96,10 @@
 			<artifactId>bcprov-jdk16</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.lowagie</groupId>
+			<artifactId>itext</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 </project>

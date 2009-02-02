@@ -53,6 +53,7 @@
 		<dependencySet>
 			<excludes>
 				<exclude>be.fedict.eid-applet:*</exclude>
+				<exclude>bouncycastle:bcprov-jdk14</exclude>
 			</excludes>
 			<outputDirectory>lib</outputDirectory>
 		</dependencySet>
