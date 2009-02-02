@@ -20,3 +20,5 @@
 == Other Gadgets ==
 
 <wiki:gadget url="http://www.ljmsite.com/google/gadgets/worldclocks.xml" title="World Clocks" up_mode="ana2" up_tz1="UTC" up_tz1name="UTC" up_tz2="BE" up_tz2name="Brussels" />
+
+<wiki:gadget url="http://1o4.jp/google/module/slim-reader.xml" up_mtitle="Google Group" up_mfeed="http://groups.google.com/group/eid-applet/feed/rss_v2_0_msgs.xml" title="eID Applet Google Group"/>
