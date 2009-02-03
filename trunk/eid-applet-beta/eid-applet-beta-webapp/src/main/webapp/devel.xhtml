@@ -2,7 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:rich="http://richfaces.org/rich">
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:beta="urn:be:fedict:eid:applet:beta:taglib:1.0">
 <body>
 <ui:composition template="/WEB-INF/template.xhtml">
 	<ui:param name="activeMenu" value="devel" />
@@ -10,28 +11,22 @@
 		<h2>Developers</h2>
 		<rich:tabPanel switchType="client">
 			<rich:tab label="Project Info">
-				<script
-					src="http://www.gmodules.com/ig/ifr?url=http://google-code-project-hosting-gadgets.googlecode.com/svn/build/prod/info/gcInfo.xml&amp;synd=open&amp;up_projectName=eid-applet&amp;title=eID+Applet+Project+Info&amp;output=js"></script>
+				<beta:projectInfo />
 			</rich:tab>
 			<rich:tab label="Downloads">
-				<script
-					src="http://www.gmodules.com/ig/ifr?url=http://google-code-project-hosting-gadgets.googlecode.com/svn/build/prod/downloads/gcDownloads.xml&amp;synd=open&amp;up_projectName=eid-applet&amp;title=eID+Applet+Downloads&amp;output=js"></script>
+				<beta:downloads />
 			</rich:tab>
 			<rich:tab label="Mailing list">
-				<script
-					src="http://www.gmodules.com/ig/ifr?url=http://1o4.jp/google/module/slim-reader.xml&amp;synd=open&amp;title=eID+Applet+Google+Group&amp;up_mfeed=http://groups.google.com/group/eid-applet/feed/rss_v2_0_msgs.xml&amp;output=js"></script>
+				<beta:mailingList />
 			</rich:tab>
 			<rich:tab label="Wiki">
-				<script
-					src="http://www.gmodules.com/ig/ifr?url=http://google-code-project-hosting-gadgets.googlecode.com/svn/build/prod/wiki/gcWiki.xml&amp;synd=open&amp;up_projectName=eid-applet&amp;title=eID+Applet+Wiki&amp;output=js"></script>
+				<beta:wiki />
 			</rich:tab>
 			<rich:tab label="Issue Tracker">
-				<script
-					src="http://www.gmodules.com/ig/ifr?url=http://google-code-project-hosting-gadgets.googlecode.com/svn/build/prod/issuetracker/gcIssueTracker.xml&amp;synd=open&amp;up_projectName=eid-applet&amp;title=eID+Applet+Issue+Tracker&amp;output=js"></script>
+				<beta:issueTracker />
 			</rich:tab>
 			<rich:tab label="Code Changes">
-				<script
-					src="http://www.gmodules.com/ig/ifr?url=http://google-code-project-hosting-gadgets.googlecode.com/svn/build/prod/changes/gcChanges.xml&amp;synd=open&amp;up_projectName=eid-applet&amp;title=eID+Applet+Code+Changes&amp;output=js"></script>
+				<beta:codeChanges />
 			</rich:tab>
 		</rich:tabPanel>
 	</ui:define>

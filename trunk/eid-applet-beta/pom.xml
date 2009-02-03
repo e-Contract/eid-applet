@@ -16,6 +16,7 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>eid-applet-beta-model</module>
+		<module>eid-applet-beta-taglib</module>
 		<module>eid-applet-beta-webapp</module>
 		<module>eid-applet-beta-deploy</module>
 	</modules>
