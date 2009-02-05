@@ -19,7 +19,10 @@
 package be.fedict.eid.applet.shared;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -60,6 +63,22 @@ public class SignatureDataMessage extends AbstractProtocolMessage {
 	@NotNull
 	@Description("Contains concatenation of signature value and sign cert chain.")
 	public byte[] body;
+
+	public SignatureDataMessage() {
+		super();
+	}
+
+	public SignatureDataMessage(byte[] signatureValue,
+			List<X509Certificate> signCertChain) throws IOException,
+			CertificateEncodingException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		this.signatureValueSize = signatureValue.length;
+		baos.write(signatureValue);
+		for (X509Certificate cert : signCertChain) {
+			baos.write(cert.getEncoded());
+		}
+		this.body = baos.toByteArray();
+	}
 
 	@PostConstruct
 	public void postConstruct() {

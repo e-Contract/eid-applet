@@ -19,7 +19,10 @@
 package be.fedict.eid.applet.shared;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -56,25 +59,56 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	@NotNull
 	public Integer signatureValueSize;
 
+	@HttpHeader(HTTP_HEADER_PREFIX + "SaltValueSize")
+	@NotNull
+	public Integer saltValueSize;
+
 	@HttpBody
 	@NotNull
-	@Description("Contains concatenation of signature value and authn cert chain.")
+	@Description("Contains concatenation of salt value, signature value, and authn cert chain.")
 	public byte[] body;
+
+	public AuthenticationDataMessage() {
+		super();
+	}
+
+	public AuthenticationDataMessage(byte[] saltValue, byte[] signatureValue,
+			List<X509Certificate> authnCertChain) throws IOException,
+			CertificateEncodingException {
+		this.signatureValueSize = signatureValue.length;
+		this.saltValueSize = saltValue.length;
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		baos.write(saltValue);
+		baos.write(signatureValue);
+		for (X509Certificate cert : authnCertChain) {
+			baos.write(cert.getEncoded());
+		}
+		this.body = baos.toByteArray();
+	}
 
 	@PostConstruct
 	public void postConstruct() {
+		int idx = 0;
+		if (0 == this.saltValueSize) {
+			throw new RuntimeException("salt bytes required");
+		}
+		this.saltValue = Arrays.copyOfRange(this.body, idx, idx
+				+ this.saltValueSize);
+		idx += this.saltValueSize;
+
 		if (this.signatureValueSize != 128) {
 			throw new RuntimeException("signature value size invalid");
 		}
-		this.signatureValue = Arrays.copyOfRange(this.body, 0,
-				this.signatureValueSize);
+		this.signatureValue = Arrays.copyOfRange(this.body, idx, idx
+				+ this.signatureValueSize);
+		idx += this.signatureValueSize;
+
 		try {
 			CertificateFactory certificateFactory = CertificateFactory
 					.getInstance("X.509");
 			Collection<? extends Certificate> certificates = certificateFactory
 					.generateCertificates(new ByteArrayInputStream(Arrays
-							.copyOfRange(this.body, this.signatureValueSize,
-									this.body.length)));
+							.copyOfRange(this.body, idx, this.body.length)));
 			this.certificateChain = new LinkedList<X509Certificate>();
 			for (Certificate certificate : certificates) {
 				this.certificateChain.add((X509Certificate) certificate);
@@ -84,6 +118,8 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 					e);
 		}
 	}
+
+	public byte[] saltValue;
 
 	public byte[] signatureValue;
 

@@ -31,7 +31,9 @@ import java.net.URL;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
@@ -540,14 +542,8 @@ public class Controller {
 				this.pcscEidSpi.logoff(logoffReaderName);
 			}
 		}
-		SignatureDataMessage signatureDataMessage = new SignatureDataMessage();
-		signatureDataMessage.signatureValueSize = signatureValue.length;
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		baos.write(signatureValue);
-		for (X509Certificate cert : signCertChain) {
-			baos.write(cert.getEncoded());
-		}
-		signatureDataMessage.body = baos.toByteArray();
+		SignatureDataMessage signatureDataMessage = new SignatureDataMessage(
+				signatureValue, signCertChain);
 		Object responseMessage = sendMessage(signatureDataMessage);
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");
@@ -600,14 +596,8 @@ public class Controller {
 			this.pcscEidSpi.close();
 		}
 
-		SignatureDataMessage signatureDataMessage = new SignatureDataMessage();
-		signatureDataMessage.signatureValueSize = signatureValue.length;
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		baos.write(signatureValue);
-		for (X509Certificate cert : signCertChain) {
-			baos.write(cert.getEncoded());
-		}
-		signatureDataMessage.body = baos.toByteArray();
+		SignatureDataMessage signatureDataMessage = new SignatureDataMessage(
+				signatureValue, signCertChain);
 		Object responseMessage = sendMessage(signatureDataMessage);
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");
@@ -664,6 +654,18 @@ public class Controller {
 		addDetailMessage("include inet address: " + includeInetAddress);
 		addDetailMessage("remove card after authn: " + removeCard);
 		addDetailMessage("logoff: " + logoff);
+
+		SecureRandom secureRandom = new SecureRandom();
+		byte[] salt = new byte[20];
+		do {
+			secureRandom.nextBytes(salt);
+			/*
+			 * We want to sign (salt||challenge) not (challenge||challenge),
+			 * else the eID Applet Service could extract sign(challenge) out of
+			 * it. OK, probability is _very_ low.
+			 */
+		} while (Arrays.equals(challenge, salt));
+
 		/*
 		 * We extract the hostname from the web page location in which this eID
 		 * Applet is embedded.
@@ -674,6 +676,7 @@ public class Controller {
 		 * then everything is lost anyway.
 		 */
 		ByteArrayOutputStream toBeSignedOutputStream = new ByteArrayOutputStream();
+		toBeSignedOutputStream.write(salt);
 		if (includeHostname) {
 			URL documentBase = this.runtime.getDocumentBase();
 			String hostname = documentBase.getHost();
@@ -703,7 +706,8 @@ public class Controller {
 			addDetailMessage("eID Middleware PKCS#11 library not found.");
 			if (null != this.pcscEidSpi) {
 				addDetailMessage("fallback to PC/SC interface for authentication...");
-				performEidPcscAuthnOperation(toBeSigned, logoff, removeCard);
+				performEidPcscAuthnOperation(salt, toBeSigned, logoff,
+						removeCard);
 				return;
 			}
 		}
@@ -753,21 +757,15 @@ public class Controller {
 			}
 		}
 
-		AuthenticationDataMessage authenticationDataMessage = new AuthenticationDataMessage();
-		authenticationDataMessage.signatureValueSize = signatureValue.length;
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		baos.write(signatureValue);
-		for (X509Certificate cert : authnCertChain) {
-			baos.write(cert.getEncoded());
-		}
-		authenticationDataMessage.body = baos.toByteArray();
+		AuthenticationDataMessage authenticationDataMessage = new AuthenticationDataMessage(
+				salt, signatureValue, authnCertChain);
 		Object responseMessage = sendMessage(authenticationDataMessage);
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");
 		}
 	}
 
-	private void performEidPcscAuthnOperation(byte[] toBeSigned,
+	private void performEidPcscAuthnOperation(byte[] salt, byte[] toBeSigned,
 			boolean logoff, boolean removeCard) throws Exception {
 		setStatusMessage(Status.NORMAL, this.messages
 				.getMessage(MESSAGE_ID.DETECTING_CARD));
@@ -796,23 +794,21 @@ public class Controller {
 			this.pcscEidSpi.close();
 		}
 
-		AuthenticationDataMessage authenticationDataMessage = new AuthenticationDataMessage();
-		authenticationDataMessage.signatureValueSize = signatureValue.length;
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		baos.write(signatureValue);
-		for (X509Certificate cert : authnCertChain) {
-			baos.write(cert.getEncoded());
-		}
-		authenticationDataMessage.body = baos.toByteArray();
+		AuthenticationDataMessage authenticationDataMessage = new AuthenticationDataMessage(
+				salt, signatureValue, authnCertChain);
 		Object responseMessage = sendMessage(authenticationDataMessage);
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");
 		}
 	}
 
-	public static final String VERSION = "0.0.9";
+	public static final String VERSION = "0.0.10";
 
 	private void printEnvironment() {
+		addDetailMessage("eID Applet - Copyright (C) 2008-2009 FedICT.");
+		addDetailMessage("Released under GNU LGPL version 3.0 license.");
+		addDetailMessage("More info: http://code.google.com/p/eid-applet/");
+
 		addDetailMessage("eID browser applet version: " + VERSION);
 		addDetailMessage("Java version: " + System.getProperty("java.version"));
 		addDetailMessage("Java vendor: " + System.getProperty("java.vendor"));
@@ -966,32 +962,9 @@ public class Controller {
 		setStatusMessage(Status.NORMAL, this.messages
 				.getMessage(MESSAGE_ID.TRANSMITTING_IDENTITY));
 
-		IdentityDataMessage identityData = new IdentityDataMessage();
-		identityData.identityFileSize = idFile.length;
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		baos.write(idFile);
-		if (null != addressFile) {
-			baos.write(addressFile);
-			identityData.addressFileSize = addressFile.length;
-		}
-		if (null != photoFile) {
-			baos.write(photoFile);
-			identityData.photoFileSize = photoFile.length;
-		}
-		if (null != identitySignatureFile) {
-			baos.write(identitySignatureFile);
-			identityData.identitySignatureFileSize = identitySignatureFile.length;
-		}
-		if (null != addressSignatureFile) {
-			baos.write(addressSignatureFile);
-			identityData.addressSignatureFileSize = addressSignatureFile.length;
-		}
-		if (null != rrnCertFile) {
-			baos.write(rrnCertFile);
-			identityData.rrnCertFileSize = rrnCertFile.length;
-		}
-		identityData.body = baos.toByteArray();
-
+		IdentityDataMessage identityData = new IdentityDataMessage(idFile,
+				addressFile, photoFile, identitySignatureFile,
+				addressSignatureFile, rrnCertFile);
 		sendMessage(identityData, FinishedMessage.class);
 	}
 

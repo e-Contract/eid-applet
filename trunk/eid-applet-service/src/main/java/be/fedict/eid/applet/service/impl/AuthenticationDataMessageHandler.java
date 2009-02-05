@@ -80,6 +80,7 @@ public class AuthenticationDataMessageHandler implements
 
 		ByteArrayOutputStream toBeSignedOutputStream = new ByteArrayOutputStream();
 		try {
+			toBeSignedOutputStream.write(message.saltValue);
 			if (null != this.hostname) {
 				LOG.debug("authn hostname: " + this.hostname);
 				toBeSignedOutputStream.write(this.hostname.getBytes());
