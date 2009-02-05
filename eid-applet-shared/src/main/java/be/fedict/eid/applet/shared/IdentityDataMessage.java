@@ -18,6 +18,8 @@
 
 package be.fedict.eid.applet.shared;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 
 import be.fedict.eid.applet.shared.annotation.Description;
@@ -70,6 +72,39 @@ public class IdentityDataMessage extends AbstractProtocolMessage {
 	@Description("Concatenation of identity file, optional address file, optional photo file, optional identity signature file, optional address signature file, and optional national registry certificate.")
 	// TODO: @MaxSize(1024 * 100)
 	public byte[] body;
+
+	public IdentityDataMessage() {
+		super();
+	}
+
+	public IdentityDataMessage(byte[] idFile, byte[] addressFile,
+			byte[] photoFile, byte[] identitySignatureFile,
+			byte[] addressSignatureFile, byte[] rrnCertFile) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		this.identityFileSize = idFile.length;
+		baos.write(idFile);
+		if (null != addressFile) {
+			baos.write(addressFile);
+			this.addressFileSize = addressFile.length;
+		}
+		if (null != photoFile) {
+			baos.write(photoFile);
+			this.photoFileSize = photoFile.length;
+		}
+		if (null != identitySignatureFile) {
+			baos.write(identitySignatureFile);
+			this.identitySignatureFileSize = identitySignatureFile.length;
+		}
+		if (null != addressSignatureFile) {
+			baos.write(addressSignatureFile);
+			this.addressSignatureFileSize = addressSignatureFile.length;
+		}
+		if (null != rrnCertFile) {
+			baos.write(rrnCertFile);
+			this.rrnCertFileSize = rrnCertFile.length;
+		}
+		this.body = baos.toByteArray();
+	}
 
 	@PostConstruct
 	public void postConstruct() {

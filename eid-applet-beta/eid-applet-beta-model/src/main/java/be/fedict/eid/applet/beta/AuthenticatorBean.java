@@ -76,7 +76,7 @@ public class AuthenticatorBean implements Authenticator {
 		return false;
 	}
 
-	@Observer("org.jboss.seam.security.loginFailed")
+	@Observer(Identity.EVENT_LOGIN_FAILED)
 	public void loginFailedCallback() {
 		/*
 		 * XXX: doesn't seam to work.

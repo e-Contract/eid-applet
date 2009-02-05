@@ -357,7 +357,15 @@ public class Applet extends JApplet {
 			 */
 			String javaVersion = System.getProperty("java.version");
 			if (javaVersion.startsWith("1.5")) {
-				// TODO: also check some 1.5 PKCS#11 required permission
+				/*
+				 * TODO: also check some 1.5 PKCS#11 required permission
+				 * 
+				 * Browsing the source code of OpenJDK you can see clearly that
+				 * the Sun PKCS#11 wrapper is/was the one from IAIK. Funny that
+				 * companies paid IAIK licenses while all that time Sun gave it
+				 * away for free. Business seems to be all about tricking stupid
+				 * people into spending money.
+				 */
 			} else {
 				/*
 				 * Java 1.6 and later.

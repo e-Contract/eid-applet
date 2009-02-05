@@ -533,12 +533,16 @@
 					PC/SC smart card interface.</para>
 			</note>
 			<para>
-				By default the eID Applet will sign a challenge using the
-				authentication certificate of the citizen's eID card. This challenge
-				is send over SSL by the eID Applet Service. To prevent a certain
-				type of man-in-the-middle attack we can make the eID Applet to sign
-				the concatenation of the site hostname and the server-side
-				challenge. This feature can be enabled by setting the following
+				By default the eID Applet will sign a
+				<code>(salt, challenge)</code>
+				sequence using the authentication certificate of the citizen's eID
+				card. The challenge is send over SSL by the eID Applet Service. The
+				salt value is produced by the eID Applet itself. The salt value
+				prevents that the eID Applet is forced into signing a given
+				server-side value. To prevent a certain type of man-in-the-middle
+				attack we can make the eID Applet to sign a
+				<code>(salt, hostname, challenge)</code>
+				sequence. This feature can be enabled by setting the following
 				<code>init-param</code>
 				on the
 				<code>AppletServiceServlet</code>
@@ -571,10 +575,10 @@
 				<code>Hostname</code>
 				and
 				<code>InetAddress</code>
-				features at the same time, the eID Applet will be signing
-				<code>hostname||IP address||challenge</code>
-				. The hostname and IP address are the same as seen by the web
-				browser.
+				features at the same time, the eID Applet will be signing a
+				<code>(salt, hostname, IP address, challenge)</code>
+				sequence. The hostname and IP address are the same as seen by the
+				web browser.
 			</para>
 		</section>
 		<section>
