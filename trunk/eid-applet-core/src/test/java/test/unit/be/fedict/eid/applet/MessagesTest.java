@@ -19,8 +19,11 @@
 package test.unit.be.fedict.eid.applet;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import java.io.InputStream;
 import java.util.Locale;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,5 +42,26 @@ public class MessagesTest {
 		Messages messages = new Messages(locale);
 		assertNotNull(messages.getMessage(MESSAGE_ID.INSERT_CARD_QUESTION));
 		LOG.debug("done msg: " + messages.getMessage(MESSAGE_ID.DONE));
+	}
+
+	@Test
+	public void allStringsAvailable() throws Exception {
+		allStringsAvailable("");
+		allStringsAvailable("nl");
+		allStringsAvailable("fr");
+	}
+
+	private void allStringsAvailable(String language) throws Exception {
+		if (false == language.isEmpty()) {
+			language = "_" + language;
+		}
+		InputStream messagesInputStream = MessagesTest.class
+				.getResourceAsStream("/be/fedict/eid/applet/Messages"
+						+ language + ".properties");
+		Properties properties = new Properties();
+		properties.load(messagesInputStream);
+		for (MESSAGE_ID messageId : MESSAGE_ID.values()) {
+			assertTrue(properties.containsKey(messageId.getId()));
+		}
 	}
 }

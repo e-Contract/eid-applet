@@ -46,6 +46,10 @@ public class Messages {
 		private MESSAGE_ID(String id) {
 			this.id = id;
 		}
+
+		public String getId() {
+			return this.id;
+		}
 	};
 
 	public Messages(Locale locale) {

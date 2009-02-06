@@ -24,6 +24,7 @@ import java.util.GregorianCalendar;
 import be.fedict.eid.applet.service.tlv.ChipNumberDataConvertor;
 import be.fedict.eid.applet.service.tlv.ConvertData;
 import be.fedict.eid.applet.service.tlv.DateOfBirthDataConvertor;
+import be.fedict.eid.applet.service.tlv.DocumentTypeConvertor;
 import be.fedict.eid.applet.service.tlv.GenderDataConvertor;
 import be.fedict.eid.applet.service.tlv.TlvField;
 import be.fedict.eid.applet.service.tlv.ValidityDateDataConvertor;
@@ -87,6 +88,16 @@ public class Identity implements Serializable {
 	@ConvertData(GenderDataConvertor.class)
 	public Gender gender;
 
+	/**
+	 * Optional Noble Condition.
+	 */
+	@TlvField(14)
+	public String nobleCondition;
+
+	@TlvField(15)
+	@ConvertData(DocumentTypeConvertor.class)
+	public DocumentType documentType;
+
 	@TlvField(17)
 	public byte[] photoDigest;
 
@@ -145,6 +156,14 @@ public class Identity implements Serializable {
 
 	public Gender getGender() {
 		return this.gender;
+	}
+
+	public String getNobleCondition() {
+		return this.nobleCondition;
+	}
+
+	public DocumentType getDocumentType() {
+		return this.documentType;
 	}
 
 	public byte[] getPhotoDigest() {
