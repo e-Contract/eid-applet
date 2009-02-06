@@ -33,7 +33,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
@@ -657,23 +656,16 @@ public class Controller {
 
 		SecureRandom secureRandom = new SecureRandom();
 		byte[] salt = new byte[20];
-		do {
-			secureRandom.nextBytes(salt);
-			/*
-			 * We want to sign (salt||challenge) not (challenge||challenge),
-			 * else the eID Applet Service could extract sign(challenge) out of
-			 * it. OK, probability is _very_ low.
-			 */
-		} while (Arrays.equals(challenge, salt));
+		secureRandom.nextBytes(salt);
 
 		/*
 		 * We extract the hostname from the web page location in which this eID
 		 * Applet is embedded.
 		 * 
-		 * Signing (hostname||challenge) prevents man-in-the-middle attacks from
-		 * websites for which the SSL certificate is still trusted but that have
-		 * been compromised. If at the same time the DNS is also attacked, well
-		 * then everything is lost anyway.
+		 * Signing (salt||hostname||challenge) prevents man-in-the-middle
+		 * attacks from websites for which the SSL certificate is still trusted
+		 * but that have been compromised. If at the same time the DNS is also
+		 * attacked, well then everything is lost anyway.
 		 */
 		ByteArrayOutputStream toBeSignedOutputStream = new ByteArrayOutputStream();
 		toBeSignedOutputStream.write(salt);

@@ -373,6 +373,7 @@ public class ControllerTest {
 		assertNotNull(identity);
 		assertNotNull(identity.name);
 		LOG.debug("name: " + identity.name);
+		LOG.debug("document type: " + identity.getDocumentType());
 		assertNull(httpSession.getAttribute("eid.identifier"));
 		assertNull(httpSession.getAttribute("eid.address"));
 		assertNull(httpSession.getAttribute("eid.photo"));
