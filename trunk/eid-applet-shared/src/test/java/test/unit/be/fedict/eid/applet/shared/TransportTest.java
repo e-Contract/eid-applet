@@ -124,8 +124,9 @@ public class TransportTest {
 		mockHttpTransmitter.addHeader("X-AppletProtocol-OSName", "Linux");
 		mockHttpTransmitter.addHeader("X-AppletProtocol-OSArch", "i386");
 		mockHttpTransmitter.addHeader("X-AppletProtocol-OSVersion", "2.6");
-		mockHttpTransmitter.setBody(EasyMock.aryEq("Reader 1\nReader 2\n"
-				.getBytes()));
+		String lineSeparator = System.getProperty("line.separator");
+		mockHttpTransmitter.setBody(EasyMock.aryEq(("Reader 1" + lineSeparator
+				+ "Reader 2" + lineSeparator).getBytes()));
 
 		// prepare
 		EasyMock.replay(mockHttpTransmitter);
