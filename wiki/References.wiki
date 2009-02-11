@@ -25,6 +25,10 @@
   * [http://homes.esat.kuleuven.be/~decockd/slides/20081015.belgian.eid.cards.introduction.pdf Belgian eID Card Introduction]
   * [http://www.snelbalie.be/downloads/Belgian_Electronic_Identity_Card_content_v2.2_NL.pdf Belgian eID Card Content v2.2]
 
+== Legal ==
+
+  * [http://www.ksz.fgov.be/nl/Legislation/doc/20010709-cert.htm Wet van 9 juli 2001 houdende vaststelling van bepaalde regels in verband met het juridisch kader voor elektronische handtekeningen en certificatiediensten]
+
 
 == Other Projects ==
 
