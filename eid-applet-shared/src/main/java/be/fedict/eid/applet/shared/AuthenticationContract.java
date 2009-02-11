@@ -30,18 +30,19 @@ import java.net.InetAddress;
  * juridisch kader voor elektronische handtekeningen en certificatiediensten kan
  * de rechtsgeldigheid van elektronische handtekeningen niet worden ontzegd op
  * grond van het feit dat de handtekening niet is gebaseerd op een
- * gekwalificeerd certificaat. Hieruit kan men afleiden dat elektronische
- * handtekeningen gemaakt met het authenticatie certificaat tevens rechtsgeldig
- * zijn.
+ * gekwalificeerd certificaat. Hieruit kan men afleiden dat cryptografische
+ * handtekeningen, gemaakt met het authenticatie certificaat, tevens als
+ * rechtsgeldige elektronische handtekeningen kunnen worden geïnterpreteerd.
  * </p>
  * 
  * <p>
- * This class allows a citizen to proof that the digital signature created with
- * his authentication certificate was indeed meant as way of authenticating.
- * There was no intention to sign any other contract exception the
- * authentication contract. If a malicious eID Applet Service tricks the citizen
- * into signing a document digest instead of a meaningless challenge, we give
- * the citizen a proof of intention via this formal authentication contract.
+ * This class allows a citizen to proof that the cryptographic signature created
+ * with his authentication certificate was indeed meant as way of
+ * authenticating. In case of challenge abuse, there was no intention to sign
+ * any legally binding contract exception the authentication contract. If a
+ * malicious eID Applet Service tricks the citizen into signing a document
+ * digest instead of a meaningless challenge, we give the citizen a proof of
+ * intention via this formal authentication contract.
  * </p>
  * 
  * @author fcorneli
@@ -54,6 +55,9 @@ public class AuthenticationContract {
 	private final String hostname;
 
 	private final InetAddress inetAddress;
+
+	public static final String LEGAL_NOTICE = "Declaration of authentication intension.\n"
+			+ "The following data should be interpreted as an authentication challenge.\n";
 
 	private final byte[] challenge;
 
@@ -95,6 +99,11 @@ public class AuthenticationContract {
 			byte[] address = this.inetAddress.getAddress();
 			toBeSignedOutputStream.write(address);
 		}
+		/*
+		 * Next is to prevent abuse of the challenge in the context of a digital
+		 * signature claim on this cryptographic authentication signature.
+		 */
+		toBeSignedOutputStream.write(LEGAL_NOTICE.getBytes());
 		/*
 		 * Of course we also digest the challenge as the server needs some mean
 		 * to authenticate us.
