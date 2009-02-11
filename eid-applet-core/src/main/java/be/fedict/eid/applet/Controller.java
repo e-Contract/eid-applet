@@ -19,7 +19,6 @@
 package be.fedict.eid.applet;
 
 import java.awt.Component;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -44,6 +43,7 @@ import javax.swing.JOptionPane;
 import be.fedict.eid.applet.Messages.MESSAGE_ID;
 import be.fedict.eid.applet.shared.AdministrationMessage;
 import be.fedict.eid.applet.shared.AppletProtocolMessageCatalog;
+import be.fedict.eid.applet.shared.AuthenticationContract;
 import be.fedict.eid.applet.shared.AuthenticationDataMessage;
 import be.fedict.eid.applet.shared.AuthenticationRequestMessage;
 import be.fedict.eid.applet.shared.CheckClientMessage;
@@ -658,33 +658,31 @@ public class Controller {
 		byte[] salt = new byte[20];
 		secureRandom.nextBytes(salt);
 
-		/*
-		 * We extract the hostname from the web page location in which this eID
-		 * Applet is embedded.
-		 * 
-		 * Signing (salt||hostname||challenge) prevents man-in-the-middle
-		 * attacks from websites for which the SSL certificate is still trusted
-		 * but that have been compromised. If at the same time the DNS is also
-		 * attacked, well then everything is lost anyway.
-		 */
-		ByteArrayOutputStream toBeSignedOutputStream = new ByteArrayOutputStream();
-		toBeSignedOutputStream.write(salt);
+		String hostname;
 		if (includeHostname) {
+			/*
+			 * We extract the hostname from the web page location in which this
+			 * eID Applet is embedded.
+			 */
 			URL documentBase = this.runtime.getDocumentBase();
-			String hostname = documentBase.getHost();
+			hostname = documentBase.getHost();
 			addDetailMessage("hostname: " + hostname);
-			toBeSignedOutputStream.write(hostname.getBytes());
+		} else {
+			hostname = null;
 		}
+
+		InetAddress inetAddress;
 		if (includeInetAddress) {
 			URL documentBase = this.runtime.getDocumentBase();
-			String hostname = documentBase.getHost();
-			InetAddress inetAddress = InetAddress.getByName(hostname);
+			inetAddress = InetAddress.getByName(documentBase.getHost());
 			addDetailMessage("inet address: " + inetAddress.getHostAddress());
-			byte[] address = inetAddress.getAddress();
-			toBeSignedOutputStream.write(address);
+		} else {
+			inetAddress = null;
 		}
-		toBeSignedOutputStream.write(challenge);
-		byte[] toBeSigned = toBeSignedOutputStream.toByteArray();
+
+		AuthenticationContract authenticationContract = new AuthenticationContract(
+				salt, hostname, inetAddress, challenge);
+		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
 
 		setStatusMessage(Status.NORMAL, this.messages
 				.getMessage(MESSAGE_ID.DETECTING_CARD));

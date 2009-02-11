@@ -158,5 +158,9 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>com.caucho</groupId>
+			<artifactId>resin-quercus</artifactId>
+		</dependency>
 	</dependencies>
 </project>

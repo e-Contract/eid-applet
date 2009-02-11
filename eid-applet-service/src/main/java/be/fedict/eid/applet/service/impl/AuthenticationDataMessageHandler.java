@@ -18,7 +18,6 @@
 
 package be.fedict.eid.applet.service.impl;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -42,6 +41,7 @@ import org.apache.commons.logging.LogFactory;
 
 import be.fedict.eid.applet.service.EIdData;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
+import be.fedict.eid.applet.shared.AuthenticationContract;
 import be.fedict.eid.applet.shared.AuthenticationDataMessage;
 import be.fedict.eid.applet.shared.FinishedMessage;
 
@@ -77,27 +77,14 @@ public class AuthenticationDataMessageHandler implements
 		PublicKey signingKey = signingCertificate.getPublicKey();
 
 		byte[] challenge = HelloMessageHandler.getAuthnChallenge(session);
-
-		ByteArrayOutputStream toBeSignedOutputStream = new ByteArrayOutputStream();
+		AuthenticationContract authenticationContract = new AuthenticationContract(
+				message.saltValue, this.hostname, this.inetAddress, challenge);
+		byte[] toBeSigned;
 		try {
-			toBeSignedOutputStream.write(message.saltValue);
-			if (null != this.hostname) {
-				LOG.debug("authn hostname: " + this.hostname);
-				toBeSignedOutputStream.write(this.hostname.getBytes());
-			} else {
-				LOG.warn("No Hostname init-param specified!");
-			}
-			if (null != this.inetAddress) {
-				LOG.debug("inet address: " + this.inetAddress.getHostAddress());
-				toBeSignedOutputStream.write(this.inetAddress.getAddress());
-			} else {
-				LOG.debug("No InetAddress init-param specified.");
-			}
-			toBeSignedOutputStream.write(challenge);
+			toBeSigned = authenticationContract.calculateToBeSigned();
 		} catch (IOException e) {
 			throw new ServletException("IO error: " + e.getMessage(), e);
 		}
-		byte[] toBeSigned = toBeSignedOutputStream.toByteArray();
 
 		try {
 			Signature signature = Signature.getInstance("SHA1withRSA");

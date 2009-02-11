@@ -255,6 +255,11 @@
 				<artifactId>itext</artifactId>
 				<version>2.1.4</version>
 			</dependency>
+			<dependency>
+				<groupId>com.caucho</groupId>
+				<artifactId>resin-quercus</artifactId>
+				<version>3.2.1</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<build>
@@ -404,6 +409,14 @@
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
+		</repository>
+		<repository>
+			<id>caucho</id>
+			<name>Caucho Repository</name>
+			<url>http://caucho.com/m2/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
 		</repository>
 		<repository>
 			<id>maven-java.net</id>
