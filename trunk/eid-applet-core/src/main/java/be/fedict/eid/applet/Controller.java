@@ -304,6 +304,11 @@ public class Controller {
 						identificationRequestMessage.includeIntegrityData,
 						identificationRequestMessage.removeCard);
 			}
+		} catch (PKCS11NotFoundException e) {
+			setStatusMessage(Status.ERROR, Controller.this.messages
+					.getMessage(MESSAGE_ID.NO_MIDDLEWARE_ERROR));
+			addDetailMessage("error: no eID Middleware PKCS#11 library found");
+			return null;
 		} catch (SecurityException e) {
 			setStatusMessage(Status.ERROR, Controller.this.messages
 					.getMessage(MESSAGE_ID.SECURITY_ERROR));
@@ -473,9 +478,12 @@ public class Controller {
 			}
 		} catch (PKCS11NotFoundException e) {
 			addDetailMessage("eID Middleware PKCS#11 library not found.");
-			addDetailMessage("fallback to PC/SC signing...");
-			performEidPcscSignOperation(signRequestMessage);
-			return;
+			if (null != this.pcscEidSpi) {
+				addDetailMessage("fallback to PC/SC signing...");
+				performEidPcscSignOperation(signRequestMessage);
+				return;
+			}
+			throw new PKCS11NotFoundException();
 		}
 		setStatusMessage(Status.NORMAL, this.messages
 				.getMessage(MESSAGE_ID.SIGNING));
@@ -700,6 +708,7 @@ public class Controller {
 						removeCard);
 				return;
 			}
+			throw new PKCS11NotFoundException();
 		}
 		setStatusMessage(Status.NORMAL, this.messages
 				.getMessage(MESSAGE_ID.AUTHENTICATING));

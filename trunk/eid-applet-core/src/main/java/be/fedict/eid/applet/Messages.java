@@ -39,7 +39,8 @@ public class Messages {
 				"transmittingIdentity"), DONE("done"), PRIVACY_QUESTION(
 				"privacyQuestion"), AUTHENTICATING("authenticating"), REMOVE_CARD(
 				"removeCard"), SIGNING("signing"), SELECT_FILES("selectFiles"), DIGESTING_FILES(
-				"digestingFiles"), COPY_ALL("copyAll"), MAIL("mail");
+				"digestingFiles"), COPY_ALL("copyAll"), MAIL("mail"), NO_MIDDLEWARE_ERROR(
+				"noMiddlewareError");
 
 		private final String id;
 
