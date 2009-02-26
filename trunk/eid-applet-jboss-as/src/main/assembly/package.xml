@@ -14,7 +14,7 @@
 			<outputDirectory>/</outputDirectory>
 		</fileSet>
 		<fileSet>
-			<directory>target/dependency/jboss-5.0.0.GA</directory>
+			<directory>target/dependency/jboss-5.0.1.GA</directory>
 			<outputDirectory>/</outputDirectory>
 			<excludes>
 				<exclude>client/**</exclude>
@@ -33,7 +33,7 @@
 			</excludes>
 		</fileSet>
 		<fileSet>
-			<directory>target/dependency/jboss-5.0.0.GA</directory>
+			<directory>target/dependency/jboss-5.0.1.GA</directory>
 			<outputDirectory>/</outputDirectory>
 			<fileMode>0544</fileMode>
 			<includes>
@@ -42,7 +42,7 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>target/dependency/jboss-5.0.0.GA</directory>
+			<directory>target/dependency/jboss-5.0.1.GA</directory>
 			<outputDirectory>/</outputDirectory>
 			<includes>
 				<!-- required by shutdown.sh -->
