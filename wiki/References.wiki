@@ -13,7 +13,7 @@
 
 == Smart Card ==
 
-  * [http://www.esat.kuleuven.be/~decockd/slides/2007.03.01.smart.cards.pdf Smart Cards introduction by Danny De Cock]
+  * [http://www.esat.kuleuven.be/~decockd/slides/2007.03.01.smart.cards.pdf Smart Cards introduction]
   * [http://www.cardwerk.com/smartcards/smartcard_standard_ISO7816-4.aspx ISO 7816-4]
   * [http://www.rsa.com/rsalabs/node.asp?id=2133 PKCS#11]
   * [http://www.rsa.com/rsalabs/node.asp?id=2141 PKCS#15]
@@ -28,6 +28,7 @@
 == Legal ==
 
   * [http://www.ksz.fgov.be/nl/Legislation/doc/20010709-cert.htm Wet van 9 juli 2001 houdende vaststelling van bepaalde regels in verband met het juridisch kader voor elektronische handtekeningen en certificatiediensten]
+  * [http://www.privacycommission.be/nl/legislation/national/ Nationale wetgeving Privacycommissie]
 
 
 == Other Projects ==
