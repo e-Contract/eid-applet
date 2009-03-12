@@ -61,8 +61,6 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	public static final String IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME = "IdentityIntegrityService";
 
-	public static final String AUTHN_SERVICE_INIT_PARAM_NAME = "AuthenticationService";
-
 	public static final String SIGNATURE_SERVICE_INIT_PARAM_NAME = "SignatureService";
 
 	public static final String REMOVE_CARD_INIT_PARAM_NAME = "RemoveCard";
@@ -103,24 +101,9 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	private SecureRandom secureRandom;
 
-	public static final String AUTHN_CHALLENGE_SESSION_ATTRIBUTE = HelloMessageHandler.class
-			.getName()
-			+ ".authnChallence";
-
 	public static final String DIGEST_VALUE_SESSION_ATTRIBUTE = HelloMessageHandler.class
 			.getName()
 			+ ".digestValue";
-
-	public static void setAuthnChallenge(byte[] challenge, HttpSession session) {
-		session.setAttribute(AUTHN_CHALLENGE_SESSION_ATTRIBUTE, challenge);
-	}
-
-	public static byte[] getAuthnChallenge(HttpSession session) {
-		byte[] challenge = (byte[]) session
-				.getAttribute(AUTHN_CHALLENGE_SESSION_ATTRIBUTE);
-		session.removeAttribute(AUTHN_CHALLENGE_SESSION_ATTRIBUTE);
-		return challenge;
-	}
 
 	public static void setDigestValue(byte[] digestValue, HttpSession session) {
 		session.setAttribute(DIGEST_VALUE_SESSION_ATTRIBUTE, digestValue);
@@ -180,7 +163,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 			byte[] challenge = new byte[20];
 			this.secureRandom.nextBytes(challenge);
 			// also keep the challenge in the session (server side!)
-			setAuthnChallenge(challenge, session);
+			AuthenticationDataMessageHandler.setAuthnChallenge(challenge,
+					session);
 			AuthenticationRequestMessage authenticationRequestMessage = new AuthenticationRequestMessage(
 					challenge, this.includeHostname, this.includeInetAddress,
 					this.logoff, this.removeCard);
@@ -215,7 +199,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 		this.identityIntegrityServiceLocator = new ServiceLocator<IdentityIntegrityService>(
 				IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME, config);
 		this.authenticationServiceLocator = new ServiceLocator<AuthenticationService>(
-				AUTHN_SERVICE_INIT_PARAM_NAME, config);
+				AuthenticationDataMessageHandler.AUTHN_SERVICE_INIT_PARAM_NAME,
+				config);
 		this.signatureServiceLocator = new ServiceLocator<SignatureService>(
 				SIGNATURE_SERVICE_INIT_PARAM_NAME, config);
 

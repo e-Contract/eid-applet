@@ -40,6 +40,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import be.fedict.eid.applet.service.EIdData;
+import be.fedict.eid.applet.service.spi.AuditService;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
 import be.fedict.eid.applet.shared.AuthenticationContract;
 import be.fedict.eid.applet.shared.AuthenticationDataMessage;
@@ -61,9 +62,19 @@ public class AuthenticationDataMessageHandler implements
 
 	private ServiceLocator<AuthenticationService> authenticationServiceLocator;
 
+	private ServiceLocator<AuditService> auditServiceLocator;
+
 	private String hostname;
 
 	private InetAddress inetAddress;
+
+	public static final String AUTHN_SERVICE_INIT_PARAM_NAME = "AuthenticationService";
+
+	public static final String AUDIT_SERVICE_INIT_PARAM_NAME = "AuditService";
+
+	public static final String AUTHN_CHALLENGE_SESSION_ATTRIBUTE = AuthenticationDataMessageHandler.class
+			.getName()
+			+ ".authnChallence";
 
 	public Object handleMessage(AuthenticationDataMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
@@ -76,7 +87,8 @@ public class AuthenticationDataMessageHandler implements
 		LOG.debug("authn signing certificate: " + signingCertificate);
 		PublicKey signingKey = signingCertificate.getPublicKey();
 
-		byte[] challenge = HelloMessageHandler.getAuthnChallenge(session);
+		byte[] challenge = AuthenticationDataMessageHandler
+				.getAuthnChallenge(session);
 		AuthenticationContract authenticationContract = new AuthenticationContract(
 				message.saltValue, this.hostname, this.inetAddress, challenge);
 		byte[] toBeSigned;
@@ -92,6 +104,12 @@ public class AuthenticationDataMessageHandler implements
 			signature.update(toBeSigned);
 			boolean result = signature.verify(signatureValue);
 			if (false == result) {
+				AuditService auditService = this.auditServiceLocator
+						.locateService();
+				if (null != auditService) {
+					String remoteAddress = request.getRemoteAddr();
+					auditService.authenticationError(remoteAddress);
+				}
 				throw new SecurityException("authn signature incorrect");
 			}
 		} catch (NoSuchAlgorithmException e) {
@@ -109,18 +127,7 @@ public class AuthenticationDataMessageHandler implements
 		/*
 		 * Push authenticated used Id into the HTTP session.
 		 */
-		X500Principal userPrincipal = signingCertificate
-				.getSubjectX500Principal();
-		String name = userPrincipal.toString();
-		int serialNumberValueBeginIdx = name.indexOf("SERIALNUMBER=")
-				+ "SERIALNUMBER=".length();
-		int serialNumberValueEndIdx = name.indexOf(",",
-				serialNumberValueBeginIdx);
-		if (-1 == serialNumberValueEndIdx) {
-			serialNumberValueEndIdx = name.length();
-		}
-		String userId = name.substring(serialNumberValueBeginIdx,
-				serialNumberValueEndIdx);
+		String userId = getUserId(signingCertificate);
 
 		/*
 		 * Some people state that you cannot use the national register number
@@ -141,12 +148,42 @@ public class AuthenticationDataMessageHandler implements
 		}
 		eidData.identifier = userId;
 
+		AuditService auditService = this.auditServiceLocator.locateService();
+		if (null != auditService) {
+			auditService.authenticated(userId);
+		}
+
 		return new FinishedMessage();
+	}
+
+	private String getUserId(X509Certificate signingCertificate) {
+		X500Principal userPrincipal = signingCertificate
+				.getSubjectX500Principal();
+		String name = userPrincipal.toString();
+		int serialNumberBeginIdx = name.indexOf("SERIALNUMBER=");
+		if (-1 == serialNumberBeginIdx) {
+			throw new SecurityException("SERIALNUMBER not found in X509 CN");
+		}
+		int serialNumberValueBeginIdx = serialNumberBeginIdx
+				+ "SERIALNUMBER=".length();
+		int serialNumberValueEndIdx = name.indexOf(",",
+				serialNumberValueBeginIdx);
+		if (-1 == serialNumberValueEndIdx) {
+			serialNumberValueEndIdx = name.length();
+		}
+		String userId = name.substring(serialNumberValueBeginIdx,
+				serialNumberValueEndIdx);
+		return userId;
 	}
 
 	public void init(ServletConfig config) throws ServletException {
 		this.authenticationServiceLocator = new ServiceLocator<AuthenticationService>(
-				HelloMessageHandler.AUTHN_SERVICE_INIT_PARAM_NAME, config);
+				AuthenticationDataMessageHandler.AUTHN_SERVICE_INIT_PARAM_NAME,
+				config);
+
+		this.auditServiceLocator = new ServiceLocator<AuditService>(
+				AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME,
+				config);
 
 		this.hostname = config
 				.getInitParameter(HelloMessageHandler.HOSTNAME_INIT_PARAM_NAME);
@@ -160,5 +197,20 @@ public class AuthenticationDataMessageHandler implements
 				throw new ServletException("unknown host: " + inetAddress);
 			}
 		}
+	}
+
+	public static void setAuthnChallenge(byte[] challenge, HttpSession session) {
+		session
+				.setAttribute(
+						AuthenticationDataMessageHandler.AUTHN_CHALLENGE_SESSION_ATTRIBUTE,
+						challenge);
+	}
+
+	public static byte[] getAuthnChallenge(HttpSession session) {
+		byte[] challenge = (byte[]) session
+				.getAttribute(AuthenticationDataMessageHandler.AUTHN_CHALLENGE_SESSION_ATTRIBUTE);
+		session
+				.removeAttribute(AuthenticationDataMessageHandler.AUTHN_CHALLENGE_SESSION_ATTRIBUTE);
+		return challenge;
 	}
 }
