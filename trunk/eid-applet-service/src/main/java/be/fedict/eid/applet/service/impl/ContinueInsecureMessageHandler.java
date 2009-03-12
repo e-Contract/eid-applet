@@ -121,7 +121,8 @@ public class ContinueInsecureMessageHandler implements
 			byte[] challenge = new byte[20];
 			this.secureRandom.nextBytes(challenge);
 			// also keep the challenge in the session (server side!)
-			HelloMessageHandler.setAuthnChallenge(challenge, session);
+			AuthenticationDataMessageHandler.setAuthnChallenge(challenge,
+					session);
 			AuthenticationRequestMessage authenticationRequestMessage = new AuthenticationRequestMessage(
 					challenge, this.includeHostname, this.includeInetAddress,
 					this.logoff, this.removeCard);
@@ -157,7 +158,8 @@ public class ContinueInsecureMessageHandler implements
 				HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME,
 				config);
 		this.authenticationServiceLocator = new ServiceLocator<AuthenticationService>(
-				HelloMessageHandler.AUTHN_SERVICE_INIT_PARAM_NAME, config);
+				AuthenticationDataMessageHandler.AUTHN_SERVICE_INIT_PARAM_NAME,
+				config);
 		this.signatureServiceLocator = new ServiceLocator<SignatureService>(
 				HelloMessageHandler.SIGNATURE_SERVICE_INIT_PARAM_NAME, config);
 
