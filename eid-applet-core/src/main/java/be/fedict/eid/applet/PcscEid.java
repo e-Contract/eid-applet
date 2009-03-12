@@ -41,7 +41,6 @@ import javax.smartcardio.CardTerminals;
 import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 import javax.smartcardio.TerminalFactory;
-import javax.swing.JOptionPane;
 
 /**
  * Holds all function related to eID card access over PC/SC.
@@ -98,11 +97,11 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	private final Dialogs dialogs;
 
-	public PcscEid(View view) {
+	public PcscEid(View view, Messages messages) {
 		this.view = view;
 		TerminalFactory factory = TerminalFactory.getDefault();
 		this.cardTerminals = factory.terminals();
-		this.dialogs = new Dialogs(this.view);
+		this.dialogs = new Dialogs(this.view, messages);
 	}
 
 	public List<String> getReaderList() {
@@ -473,10 +472,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 				this.view.addDetailMessage("SW: "
 						+ Integer.toHexString(responseApdu.getSW()));
 				if (0x6983 == responseApdu.getSW()) {
-					this.view.addDetailMessage("eID card blocked!");
-					JOptionPane.showMessageDialog(this.view
-							.getParentComponent(), "eID PIN blocked!",
-							"eID card blocked", JOptionPane.ERROR_MESSAGE);
+					this.dialogs.showPinBlockedDialog();
 					throw new RuntimeException("eID card blocked!");
 				}
 				if (0x63 != responseApdu.getSW1()) {
@@ -552,9 +548,10 @@ public class PcscEid extends Observable implements PcscEidSpi {
 				this.view.addDetailMessage("CHANGE PIN error");
 				this.view.addDetailMessage("SW: "
 						+ Integer.toHexString(responseApdu.getSW()));
-				/*
-				 * 0x6983 = PIN blocked?
-				 */
+				if (0x6983 == responseApdu.getSW()) {
+					this.dialogs.showPinBlockedDialog();
+					throw new RuntimeException("eID card blocked!");
+				}
 				if (0x63 != responseApdu.getSW1()) {
 					this.view
 							.addDetailMessage("PIN change error. Card blocked?");
@@ -564,9 +561,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 				this.view.addDetailMessage("retries left: " + retriesLeft);
 			}
 		} while (0x9000 != responseApdu.getSW());
-		JOptionPane.showMessageDialog(this.view.getParentComponent(),
-				"PIN changed successfully", "eID PIN change",
-				JOptionPane.INFORMATION_MESSAGE);
+		this.dialogs.showPinChanged();
 	}
 
 	public void unblockPin() throws Exception {
@@ -607,10 +602,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 				this.view.addDetailMessage("SW: "
 						+ Integer.toHexString(responseApdu.getSW()));
 				if (0x6983 == responseApdu.getSW()) {
-					this.view.addDetailMessage("eID card blocked!");
-					JOptionPane.showMessageDialog(this.view
-							.getParentComponent(), "eID PIN blocked!",
-							"eID card blocked", JOptionPane.ERROR_MESSAGE);
+					this.dialogs.showPinBlockedDialog();
 					throw new RuntimeException("eID card blocked!");
 				}
 				if (0x63 != responseApdu.getSW1()) {
@@ -621,9 +613,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 				this.view.addDetailMessage("retries left: " + retriesLeft);
 			}
 		} while (0x9000 != responseApdu.getSW());
-		JOptionPane.showMessageDialog(this.view.getParentComponent(),
-				"PIN successfully unblocked", "eID PIN unblock",
-				JOptionPane.INFORMATION_MESSAGE);
+		this.dialogs.showPinUnblocked();
 	}
 
 	public List<X509Certificate> getSignCertificateChain()

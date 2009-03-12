@@ -36,6 +36,7 @@ import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.List;
+import java.util.Locale;
 
 import javax.crypto.Cipher;
 
@@ -45,9 +46,11 @@ import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.DigestInfo;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import sun.security.pkcs11.wrapper.PKCS11Exception;
+import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.PcscEid;
 import be.fedict.eid.applet.PcscEidSpi;
 import be.fedict.eid.applet.Pkcs11Eid;
@@ -57,6 +60,13 @@ import be.fedict.eid.applet.View;
 public class Pkcs11Test {
 
 	private static final Log LOG = LogFactory.getLog(Pkcs11Test.class);
+
+	private Messages messages;
+
+	@Before
+	public void setUp() {
+		this.messages = new Messages(Locale.getDefault());
+	}
 
 	public static class TestView implements View {
 
@@ -88,7 +98,7 @@ public class Pkcs11Test {
 
 	@Test
 	public void testAuthnSignature() throws Exception {
-		Pkcs11Eid pkcs11Eid = new Pkcs11Eid(new TestView());
+		Pkcs11Eid pkcs11Eid = new Pkcs11Eid(new TestView(), this.messages);
 		if (false == pkcs11Eid.isEidPresent()) {
 			LOG.debug("insert eID...");
 			pkcs11Eid.waitForEidPresent();
@@ -110,7 +120,7 @@ public class Pkcs11Test {
 
 	@Test
 	public void testAuthnSignatureWithLogoff() throws Exception {
-		Pkcs11Eid pkcs11Eid = new Pkcs11Eid(new TestView());
+		Pkcs11Eid pkcs11Eid = new Pkcs11Eid(new TestView(), this.messages);
 		if (false == pkcs11Eid.isEidPresent()) {
 			LOG.debug("insert eID...");
 			pkcs11Eid.waitForEidPresent();
@@ -131,7 +141,7 @@ public class Pkcs11Test {
 		boolean result = signature.verify(signatureValue);
 		assertTrue(result);
 
-		PcscEidSpi pcscEid = new PcscEid(new TestView());
+		PcscEidSpi pcscEid = new PcscEid(new TestView(), this.messages);
 		pcscEid.logoff(readerName);
 	}
 
@@ -160,7 +170,7 @@ public class Pkcs11Test {
 			IllegalAccessException, InvocationTargetException,
 			NoSuchMethodException, NoSuchAlgorithmException, Exception,
 			InvalidKeyException, SignatureException {
-		Pkcs11Eid pkcs11Eid = new Pkcs11Eid(new TestView());
+		Pkcs11Eid pkcs11Eid = new Pkcs11Eid(new TestView(), this.messages);
 		if (false == pkcs11Eid.isEidPresent()) {
 			LOG.debug("insert eID...");
 			pkcs11Eid.waitForEidPresent();
@@ -228,7 +238,7 @@ public class Pkcs11Test {
 
 	@Test
 	public void testReaderList() throws Exception {
-		Pkcs11Eid pkcs11Eid = new Pkcs11Eid(new TestView());
+		Pkcs11Eid pkcs11Eid = new Pkcs11Eid(new TestView(), this.messages);
 		List<String> readerList = pkcs11Eid.getReaderList();
 		assertNotNull(readerList);
 		LOG.debug("reader list: " + readerList);

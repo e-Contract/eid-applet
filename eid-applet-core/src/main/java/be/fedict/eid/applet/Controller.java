@@ -104,8 +104,9 @@ public class Controller {
 				Class<? extends PcscEidSpi> pcscEidClass = (Class<? extends PcscEidSpi>) Class
 						.forName("be.fedict.eid.applet.PcscEid");
 				Constructor<? extends PcscEidSpi> pcscEidConstructor = pcscEidClass
-						.getConstructor(View.class);
-				this.pcscEidSpi = pcscEidConstructor.newInstance(this.view);
+						.getConstructor(View.class, Messages.class);
+				this.pcscEidSpi = pcscEidConstructor.newInstance(this.view,
+						this.messages);
 			} catch (Exception e) {
 				throw new RuntimeException("Error loading pcsc eid component: "
 						+ e.getMessage());
@@ -117,7 +118,7 @@ public class Controller {
 			 */
 			this.pcscEidSpi = null;
 		}
-		this.pkcs11Eid = new Pkcs11Eid(this.view);
+		this.pkcs11Eid = new Pkcs11Eid(this.view, this.messages);
 		ProtocolContext protocolContext = new LocalAppletProtocolContext(
 				this.view);
 		this.protocolStateMachine = new ProtocolStateMachine(protocolContext);
