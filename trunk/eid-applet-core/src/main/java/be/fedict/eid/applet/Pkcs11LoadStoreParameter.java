@@ -36,9 +36,10 @@ public class Pkcs11LoadStoreParameter implements LoadStoreParameter {
 
 	private final CallbackHandlerProtection callbackHandlerProtection;
 
-	public Pkcs11LoadStoreParameter(View view) {
+	public Pkcs11LoadStoreParameter(View view, Messages messages) {
 		this.view = view;
-		CallbackHandler callbackHandler = new Pkcs11CallbackHandler(this.view);
+		CallbackHandler callbackHandler = new Pkcs11CallbackHandler(this.view,
+				messages);
 		this.callbackHandlerProtection = new CallbackHandlerProtection(
 				callbackHandler);
 	}

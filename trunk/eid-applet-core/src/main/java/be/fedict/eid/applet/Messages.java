@@ -40,7 +40,9 @@ public class Messages {
 				"privacyQuestion"), AUTHENTICATING("authenticating"), REMOVE_CARD(
 				"removeCard"), SIGNING("signing"), SELECT_FILES("selectFiles"), DIGESTING_FILES(
 				"digestingFiles"), COPY_ALL("copyAll"), MAIL("mail"), NO_MIDDLEWARE_ERROR(
-				"noMiddlewareError");
+				"noMiddlewareError"), PIN_BLOCKED("pinBlocked"), PIN_CHANGED(
+				"pinChanged"), PIN_UNBLOCKED("pinUnblocked"), RETRIES_LEFT(
+				"retriesLeft");
 
 		private final String id;
 

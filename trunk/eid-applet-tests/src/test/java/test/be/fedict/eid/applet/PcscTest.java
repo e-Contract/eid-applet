@@ -28,6 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Locale;
 
 import javax.imageio.ImageIO;
 import javax.smartcardio.Card;
@@ -38,8 +39,10 @@ import javax.smartcardio.ResponseAPDU;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.junit.Test;
 
+import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.PcscEid;
 import be.fedict.eid.applet.PcscEidSpi;
 import be.fedict.eid.applet.Status;
@@ -83,9 +86,16 @@ public class PcscTest {
 		}
 	}
 
+	private Messages messages;
+
+	@Before
+	public void setUp() {
+		this.messages = new Messages(Locale.getDefault());
+	}
+
 	@Test
 	public void pcscAuthnSignature() throws Exception {
-		PcscEidSpi pcscEidSpi = new PcscEid(new TestView());
+		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEidSpi.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEidSpi.waitForEidPresent();
@@ -105,7 +115,7 @@ public class PcscTest {
 
 	@Test
 	public void logoff() throws Exception {
-		PcscEidSpi pcscEidSpi = new PcscEid(new TestView());
+		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEidSpi.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEidSpi.waitForEidPresent();
@@ -118,7 +128,7 @@ public class PcscTest {
 
 	@Test
 	public void pcscChangePin() throws Exception {
-		PcscEidSpi pcscEidSpi = new PcscEid(new TestView());
+		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEidSpi.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEidSpi.waitForEidPresent();
@@ -131,7 +141,7 @@ public class PcscTest {
 
 	@Test
 	public void pcscUnblockPin() throws Exception {
-		PcscEidSpi pcscEidSpi = new PcscEid(new TestView());
+		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEidSpi.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEidSpi.waitForEidPresent();
@@ -144,7 +154,7 @@ public class PcscTest {
 
 	@Test
 	public void photo() throws Exception {
-		PcscEidSpi pcscEidSpi = new PcscEid(new TestView());
+		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEidSpi.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEidSpi.waitForEidPresent();
@@ -162,7 +172,7 @@ public class PcscTest {
 
 	@Test
 	public void testCcid() throws Exception {
-		PcscEid pcscEid = new PcscEid(new TestView());
+		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEid.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEid.waitForEidPresent();
@@ -199,7 +209,7 @@ public class PcscTest {
 		verifyCommand.write(30); // bTimeOut
 		verifyCommand.write(30); // bTimeOut2
 		verifyCommand.write(0x89); // bmFormatString: BCD PIN - SPR532 only,
-									// else 0x01
+		// else 0x01
 		verifyCommand.write(0x47); // bmPINBlockString
 		verifyCommand.write(0x04); // bmPINLengthFormat
 		verifyCommand.write(new byte[] { 0x0C, 0x04 }); // wPINMaxExtraDigit
@@ -258,7 +268,7 @@ public class PcscTest {
 
 	@Test
 	public void testListReaders() throws Exception {
-		PcscEid pcscEid = new PcscEid(new TestView());
+		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
 		LOG.debug("reader list: " + pcscEid.getReaderList());
 	}
 }

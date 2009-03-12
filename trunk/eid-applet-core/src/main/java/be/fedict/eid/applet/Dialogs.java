@@ -26,6 +26,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 
+import be.fedict.eid.applet.Messages.MESSAGE_ID;
+
 /**
  * Holds the implementation of some eID related dialogs.
  * 
@@ -36,8 +38,11 @@ public class Dialogs {
 
 	private final View view;
 
-	public Dialogs(View view) {
+	private final Messages messages;
+
+	public Dialogs(View view, Messages messages) {
 		this.view = view;
+		this.messages = messages;
 	}
 
 	public void getPuks(int retriesLeft, char[] puk1, char[] puk2) {
@@ -45,7 +50,9 @@ public class Dialogs {
 
 		if (-1 != retriesLeft) {
 			Box retriesPanel = Box.createHorizontalBox();
-			JLabel retriesLabel = new JLabel("Retries left: " + retriesLeft);
+			JLabel retriesLabel = new JLabel(this.messages
+					.getMessage(MESSAGE_ID.RETRIES_LEFT)
+					+ ": " + retriesLeft);
 			retriesPanel.add(retriesLabel);
 			retriesPanel.add(Box.createHorizontalGlue());
 			mainPanel.add(retriesPanel);
@@ -88,7 +95,9 @@ public class Dialogs {
 
 		if (-1 != retriesLeft) {
 			Box retriesPanel = Box.createHorizontalBox();
-			JLabel retriesLabel = new JLabel("Retries left: " + retriesLeft);
+			JLabel retriesLabel = new JLabel(this.messages
+					.getMessage(MESSAGE_ID.RETRIES_LEFT)
+					+ ": " + retriesLeft);
 			retriesPanel.add(retriesLabel);
 			retriesPanel.add(Box.createHorizontalGlue());
 			mainPanel.add(retriesPanel);
@@ -149,7 +158,9 @@ public class Dialogs {
 
 		if (-1 != retriesLeft) {
 			Box retriesPanel = Box.createHorizontalBox();
-			JLabel retriesLabel = new JLabel("Retries left: " + retriesLeft);
+			JLabel retriesLabel = new JLabel(this.messages
+					.getMessage(MESSAGE_ID.RETRIES_LEFT)
+					+ ": " + retriesLeft);
 			retriesPanel.add(retriesLabel);
 			retriesPanel.add(Box.createHorizontalGlue());
 			mainPanel.add(retriesPanel);
@@ -173,5 +184,23 @@ public class Dialogs {
 			return pin;
 		}
 		throw new RuntimeException("operation canceled.");
+	}
+
+	public void showPinBlockedDialog() {
+		JOptionPane.showMessageDialog(this.view.getParentComponent(),
+				this.messages.getMessage(MESSAGE_ID.PIN_BLOCKED),
+				"eID card blocked", JOptionPane.ERROR_MESSAGE);
+	}
+
+	public void showPinChanged() {
+		JOptionPane.showMessageDialog(this.view.getParentComponent(),
+				this.messages.getMessage(MESSAGE_ID.PIN_CHANGED),
+				"eID PIN change", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	public void showPinUnblocked() {
+		JOptionPane.showMessageDialog(this.view.getParentComponent(),
+				this.messages.getMessage(MESSAGE_ID.PIN_UNBLOCKED),
+				"eID PIN unblock", JOptionPane.INFORMATION_MESSAGE);
 	}
 }

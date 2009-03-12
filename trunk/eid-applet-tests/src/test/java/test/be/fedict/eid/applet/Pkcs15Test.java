@@ -29,6 +29,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Locale;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
@@ -38,6 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import test.be.fedict.eid.applet.PcscTest.TestView;
+import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.PcscEid;
 import be.fedict.eid.applet.PcscEidSpi;
 
@@ -49,12 +51,15 @@ public class Pkcs15Test {
 
 	@Before
 	public void setUp() throws Exception {
-		this.pcscEidSpi = new PcscEid(new TestView());
+		this.messages = new Messages(Locale.getDefault());
+		this.pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == this.pcscEidSpi.isEidPresent()) {
 			LOG.debug("insert eID card");
 			this.pcscEidSpi.waitForEidPresent();
 		}
 	}
+
+	private Messages messages;
 
 	@After
 	public void tearDown() throws Exception {

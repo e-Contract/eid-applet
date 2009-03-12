@@ -103,8 +103,11 @@ public class Pkcs11Eid {
 
 	private String slotDescription;
 
-	public Pkcs11Eid(View view) {
+	private Messages messages;
+
+	public Pkcs11Eid(View view, Messages messages) {
 		this.view = view;
+		this.messages = messages;
 	}
 
 	private String getPkcs11Path() throws PKCS11NotFoundException {
@@ -324,7 +327,7 @@ public class Pkcs11Eid {
 		// load key material
 		KeyStore keyStore = KeyStore.getInstance("PKCS11", this.pkcs11Provider);
 		LoadStoreParameter loadStoreParameter = new Pkcs11LoadStoreParameter(
-				this.view);
+				this.view, this.messages);
 		keyStore.load(loadStoreParameter);
 		Enumeration<String> aliases = keyStore.aliases();
 		while (aliases.hasMoreElements()) {

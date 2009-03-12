@@ -37,9 +37,9 @@ public class Pkcs11CallbackHandler implements CallbackHandler {
 
 	private final Dialogs dialogs;
 
-	public Pkcs11CallbackHandler(View view) {
+	public Pkcs11CallbackHandler(View view, Messages messages) {
 		this.view = view;
-		this.dialogs = new Dialogs(this.view);
+		this.dialogs = new Dialogs(this.view, messages);
 	}
 
 	public void handle(Callback[] callbacks) throws IOException,

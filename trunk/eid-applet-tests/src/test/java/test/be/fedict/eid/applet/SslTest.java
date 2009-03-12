@@ -47,6 +47,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.RSAKeyGenParameterSpec;
+import java.util.Locale;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
@@ -83,6 +84,7 @@ import org.junit.Test;
 import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.testing.ServletTester;
 
+import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.Pkcs11Eid;
 import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
@@ -208,8 +210,12 @@ public class SslTest {
 		}
 	}
 
+	private Messages messages;
+
 	@Before
 	public void setUp() throws Exception {
+		this.messages = new Messages(Locale.getDefault());
+
 		this.servletTester = new ServletTester();
 		this.servletTester.addServlet(TestServlet.class, "/");
 
@@ -245,7 +251,7 @@ public class SslTest {
 
 		SSLContext sslContext = SSLContext.getInstance("TLS");
 		TrustManager trustManager = new TestTrustManager(certificate);
-		KeyManager keyManager = new TestKeyManager();
+		KeyManager keyManager = new TestKeyManager(this.messages);
 		sslContext.init(new KeyManager[] { keyManager },
 				new TrustManager[] { trustManager }, null);
 		SSLContext.setDefault(sslContext);
@@ -289,6 +295,12 @@ public class SslTest {
 
 		private static final String ALIAS = "eID";
 
+		private final Messages messages;
+
+		public TestKeyManager(Messages messages) {
+			this.messages = messages;
+		}
+
 		@Override
 		public String chooseClientAlias(String[] keyType, Principal[] issuers,
 				Socket socket) {
@@ -313,7 +325,8 @@ public class SslTest {
 					if (null != this.pkcs11Eid) {
 						this.pkcs11Eid.close();
 					} else {
-						this.pkcs11Eid = new Pkcs11Eid(new TestView());
+						this.pkcs11Eid = new Pkcs11Eid(new TestView(),
+								this.messages);
 					}
 					if (false == this.pkcs11Eid.isEidPresent()) {
 						LOG.debug("insert eID card...");
