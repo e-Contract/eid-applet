@@ -36,3 +36,4 @@
   * [http://developer.novell.com/wiki/index.php/EID-belgium SUSE Linux eID toolkit]
   * [http://code.google.com/p/eidlib/ Native Java e-ID library]
   * [http://homes.esat.kuleuven.be/~decockd/wiki/bin/view.cgi eID Site of Danny De Cock]
+  * [http://code.google.com/p/eid-javascript-lib/ JavaScript library to be used with the eID middleware applet.]
