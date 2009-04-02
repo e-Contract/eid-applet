@@ -18,6 +18,8 @@
 
 package be.fedict.eid.applet.service.spi;
 
+import java.security.cert.X509Certificate;
+
 /**
  * Interface for audit service components.
  * 
@@ -31,6 +33,7 @@ public interface AuditService {
 	 * authenticated using the eID Applet.
 	 * 
 	 * @param userId
+	 *            the unique identifier of the authenticated user.
 	 */
 	void authenticated(String userId);
 
@@ -39,6 +42,41 @@ public interface AuditService {
 	 * invalid authentication signature.
 	 * 
 	 * @param remoteAddress
+	 *            the remote address of the client causing the authentication
+	 *            error.
+	 * @param clientCertificate
+	 *            the X509 certificate causing the authentication error.
 	 */
-	void authenticationError(String remoteAddress);
+	void authenticationError(String remoteAddress,
+			X509Certificate clientCertificate);
+
+	/**
+	 * Called by the eID Applet Service in case the eID Applet detects an
+	 * integrity error during the identity data verification.
+	 * 
+	 * @param remoteAddress
+	 *            the remote address of the client causing the integrity error.
+	 */
+	void identityIntegrityError(String remoteAddress);
+
+	/**
+	 * Called by the eID Applet Service in case the eID Applet responded with an
+	 * invalid non-repudiation signature.
+	 * 
+	 * @param remoteAddress
+	 *            the remote address of the client causing the signature error.
+	 * @param clientCertificate
+	 *            the X509 certificate causing the signature error.
+	 */
+	void signatureError(String remoteAddress, X509Certificate clientCertificate);
+
+	/**
+	 * Called by the eID Applet Service in case a user created a non-repudiation
+	 * signature.
+	 * 
+	 * @param userId
+	 *            the unique identifier of the user creating a non-repudiation
+	 *            signature.
+	 */
+	void signed(String userId);
 }

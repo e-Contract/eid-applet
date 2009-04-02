@@ -101,18 +101,6 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	private SecureRandom secureRandom;
 
-	public static final String DIGEST_VALUE_SESSION_ATTRIBUTE = HelloMessageHandler.class
-			.getName()
-			+ ".digestValue";
-
-	public static void setDigestValue(byte[] digestValue, HttpSession session) {
-		session.setAttribute(DIGEST_VALUE_SESSION_ATTRIBUTE, digestValue);
-	}
-
-	public static byte[] getDigestValue(HttpSession session) {
-		return (byte[]) session.getAttribute(DIGEST_VALUE_SESSION_ATTRIBUTE);
-	}
-
 	public Object handleMessage(HelloMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
 			HttpSession session) throws ServletException {
@@ -149,7 +137,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 			}
 
 			// also save it in the session for later verification
-			setDigestValue(digestInfo.digestValue, session);
+			SignatureDataMessageHandler.setDigestValue(digestInfo.digestValue,
+					session);
 
 			SignRequestMessage signRequestMessage = new SignRequestMessage(
 					digestInfo.digestValue, digestInfo.digestAlgo,

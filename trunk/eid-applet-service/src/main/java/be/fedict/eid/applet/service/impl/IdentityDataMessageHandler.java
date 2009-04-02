@@ -42,6 +42,7 @@ import org.apache.commons.logging.LogFactory;
 import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.EIdData;
 import be.fedict.eid.applet.service.Identity;
+import be.fedict.eid.applet.service.spi.AuditService;
 import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
 import be.fedict.eid.applet.service.tlv.TlvParser;
 import be.fedict.eid.applet.shared.FinishedMessage;
@@ -72,6 +73,8 @@ public class IdentityDataMessageHandler implements
 	private boolean includeAddress;
 
 	private ServiceLocator<IdentityIntegrityService> identityIntegrityServiceLocator;
+
+	private ServiceLocator<AuditService> auditServiceLocator;
 
 	public Object handleMessage(IdentityDataMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
@@ -136,7 +139,7 @@ public class IdentityDataMessageHandler implements
 			X509Certificate rrnCertificate = getCertificate(message.rrnCertFile);
 			PublicKey rrnPublicKey = rrnCertificate.getPublicKey();
 			verifySignature(message.identitySignatureFile, rrnPublicKey,
-					message.idFile);
+					request, message.idFile);
 			String authnUserId = (String) session
 					.getAttribute(AuthenticationDataMessageHandler.AUTHENTICATED_USER_IDENTIFIER_SESSION_ATTRIBUTE);
 			if (null != authnUserId) {
@@ -147,10 +150,12 @@ public class IdentityDataMessageHandler implements
 			if (this.includeAddress) {
 				byte[] addressFile = trimRight(message.addressFile);
 				verifySignature(message.addressSignatureFile, rrnPublicKey,
-						addressFile, message.identitySignatureFile);
+						request, addressFile, message.identitySignatureFile);
 			}
+			LOG.debug("checking national registration certificate: "
+					+ rrnCertificate.getSubjectX500Principal());
 			identityIntegrityService
-					.checkNationalRegistryCertificate(rrnCertificate);
+					.checkNationalRegistrationCertificate(rrnCertificate);
 		}
 
 		if (null != message.photoFile) {
@@ -174,8 +179,12 @@ public class IdentityDataMessageHandler implements
 
 		// push the identity into the session
 		session.setAttribute(IDENTITY_SESSION_ATTRIBUTE, identity);
-		session.setAttribute(ADDRESS_SESSION_ATTRIBUTE, address);
-		session.setAttribute(PHOTO_SESSION_ATTRIBUTE, message.photoFile);
+		if (null != address) {
+			session.setAttribute(ADDRESS_SESSION_ATTRIBUTE, address);
+		}
+		if (null != message.photoFile) {
+			session.setAttribute(PHOTO_SESSION_ATTRIBUTE, message.photoFile);
+		}
 
 		EIdData eidData = (EIdData) session.getAttribute(EID_SESSION_ATTRIBUTE);
 		if (null == eidData) {
@@ -200,17 +209,17 @@ public class IdentityDataMessageHandler implements
 	}
 
 	private void verifySignature(byte[] signatureData, PublicKey publicKey,
-			byte[]... data) {
+			HttpServletRequest request, byte[]... data) throws ServletException {
 		Signature signature;
 		try {
 			signature = Signature.getInstance("SHA1withRSA");
 		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("algo error: " + e.getMessage(), e);
+			throw new ServletException("algo error: " + e.getMessage(), e);
 		}
 		try {
 			signature.initVerify(publicKey);
 		} catch (InvalidKeyException e) {
-			throw new RuntimeException("key error: " + e.getMessage(), e);
+			throw new ServletException("key error: " + e.getMessage(), e);
 		}
 		try {
 			for (byte[] dataItem : data) {
@@ -218,10 +227,16 @@ public class IdentityDataMessageHandler implements
 			}
 			boolean result = signature.verify(signatureData);
 			if (false == result) {
-				throw new RuntimeException("signature incorrect");
+				AuditService auditService = this.auditServiceLocator
+						.locateService();
+				if (null != auditService) {
+					String remoteAddress = request.getRemoteAddr();
+					auditService.identityIntegrityError(remoteAddress);
+				}
+				throw new ServletException("signature incorrect");
 			}
 		} catch (SignatureException e) {
-			throw new RuntimeException("signature error: " + e.getMessage(), e);
+			throw new ServletException("signature error: " + e.getMessage(), e);
 		}
 	}
 
@@ -262,6 +277,9 @@ public class IdentityDataMessageHandler implements
 		}
 		this.identityIntegrityServiceLocator = new ServiceLocator<IdentityIntegrityService>(
 				HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME,
+				config);
+		this.auditServiceLocator = new ServiceLocator<AuditService>(
+				AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME,
 				config);
 	}
 }

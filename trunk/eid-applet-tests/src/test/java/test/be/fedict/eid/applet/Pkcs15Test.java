@@ -31,6 +31,10 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Locale;
 
+import javax.smartcardio.CardChannel;
+import javax.smartcardio.CommandAPDU;
+import javax.smartcardio.ResponseAPDU;
+
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,21 +45,20 @@ import org.junit.Test;
 import test.be.fedict.eid.applet.PcscTest.TestView;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.PcscEid;
-import be.fedict.eid.applet.PcscEidSpi;
 
 public class Pkcs15Test {
 
 	private static final Log LOG = LogFactory.getLog(Pkcs15Test.class);
 
-	private PcscEidSpi pcscEidSpi;
+	private PcscEid pcscEid;
 
 	@Before
 	public void setUp() throws Exception {
 		this.messages = new Messages(Locale.getDefault());
-		this.pcscEidSpi = new PcscEid(new TestView(), this.messages);
-		if (false == this.pcscEidSpi.isEidPresent()) {
+		this.pcscEid = new PcscEid(new TestView(), this.messages);
+		if (false == this.pcscEid.isEidPresent()) {
 			LOG.debug("insert eID card");
-			this.pcscEidSpi.waitForEidPresent();
+			this.pcscEid.waitForEidPresent();
 		}
 	}
 
@@ -63,7 +66,7 @@ public class Pkcs15Test {
 
 	@After
 	public void tearDown() throws Exception {
-		this.pcscEidSpi.close();
+		this.pcscEid.close();
 	}
 
 	@Documented
@@ -162,7 +165,7 @@ public class Pkcs15Test {
 
 	@Test
 	public void EF_DIR() throws Exception {
-		byte[] dir = this.pcscEidSpi.readFile(new byte[] { 0x2f, 0x00 });
+		byte[] dir = this.pcscEid.readFile(new byte[] { 0x2f, 0x00 });
 		LOG.debug("size of EF(DIR): " + dir.length);
 		LOG.debug("EF(DIR): " + new String(Hex.encodeHex(dir)));
 
@@ -199,7 +202,7 @@ public class Pkcs15Test {
 
 	@Test
 	public void EF_ODF() throws Exception {
-		byte[] dirData = this.pcscEidSpi.readFile(new byte[] { 0x2f, 0x00 });
+		byte[] dirData = this.pcscEid.readFile(new byte[] { 0x2f, 0x00 });
 		Pkcs15_EF_DIR dir = parsePkcs15File(dirData, Pkcs15_EF_DIR.class);
 
 		Pkcs15ApplicationTemplate applicationTemplate = getApplication(dir,
@@ -211,8 +214,19 @@ public class Pkcs15Test {
 				applicationTemplate.path.length);
 		System.arraycopy(new byte[] { 0x50, 0x31 }, 0, odfFileId, 4, 2);
 
-		byte[] odf = this.pcscEidSpi.readFile(odfFileId);
+		byte[] odf = this.pcscEid.readFile(odfFileId);
 		LOG.debug("size of EF(ODF): " + odf.length);
 		LOG.debug("EF(ODF): " + new String(Hex.encodeHex(odf)));
+	}
+
+	@Test
+	public void testSelectBelpicApplication() throws Exception {
+		CardChannel cardChannel = this.pcscEid.getCardChannel();
+		byte[] aId = new byte[] { (byte) 0xa0, 0x00, 0x00, 0x01, 0x77, 0x50,
+				0x4b, 0x43, 0x53, 0x2d, 0x31, 0x35 };
+		CommandAPDU selectApplicationApdu = new CommandAPDU(0x00, 0xA4, 0x04,
+				0x0C, aId);
+		ResponseAPDU responseApdu = cardChannel.transmit(selectApplicationApdu);
+		assertEquals(0x9000, responseApdu.getSW());
 	}
 }

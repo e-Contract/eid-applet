@@ -30,7 +30,6 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
 
-import javax.security.auth.x500.X500Principal;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -108,7 +107,8 @@ public class AuthenticationDataMessageHandler implements
 						.locateService();
 				if (null != auditService) {
 					String remoteAddress = request.getRemoteAddr();
-					auditService.authenticationError(remoteAddress);
+					auditService.authenticationError(remoteAddress,
+							signingCertificate);
 				}
 				throw new SecurityException("authn signature incorrect");
 			}
@@ -127,7 +127,7 @@ public class AuthenticationDataMessageHandler implements
 		/*
 		 * Push authenticated used Id into the HTTP session.
 		 */
-		String userId = getUserId(signingCertificate);
+		String userId = UserIdentifierUtil.getUserId(signingCertificate);
 
 		/*
 		 * Some people state that you cannot use the national register number
@@ -154,26 +154,6 @@ public class AuthenticationDataMessageHandler implements
 		}
 
 		return new FinishedMessage();
-	}
-
-	private String getUserId(X509Certificate signingCertificate) {
-		X500Principal userPrincipal = signingCertificate
-				.getSubjectX500Principal();
-		String name = userPrincipal.toString();
-		int serialNumberBeginIdx = name.indexOf("SERIALNUMBER=");
-		if (-1 == serialNumberBeginIdx) {
-			throw new SecurityException("SERIALNUMBER not found in X509 CN");
-		}
-		int serialNumberValueBeginIdx = serialNumberBeginIdx
-				+ "SERIALNUMBER=".length();
-		int serialNumberValueEndIdx = name.indexOf(",",
-				serialNumberValueBeginIdx);
-		if (-1 == serialNumberValueEndIdx) {
-			serialNumberValueEndIdx = name.length();
-		}
-		String userId = name.substring(serialNumberValueBeginIdx,
-				serialNumberValueEndIdx);
-		return userId;
 	}
 
 	public void init(ServletConfig config) throws ServletException {
