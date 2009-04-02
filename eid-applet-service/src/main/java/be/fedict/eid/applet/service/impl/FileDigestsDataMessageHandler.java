@@ -86,7 +86,7 @@ public class FileDigestsDataMessageHandler implements
 		}
 
 		// also save it in the session for later verification
-		HelloMessageHandler.setDigestValue(digestInfo.digestValue, session);
+		SignatureDataMessageHandler.setDigestValue(digestInfo.digestValue, session);
 
 		SignRequestMessage signRequestMessage = new SignRequestMessage(
 				digestInfo.digestValue, digestInfo.digestAlgo,

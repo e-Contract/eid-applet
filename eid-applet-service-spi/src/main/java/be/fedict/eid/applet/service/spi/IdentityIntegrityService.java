@@ -31,12 +31,12 @@ import java.security.cert.X509Certificate;
 public interface IdentityIntegrityService {
 
 	/**
-	 * Checks the validity of the National Registry certificate.
+	 * Checks the validity of the National Registration certificate.
 	 * 
 	 * @param certificate
 	 * @throws SecurityException
 	 *             in case the certificate is invalid/not accepted.
 	 */
-	void checkNationalRegistryCertificate(X509Certificate certificate)
+	void checkNationalRegistrationCertificate(X509Certificate certificate)
 			throws SecurityException;
 }

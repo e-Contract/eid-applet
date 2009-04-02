@@ -36,6 +36,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.DigestInfo;
 import org.bouncycastle.util.Arrays;
 
+import be.fedict.eid.applet.service.spi.AuditService;
 import be.fedict.eid.applet.service.spi.SignatureService;
 import be.fedict.eid.applet.shared.FinishedMessage;
 import be.fedict.eid.applet.shared.SignatureDataMessage;
@@ -54,6 +55,12 @@ public class SignatureDataMessageHandler implements
 
 	private ServiceLocator<SignatureService> signatureServiceLocator;
 
+	private ServiceLocator<AuditService> auditServiceLocator;
+
+	public static final String DIGEST_VALUE_SESSION_ATTRIBUTE = SignatureDataMessageHandler.class
+			.getName()
+			+ ".digestValue";
+
 	public Object handleMessage(SignatureDataMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
 			HttpSession session) throws ServletException {
@@ -61,6 +68,9 @@ public class SignatureDataMessageHandler implements
 
 		byte[] signatureValue = message.signatureValue;
 		List<X509Certificate> certificateChain = message.certificateChain;
+		if (certificateChain.isEmpty()) {
+			throw new ServletException("certificate chain is empty");
+		}
 		X509Certificate signingCertificate = certificateChain.get(0);
 		LOG.debug("non-repudiation signing certificate: " + signingCertificate);
 		PublicKey signingPublicKey = signingCertificate.getPublicKey();
@@ -68,7 +78,7 @@ public class SignatureDataMessageHandler implements
 		/*
 		 * Verify the signature.
 		 */
-		byte[] expectedDigestValue = HelloMessageHandler
+		byte[] expectedDigestValue = SignatureDataMessageHandler
 				.getDigestValue(session);
 		byte[] signatureDigestValue;
 		try {
@@ -80,14 +90,27 @@ public class SignatureDataMessageHandler implements
 					.readObject());
 			signatureDigestValue = signatureDigestInfo.getDigest();
 		} catch (Exception e) {
-			throw new RuntimeException("signature verification error: "
+			LOG.debug("signature verification error: " + e.getMessage());
+			throw new ServletException("signature verification error: "
 					+ e.getMessage(), e);
 		}
 
 		if (false == Arrays.areEqual(expectedDigestValue, signatureDigestValue)) {
-			throw new RuntimeException("signature incorrect");
+			AuditService auditService = this.auditServiceLocator
+					.locateService();
+			if (null != auditService) {
+				String remoteAddress = request.getRemoteAddr();
+				auditService.signatureError(remoteAddress, signingCertificate);
+			}
+			throw new ServletException("signature incorrect");
 		}
 		// no need to also check the digest algo
+
+		AuditService auditService = this.auditServiceLocator.locateService();
+		if (null != auditService) {
+			String userId = UserIdentifierUtil.getUserId(signingCertificate);
+			auditService.signed(userId);
+		}
 
 		SignatureService signatureService = this.signatureServiceLocator
 				.locateService();
@@ -99,5 +122,16 @@ public class SignatureDataMessageHandler implements
 	public void init(ServletConfig config) throws ServletException {
 		this.signatureServiceLocator = new ServiceLocator<SignatureService>(
 				HelloMessageHandler.SIGNATURE_SERVICE_INIT_PARAM_NAME, config);
+		this.auditServiceLocator = new ServiceLocator<AuditService>(
+				AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME,
+				config);
+	}
+
+	public static byte[] getDigestValue(HttpSession session) {
+		return (byte[]) session.getAttribute(DIGEST_VALUE_SESSION_ATTRIBUTE);
+	}
+
+	public static void setDigestValue(byte[] digestValue, HttpSession session) {
+		session.setAttribute(DIGEST_VALUE_SESSION_ATTRIBUTE, digestValue);
 	}
 }

@@ -41,7 +41,7 @@ public class IdentityIntegrityServiceBean implements IdentityIntegrityService {
 	private static final Log LOG = LogFactory
 			.getLog(IdentityIntegrityServiceBean.class);
 
-	public void checkNationalRegistryCertificate(X509Certificate certificate)
+	public void checkNationalRegistrationCertificate(X509Certificate certificate)
 			throws SecurityException {
 		LOG.debug("checking national registry certificate...");
 
