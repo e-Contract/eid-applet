@@ -106,7 +106,8 @@ public class ContinueInsecureMessageHandler implements
 			}
 
 			// also save it in the session for later verification
-			SignatureDataMessageHandler.setDigestValue(digestInfo.digestValue, session);
+			SignatureDataMessageHandler.setDigestValue(digestInfo.digestValue,
+					session);
 
 			SignRequestMessage signRequestMessage = new SignRequestMessage(
 					digestInfo.digestValue, digestInfo.digestAlgo,
@@ -116,13 +117,8 @@ public class ContinueInsecureMessageHandler implements
 		AuthenticationService authenticationService = this.authenticationServiceLocator
 				.locateService();
 		if (null != authenticationService) {
-			// TODO DRY refactor: is a copy-and-paste from HelloMessageHandler
-			// since SHA-1 is 20 bytes we also take 20 here.
-			byte[] challenge = new byte[20];
-			this.secureRandom.nextBytes(challenge);
-			// also keep the challenge in the session (server side!)
-			AuthenticationDataMessageHandler.setAuthnChallenge(challenge,
-					session);
+			byte[] challenge = AuthenticationChallenge
+					.generateChallenge(session);
 			AuthenticationRequestMessage authenticationRequestMessage = new AuthenticationRequestMessage(
 					challenge, this.includeHostname, this.includeInetAddress,
 					this.logoff, this.removeCard);

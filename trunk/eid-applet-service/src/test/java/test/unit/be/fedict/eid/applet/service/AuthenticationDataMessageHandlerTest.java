@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -43,7 +44,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
-import be.fedict.eid.applet.service.EIdData;
+import be.fedict.eid.applet.service.impl.AuthenticationChallenge;
 import be.fedict.eid.applet.service.impl.AuthenticationDataMessageHandler;
 import be.fedict.eid.applet.service.impl.HelloMessageHandler;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
@@ -80,13 +81,14 @@ public class AuthenticationDataMessageHandlerTest {
 		message.saltValue = salt;
 
 		Map<String, String> httpHeaders = new HashMap<String, String>();
-		HttpSession mockHttpSession = EasyMock.createMock(HttpSession.class);
+		HttpSession testHttpSession = new HttpTestSession();
 		HttpServletRequest mockServletRequest = EasyMock
 				.createMock(HttpServletRequest.class);
 		ServletConfig mockServletConfig = EasyMock
 				.createMock(ServletConfig.class);
 
-		byte[] challenge = "challenge".getBytes();
+		byte[] challenge = AuthenticationChallenge
+				.generateChallenge(testHttpSession);
 
 		AuthenticationContract authenticationContract = new AuthenticationContract(
 				salt, null, null, challenge);
@@ -97,6 +99,11 @@ public class AuthenticationDataMessageHandlerTest {
 		byte[] signatureValue = signature.sign();
 		message.signatureValue = signatureValue;
 
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.CHALLENGE_MAX_MATURITY_INIT_PARAM_NAME))
+				.andReturn(null);
 		EasyMock
 				.expect(
 						mockServletConfig
@@ -130,34 +137,119 @@ public class AuthenticationDataMessageHandlerTest {
 										+ "Class")).andReturn(
 						AuditTestService.class.getName());
 
-		EasyMock
-				.expect(
-						mockHttpSession
-								.getAttribute(AuthenticationDataMessageHandler.AUTHN_CHALLENGE_SESSION_ATTRIBUTE))
-				.andReturn(challenge);
-		mockHttpSession
-				.removeAttribute(AuthenticationDataMessageHandler.AUTHN_CHALLENGE_SESSION_ATTRIBUTE);
-
-		mockHttpSession
-				.setAttribute(
-						AuthenticationDataMessageHandler.AUTHENTICATED_USER_IDENTIFIER_SESSION_ATTRIBUTE,
-						userId);
-		EasyMock.expect(mockHttpSession.getAttribute("eid")).andReturn(null);
-		mockHttpSession.setAttribute(EasyMock.eq("eid"), EasyMock
-				.isA(EIdData.class));
-
 		// prepare
-		EasyMock.replay(mockHttpSession, mockServletRequest, mockServletConfig);
+		EasyMock.replay(mockServletRequest, mockServletConfig);
 
 		// operate
 		this.testedInstance.init(mockServletConfig);
 		this.testedInstance.handleMessage(message, httpHeaders,
-				mockServletRequest, mockHttpSession);
+				mockServletRequest, testHttpSession);
 
 		// verify
-		EasyMock.verify(mockHttpSession, mockServletRequest, mockServletConfig);
+		EasyMock.verify(mockServletRequest, mockServletConfig);
 		assertTrue(AuthenticationTestService.isCalled());
 		assertEquals(userId, AuditTestService.getAuditUserId());
+		assertEquals(userId, testHttpSession.getAttribute("eid.identifier"));
+	}
+
+	@Test
+	public void testHandleMessageExpiredChallenge() throws Exception {
+		// setup
+		KeyPair keyPair = MiscTestUtils.generateKeyPair();
+		DateTime notBefore = new DateTime();
+		DateTime notAfter = notBefore.plusYears(1);
+		String userId = "1234";
+		X509Certificate certificate = MiscTestUtils.generateCertificate(keyPair
+				.getPublic(), "CN=Test, SERIALNUMBER=" + userId, notBefore,
+				notAfter, null, keyPair.getPrivate(), true, 0, null, null);
+
+		byte[] salt = "salt".getBytes();
+
+		AuthenticationDataMessage message = new AuthenticationDataMessage();
+		message.certificateChain = new LinkedList<X509Certificate>();
+		message.certificateChain.add(certificate);
+		message.saltValue = salt;
+
+		Map<String, String> httpHeaders = new HashMap<String, String>();
+		HttpSession testHttpSession = new HttpTestSession();
+		HttpServletRequest mockServletRequest = EasyMock
+				.createMock(HttpServletRequest.class);
+		ServletConfig mockServletConfig = EasyMock
+				.createMock(ServletConfig.class);
+
+		byte[] challenge = AuthenticationChallenge
+				.generateChallenge(testHttpSession);
+
+		Thread.sleep(1000); // > 1 ms
+
+		AuthenticationContract authenticationContract = new AuthenticationContract(
+				salt, null, null, challenge);
+		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
+		Signature signature = Signature.getInstance("SHA1withRSA");
+		signature.initSign(keyPair.getPrivate());
+		signature.update(toBeSigned);
+		byte[] signatureValue = signature.sign();
+		message.signatureValue = signatureValue;
+
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.CHALLENGE_MAX_MATURITY_INIT_PARAM_NAME))
+				.andReturn("1"); // 1 ms
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.AUTHN_SERVICE_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.AUTHN_SERVICE_INIT_PARAM_NAME
+										+ "Class")).andReturn(
+						AuthenticationTestService.class.getName());
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.HOSTNAME_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INET_ADDRESS_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME
+										+ "Class")).andReturn(
+						AuditTestService.class.getName());
+		EasyMock.expect(mockServletRequest.getRemoteAddr()).andStubReturn(
+				"remote-address");
+
+		// prepare
+		EasyMock.replay(mockServletRequest, mockServletConfig);
+
+		// operate
+		this.testedInstance.init(mockServletConfig);
+		try {
+			this.testedInstance.handleMessage(message, httpHeaders,
+					mockServletRequest, testHttpSession);
+			fail();
+		} catch (ServletException e) {
+			// verify
+			EasyMock.verify(mockServletRequest, mockServletConfig);
+			assertNull(AuditTestService.getAuditUserId());
+			assertNull(testHttpSession.getAttribute("eid.identifier"));
+			assertEquals(certificate, AuditTestService
+					.getAuditClientCertificate());
+			assertEquals("remote-address", AuditTestService
+					.getAuditRemoteAddress());
+		}
 	}
 
 	@Test
@@ -179,13 +271,13 @@ public class AuthenticationDataMessageHandlerTest {
 		message.saltValue = salt;
 
 		Map<String, String> httpHeaders = new HashMap<String, String>();
-		HttpSession mockHttpSession = EasyMock.createMock(HttpSession.class);
+		HttpSession testHttpSession = new HttpTestSession();
 		HttpServletRequest mockServletRequest = EasyMock
 				.createMock(HttpServletRequest.class);
 		ServletConfig mockServletConfig = EasyMock
 				.createMock(ServletConfig.class);
 
-		byte[] challenge = "challenge".getBytes();
+		AuthenticationChallenge.generateChallenge(testHttpSession);
 
 		AuthenticationContract authenticationContract = new AuthenticationContract(
 				salt, null, null, "foobar-challenge".getBytes());
@@ -196,6 +288,11 @@ public class AuthenticationDataMessageHandlerTest {
 		byte[] signatureValue = signature.sign();
 		message.signatureValue = signatureValue;
 
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.CHALLENGE_MAX_MATURITY_INIT_PARAM_NAME))
+				.andReturn(null);
 		EasyMock
 				.expect(
 						mockServletConfig
@@ -229,38 +326,31 @@ public class AuthenticationDataMessageHandlerTest {
 										+ "Class")).andReturn(
 						AuditTestService.class.getName());
 
-		EasyMock
-				.expect(
-						mockHttpSession
-								.getAttribute(AuthenticationDataMessageHandler.AUTHN_CHALLENGE_SESSION_ATTRIBUTE))
-				.andReturn(challenge);
-		mockHttpSession
-				.removeAttribute(AuthenticationDataMessageHandler.AUTHN_CHALLENGE_SESSION_ATTRIBUTE);
-
 		String remoteAddress = "1.2.3.4";
 		EasyMock.expect(mockServletRequest.getRemoteAddr()).andReturn(
 				remoteAddress);
 
 		// prepare
-		EasyMock.replay(mockHttpSession, mockServletRequest, mockServletConfig);
+		EasyMock.replay(mockServletRequest, mockServletConfig);
 
 		// operate
 		this.testedInstance.init(mockServletConfig);
 
 		try {
 			this.testedInstance.handleMessage(message, httpHeaders,
-					mockServletRequest, mockHttpSession);
+					mockServletRequest, testHttpSession);
 			fail();
 		} catch (SecurityException e) {
 			// expected
 		}
 
 		// verify
-		EasyMock.verify(mockHttpSession, mockServletRequest, mockServletConfig);
+		EasyMock.verify(mockServletRequest, mockServletConfig);
 		assertFalse(AuthenticationTestService.isCalled());
 		assertNull(AuditTestService.getAuditUserId());
 		assertEquals(remoteAddress, AuditTestService.getAuditRemoteAddress());
 		assertEquals(certificate, AuditTestService.getAuditClientCertificate());
+		assertNull(testHttpSession.getAttribute("eid.identifier"));
 	}
 
 	@Test
@@ -282,13 +372,14 @@ public class AuthenticationDataMessageHandlerTest {
 		message.saltValue = salt;
 
 		Map<String, String> httpHeaders = new HashMap<String, String>();
-		HttpSession mockHttpSession = EasyMock.createMock(HttpSession.class);
+		HttpSession testHttpSession = new HttpTestSession();
 		HttpServletRequest mockServletRequest = EasyMock
 				.createMock(HttpServletRequest.class);
 		ServletConfig mockServletConfig = EasyMock
 				.createMock(ServletConfig.class);
 
-		byte[] challenge = "challenge".getBytes();
+		byte[] challenge = AuthenticationChallenge
+				.generateChallenge(testHttpSession);
 
 		AuthenticationContract authenticationContract = new AuthenticationContract(
 				salt, null, null, challenge);
@@ -299,6 +390,11 @@ public class AuthenticationDataMessageHandlerTest {
 		byte[] signatureValue = signature.sign();
 		message.signatureValue = signatureValue;
 
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.CHALLENGE_MAX_MATURITY_INIT_PARAM_NAME))
+				.andReturn(null);
 		EasyMock
 				.expect(
 						mockServletConfig
@@ -331,34 +427,19 @@ public class AuthenticationDataMessageHandlerTest {
 								.getInitParameter(AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME
 										+ "Class")).andReturn(null);
 
-		EasyMock
-				.expect(
-						mockHttpSession
-								.getAttribute(AuthenticationDataMessageHandler.AUTHN_CHALLENGE_SESSION_ATTRIBUTE))
-				.andReturn(challenge);
-		mockHttpSession
-				.removeAttribute(AuthenticationDataMessageHandler.AUTHN_CHALLENGE_SESSION_ATTRIBUTE);
-
-		mockHttpSession
-				.setAttribute(
-						AuthenticationDataMessageHandler.AUTHENTICATED_USER_IDENTIFIER_SESSION_ATTRIBUTE,
-						userId);
-		EasyMock.expect(mockHttpSession.getAttribute("eid")).andReturn(null);
-		mockHttpSession.setAttribute(EasyMock.eq("eid"), EasyMock
-				.isA(EIdData.class));
-
 		// prepare
-		EasyMock.replay(mockHttpSession, mockServletRequest, mockServletConfig);
+		EasyMock.replay(mockServletRequest, mockServletConfig);
 
 		// operate
 		this.testedInstance.init(mockServletConfig);
 		this.testedInstance.handleMessage(message, httpHeaders,
-				mockServletRequest, mockHttpSession);
+				mockServletRequest, testHttpSession);
 
 		// verify
-		EasyMock.verify(mockHttpSession, mockServletRequest, mockServletConfig);
+		EasyMock.verify(mockServletRequest, mockServletConfig);
 		assertTrue(AuthenticationTestService.isCalled());
 		assertNull(AuditTestService.getAuditUserId());
+		assertEquals(userId, testHttpSession.getAttribute("eid.identifier"));
 	}
 
 	public static class AuthenticationTestService implements
