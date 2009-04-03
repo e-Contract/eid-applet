@@ -19,7 +19,6 @@
 package be.fedict.eid.applet.service.impl;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
@@ -99,8 +98,6 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	private ServiceLocator<SignatureService> signatureServiceLocator;
 
-	private SecureRandom secureRandom;
-
 	public Object handleMessage(HelloMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
 			HttpSession session) throws ServletException {
@@ -148,12 +145,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 		AuthenticationService authenticationService = this.authenticationServiceLocator
 				.locateService();
 		if (null != authenticationService) {
-			// since SHA-1 is 20 bytes we also take 20 here.
-			byte[] challenge = new byte[20];
-			this.secureRandom.nextBytes(challenge);
-			// also keep the challenge in the session (server side!)
-			AuthenticationDataMessageHandler.setAuthnChallenge(challenge,
-					session);
+			byte[] challenge = AuthenticationChallenge
+					.generateChallenge(session);
 			AuthenticationRequestMessage authenticationRequestMessage = new AuthenticationRequestMessage(
 					challenge, this.includeHostname, this.includeInetAddress,
 					this.logoff, this.removeCard);
@@ -192,9 +185,6 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 				config);
 		this.signatureServiceLocator = new ServiceLocator<SignatureService>(
 				SIGNATURE_SERVICE_INIT_PARAM_NAME, config);
-
-		this.secureRandom = new SecureRandom();
-		this.secureRandom.setSeed(System.currentTimeMillis());
 
 		String removeCard = config
 				.getInitParameter(REMOVE_CARD_INIT_PARAM_NAME);

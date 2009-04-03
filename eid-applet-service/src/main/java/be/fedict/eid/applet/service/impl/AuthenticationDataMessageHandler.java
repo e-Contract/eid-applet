@@ -67,13 +67,13 @@ public class AuthenticationDataMessageHandler implements
 
 	private InetAddress inetAddress;
 
+	private Long maxMaturity;
+
 	public static final String AUTHN_SERVICE_INIT_PARAM_NAME = "AuthenticationService";
 
 	public static final String AUDIT_SERVICE_INIT_PARAM_NAME = "AuditService";
 
-	public static final String AUTHN_CHALLENGE_SESSION_ATTRIBUTE = AuthenticationDataMessageHandler.class
-			.getName()
-			+ ".authnChallence";
+	public static final String CHALLENGE_MAX_MATURITY_INIT_PARAM_NAME = "ChallengeMaxMaturity";
 
 	public Object handleMessage(AuthenticationDataMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
@@ -86,8 +86,20 @@ public class AuthenticationDataMessageHandler implements
 		LOG.debug("authn signing certificate: " + signingCertificate);
 		PublicKey signingKey = signingCertificate.getPublicKey();
 
-		byte[] challenge = AuthenticationDataMessageHandler
-				.getAuthnChallenge(session);
+		byte[] challenge;
+		try {
+			challenge = AuthenticationChallenge.getAuthnChallenge(session,
+					maxMaturity);
+		} catch (SecurityException e) {
+			AuditService auditService = this.auditServiceLocator
+					.locateService();
+			if (null != auditService) {
+				String remoteAddress = request.getRemoteAddr();
+				auditService.authenticationError(remoteAddress,
+						signingCertificate);
+			}
+			throw new ServletException("security error: " + e.getMessage(), e);
+		}
 		AuthenticationContract authenticationContract = new AuthenticationContract(
 				message.saltValue, this.hostname, this.inetAddress, challenge);
 		byte[] toBeSigned;
@@ -177,20 +189,14 @@ public class AuthenticationDataMessageHandler implements
 				throw new ServletException("unknown host: " + inetAddress);
 			}
 		}
-	}
 
-	public static void setAuthnChallenge(byte[] challenge, HttpSession session) {
-		session
-				.setAttribute(
-						AuthenticationDataMessageHandler.AUTHN_CHALLENGE_SESSION_ATTRIBUTE,
-						challenge);
-	}
-
-	public static byte[] getAuthnChallenge(HttpSession session) {
-		byte[] challenge = (byte[]) session
-				.getAttribute(AuthenticationDataMessageHandler.AUTHN_CHALLENGE_SESSION_ATTRIBUTE);
-		session
-				.removeAttribute(AuthenticationDataMessageHandler.AUTHN_CHALLENGE_SESSION_ATTRIBUTE);
-		return challenge;
+		String maxMaturity = config
+				.getInitParameter(CHALLENGE_MAX_MATURITY_INIT_PARAM_NAME);
+		if (null != maxMaturity) {
+			this.maxMaturity = Long.parseLong(maxMaturity);
+			LOG.debug("explicit max maturity: " + this.maxMaturity);
+		} else {
+			this.maxMaturity = null;
+		}
 	}
 }

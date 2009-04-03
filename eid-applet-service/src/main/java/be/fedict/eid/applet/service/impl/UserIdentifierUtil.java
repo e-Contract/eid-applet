@@ -22,12 +22,24 @@ import java.security.cert.X509Certificate;
 
 import javax.security.auth.x500.X500Principal;
 
+/**
+ * Utility class for user identifier construction.
+ * 
+ * @author fcorneli
+ * 
+ */
 public class UserIdentifierUtil {
 
 	private UserIdentifierUtil() {
 		super();
 	}
 
+	/**
+	 * Gives back a unique user identifier given an X509 certificate.
+	 * 
+	 * @param signingCertificate
+	 * @return
+	 */
 	public static String getUserId(X509Certificate signingCertificate) {
 		X500Principal userPrincipal = signingCertificate
 				.getSubjectX500Principal();
