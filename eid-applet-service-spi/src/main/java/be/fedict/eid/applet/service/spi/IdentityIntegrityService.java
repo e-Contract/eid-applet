@@ -31,9 +31,16 @@ import java.security.cert.X509Certificate;
 public interface IdentityIntegrityService {
 
 	/**
-	 * Checks the validity of the National Registration certificate.
+	 * Checks the validity of the National Registration certificate. After the
+	 * eID Applet Service has performed the integrity checks on the incoming
+	 * identity data files it will invoke this method on your component. Your
+	 * implementation should check the validity of the given national
+	 * registration certificate. This method should only be used to validation
+	 * the national registration certificate. Processing the incoming identity
+	 * data should be handled as part of the eID Applet target page.
 	 * 
 	 * @param certificate
+	 *            the national registration X509 certificate.
 	 * @throws SecurityException
 	 *             in case the certificate is invalid/not accepted.
 	 */

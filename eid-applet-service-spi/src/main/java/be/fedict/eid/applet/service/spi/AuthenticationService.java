@@ -30,10 +30,19 @@ import java.util.List;
 public interface AuthenticationService {
 
 	/**
-	 * Validates the given certificate chain.
+	 * Validates the given certificate chain. After the eID Applet Service has
+	 * verified the authentication signature it will invoke this method on your
+	 * authentication service component. The implementation of this method
+	 * should validate the given certificate chain. This validation could be
+	 * based on PKI validation, or could be based on simply trusting the
+	 * incoming public key. The actual implementation is very dependent on your
+	 * type of application. This method should only be used for certificate
+	 * validation. Processing the incoming citizen identifier (if required at
+	 * all) should be handled as part of the eID Applet target page.
 	 * 
 	 * @param certificateChain
 	 * @throws SecurityException
+	 *             in case the certificate chain is invalid/not accepted.
 	 */
 	void validateCertificateChain(List<X509Certificate> certificateChain)
 			throws SecurityException;
