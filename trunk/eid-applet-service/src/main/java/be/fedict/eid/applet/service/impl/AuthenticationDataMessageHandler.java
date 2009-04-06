@@ -27,6 +27,7 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.util.encoders.Hex;
 
 import be.fedict.eid.applet.service.EIdData;
 import be.fedict.eid.applet.service.spi.AuditService;
@@ -86,6 +88,33 @@ public class AuthenticationDataMessageHandler implements
 		LOG.debug("authn signing certificate: " + signingCertificate);
 		PublicKey signingKey = signingCertificate.getPublicKey();
 
+		byte[] sessionId = message.sessionId;
+		/*
+		 * Next is Tomcat specific.
+		 */
+		String actualSessionId = (String) request
+				.getAttribute("javax.servlet.request.ssl_session");
+		if (null == actualSessionId) {
+			/*
+			 * Servlet specs v3.0
+			 */
+			actualSessionId = (String) request
+					.getAttribute("javax.servlet.request.ssl_session_id");
+		}
+		if (null == actualSessionId) {
+			LOG.warn("could not verify the SSL session identifier");
+		} else {
+			if (false == Arrays.equals(sessionId, Hex.decode(actualSessionId))) {
+				LOG.debug("SSL session Id mismatch");
+				LOG.debug("signed SSL session Id: "
+						+ new String(Hex.encode(sessionId)));
+				LOG.debug("actual SSL session Id: " + actualSessionId);
+				throw new SecurityException("SSL session Id mismatch");
+			} else {
+				LOG.debug("SSL session identifier checked");
+			}
+		}
+
 		byte[] challenge;
 		try {
 			challenge = AuthenticationChallenge.getAuthnChallenge(session,
@@ -101,7 +130,8 @@ public class AuthenticationDataMessageHandler implements
 			throw new ServletException("security error: " + e.getMessage(), e);
 		}
 		AuthenticationContract authenticationContract = new AuthenticationContract(
-				message.saltValue, this.hostname, this.inetAddress, challenge);
+				message.saltValue, this.hostname, this.inetAddress,
+				message.sessionId, challenge);
 		byte[] toBeSigned;
 		try {
 			toBeSigned = authenticationContract.calculateToBeSigned();

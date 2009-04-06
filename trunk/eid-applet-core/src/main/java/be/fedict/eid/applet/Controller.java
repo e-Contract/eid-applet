@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -689,8 +691,16 @@ public class Controller {
 			inetAddress = null;
 		}
 
+		SSLSocketFactory sslSocketFactory = HttpsURLConnection
+				.getDefaultSSLSocketFactory();
+		if (false == sslSocketFactory instanceof AppletSSLSocketFactory) {
+			throw new SecurityException("wrong SSL socket factory");
+		}
+		AppletSSLSocketFactory appletSslSocketFactory = (AppletSSLSocketFactory) sslSocketFactory;
+		byte[] sessionId = appletSslSocketFactory.getSessionId();
+
 		AuthenticationContract authenticationContract = new AuthenticationContract(
-				salt, hostname, inetAddress, challenge);
+				salt, hostname, inetAddress, sessionId, challenge);
 		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
 
 		setStatusMessage(Status.NORMAL, this.messages
@@ -705,8 +715,8 @@ public class Controller {
 			addDetailMessage("eID Middleware PKCS#11 library not found.");
 			if (null != this.pcscEidSpi) {
 				addDetailMessage("fallback to PC/SC interface for authentication...");
-				performEidPcscAuthnOperation(salt, toBeSigned, logoff,
-						removeCard);
+				performEidPcscAuthnOperation(salt, sessionId, toBeSigned,
+						logoff, removeCard);
 				return;
 			}
 			throw new PKCS11NotFoundException();
@@ -758,15 +768,16 @@ public class Controller {
 		}
 
 		AuthenticationDataMessage authenticationDataMessage = new AuthenticationDataMessage(
-				salt, signatureValue, authnCertChain);
+				salt, sessionId, signatureValue, authnCertChain);
 		Object responseMessage = sendMessage(authenticationDataMessage);
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");
 		}
 	}
 
-	private void performEidPcscAuthnOperation(byte[] salt, byte[] toBeSigned,
-			boolean logoff, boolean removeCard) throws Exception {
+	private void performEidPcscAuthnOperation(byte[] salt, byte[] sessionId,
+			byte[] toBeSigned, boolean logoff, boolean removeCard)
+			throws Exception {
 		setStatusMessage(Status.NORMAL, this.messages
 				.getMessage(MESSAGE_ID.DETECTING_CARD));
 		if (false == this.pcscEidSpi.isEidPresent()) {
@@ -795,7 +806,7 @@ public class Controller {
 		}
 
 		AuthenticationDataMessage authenticationDataMessage = new AuthenticationDataMessage(
-				salt, signatureValue, authnCertChain);
+				salt, sessionId, signatureValue, authnCertChain);
 		Object responseMessage = sendMessage(authenticationDataMessage);
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");
@@ -981,6 +992,19 @@ public class Controller {
 
 		URL appletServiceUrl = new URL(this.runtime.getDocumentBase(),
 				appletServiceParam);
+
+		/*
+		 * Install our SSL socket factory.
+		 */
+		SSLSocketFactory sslSocketFactory = HttpsURLConnection
+				.getDefaultSSLSocketFactory();
+		if (false == sslSocketFactory instanceof AppletSSLSocketFactory) {
+			AppletSSLSocketFactory appletSslSocketFactory = new AppletSSLSocketFactory(
+					this.view, sslSocketFactory);
+			HttpsURLConnection
+					.setDefaultSSLSocketFactory(appletSslSocketFactory);
+		}
+
 		HttpURLConnection connection = (HttpURLConnection) appletServiceUrl
 				.openConnection();
 		return connection;

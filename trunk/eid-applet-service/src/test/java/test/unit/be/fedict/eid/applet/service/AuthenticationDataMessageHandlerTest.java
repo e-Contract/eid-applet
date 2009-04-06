@@ -37,6 +37,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.easymock.EasyMock;
@@ -74,11 +75,13 @@ public class AuthenticationDataMessageHandlerTest {
 				notAfter, null, keyPair.getPrivate(), true, 0, null, null);
 
 		byte[] salt = "salt".getBytes();
+		byte[] sessionId = "session-id".getBytes();
 
 		AuthenticationDataMessage message = new AuthenticationDataMessage();
 		message.certificateChain = new LinkedList<X509Certificate>();
 		message.certificateChain.add(certificate);
 		message.saltValue = salt;
+		message.sessionId = sessionId;
 
 		Map<String, String> httpHeaders = new HashMap<String, String>();
 		HttpSession testHttpSession = new HttpTestSession();
@@ -91,7 +94,7 @@ public class AuthenticationDataMessageHandlerTest {
 				.generateChallenge(testHttpSession);
 
 		AuthenticationContract authenticationContract = new AuthenticationContract(
-				salt, null, null, challenge);
+				salt, null, null, sessionId, challenge);
 		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
 		Signature signature = Signature.getInstance("SHA1withRSA");
 		signature.initSign(keyPair.getPrivate());
@@ -137,6 +140,11 @@ public class AuthenticationDataMessageHandlerTest {
 										+ "Class")).andReturn(
 						AuditTestService.class.getName());
 
+		EasyMock.expect(
+				mockServletRequest
+						.getAttribute("javax.servlet.request.ssl_session"))
+				.andStubReturn(new String(Hex.encodeHex(sessionId)));
+
 		// prepare
 		EasyMock.replay(mockServletRequest, mockServletConfig);
 
@@ -164,11 +172,13 @@ public class AuthenticationDataMessageHandlerTest {
 				notAfter, null, keyPair.getPrivate(), true, 0, null, null);
 
 		byte[] salt = "salt".getBytes();
+		byte[] sessionId = "session-id".getBytes();
 
 		AuthenticationDataMessage message = new AuthenticationDataMessage();
 		message.certificateChain = new LinkedList<X509Certificate>();
 		message.certificateChain.add(certificate);
 		message.saltValue = salt;
+		message.sessionId = sessionId;
 
 		Map<String, String> httpHeaders = new HashMap<String, String>();
 		HttpSession testHttpSession = new HttpTestSession();
@@ -183,7 +193,7 @@ public class AuthenticationDataMessageHandlerTest {
 		Thread.sleep(1000); // > 1 ms
 
 		AuthenticationContract authenticationContract = new AuthenticationContract(
-				salt, null, null, challenge);
+				salt, null, null, sessionId, challenge);
 		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
 		Signature signature = Signature.getInstance("SHA1withRSA");
 		signature.initSign(keyPair.getPrivate());
@@ -231,6 +241,11 @@ public class AuthenticationDataMessageHandlerTest {
 		EasyMock.expect(mockServletRequest.getRemoteAddr()).andStubReturn(
 				"remote-address");
 
+		EasyMock.expect(
+				mockServletRequest
+						.getAttribute("javax.servlet.request.ssl_session"))
+				.andStubReturn(new String(Hex.encodeHex(sessionId)));
+
 		// prepare
 		EasyMock.replay(mockServletRequest, mockServletConfig);
 
@@ -264,11 +279,13 @@ public class AuthenticationDataMessageHandlerTest {
 				notAfter, null, keyPair.getPrivate(), true, 0, null, null);
 
 		byte[] salt = "salt".getBytes();
+		byte[] sessionId = "session-id".getBytes();
 
 		AuthenticationDataMessage message = new AuthenticationDataMessage();
 		message.certificateChain = new LinkedList<X509Certificate>();
 		message.certificateChain.add(certificate);
 		message.saltValue = salt;
+		message.sessionId = sessionId;
 
 		Map<String, String> httpHeaders = new HashMap<String, String>();
 		HttpSession testHttpSession = new HttpTestSession();
@@ -280,7 +297,7 @@ public class AuthenticationDataMessageHandlerTest {
 		AuthenticationChallenge.generateChallenge(testHttpSession);
 
 		AuthenticationContract authenticationContract = new AuthenticationContract(
-				salt, null, null, "foobar-challenge".getBytes());
+				salt, null, null, sessionId, "foobar-challenge".getBytes());
 		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
 		Signature signature = Signature.getInstance("SHA1withRSA");
 		signature.initSign(keyPair.getPrivate());
@@ -326,6 +343,11 @@ public class AuthenticationDataMessageHandlerTest {
 										+ "Class")).andReturn(
 						AuditTestService.class.getName());
 
+		EasyMock.expect(
+				mockServletRequest
+						.getAttribute("javax.servlet.request.ssl_session"))
+				.andStubReturn(new String(Hex.encodeHex(sessionId)));
+
 		String remoteAddress = "1.2.3.4";
 		EasyMock.expect(mockServletRequest.getRemoteAddr()).andReturn(
 				remoteAddress);
@@ -365,11 +387,13 @@ public class AuthenticationDataMessageHandlerTest {
 				notAfter, null, keyPair.getPrivate(), true, 0, null, null);
 
 		byte[] salt = "salt".getBytes();
+		byte[] sessionId = "session-id".getBytes();
 
 		AuthenticationDataMessage message = new AuthenticationDataMessage();
 		message.certificateChain = new LinkedList<X509Certificate>();
 		message.certificateChain.add(certificate);
 		message.saltValue = salt;
+		message.sessionId = sessionId;
 
 		Map<String, String> httpHeaders = new HashMap<String, String>();
 		HttpSession testHttpSession = new HttpTestSession();
@@ -382,7 +406,7 @@ public class AuthenticationDataMessageHandlerTest {
 				.generateChallenge(testHttpSession);
 
 		AuthenticationContract authenticationContract = new AuthenticationContract(
-				salt, null, null, challenge);
+				salt, null, null, sessionId, challenge);
 		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
 		Signature signature = Signature.getInstance("SHA1withRSA");
 		signature.initSign(keyPair.getPrivate());
@@ -426,6 +450,11 @@ public class AuthenticationDataMessageHandlerTest {
 						mockServletConfig
 								.getInitParameter(AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME
 										+ "Class")).andReturn(null);
+
+		EasyMock.expect(
+				mockServletRequest
+						.getAttribute("javax.servlet.request.ssl_session"))
+				.andStubReturn(new String(Hex.encodeHex(sessionId)));
 
 		// prepare
 		EasyMock.replay(mockServletRequest, mockServletConfig);
