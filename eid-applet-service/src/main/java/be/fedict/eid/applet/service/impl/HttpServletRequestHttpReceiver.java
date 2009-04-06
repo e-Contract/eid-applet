@@ -27,8 +27,6 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import be.fedict.eid.applet.shared.protocol.HttpReceiver;
 
@@ -39,9 +37,6 @@ import be.fedict.eid.applet.shared.protocol.HttpReceiver;
  * 
  */
 public class HttpServletRequestHttpReceiver implements HttpReceiver {
-
-	private static final Log LOG = LogFactory
-			.getLog(HttpServletRequestHttpReceiver.class);
 
 	private final HttpServletRequest httpServletRequest;
 
@@ -80,14 +75,6 @@ public class HttpServletRequestHttpReceiver implements HttpReceiver {
 		if (false == this.httpServletRequest.isSecure()) {
 			return false;
 		}
-		/*
-		 * Next is Tomcat specific.
-		 */
-		String sslSessionId = (String) this.httpServletRequest
-				.getAttribute("javax.servlet.request.ssl_session");
-		// TODO: SSL session tracking?
-		// http://jira.codehaus.org/browse/JETTY-818
-		LOG.debug("SSL session Id: " + sslSessionId);
 		return true;
 	}
 }

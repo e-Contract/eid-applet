@@ -63,22 +63,41 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	@NotNull
 	public Integer saltValueSize;
 
+	@HttpHeader(HTTP_HEADER_PREFIX + "SessionIdSize")
+	@NotNull
+	public Integer sessionIdSize;
+
 	@HttpBody
 	@NotNull
-	@Description("Contains concatenation of salt value, signature value, and authn cert chain.")
+	@Description("Contains concatenation of salt value, session id, signature value, and authn cert chain.")
 	public byte[] body;
 
+	/**
+	 * Default constructor.
+	 */
 	public AuthenticationDataMessage() {
 		super();
 	}
 
-	public AuthenticationDataMessage(byte[] saltValue, byte[] signatureValue,
-			List<X509Certificate> authnCertChain) throws IOException,
-			CertificateEncodingException {
-		this.signatureValueSize = signatureValue.length;
+	/**
+	 * Main constructor.
+	 * 
+	 * @param saltValue
+	 * @param sessionId
+	 * @param signatureValue
+	 * @param authnCertChain
+	 * @throws IOException
+	 * @throws CertificateEncodingException
+	 */
+	public AuthenticationDataMessage(byte[] saltValue, byte[] sessionId,
+			byte[] signatureValue, List<X509Certificate> authnCertChain)
+			throws IOException, CertificateEncodingException {
 		this.saltValueSize = saltValue.length;
+		this.sessionIdSize = sessionId.length;
+		this.signatureValueSize = signatureValue.length;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		baos.write(saltValue);
+		baos.write(sessionId);
 		baos.write(signatureValue);
 		for (X509Certificate cert : authnCertChain) {
 			baos.write(cert.getEncoded());
@@ -95,6 +114,13 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 		this.saltValue = Arrays.copyOfRange(this.body, idx, idx
 				+ this.saltValueSize);
 		idx += this.saltValueSize;
+
+		if (0 == this.sessionIdSize) {
+			throw new RuntimeException("session Id required");
+		}
+		this.sessionId = Arrays.copyOfRange(this.body, idx, idx
+				+ this.sessionIdSize);
+		idx += this.sessionIdSize;
 
 		if (this.signatureValueSize != 128) {
 			throw new RuntimeException("signature value size invalid");
@@ -120,6 +146,8 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	}
 
 	public byte[] saltValue;
+
+	public byte[] sessionId;
 
 	public byte[] signatureValue;
 

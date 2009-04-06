@@ -39,7 +39,7 @@ import java.net.InetAddress;
  * This class allows a citizen to proof that the cryptographic signature created
  * with his authentication certificate was indeed meant as way of
  * authenticating. In case of challenge abuse, there was no intention to sign
- * any legally binding contract exception the authentication contract. If a
+ * any legally binding contract except this authentication contract. If a
  * malicious eID Applet Service tricks the citizen into signing a document
  * digest instead of a meaningless challenge, we give the citizen a proof of
  * intention via this formal authentication contract.
@@ -59,6 +59,8 @@ public class AuthenticationContract {
 	public static final String LEGAL_NOTICE = "Declaration of authentication intension.\n"
 			+ "The following data should be interpreted as an authentication challenge.\n";
 
+	private final byte[] sessionId;
+
 	private final byte[] challenge;
 
 	/**
@@ -69,13 +71,16 @@ public class AuthenticationContract {
 	 *            the optional hostname.
 	 * @param inetAddress
 	 *            the optional internet address.
+	 * @param sessionId
+	 *            the SSL session identifier.
 	 * @param challenge
 	 */
 	public AuthenticationContract(byte[] salt, String hostname,
-			InetAddress inetAddress, byte[] challenge) {
+			InetAddress inetAddress, byte[] sessionId, byte[] challenge) {
 		this.salt = salt;
 		this.hostname = hostname;
 		this.inetAddress = inetAddress;
+		this.sessionId = sessionId;
 		this.challenge = challenge;
 	}
 
@@ -104,6 +109,7 @@ public class AuthenticationContract {
 		 * signature claim on this cryptographic authentication signature.
 		 */
 		toBeSignedOutputStream.write(LEGAL_NOTICE.getBytes());
+		toBeSignedOutputStream.write(this.sessionId);
 		/*
 		 * Of course we also digest the challenge as the server needs some mean
 		 * to authenticate us.
