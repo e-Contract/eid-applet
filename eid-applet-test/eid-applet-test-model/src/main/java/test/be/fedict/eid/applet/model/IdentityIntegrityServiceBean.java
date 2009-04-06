@@ -19,6 +19,7 @@
 package test.be.fedict.eid.applet.model;
 
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 import javax.ejb.Local;
 import javax.ejb.Stateless;
@@ -41,8 +42,8 @@ public class IdentityIntegrityServiceBean implements IdentityIntegrityService {
 	private static final Log LOG = LogFactory
 			.getLog(IdentityIntegrityServiceBean.class);
 
-	public void checkNationalRegistrationCertificate(X509Certificate certificate)
-			throws SecurityException {
+	public void checkNationalRegistrationCertificate(
+			List<X509Certificate> certificateChain) throws SecurityException {
 		LOG.debug("checking national registry certificate...");
 
 		HttpServletRequest httpServletRequest;
@@ -54,6 +55,7 @@ public class IdentityIntegrityServiceBean implements IdentityIntegrityService {
 		}
 
 		HttpSession httpSession = httpServletRequest.getSession();
+		X509Certificate certificate = certificateChain.get(0);
 		httpSession.setAttribute("NationalRegistryCertificate", certificate);
 	}
 }

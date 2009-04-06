@@ -42,6 +42,9 @@ public class IdentityDataMessageSemanticValidator implements
 		if (null != object.rrnCertFileSize) {
 			expectedSize += object.rrnCertFileSize;
 		}
+		if (null != object.rootCertFileSize) {
+			expectedSize += object.rootCertFileSize;
+		}
 		if (expectedSize != object.body.length) {
 			throw new SemanticValidatorException("body size incorrect");
 		}

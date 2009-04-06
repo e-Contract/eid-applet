@@ -19,6 +19,7 @@
 package be.fedict.eid.applet.service.spi;
 
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 /**
  * Interface for identity integrity service components. Can be used by the eID
@@ -39,11 +40,11 @@ public interface IdentityIntegrityService {
 	 * the national registration certificate. Processing the incoming identity
 	 * data should be handled as part of the eID Applet target page.
 	 * 
-	 * @param certificate
-	 *            the national registration X509 certificate.
+	 * @param certificateChain
+	 *            the national registration X509 certificate chain.
 	 * @throws SecurityException
 	 *             in case the certificate is invalid/not accepted.
 	 */
-	void checkNationalRegistrationCertificate(X509Certificate certificate)
-			throws SecurityException;
+	void checkNationalRegistrationCertificate(
+			List<X509Certificate> certificateChain) throws SecurityException;
 }

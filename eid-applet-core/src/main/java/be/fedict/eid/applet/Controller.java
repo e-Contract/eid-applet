@@ -890,6 +890,7 @@ public class Controller {
 				this.maxProgress++; // address signature file
 			}
 			this.maxProgress += 1000 / 255; // RRN certificate file
+			this.maxProgress += 1000 / 255; // Root certificate file
 		}
 		this.currentProgress = 0;
 		this.view.progressIndication(this.maxProgress, this.currentProgress);
@@ -934,6 +935,7 @@ public class Controller {
 		byte[] identitySignatureFile = null;
 		byte[] addressSignatureFile = null;
 		byte[] rrnCertFile = null;
+		byte[] rootCertFile = null;
 		if (includeIntegrityData) {
 			addDetailMessage("Read identity signature file...");
 			identitySignatureFile = invokeAndBackoffOnException(new Task<byte[]>() {
@@ -958,6 +960,13 @@ public class Controller {
 							.readFile(PcscEid.RRN_CERT_FILE_ID);
 				}
 			});
+			addDetailMessage("reading root certificate file...");
+			rootCertFile = invokeAndBackoffOnException(new Task<byte[]>() {
+				public byte[] run() throws Exception {
+					return Controller.this.pcscEidSpi
+							.readFile(PcscEid.ROOT_CERT_FILE_ID);
+				}
+			});
 		}
 
 		this.view.progressIndication(-1, 0);
@@ -975,7 +984,7 @@ public class Controller {
 
 		IdentityDataMessage identityData = new IdentityDataMessage(idFile,
 				addressFile, photoFile, identitySignatureFile,
-				addressSignatureFile, rrnCertFile);
+				addressSignatureFile, rrnCertFile, rootCertFile);
 		sendMessage(identityData, FinishedMessage.class);
 	}
 

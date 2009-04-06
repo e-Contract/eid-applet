@@ -76,9 +76,6 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 		 */
 		SSLSession sslSession = sslSocket.getSession();
 		String cipherSuite = sslSession.getCipherSuite();
-		this.view.addDetailMessage("SSL cipher suite: " + cipherSuite);
-		this.view.addDetailMessage("Enable session creation: "
-				+ sslSocket.getEnableSessionCreation());
 		if ("SSL_NULL_WITH_NULL_NULL".equals(cipherSuite)) {
 			/*
 			 * Inside a browser we're depending on the SSL handshake listener to
@@ -86,6 +83,7 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 			 */
 			return;
 		}
+		this.view.addDetailMessage("SSL cipher suite: " + cipherSuite);
 		byte[] sslSessionId = sslSession.getId();
 		if (null == this.sslSessionId) {
 			this.sslSessionId = sslSessionId;
