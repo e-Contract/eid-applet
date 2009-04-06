@@ -37,3 +37,4 @@
   * [http://code.google.com/p/eidlib/ Native Java e-ID library]
   * [http://homes.esat.kuleuven.be/~decockd/wiki/bin/view.cgi eID Site of Danny De Cock]
   * [http://code.google.com/p/eid-javascript-lib/ JavaScript library to be used with the eID middleware applet.]
+  * [http://egovlabs.gv.at/scm/?group_id=13 Mocca]
