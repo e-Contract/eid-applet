@@ -67,19 +67,38 @@ public class IdentityDataMessage extends AbstractProtocolMessage {
 	@HttpHeader(HTTP_HEADER_PREFIX + "RrnCertFileSize")
 	public Integer rrnCertFileSize;
 
+	@HttpHeader(HTTP_HEADER_PREFIX + "RootCertFileSize")
+	public Integer rootCertFileSize;
+
 	@HttpBody
 	@NotNull
-	@Description("Concatenation of identity file, optional address file, optional photo file, optional identity signature file, optional address signature file, and optional national registry certificate.")
+	@Description("Concatenation of identity file, optional address file, optional photo file, optional identity signature file, optional address signature file, and optional national registry certificate and root certificate.")
 	// TODO: @MaxSize(1024 * 100)
 	public byte[] body;
 
+	/**
+	 * Default constructor.
+	 */
 	public IdentityDataMessage() {
 		super();
 	}
 
+	/**
+	 * Main constructor.
+	 * 
+	 * @param idFile
+	 * @param addressFile
+	 * @param photoFile
+	 * @param identitySignatureFile
+	 * @param addressSignatureFile
+	 * @param rrnCertFile
+	 * @param rootCertFile
+	 * @throws IOException
+	 */
 	public IdentityDataMessage(byte[] idFile, byte[] addressFile,
 			byte[] photoFile, byte[] identitySignatureFile,
-			byte[] addressSignatureFile, byte[] rrnCertFile) throws IOException {
+			byte[] addressSignatureFile, byte[] rrnCertFile, byte[] rootCertFile)
+			throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		this.identityFileSize = idFile.length;
 		baos.write(idFile);
@@ -102,6 +121,10 @@ public class IdentityDataMessage extends AbstractProtocolMessage {
 		if (null != rrnCertFile) {
 			baos.write(rrnCertFile);
 			this.rrnCertFileSize = rrnCertFile.length;
+		}
+		if (null != rootCertFile) {
+			baos.write(rootCertFile);
+			this.rootCertFileSize = rootCertFile.length;
 		}
 		this.body = baos.toByteArray();
 	}
@@ -141,6 +164,12 @@ public class IdentityDataMessage extends AbstractProtocolMessage {
 					+ this.rrnCertFileSize);
 			idx += this.rrnCertFileSize;
 		}
+
+		if (null != this.rootCertFileSize) {
+			this.rootCertFile = Arrays.copyOfRange(this.body, idx, idx
+					+ this.rootCertFileSize);
+			idx += this.rootCertFileSize;
+		}
 	}
 
 	public byte[] idFile;
@@ -154,4 +183,6 @@ public class IdentityDataMessage extends AbstractProtocolMessage {
 	public byte[] addressSignatureFile;
 
 	public byte[] rrnCertFile;
+
+	public byte[] rootCertFile;
 }

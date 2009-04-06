@@ -29,6 +29,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
@@ -154,8 +156,12 @@ public class IdentityDataMessageHandler implements
 			}
 			LOG.debug("checking national registration certificate: "
 					+ rrnCertificate.getSubjectX500Principal());
+			X509Certificate rootCertificate = getCertificate(message.rootCertFile);
+			List<X509Certificate> rrnCertificateChain = new LinkedList<X509Certificate>();
+			rrnCertificateChain.add(rrnCertificate);
+			rrnCertificateChain.add(rootCertificate);
 			identityIntegrityService
-					.checkNationalRegistrationCertificate(rrnCertificate);
+					.checkNationalRegistrationCertificate(rrnCertificateChain);
 		}
 
 		if (null != message.photoFile) {

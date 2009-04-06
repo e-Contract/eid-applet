@@ -26,6 +26,7 @@ import java.security.KeyPair;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
@@ -113,12 +114,17 @@ public class IdentityDataMessageHandlerTest {
 	@Test
 	public void testHandleMessageWithIntegrityCheck() throws Exception {
 		// setup
-		KeyPair keyPair = MiscTestUtils.generateKeyPair();
+		KeyPair rootKeyPair = MiscTestUtils.generateKeyPair();
+		KeyPair rrnKeyPair = MiscTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = MiscTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=TestNationalRegistration", notBefore,
-				notAfter, null, keyPair.getPrivate(), true, 0, null, null);
+		X509Certificate rootCertificate = MiscTestUtils.generateCertificate(
+				rootKeyPair.getPublic(), "CN=TestRootCA", notBefore, notAfter,
+				null, rootKeyPair.getPrivate(), true, 0, null, null);
+		X509Certificate rrnCertificate = MiscTestUtils.generateCertificate(
+				rrnKeyPair.getPublic(), "CN=TestNationalRegistration",
+				notBefore, notAfter, null, rootKeyPair.getPrivate(), false, 0,
+				null, null);
 
 		ServletConfig mockServletConfig = EasyMock
 				.createMock(ServletConfig.class);
@@ -159,11 +165,12 @@ public class IdentityDataMessageHandlerTest {
 		message.idFile = idFile;
 
 		Signature signature = Signature.getInstance("SHA1withRSA");
-		signature.initSign(keyPair.getPrivate());
+		signature.initSign(rrnKeyPair.getPrivate());
 		signature.update(idFile);
 		byte[] idFileSignature = signature.sign();
 		message.identitySignatureFile = idFileSignature;
-		message.rrnCertFile = certificate.getEncoded();
+		message.rrnCertFile = rrnCertificate.getEncoded();
+		message.rootCertFile = rootCertificate.getEncoded();
 
 		// prepare
 		EasyMock.replay(mockServletConfig, mockHttpSession, mockServletRequest);
@@ -175,7 +182,8 @@ public class IdentityDataMessageHandlerTest {
 
 		// verify
 		EasyMock.verify(mockServletConfig, mockHttpSession, mockServletRequest);
-		assertEquals(certificate, IdentityIntegrityTestService.getCertificate());
+		assertEquals(rrnCertificate, IdentityIntegrityTestService
+				.getCertificate());
 	}
 
 	@Test
@@ -325,8 +333,9 @@ public class IdentityDataMessageHandlerTest {
 		}
 
 		public void checkNationalRegistrationCertificate(
-				X509Certificate certificate) throws SecurityException {
-			IdentityIntegrityTestService.certificate = certificate;
+				List<X509Certificate> certificateChain)
+				throws SecurityException {
+			IdentityIntegrityTestService.certificate = certificateChain.get(0);
 		}
 	}
 }
