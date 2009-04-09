@@ -42,6 +42,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import be.fedict.eid.applet.service.Address;
+import be.fedict.eid.applet.service.EIdCertsData;
 import be.fedict.eid.applet.service.EIdData;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.spi.AuditService;
@@ -70,9 +71,21 @@ public class IdentityDataMessageHandler implements
 
 	public static final String EID_SESSION_ATTRIBUTE = "eid";
 
+	public static final String EID_CERTS_SESSION_ATTRIBUTE = "eid.certs";
+
+	public static final String AUTHN_CERT_SESSION_ATTRIBUTE = "eid.certs.authn";
+
+	public static final String SIGN_CERT_SESSION_ATTRIBUTE = "eid.certs.sign";
+
+	public static final String CA_CERT_SESSION_ATTRIBUTE = "eid.certs.ca";
+
+	public static final String ROOT_CERT_SESSION_ATTRIBTUE = "eid.certs.root";
+
 	private boolean includePhoto;
 
 	private boolean includeAddress;
+
+	private boolean includeCertificates;
 
 	private ServiceLocator<IdentityIntegrityService> identityIntegrityServiceLocator;
 
@@ -107,6 +120,33 @@ public class IdentityDataMessageHandler implements
 						"Address not included while requested");
 			}
 			address = null;
+		}
+
+		X509Certificate authnCert = null;
+		X509Certificate signCert = null;
+		X509Certificate caCert = null;
+		X509Certificate rootCert = null;
+		if (this.includeCertificates) {
+			if (null == message.authnCertFile) {
+				throw new ServletException(
+						"authn cert not included while requested");
+			}
+			if (null == message.signCertFile) {
+				throw new ServletException(
+						"sign cert not included while requested");
+			}
+			if (null == message.caCertFile) {
+				throw new ServletException(
+						"CA cert not included while requested");
+			}
+			if (null == message.rootCertFile) {
+				throw new ServletException(
+						"root cert not included while requested");
+			}
+			authnCert = getCertificate(message.authnCertFile);
+			signCert = getCertificate(message.signCertFile);
+			caCert = getCertificate(message.caCertFile);
+			rootCert = getCertificate(message.rootCertFile);
 		}
 
 		IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
@@ -192,6 +232,13 @@ public class IdentityDataMessageHandler implements
 			session.setAttribute(PHOTO_SESSION_ATTRIBUTE, message.photoFile);
 		}
 
+		if (this.includeCertificates) {
+			session.setAttribute(AUTHN_CERT_SESSION_ATTRIBUTE, authnCert);
+			session.setAttribute(SIGN_CERT_SESSION_ATTRIBUTE, signCert);
+			session.setAttribute(CA_CERT_SESSION_ATTRIBUTE, caCert);
+			session.setAttribute(ROOT_CERT_SESSION_ATTRIBTUE, rootCert);
+		}
+
 		EIdData eidData = (EIdData) session.getAttribute(EID_SESSION_ATTRIBUTE);
 		if (null == eidData) {
 			eidData = new EIdData();
@@ -200,6 +247,21 @@ public class IdentityDataMessageHandler implements
 		eidData.identity = identity;
 		eidData.address = address;
 		eidData.photo = message.photoFile;
+		if (this.includeCertificates) {
+			EIdCertsData eidCertsData = new EIdCertsData();
+			session.setAttribute(EID_CERTS_SESSION_ATTRIBUTE, eidCertsData);
+			eidData.certs = eidCertsData;
+
+			eidCertsData.authn = authnCert;
+			eidCertsData.sign = signCert;
+			eidCertsData.ca = caCert;
+			eidCertsData.root = rootCert;
+
+			session.setAttribute(AUTHN_CERT_SESSION_ATTRIBUTE, authnCert);
+			session.setAttribute(SIGN_CERT_SESSION_ATTRIBUTE, signCert);
+			session.setAttribute(CA_CERT_SESSION_ATTRIBUTE, caCert);
+			session.setAttribute(ROOT_CERT_SESSION_ATTRIBTUE, rootCert);
+		}
 
 		return new FinishedMessage();
 	}
@@ -276,11 +338,20 @@ public class IdentityDataMessageHandler implements
 		if (null != includeAddress) {
 			this.includeAddress = Boolean.parseBoolean(includeAddress);
 		}
+
 		String includePhoto = config
 				.getInitParameter(HelloMessageHandler.INCLUDE_PHOTO_INIT_PARAM_NAME);
 		if (null != includePhoto) {
 			this.includePhoto = Boolean.parseBoolean(includePhoto);
 		}
+
+		String includeCertificates = config
+				.getInitParameter(HelloMessageHandler.INCLUDE_CERTS_INIT_PARAM_NAME);
+		if (null != includeCertificates) {
+			this.includeCertificates = Boolean
+					.parseBoolean(includeCertificates);
+		}
+
 		this.identityIntegrityServiceLocator = new ServiceLocator<IdentityIntegrityService>(
 				HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME,
 				config);

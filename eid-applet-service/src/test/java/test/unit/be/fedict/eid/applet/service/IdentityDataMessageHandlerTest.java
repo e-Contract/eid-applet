@@ -76,6 +76,9 @@ public class IdentityDataMessageHandlerTest {
 		EasyMock.expect(mockServletConfig.getInitParameter("IncludePhoto"))
 				.andStubReturn(null);
 		EasyMock.expect(
+				mockServletConfig.getInitParameter("IncludeCertificates"))
+				.andStubReturn(null);
+		EasyMock.expect(
 				mockServletConfig.getInitParameter("IdentityIntegrityService"))
 				.andStubReturn(null);
 		EasyMock.expect(
@@ -136,6 +139,9 @@ public class IdentityDataMessageHandlerTest {
 		EasyMock.expect(mockServletConfig.getInitParameter("IncludeAddress"))
 				.andStubReturn(null);
 		EasyMock.expect(mockServletConfig.getInitParameter("IncludePhoto"))
+				.andStubReturn(null);
+		EasyMock.expect(
+				mockServletConfig.getInitParameter("IncludeCertificates"))
 				.andStubReturn(null);
 		EasyMock.expect(
 				mockServletConfig.getInitParameter("IdentityIntegrityService"))
@@ -208,6 +214,9 @@ public class IdentityDataMessageHandlerTest {
 		EasyMock.expect(mockServletConfig.getInitParameter("IncludePhoto"))
 				.andStubReturn(null);
 		EasyMock.expect(
+				mockServletConfig.getInitParameter("IncludeCertificates"))
+				.andStubReturn(null);
+		EasyMock.expect(
 				mockServletConfig.getInitParameter("IdentityIntegrityService"))
 				.andStubReturn(null);
 		EasyMock.expect(
@@ -275,6 +284,9 @@ public class IdentityDataMessageHandlerTest {
 		EasyMock.expect(mockServletConfig.getInitParameter("IncludeAddress"))
 				.andStubReturn(null);
 		EasyMock.expect(mockServletConfig.getInitParameter("IncludePhoto"))
+				.andStubReturn(null);
+		EasyMock.expect(
+				mockServletConfig.getInitParameter("IncludeCertificates"))
 				.andStubReturn(null);
 		EasyMock.expect(
 				mockServletConfig.getInitParameter("IdentityIntegrityService"))
