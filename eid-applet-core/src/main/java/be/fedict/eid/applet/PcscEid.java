@@ -685,4 +685,25 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			card.disconnect(true);
 		}
 	}
+
+	public void selectBelpicJavaCardApplet() {
+		byte[] belpicAID = new byte[] { (byte) 0xA0, 0x00, 0x00, 0x00, 0x30,
+				0x29, 0x05, 0x70, 0x00, (byte) 0xAD, 0x13, 0x10, 0x01, 0x01,
+				(byte) 0xFF };
+		CommandAPDU selectApplicationApdu = new CommandAPDU(0x00, 0xA4, 0x04,
+				0x0C, belpicAID);
+		ResponseAPDU responseApdu;
+		try {
+			responseApdu = this.cardChannel.transmit(selectApplicationApdu);
+		} catch (CardException e) {
+			this.view
+					.addDetailMessage("error selecting BELPIC JavaCard Applet");
+			return;
+		}
+		if (0x9000 != responseApdu.getSW()) {
+			this.view
+					.addDetailMessage("could not select the BELPIC JavaCard Applet");
+		}
+		this.view.addDetailMessage("BELPIC JavaCard applet selected");
+	}
 }
