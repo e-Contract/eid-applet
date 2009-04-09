@@ -191,6 +191,8 @@ public class PcscTest {
 
 		LOG.debug("authentication certificate: " + authnCert);
 		LOG.debug("signature certificate: " + signCert);
+		LOG.debug("authn cert size: " + authnCertFile.length);
+		LOG.debug("sign cert size: " + signCertFile.length);
 
 		pcscEidSpi.close();
 	}

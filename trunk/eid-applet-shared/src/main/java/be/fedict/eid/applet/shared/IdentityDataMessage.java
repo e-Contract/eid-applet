@@ -70,6 +70,15 @@ public class IdentityDataMessage extends AbstractProtocolMessage {
 	@HttpHeader(HTTP_HEADER_PREFIX + "RootCertFileSize")
 	public Integer rootCertFileSize;
 
+	@HttpHeader(HTTP_HEADER_PREFIX + "AuthnCertFileSize")
+	public Integer authnCertFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "SignCertFileSize")
+	public Integer signCertFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "CaCertFileSize")
+	public Integer caCertFileSize;
+
 	@HttpBody
 	@NotNull
 	@Description("Concatenation of identity file, optional address file, optional photo file, optional identity signature file, optional address signature file, and optional national registry certificate and root certificate.")
@@ -93,12 +102,16 @@ public class IdentityDataMessage extends AbstractProtocolMessage {
 	 * @param addressSignatureFile
 	 * @param rrnCertFile
 	 * @param rootCertFile
+	 * @param authnCertFile
+	 * @param signCertFile
+	 * @param caCertFile
 	 * @throws IOException
 	 */
 	public IdentityDataMessage(byte[] idFile, byte[] addressFile,
 			byte[] photoFile, byte[] identitySignatureFile,
-			byte[] addressSignatureFile, byte[] rrnCertFile, byte[] rootCertFile)
-			throws IOException {
+			byte[] addressSignatureFile, byte[] rrnCertFile,
+			byte[] rootCertFile, byte[] authnCertFile, byte[] signCertFile,
+			byte[] caCertFile) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		this.identityFileSize = idFile.length;
 		baos.write(idFile);
@@ -117,6 +130,18 @@ public class IdentityDataMessage extends AbstractProtocolMessage {
 		if (null != addressSignatureFile) {
 			baos.write(addressSignatureFile);
 			this.addressSignatureFileSize = addressSignatureFile.length;
+		}
+		if (null != authnCertFile) {
+			baos.write(authnCertFile);
+			this.authnCertFileSize = authnCertFile.length;
+		}
+		if (null != signCertFile) {
+			baos.write(signCertFile);
+			this.signCertFileSize = signCertFile.length;
+		}
+		if (null != caCertFile) {
+			baos.write(caCertFile);
+			this.caCertFileSize = caCertFile.length;
 		}
 		if (null != rrnCertFile) {
 			baos.write(rrnCertFile);
@@ -159,6 +184,24 @@ public class IdentityDataMessage extends AbstractProtocolMessage {
 			idx += this.addressSignatureFileSize;
 		}
 
+		if (null != this.authnCertFileSize) {
+			this.authnCertFile = Arrays.copyOfRange(this.body, idx, idx
+					+ this.authnCertFileSize);
+			idx += this.authnCertFileSize;
+		}
+
+		if (null != this.signCertFileSize) {
+			this.signCertFile = Arrays.copyOfRange(this.body, idx, idx
+					+ this.signCertFileSize);
+			idx += this.signCertFileSize;
+		}
+
+		if (null != this.caCertFileSize) {
+			this.caCertFile = Arrays.copyOfRange(this.body, idx, idx
+					+ this.caCertFileSize);
+			idx += this.caCertFileSize;
+		}
+
 		if (null != this.rrnCertFileSize) {
 			this.rrnCertFile = Arrays.copyOfRange(this.body, idx, idx
 					+ this.rrnCertFileSize);
@@ -185,4 +228,10 @@ public class IdentityDataMessage extends AbstractProtocolMessage {
 	public byte[] rrnCertFile;
 
 	public byte[] rootCertFile;
+
+	public byte[] authnCertFile;
+
+	public byte[] signCertFile;
+
+	public byte[] caCertFile;
 }

@@ -158,7 +158,7 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 
 	public void handshakeCompleted(HandshakeCompletedEvent event) {
 		String cipherSuite = event.getCipherSuite();
-		this.view.addDetailMessage("Cipher suite: " + cipherSuite);
+		this.view.addDetailMessage("SSL cipher suite: " + cipherSuite);
 		SSLSession sslSession = event.getSession();
 		byte[] sslSessionId = sslSession.getId();
 		if (null == this.sslSessionId) {

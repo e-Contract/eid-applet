@@ -80,6 +80,8 @@ public class ClientEnvironmentMessageHandler implements
 
 	private boolean logoff;
 
+	private boolean includeCertificates;
+
 	private ServiceLocator<SignatureService> signatureServiceLocator;
 
 	public Object handleMessage(ClientEnvironmentMessage message,
@@ -151,17 +153,13 @@ public class ClientEnvironmentMessageHandler implements
 					this.logoff, this.removeCard);
 			return authenticationRequestMessage;
 		} else {
-			IdentificationRequestMessage responseMessage = new IdentificationRequestMessage();
-			responseMessage.includePhoto = this.includePhoto;
-			responseMessage.includeAddress = this.includeAddress;
-			responseMessage.removeCard = this.removeCard;
-			if (null != this.identityIntegrityServiceLocator.locateService()) {
-				/*
-				 * TODO: how to make this configuration more consitent with what
-				 * happens in HelloMessageHandler.
-				 */
-				responseMessage.includeIntegrityData = true;
-			}
+			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
+					.locateService();
+			boolean includeIntegrityData = null != identityIntegrityService;
+			IdentificationRequestMessage responseMessage = new IdentificationRequestMessage(
+					this.includeAddress, this.includePhoto,
+					includeIntegrityData, this.includeCertificates,
+					this.removeCard);
 			return responseMessage;
 		}
 	}
@@ -196,6 +194,13 @@ public class ClientEnvironmentMessageHandler implements
 				.getInitParameter(HelloMessageHandler.REMOVE_CARD_INIT_PARAM_NAME);
 		if (null != removeCard) {
 			this.removeCard = Boolean.parseBoolean(removeCard);
+		}
+
+		String includeCertificates = config
+				.getInitParameter(HelloMessageHandler.INCLUDE_CERTS_INIT_PARAM_NAME);
+		if (null != includeCertificates) {
+			this.includeCertificates = Boolean
+					.parseBoolean(includeCertificates);
 		}
 
 		String hostname = config

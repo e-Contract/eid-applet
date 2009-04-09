@@ -85,6 +85,8 @@ public class TransportTest {
 		// TODO: protocol optimization: next could be omitted
 		mockHttpTransmitter.addHeader("X-AppletProtocol-IncludeIntegrityData",
 				"false");
+		mockHttpTransmitter.addHeader("X-AppletProtocol-IncludeCertificates",
+				"false");
 		mockHttpTransmitter.addHeader("X-AppletProtocol-RemoveCard", "false");
 
 		// prepare

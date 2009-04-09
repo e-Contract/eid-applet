@@ -39,6 +39,15 @@ public class IdentityDataMessageSemanticValidator implements
 		if (null != object.addressSignatureFileSize) {
 			expectedSize += object.addressSignatureFileSize;
 		}
+		if (null != object.authnCertFileSize) {
+			expectedSize += object.authnCertFileSize;
+		}
+		if (null != object.signCertFileSize) {
+			expectedSize += object.signCertFileSize;
+		}
+		if (null != object.caCertFileSize) {
+			expectedSize += object.caCertFileSize;
+		}
 		if (null != object.rrnCertFileSize) {
 			expectedSize += object.rrnCertFileSize;
 		}

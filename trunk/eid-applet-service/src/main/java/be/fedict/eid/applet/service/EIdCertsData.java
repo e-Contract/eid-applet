@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2009 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -19,48 +19,33 @@
 package be.fedict.eid.applet.service;
 
 import java.io.Serializable;
+import java.security.cert.X509Certificate;
 
-/**
- * Top-level eID data container.
- * 
- * @author fcorneli
- * 
- */
-public class EIdData implements Serializable {
+public class EIdCertsData implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public Identity identity;
+	public X509Certificate authn;
 
-	public Address address;
+	public X509Certificate sign;
 
-	public byte[] photo;
+	public X509Certificate ca;
 
-	public String identifier;
+	public X509Certificate root;
 
-	public EIdCertsData certs;
-
-	public static long getSerialVersionUID() {
-		return serialVersionUID;
+	public X509Certificate getAuthn() {
+		return this.authn;
 	}
 
-	public Identity getIdentity() {
-		return this.identity;
+	public X509Certificate getSign() {
+		return this.sign;
 	}
 
-	public Address getAddress() {
-		return this.address;
+	public X509Certificate getCa() {
+		return this.ca;
 	}
 
-	public byte[] getPhoto() {
-		return this.photo;
-	}
-
-	public String getIdentifier() {
-		return this.identifier;
-	}
-
-	public EIdCertsData getCerts() {
-		return this.certs;
+	public X509Certificate getRoot() {
+		return this.root;
 	}
 }

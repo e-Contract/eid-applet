@@ -54,6 +54,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	public static final String INCLUDE_PHOTO_INIT_PARAM_NAME = "IncludePhoto";
 
+	public static final String INCLUDE_CERTS_INIT_PARAM_NAME = "IncludeCertificates";
+
 	public static final String INCLUDE_ADDRESS_INIT_PARAM_NAME = "IncludeAddress";
 
 	public static final String SECURE_CLIENT_ENV_SERVICE_INIT_PARAM_NAME = "SecureClientEnvironmentService";
@@ -89,6 +91,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 	private boolean unblockPin;
 
 	private boolean logoff;
+
+	private boolean includeCertificates;
 
 	private ServiceLocator<SecureClientEnvironmentService> secureClientEnvServiceLocator;
 
@@ -153,15 +157,12 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 			return authenticationRequestMessage;
 		}
 
-		IdentificationRequestMessage responseMessage = new IdentificationRequestMessage();
-		responseMessage.includePhoto = this.includePhoto;
-		responseMessage.includeAddress = this.includeAddress;
-		responseMessage.removeCard = this.removeCard;
 		IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
 				.locateService();
-		if (null != identityIntegrityService) {
-			responseMessage.includeIntegrityData = true;
-		}
+		boolean includeIntegrityData = null != identityIntegrityService;
+		IdentificationRequestMessage responseMessage = new IdentificationRequestMessage(
+				this.includeAddress, this.includePhoto, includeIntegrityData,
+				this.includeCertificates, this.removeCard);
 		return responseMessage;
 	}
 
@@ -190,6 +191,13 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 				.getInitParameter(REMOVE_CARD_INIT_PARAM_NAME);
 		if (null != removeCard) {
 			this.removeCard = Boolean.parseBoolean(removeCard);
+		}
+
+		String includeCertificates = config
+				.getInitParameter(INCLUDE_CERTS_INIT_PARAM_NAME);
+		if (null != includeCertificates) {
+			this.includeCertificates = Boolean
+					.parseBoolean(includeCertificates);
 		}
 
 		String hostname = config.getInitParameter(HOSTNAME_INIT_PARAM_NAME);

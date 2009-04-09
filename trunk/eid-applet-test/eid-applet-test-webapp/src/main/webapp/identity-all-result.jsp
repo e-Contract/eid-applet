@@ -144,11 +144,31 @@
 		<td><%=session.getAttribute("ClientRemoteAddress")%></td>
 	</tr>
 </table>
+
 <h2>Identity Integrity</h2>
 National Registry Certificate:
 <pre>
 <%=session.getAttribute("NationalRegistryCertificate")%>
 </pre>
+
+<h2>Certificates</h2>
+Authentication Certificate:
+<pre>
+<%=session.getAttribute("eid.certs.authn")%>
+</pre>
+Signature Certificate:
+<pre>
+<%=session.getAttribute("eid.certs.sign")%>
+</pre>
+Citizen CA Certificate:
+<pre>
+<%=session.getAttribute("eid.certs.ca")%>
+</pre>
+Root CA Certificate:
+<pre>
+<%=session.getAttribute("eid.certs.root")%>
+</pre>
+
 <p><a href="identity.pdf">Identity in PDF</a></p>
 <a href="identify-all.jsp">Again</a>
 |

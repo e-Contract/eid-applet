@@ -298,6 +298,8 @@ public class Controller {
 						+ identificationRequestMessage.includePhoto);
 				addDetailMessage("include integrity data: "
 						+ identificationRequestMessage.includeIntegrityData);
+				addDetailMessage("include certificates: "
+						+ identificationRequestMessage.includeCertificates);
 				addDetailMessage("remove card: "
 						+ identificationRequestMessage.removeCard);
 
@@ -305,6 +307,7 @@ public class Controller {
 						identificationRequestMessage.includeAddress,
 						identificationRequestMessage.includePhoto,
 						identificationRequestMessage.includeIntegrityData,
+						identificationRequestMessage.includeCertificates,
 						identificationRequestMessage.removeCard);
 			}
 		} catch (PKCS11NotFoundException e) {
@@ -813,17 +816,15 @@ public class Controller {
 		}
 	}
 
-	public static final String VERSION = "0.0.10";
+	public static final String VERSION = "0.0.11";
 
 	private void printEnvironment() {
-		addDetailMessage("eID Applet - Copyright (C) 2008-2009 FedICT.");
-		addDetailMessage("Released under GNU LGPL version 3.0 license.");
-		addDetailMessage("More info: http://code.google.com/p/eid-applet/");
-
 		addDetailMessage("eID browser applet version: " + VERSION);
 		addDetailMessage("Java version: " + System.getProperty("java.version"));
 		addDetailMessage("Java vendor: " + System.getProperty("java.vendor"));
 		addDetailMessage("OS: " + System.getProperty("os.name"));
+		addDetailMessage("OS version: " + System.getProperty("os.version"));
+		addDetailMessage("OS arch: " + System.getProperty("os.arch"));
 		addDetailMessage("Web application URL: "
 				+ this.runtime.getDocumentBase());
 		// TODO when using SunPKCS11 we only accept the Sun JRE
@@ -852,7 +853,7 @@ public class Controller {
 
 	private void performEidIdentificationOperation(boolean includeAddress,
 			boolean includePhoto, boolean includeIntegrityData,
-			boolean removeCard) throws Exception {
+			boolean includeCertificates, boolean removeCard) throws Exception {
 		setStatusMessage(Status.NORMAL, this.messages
 				.getMessage(MESSAGE_ID.DETECTING_CARD));
 		if (false == this.pcscEidSpi.isEidPresent()) {
@@ -889,8 +890,16 @@ public class Controller {
 			if (includeAddress) {
 				this.maxProgress++; // address signature file
 			}
-			this.maxProgress += 1000 / 255; // RRN certificate file
-			this.maxProgress += 1000 / 255; // Root certificate file
+			this.maxProgress += (1050 / 255) + 1; // RRN certificate file
+			this.maxProgress += (1050 / 255) + 1; // Root certificate file
+		}
+		if (includeCertificates) {
+			this.maxProgress += (1050 / 255) + 1; // authn cert file
+			this.maxProgress += (1050 / 255) + 1; // sign cert file
+			this.maxProgress += (1050 / 255) + 1; // citizen CA cert file
+			if (false == includeIntegrityData) {
+				this.maxProgress += (1050 / 255) + 1; // root CA cert file
+			}
 		}
 		this.currentProgress = 0;
 		this.view.progressIndication(this.maxProgress, this.currentProgress);
@@ -969,6 +978,45 @@ public class Controller {
 			});
 		}
 
+		byte[] authnCertFile = null;
+		byte[] signCertFile = null;
+		byte[] caCertFile = null;
+		if (includeCertificates) {
+			addDetailMessage("reading authn certificate file...");
+			authnCertFile = invokeAndBackoffOnException(new Task<byte[]>() {
+				public byte[] run() throws Exception {
+					return Controller.this.pcscEidSpi
+							.readFile(PcscEid.AUTHN_CERT_FILE_ID);
+				}
+			});
+
+			addDetailMessage("reading sign certificate file...");
+			signCertFile = invokeAndBackoffOnException(new Task<byte[]>() {
+				public byte[] run() throws Exception {
+					return Controller.this.pcscEidSpi
+							.readFile(PcscEid.SIGN_CERT_FILE_ID);
+				}
+			});
+
+			addDetailMessage("reading citizen CA certificate file...");
+			caCertFile = invokeAndBackoffOnException(new Task<byte[]>() {
+				public byte[] run() throws Exception {
+					return Controller.this.pcscEidSpi
+							.readFile(PcscEid.CA_CERT_FILE_ID);
+				}
+			});
+
+			if (null == rootCertFile) {
+				addDetailMessage("reading root certificate file...");
+				rootCertFile = invokeAndBackoffOnException(new Task<byte[]>() {
+					public byte[] run() throws Exception {
+						return Controller.this.pcscEidSpi
+								.readFile(PcscEid.ROOT_CERT_FILE_ID);
+					}
+				});
+			}
+		}
+
 		this.view.progressIndication(-1, 0);
 
 		if (removeCard) {
@@ -984,7 +1032,8 @@ public class Controller {
 
 		IdentityDataMessage identityData = new IdentityDataMessage(idFile,
 				addressFile, photoFile, identitySignatureFile,
-				addressSignatureFile, rrnCertFile, rootCertFile);
+				addressSignatureFile, rrnCertFile, rootCertFile, authnCertFile,
+				signCertFile, caCertFile);
 		sendMessage(identityData, FinishedMessage.class);
 	}
 
