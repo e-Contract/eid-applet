@@ -1050,6 +1050,15 @@ public class Controller {
 				throw new RuntimeException("error sleeping");
 			}
 			tries--;
+			/*
+			 * Because software like ActivClient select the JavaCard card
+			 * manager to browse the available JavaCard applets on inserted
+			 * smart cards, we risk of not having the Belpic JavaCard applet
+			 * selected per default. To circumvent this situation we explicitly
+			 * select the Belpic JavaCard applet after a failed eID APDU
+			 * sequence.
+			 */
+			Controller.this.pcscEidSpi.selectBelpicJavaCardApplet();
 		}
 		throw new RuntimeException("maximum tries exceeded. I give up.");
 	}

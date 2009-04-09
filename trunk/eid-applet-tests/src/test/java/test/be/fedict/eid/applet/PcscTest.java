@@ -26,6 +26,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.security.Signature;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Locale;
@@ -166,6 +167,30 @@ public class PcscTest {
 		assertNotNull(image);
 		LOG.debug("width: " + image.getWidth());
 		LOG.debug("height: " + image.getHeight());
+
+		pcscEidSpi.close();
+	}
+
+	@Test
+	public void displayCitizenCertificates() throws Exception {
+		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEidSpi.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEidSpi.waitForEidPresent();
+		}
+
+		byte[] authnCertFile = pcscEidSpi.readFile(PcscEid.AUTHN_CERT_FILE_ID);
+		byte[] signCertFile = pcscEidSpi.readFile(PcscEid.SIGN_CERT_FILE_ID);
+
+		CertificateFactory certificateFactory = CertificateFactory
+				.getInstance("X.509");
+		X509Certificate authnCert = (X509Certificate) certificateFactory
+				.generateCertificate(new ByteArrayInputStream(authnCertFile));
+		X509Certificate signCert = (X509Certificate) certificateFactory
+				.generateCertificate(new ByteArrayInputStream(signCertFile));
+
+		LOG.debug("authentication certificate: " + authnCert);
+		LOG.debug("signature certificate: " + signCert);
 
 		pcscEidSpi.close();
 	}

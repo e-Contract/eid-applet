@@ -73,4 +73,6 @@ public interface PcscEidSpi {
 	void addObserver(Observer observer);
 
 	void logoff(String readerName) throws Exception;
+
+	void selectBelpicJavaCardApplet();
 }

@@ -220,12 +220,24 @@ public class Pkcs15Test {
 	}
 
 	@Test
-	public void testSelectBelpicApplication() throws Exception {
+	public void testSelectPkcs15Application() throws Exception {
 		CardChannel cardChannel = this.pcscEid.getCardChannel();
 		byte[] aId = new byte[] { (byte) 0xa0, 0x00, 0x00, 0x01, 0x77, 0x50,
 				0x4b, 0x43, 0x53, 0x2d, 0x31, 0x35 };
 		CommandAPDU selectApplicationApdu = new CommandAPDU(0x00, 0xA4, 0x04,
 				0x0C, aId);
+		ResponseAPDU responseApdu = cardChannel.transmit(selectApplicationApdu);
+		assertEquals(0x9000, responseApdu.getSW());
+	}
+
+	@Test
+	public void testSelectBelpicApplication() throws Exception {
+		CardChannel cardChannel = this.pcscEid.getCardChannel();
+		byte[] belpicAID = new byte[] { (byte) 0xA0, 0x00, 0x00, 0x00, 0x30,
+				0x29, 0x05, 0x70, 0x00, (byte) 0xAD, 0x13, 0x10, 0x01, 0x01,
+				(byte) 0xFF };
+		CommandAPDU selectApplicationApdu = new CommandAPDU(0x00, 0xA4, 0x04,
+				0x0C, belpicAID);
 		ResponseAPDU responseApdu = cardChannel.transmit(selectApplicationApdu);
 		assertEquals(0x9000, responseApdu.getSW());
 	}
