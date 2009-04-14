@@ -37,8 +37,6 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -694,13 +692,7 @@ public class Controller {
 			inetAddress = null;
 		}
 
-		SSLSocketFactory sslSocketFactory = HttpsURLConnection
-				.getDefaultSSLSocketFactory();
-		if (false == sslSocketFactory instanceof AppletSSLSocketFactory) {
-			throw new SecurityException("wrong SSL socket factory");
-		}
-		AppletSSLSocketFactory appletSslSocketFactory = (AppletSSLSocketFactory) sslSocketFactory;
-		byte[] sessionId = appletSslSocketFactory.getSessionId();
+		byte[] sessionId = AppletSSLSocketFactory.getActualSessionId();
 
 		AuthenticationContract authenticationContract = new AuthenticationContract(
 				salt, hostname, inetAddress, sessionId, challenge);
@@ -1054,14 +1046,7 @@ public class Controller {
 		/*
 		 * Install our SSL socket factory.
 		 */
-		SSLSocketFactory sslSocketFactory = HttpsURLConnection
-				.getDefaultSSLSocketFactory();
-		if (false == sslSocketFactory instanceof AppletSSLSocketFactory) {
-			AppletSSLSocketFactory appletSslSocketFactory = new AppletSSLSocketFactory(
-					this.view, sslSocketFactory);
-			HttpsURLConnection
-					.setDefaultSSLSocketFactory(appletSslSocketFactory);
-		}
+		AppletSSLSocketFactory.installSocketFactory(this.view);
 
 		HttpURLConnection connection = (HttpURLConnection) appletServiceUrl
 				.openConnection();

@@ -3,7 +3,7 @@ README for FedICT eID Applet Project
 
 === 1. Introduction
 
-This project contains the source core tree of the FedICT eID Applet.
+This project contains the source code tree of the FedICT eID Applet.
 The source code is hosted at: http://code.google.com/p/eid-applet/
 
 
