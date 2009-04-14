@@ -162,5 +162,9 @@
 			<groupId>com.caucho</groupId>
 			<artifactId>resin-quercus</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+		</dependency>
 	</dependencies>
 </project>

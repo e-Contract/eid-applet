@@ -24,8 +24,10 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 
+import javax.net.SocketFactory;
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -55,6 +57,8 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 			SSLSocketFactory originalSslSocketFactory) {
 		this.view = view;
 		this.originalSslSocketFactory = originalSslSocketFactory;
+		this.view.addDetailMessage("original SSL socket factory: "
+				+ originalSslSocketFactory.getClass().getName());
 	}
 
 	@Override
@@ -89,7 +93,11 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 			this.sslSessionId = sslSessionId;
 		} else {
 			if (false == Arrays.equals(this.sslSessionId, sslSessionId)) {
-				throw new IOException("SSL session mismatch");
+				/*
+				 * Even in case we detect an SSL session mismatch we continue as
+				 * we want the eID Applet Service to receive this.
+				 */
+				this.view.addDetailMessage("SSL session mismatch!");
 			}
 		}
 	}
@@ -158,15 +166,64 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 
 	public void handshakeCompleted(HandshakeCompletedEvent event) {
 		String cipherSuite = event.getCipherSuite();
-		this.view.addDetailMessage("SSL cipher suite: " + cipherSuite);
+		this.view.addDetailMessage("SSL handshake finish cipher suite: "
+				+ cipherSuite);
 		SSLSession sslSession = event.getSession();
 		byte[] sslSessionId = sslSession.getId();
 		if (null == this.sslSessionId) {
 			this.sslSessionId = sslSessionId;
 		} else {
 			if (false == Arrays.equals(this.sslSessionId, sslSessionId)) {
-				this.view.addDetailMessage("SSL session Id mismatch");
+				this.view
+						.addDetailMessage("SSL handshake finish; session Id mismatch!");
 			}
 		}
+	}
+
+	public static SocketFactory getDefault() {
+		SSLSocketFactory sslSocketFactory = HttpsURLConnection
+				.getDefaultSSLSocketFactory();
+		return sslSocketFactory;
+	}
+
+	public static final boolean ENABLED = true;
+
+	/**
+	 * Installs this socket factory within the JRE.
+	 * 
+	 * @param view
+	 */
+	public static void installSocketFactory(View view) {
+		if (false == ENABLED) {
+			return;
+		}
+		SSLSocketFactory sslSocketFactory = HttpsURLConnection
+				.getDefaultSSLSocketFactory();
+		if (sslSocketFactory instanceof AppletSSLSocketFactory) {
+			// already installed
+			return;
+		}
+		AppletSSLSocketFactory appletSslSocketFactory = new AppletSSLSocketFactory(
+				view, sslSocketFactory);
+		HttpsURLConnection.setDefaultSSLSocketFactory(appletSslSocketFactory);
+	}
+
+	/**
+	 * Returns the actual SSL session identifier.
+	 * 
+	 * @return
+	 */
+	public static byte[] getActualSessionId() {
+		if (false == ENABLED) {
+			return "foobar".getBytes();
+		}
+		SSLSocketFactory sslSocketFactory = HttpsURLConnection
+				.getDefaultSSLSocketFactory();
+		if (false == sslSocketFactory instanceof AppletSSLSocketFactory) {
+			throw new SecurityException("wrong SSL socket factory");
+		}
+		AppletSSLSocketFactory appletSslSocketFactory = (AppletSSLSocketFactory) sslSocketFactory;
+		byte[] sessionId = appletSslSocketFactory.getSessionId();
+		return sessionId;
 	}
 }

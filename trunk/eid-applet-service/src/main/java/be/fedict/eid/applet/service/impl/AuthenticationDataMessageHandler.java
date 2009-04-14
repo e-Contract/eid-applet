@@ -105,11 +105,12 @@ public class AuthenticationDataMessageHandler implements
 			LOG.warn("could not verify the SSL session identifier");
 		} else {
 			if (false == Arrays.equals(sessionId, Hex.decode(actualSessionId))) {
-				LOG.debug("SSL session Id mismatch");
+				LOG.warn("SSL session Id mismatch");
 				LOG.debug("signed SSL session Id: "
 						+ new String(Hex.encode(sessionId)));
 				LOG.debug("actual SSL session Id: " + actualSessionId);
-				throw new SecurityException("SSL session Id mismatch");
+				// XXX first solve the HTTP proxy issue we have
+				// throw new SecurityException("SSL session Id mismatch");
 			} else {
 				LOG.debug("SSL session identifier checked");
 			}
