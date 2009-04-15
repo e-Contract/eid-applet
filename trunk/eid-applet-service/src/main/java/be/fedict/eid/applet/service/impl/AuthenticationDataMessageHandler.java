@@ -109,8 +109,7 @@ public class AuthenticationDataMessageHandler implements
 				LOG.debug("signed SSL session Id: "
 						+ new String(Hex.encode(sessionId)));
 				LOG.debug("actual SSL session Id: " + actualSessionId);
-				// XXX first solve the HTTP proxy issue we have
-				// throw new SecurityException("SSL session Id mismatch");
+				throw new SecurityException("SSL session Id mismatch");
 			} else {
 				LOG.debug("SSL session identifier checked");
 			}
