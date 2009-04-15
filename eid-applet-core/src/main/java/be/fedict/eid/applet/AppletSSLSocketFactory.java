@@ -66,40 +66,20 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 			boolean autoClose) throws IOException {
 		Socket socket = this.originalSslSocketFactory.createSocket(s, host,
 				port, autoClose);
-		checkSocket(socket);
+		/*
+		 * Important here not to try to access the SSL session identifier via
+		 * getSession. This can cause problems when sitting behind an HTTP
+		 * proxy. The only way to get access to the SSL session identifier is
+		 * via the TLS handshake completed listener.
+		 */
+		installHandshakeCompletedListener(socket);
 		return socket;
 	}
 
-	private void checkSocket(Socket socket) throws IOException {
+	private void installHandshakeCompletedListener(Socket socket)
+			throws IOException {
 		SSLSocket sslSocket = (SSLSocket) socket;
 		sslSocket.addHandshakeCompletedListener(this);
-		/*
-		 * Retrieving the SSL session identifier via sslSocket.getSession()
-		 * doesn't always work. Hence the need to also add an SSL handshake
-		 * listener.
-		 */
-		SSLSession sslSession = sslSocket.getSession();
-		String cipherSuite = sslSession.getCipherSuite();
-		if ("SSL_NULL_WITH_NULL_NULL".equals(cipherSuite)) {
-			/*
-			 * Inside a browser we're depending on the SSL handshake listener to
-			 * retrieve the SSL session identifier.
-			 */
-			return;
-		}
-		this.view.addDetailMessage("SSL cipher suite: " + cipherSuite);
-		byte[] sslSessionId = sslSession.getId();
-		if (null == this.sslSessionId) {
-			this.sslSessionId = sslSessionId;
-		} else {
-			if (false == Arrays.equals(this.sslSessionId, sslSessionId)) {
-				/*
-				 * Even in case we detect an SSL session mismatch we continue as
-				 * we want the eID Applet Service to receive this.
-				 */
-				this.view.addDetailMessage("SSL session mismatch!");
-			}
-		}
 	}
 
 	@Override
@@ -116,14 +96,14 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 	public Socket createSocket(String host, int port) throws IOException,
 			UnknownHostException {
 		Socket socket = this.originalSslSocketFactory.createSocket(host, port);
-		checkSocket(socket);
+		installHandshakeCompletedListener(socket);
 		return socket;
 	}
 
 	@Override
 	public Socket createSocket(InetAddress host, int port) throws IOException {
 		Socket socket = this.originalSslSocketFactory.createSocket(host, port);
-		checkSocket(socket);
+		installHandshakeCompletedListener(socket);
 		return socket;
 	}
 
@@ -132,7 +112,7 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 			int localPort) throws IOException, UnknownHostException {
 		Socket socket = this.originalSslSocketFactory.createSocket(host, port,
 				localHost, localPort);
-		checkSocket(socket);
+		installHandshakeCompletedListener(socket);
 		return socket;
 	}
 
@@ -141,7 +121,7 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 			InetAddress localHost, int localPort) throws IOException {
 		Socket socket = this.originalSslSocketFactory.createSocket(host, port,
 				localHost, localPort);
-		checkSocket(socket);
+		installHandshakeCompletedListener(socket);
 		return socket;
 	}
 
@@ -160,7 +140,7 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 	@Override
 	public Socket createSocket() throws IOException {
 		Socket socket = this.originalSslSocketFactory.createSocket();
-		checkSocket(socket);
+		installHandshakeCompletedListener(socket);
 		return socket;
 	}
 
@@ -186,17 +166,12 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 		return sslSocketFactory;
 	}
 
-	public static final boolean ENABLED = true;
-
 	/**
 	 * Installs this socket factory within the JRE.
 	 * 
 	 * @param view
 	 */
 	public static void installSocketFactory(View view) {
-		if (false == ENABLED) {
-			return;
-		}
 		SSLSocketFactory sslSocketFactory = HttpsURLConnection
 				.getDefaultSSLSocketFactory();
 		if (sslSocketFactory instanceof AppletSSLSocketFactory) {
@@ -214,9 +189,6 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 	 * @return
 	 */
 	public static byte[] getActualSessionId() {
-		if (false == ENABLED) {
-			return "foobar".getBytes();
-		}
 		SSLSocketFactory sslSocketFactory = HttpsURLConnection
 				.getDefaultSSLSocketFactory();
 		if (false == sslSocketFactory instanceof AppletSSLSocketFactory) {
