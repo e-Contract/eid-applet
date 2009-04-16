@@ -21,63 +21,73 @@ using System.Web;
 using System.Web.SessionState;
 using System.IO;
 using System.Text;
+using System.Reflection;
 
-namespace Be.FedICT.EID.Applet.Service
-{
+namespace Be.FedICT.EID.Applet.Service {
 	
-	public class AppletService : IHttpHandler, IRequiresSessionState
-	{
+	public class AppletService : IHttpHandler, IRequiresSessionState {
 		
-		public AppletService()
-		{
+		public AppletService() {
 		}
 		
 		public void ProcessRequest(HttpContext httpContext) {
 			HttpRequest httpRequest = httpContext.Request;
+			HttpResponse httpResponse = httpContext.Response;
 			if ("GET".Equals(httpRequest.HttpMethod)) {
-				HttpResponse httpResponse = httpContext.Response;
 				httpResponse.Write("<html><body>The eID Applet Service should not be invoked directly.</body></html>");
 				return;
 			}
 			if (!"POST".Equals(httpRequest.HttpMethod)) {
-				HttpResponse httpResponse = httpContext.Response;
 				httpResponse.StatusCode = 400; // bad request
 				return;
 			}
 			String protocolVersion = httpRequest.Headers["X-AppletProtocol-Version"];
 			if (!"1".Equals(protocolVersion)) {
-				HttpResponse httpResponse = httpContext.Response;
 				httpResponse.StatusCode = 400; // bad request
 				return;
 			}
 			String messageType = httpRequest.Headers["X-AppletProtocol-Type"];
 			if ("HelloMessage".Equals(messageType)) {
-				HttpResponse httpResponse = httpContext.Response;
-				httpResponse.AddHeader("X-AppletProtocol-Version", "1");
-				httpResponse.AddHeader("X-AppletProtocol-Type", "IdentificationRequestMessage");
+				sendCommand("IdentificationRequestMessage", httpResponse);
 				return;
 			} else if ("IdentityDataMessage".Equals(messageType)) {
 				int identityFileSize = int.Parse(httpRequest.Headers["X-AppletProtocol-IdentityFileSize"]);
 				Stream stream = httpRequest.InputStream;
+				Identity identity = new Identity();
+				Type identityType = typeof(Identity);
+				PropertyInfo[] properties = identityType.GetProperties();
 				while (stream.Position < stream.Length) {
 					int tag = stream.ReadByte();
 					int length = stream.ReadByte();
 					byte[] buffer = new byte[length];
 					stream.Read(buffer, 0, length);
-					if (7 == tag) {
+					switch(tag) {
+					case 7:
 						String name = Encoding.UTF8.GetString(buffer);
 						httpContext.Session.Add("Identity.Name", name);
-					} else if (8 == tag) {
+						break;
+					case 8:
 						String firstName = Encoding.UTF8.GetString(buffer);
 						httpContext.Session.Add("Identity.FirstName", firstName);
+						break;
 					}
+					foreach (PropertyInfo property in properties) {
+						object[] tlvFieldAttributes = property.GetCustomAttributes(typeof(TlvField), false);
+						if (0 == tlvFieldAttributes.Length) {
+							continue;
+						}
+						TlvField tlvFieldAttribute = (TlvField) tlvFieldAttributes[0];
+						int tlvTag = tlvFieldAttribute.Tag;
+						if (tlvTag == tag) {
+							String fieldValue = Encoding.UTF8.GetString(buffer);
+							property.SetValue(identity, fieldValue, null);
+						}
+					}
+					httpContext.Session.Add("Identity", identity);
 				}
-				HttpResponse httpResponse = httpContext.Response;
-				httpResponse.AddHeader("X-AppletProtocol-Version", "1");
-				httpResponse.AddHeader("X-AppletProtocol-Type", "FinishedMessage");
+				sendCommand("FinishedMessage", httpResponse);
 				return;
 			} else {
-				HttpResponse httpResponse = httpContext.Response;
 				httpResponse.StatusCode = 400; // bad request
 				return;
 			}
@@ -87,6 +97,11 @@ namespace Be.FedICT.EID.Applet.Service
 			get {
 				return true;
 			}
+		}
+		
+		private void sendCommand(string command, HttpResponse httpResponse) {
+			httpResponse.AddHeader("X-AppletProtocol-Version", "1");
+			httpResponse.AddHeader("X-AppletProtocol-Type", command);
 		}
 	}
 }
