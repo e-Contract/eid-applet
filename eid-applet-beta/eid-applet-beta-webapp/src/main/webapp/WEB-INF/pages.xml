@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <pages xmlns="http://jboss.com/products/seam/pages" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.0.xsd">
+	xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.0.xsd"
+	login-view-id="/login.xhtml">
 	<!-- Security settings on administrator pages -->
 	<page view-id="*">
 		<!-- XXX: doesn't really work -->
@@ -8,10 +9,8 @@
 			<redirect view-id="/main.xhtml" />
 		</navigation>
 	</page>
-	<page view-id="/admin/admin.xhtml">
-		<restrict>#{s:hasRole('admin')}</restrict>
-	</page>
-	<page view-id="/admin/feedback-view.xhtml">
+	<page view-id="/admin/*">
+		<!-- login-required="true" doesn't work -->
 		<restrict>#{s:hasRole('admin')}</restrict>
 	</page>
 	<!-- Without the following the user can just view the admin pages. -->

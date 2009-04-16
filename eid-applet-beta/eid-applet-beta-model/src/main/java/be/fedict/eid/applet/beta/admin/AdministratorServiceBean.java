@@ -16,7 +16,7 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.beta;
+package be.fedict.eid.applet.beta.admin;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -51,9 +51,10 @@ public class AdministratorServiceBean implements AuthenticationService {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	private void register(PublicKey publicKey) {
+	private void register(PublicKey publicKey, String serialNumber) {
 		AdministratorEntity administratorEntity = new AdministratorEntity();
 		administratorEntity.setPublicKey(publicKey.getEncoded());
+		administratorEntity.setSerialNumber(serialNumber);
 		this.entityManager.persist(administratorEntity);
 	}
 
@@ -70,11 +71,12 @@ public class AdministratorServiceBean implements AuthenticationService {
 		 */
 		X509Certificate adminCert = certificateChain.get(0);
 		PublicKey adminPublicKey = adminCert.getPublicKey();
+		String userId = getUserId(adminCert);
 		if (isRegistered()) {
 			LOG.debug("admin login");
 		} else {
 			LOG.debug("admin registration");
-			register(adminPublicKey);
+			register(adminPublicKey, userId);
 		}
 
 		String adminPassword = new String(Hex.encodeHex(adminPublicKey
@@ -92,6 +94,15 @@ public class AdministratorServiceBean implements AuthenticationService {
 		Credentials credentials = (Credentials) httpSession
 				.getAttribute("org.jboss.seam.security.credentials");
 
+		LOG.debug("username: " + userId);
+		/*
+		 * Pass the eID credentials to the JBoss Seam security framework.
+		 */
+		credentials.setUsername(userId);
+		credentials.setPassword(adminPassword);
+	}
+
+	private String getUserId(X509Certificate adminCert) {
 		X500Principal userPrincipal = adminCert.getSubjectX500Principal();
 		String name = userPrincipal.toString();
 		int serialNumberValueBeginIdx = name.indexOf("SERIALNUMBER=")
@@ -103,12 +114,6 @@ public class AdministratorServiceBean implements AuthenticationService {
 		}
 		String userId = name.substring(serialNumberValueBeginIdx,
 				serialNumberValueEndIdx);
-
-		LOG.debug("username: " + userId);
-		/*
-		 * Pass the eID credentials to the JBoss Seam security framework.
-		 */
-		credentials.setUsername(userId);
-		credentials.setPassword(adminPassword);
+		return userId;
 	}
 }

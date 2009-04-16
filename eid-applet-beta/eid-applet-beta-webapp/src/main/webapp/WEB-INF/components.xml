@@ -7,4 +7,11 @@
         http://jboss.com/products/seam/security http://jboss.com/products/seam/security-2.1.xsd">
 	<core:init jndi-pattern="fedict/eid/applet/beta/#{ejbName}" />
 	<security:identity authenticate-method="#{authenticator.authenticate}" />
+	<!-- remember navigation location after login -->
+	<event type="org.jboss.seam.notLoggedIn">
+		<action execute="#{redirect.captureCurrentView}" />
+	</event>
+	<event type="org.jboss.seam.postAuthenticate">
+		<action execute="#{redirect.returnToCapturedView}" />
+	</event>
 </components>
