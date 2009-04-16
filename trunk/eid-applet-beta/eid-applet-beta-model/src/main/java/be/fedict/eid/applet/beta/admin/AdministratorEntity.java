@@ -16,7 +16,7 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.beta;
+package be.fedict.eid.applet.beta.admin;
 
 import java.io.Serializable;
 
@@ -38,6 +38,8 @@ public class AdministratorEntity implements Serializable {
 
 	private byte[] publicKey;
 
+	private String serialNumber;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	public int getId() {
@@ -56,5 +58,13 @@ public class AdministratorEntity implements Serializable {
 
 	public void setPublicKey(byte[] publicKey) {
 		this.publicKey = publicKey;
+	}
+
+	public String getSerialNumber() {
+		return this.serialNumber;
+	}
+
+	public void setSerialNumber(String serialNumber) {
+		this.serialNumber = serialNumber;
 	}
 }

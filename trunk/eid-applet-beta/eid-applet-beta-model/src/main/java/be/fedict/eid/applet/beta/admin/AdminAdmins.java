@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2009 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -16,12 +16,16 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.beta;
+package be.fedict.eid.applet.beta.admin;
 
 import javax.ejb.Local;
+import javax.ejb.Remove;
 
 @Local
-public interface Administrator {
+public interface AdminAdmins {
 
-	boolean isRegistered();
+	void listAdmins();
+
+	@Remove
+	void destroy();
 }

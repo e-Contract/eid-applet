@@ -13,6 +13,10 @@ Under Linux execute the following:
 	cd bin
 	./run.sh &
 
+To bind JBoss AS on all network interfaces, start the server as follows:
+	cd bin
+	./run.sh -b 0.0.0.0 &
+
 
 === 3. Stopping the server
 

@@ -19,6 +19,7 @@
 package be.fedict.eid.applet.beta;
 
 import javax.ejb.Local;
+import javax.ejb.Remove;
 
 @Local
 public interface Authenticator {
@@ -26,4 +27,7 @@ public interface Authenticator {
 	boolean authenticate();
 
 	void loginFailedCallback();
+
+	@Remove
+	void remove();
 }

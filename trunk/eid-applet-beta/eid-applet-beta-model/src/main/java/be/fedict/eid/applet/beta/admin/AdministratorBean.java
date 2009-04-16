@@ -16,7 +16,7 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.beta;
+package be.fedict.eid.applet.beta.admin;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -26,6 +26,7 @@ import org.jboss.ejb3.annotation.LocalBinding;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.log.Log;
+
 
 @Stateless
 @Name("administrator")

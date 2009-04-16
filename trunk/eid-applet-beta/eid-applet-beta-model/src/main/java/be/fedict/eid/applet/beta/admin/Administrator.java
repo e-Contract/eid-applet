@@ -19,17 +19,9 @@
 package be.fedict.eid.applet.beta.admin;
 
 import javax.ejb.Local;
-import javax.ejb.Remove;
 
 @Local
-public interface FeedbackAdmin {
+public interface Administrator {
 
-	void listMessages();
-
-	@Remove
-	void destroy();
-
-	String view();
-
-	String delete();
+	boolean isRegistered();
 }
