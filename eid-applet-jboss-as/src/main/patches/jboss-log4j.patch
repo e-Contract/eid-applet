@@ -1,5 +1,5 @@
---- server/default/conf/jboss-log4j.xml.orig	2008-12-04 21:23:58.000000000 +0100
-+++ server/default/conf/jboss-log4j.xml	2008-12-15 14:30:56.000000000 +0100
+--- server/default/conf/jboss-log4j.xml.orig	2009-04-15 16:44:08.000000000 +0200
++++ server/default/conf/jboss-log4j.xml	2009-04-15 16:44:54.000000000 +0200
 @@ -63,6 +63,28 @@
     </appender>
     -->
@@ -29,16 +29,11 @@
     <!-- ============================== -->
     <!-- Append messages to the console -->
     <!-- ============================== -->
-@@ -324,6 +346,16 @@
+@@ -324,6 +346,11 @@
     </category>
     -->
     
-+   <category name="test.be.fedict.eid">
-+     <priority value="DEBUG"/>
-+     <appender-ref ref="FEDICT"/>
-+   </category>
-+
-+   <category name="be.fedict.eid">
++   <category name="be.fedict">
 +     <priority value="DEBUG"/>
 +     <appender-ref ref="FEDICT"/>
 +   </category>
