@@ -47,7 +47,7 @@ import javax.net.ssl.SSLSocketFactory;
 public class AppletSSLSocketFactory extends SSLSocketFactory implements
 		HandshakeCompletedListener {
 
-	private final View view;
+	private View view;
 
 	private final SSLSocketFactory originalSslSocketFactory;
 
@@ -57,8 +57,10 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 			SSLSocketFactory originalSslSocketFactory) {
 		this.view = view;
 		this.originalSslSocketFactory = originalSslSocketFactory;
-		this.view.addDetailMessage("original SSL socket factory: "
-				+ originalSslSocketFactory.getClass().getName());
+	}
+
+	private void setView(View view) {
+		this.view = view;
 	}
 
 	@Override
@@ -150,14 +152,14 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 				+ cipherSuite);
 		SSLSession sslSession = event.getSession();
 		byte[] sslSessionId = sslSession.getId();
-		if (null == this.sslSessionId) {
-			this.sslSessionId = sslSessionId;
-		} else {
-			if (false == Arrays.equals(this.sslSessionId, sslSessionId)) {
-				this.view
-						.addDetailMessage("SSL handshake finish; session Id mismatch!");
-			}
+		if (null != this.sslSessionId
+				&& false == Arrays.equals(this.sslSessionId, sslSessionId)) {
+			/*
+			 * This could also be caused by an SSL session renewal.
+			 */
+			this.view.addDetailMessage("SSL session Id mismatch");
 		}
+		this.sslSessionId = sslSessionId;
 	}
 
 	public static SocketFactory getDefault() {
@@ -174,13 +176,21 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 	public static void installSocketFactory(View view) {
 		SSLSocketFactory sslSocketFactory = HttpsURLConnection
 				.getDefaultSSLSocketFactory();
-		if (sslSocketFactory instanceof AppletSSLSocketFactory) {
-			// already installed
-			return;
+		if (false == sslSocketFactory instanceof AppletSSLSocketFactory) {
+			/*
+			 * Install a new one.
+			 */
+			AppletSSLSocketFactory appletSslSocketFactory = new AppletSSLSocketFactory(
+					view, sslSocketFactory);
+			HttpsURLConnection
+					.setDefaultSSLSocketFactory(appletSslSocketFactory);
+		} else {
+			/*
+			 * Make sure that the existing one reports to us.
+			 */
+			AppletSSLSocketFactory appletSslSocketFactory = (AppletSSLSocketFactory) sslSocketFactory;
+			appletSslSocketFactory.setView(view);
 		}
-		AppletSSLSocketFactory appletSslSocketFactory = new AppletSSLSocketFactory(
-				view, sslSocketFactory);
-		HttpsURLConnection.setDefaultSSLSocketFactory(appletSslSocketFactory);
 	}
 
 	/**
