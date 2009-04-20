@@ -115,68 +115,112 @@ public class Pkcs11Eid {
 		File pkcs11File;
 		if (osName.startsWith("Linux")) {
 			/*
-			 * Covers both 3.5 and 2.6 eID Middleware.
+			 * Covers 3.5 eID Middleware.
 			 */
 			pkcs11File = new File("/usr/local/lib/libbeidpkcs11.so");
-			if (false == pkcs11File.exists()) {
-				pkcs11File = new File("/usr/lib/libbeidpkcs11.so");
+			if (pkcs11File.exists()) {
+				return pkcs11File.getAbsolutePath();
 			}
-			if (false == pkcs11File.exists()) {
-				/*
-				 * Some 2.6 and 2.5.9 installations.
-				 */
-				pkcs11File = new File(
-						"/usr/local/lib/pkcs11/Belgium-EID-pkcs11.so");
+			/*
+			 * Some 2.6 eID MW installations.
+			 */
+			pkcs11File = new File("/usr/lib/libbeidpkcs11.so");
+			if (pkcs11File.exists()) {
+				return pkcs11File.getAbsolutePath();
 			}
-			if (false == pkcs11File.exists()) {
-				/*
-				 * Final fallback is OpenSC. opensc pkcs#11 cannot create
-				 * non-rep signature.
-				 * 
-				 * /etc/opensc.conf:
-				 * 
-				 * card_drivers = belpic, ...
-				 * 
-				 * reader_driver pcsc {}
-				 */
-				pkcs11File = new File("/usr/lib/opensc-pkcs11.so");
+			/*
+			 * Some 2.6 and 2.5.9 installations.
+			 */
+			pkcs11File = new File("/usr/local/lib/pkcs11/Belgium-EID-pkcs11.so");
+			if (pkcs11File.exists()) {
+				return pkcs11File.getAbsolutePath();
+			}
+			/*
+			 * Final fallback is OpenSC. Note that OpenSC PKCS#11 cannot create
+			 * non-rep signatures.
+			 * 
+			 * /etc/opensc.conf:
+			 * 
+			 * card_drivers = belpic, ...
+			 * 
+			 * reader_driver pcsc {}
+			 */
+			pkcs11File = new File("/usr/lib/opensc-pkcs11.so");
+			if (pkcs11File.exists()) {
+				return pkcs11File.getAbsolutePath();
 			}
 		} else if (osName.startsWith("Mac")) {
+			/*
+			 * eID MW 3.5.1
+			 */
+			pkcs11File = new File("/usr/local/lib/libbeidpkcs11.3.5.1.dylib");
+			if (pkcs11File.exists()) {
+				return pkcs11File.getAbsolutePath();
+			}
 			/*
 			 * eID MW 3.5
 			 */
 			pkcs11File = new File("/usr/local/lib/libbeidpkcs11.3.5.0.dylib");
-			if (false == pkcs11File.exists()) {
-				/*
-				 * eID MW 2.6
-				 */
-				pkcs11File = new File(
-						"/usr/local/lib/beid-pkcs11.bundle/Contents/MacOS/libbeidpkcs11.2.1.0.dylib");
+			if (pkcs11File.exists()) {
+				return pkcs11File.getAbsolutePath();
+			}
+			/*
+			 * eID MW 2.6
+			 */
+			pkcs11File = new File(
+					"/usr/local/lib/beid-pkcs11.bundle/Contents/MacOS/libbeidpkcs11.2.1.0.dylib");
+			if (pkcs11File.exists()) {
+				return pkcs11File.getAbsolutePath();
+			}
+			/*
+			 * We try the symbolic links only at the end since there were some
+			 * negative reports on the symbolic links on Mac installations.
+			 */
+			/*
+			 * eID MW 3.x series
+			 */
+			pkcs11File = new File("/usr/local/lib/libbeidpkcs11.dylib");
+			if (pkcs11File.exists()) {
+				return pkcs11File.getAbsolutePath();
+			}
+			/*
+			 * eID MW 2.x series
+			 */
+			pkcs11File = new File(
+					"/usr/local/lib/beid-pkcs11.bundle/Contents/MacOS/libbeidpkcs11.dylib");
+			if (pkcs11File.exists()) {
+				return pkcs11File.getAbsolutePath();
 			}
 		} else {
 			/*
 			 * eID Middleware 3.5 - XP
 			 */
 			pkcs11File = new File("C:\\WINDOWS\\system32\\beidpkcs11.dll");
-			if (false == pkcs11File.exists()) {
-				/*
-				 * eID Middleware 2.6 and 2.5.9
-				 */
-				pkcs11File = new File(
-						"C:\\WINDOWS\\system32\\Belgium Identity Card PKCS11.dll");
+			if (pkcs11File.exists()) {
+				return pkcs11File.getAbsolutePath();
 			}
-			if (false == pkcs11File.exists()) {
-				/*
-				 * Windows 2000.
-				 */
-				pkcs11File = new File(
-						"C:\\WINNT\\system32\\Belgium Identity Card PKCS11.dll");
+			/*
+			 * eID Middleware 2.6 and 2.5.9
+			 */
+			pkcs11File = new File(
+					"C:\\WINDOWS\\system32\\Belgium Identity Card PKCS11.dll");
+			if (pkcs11File.exists()) {
+				return pkcs11File.getAbsolutePath();
+			}
+			/*
+			 * Windows 2000.
+			 */
+			pkcs11File = new File(
+					"C:\\WINNT\\system32\\Belgium Identity Card PKCS11.dll");
+			if (pkcs11File.exists()) {
+				return pkcs11File.getAbsolutePath();
+			}
+			pkcs11File = new File("C:\\WINNT\\system32\\beidpkcs11.dll");
+			if (pkcs11File.exists()) {
+				return pkcs11File.getAbsolutePath();
 			}
 		}
-		if (false == pkcs11File.exists()) {
-			throw new PKCS11NotFoundException();
-		}
-		return pkcs11File.getAbsolutePath();
+		throw new PKCS11NotFoundException();
 	}
 
 	private PKCS11 loadPkcs11(String pkcs11Path)

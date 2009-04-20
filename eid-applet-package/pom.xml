@@ -65,6 +65,7 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>keytool-maven-plugin</artifactId>
+						<!-- http://jira.codehaus.org/browse/MKEYTOOL-6 -->
 						<executions>
 							<execution>
 								<goals>

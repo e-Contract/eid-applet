@@ -5,7 +5,7 @@
 	<!-- Security settings on administrator pages -->
 	<page view-id="*">
 		<!-- XXX: doesn't really work -->
-		<navigation from-action="#{identity.logout}">
+		<navigation from-action="#{identity.logout()}">
 			<redirect view-id="/main.xhtml" />
 		</navigation>
 	</page>

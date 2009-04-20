@@ -16,18 +16,22 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.beta.admin;
+package be.fedict.eid.applet.beta.service;
 
-import javax.ejb.Local;
-import javax.ejb.Remove;
+import java.io.Serializable;
+import java.security.Principal;
 
-@Local
-public interface AdminAdmins {
+public class NamePrincipal implements Principal, Serializable {
 
-	void listAdmins();
+	private static final long serialVersionUID = 1L;
 
-	@Remove
-	void destroy();
-	
-	String delete();
+	private final String name;
+
+	public NamePrincipal(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return this.name;
+	}
 }
