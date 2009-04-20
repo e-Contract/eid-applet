@@ -20,6 +20,10 @@
 				<artifactId>maven-ear-plugin</artifactId>
 				<configuration>
 					<modules>
+						<sarModule>
+							<groupId>be.fedict.eid-applet</groupId>
+							<artifactId>eid-applet-beta-service</artifactId>
+						</sarModule>
 						<jarModule>
 							<groupId>be.fedict.eid-applet</groupId>
 							<artifactId>eid-applet-service-spi</artifactId>
@@ -44,6 +48,12 @@
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service-spi</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>be.fedict.eid-applet</groupId>
+			<artifactId>eid-applet-beta-service</artifactId>
+			<type>sar</type>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>

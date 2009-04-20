@@ -83,7 +83,7 @@
 			</c:choose>
 
 			<c:if test="#{identity.isLoggedIn()}">
-				<li><h:commandLink value="Logout" action="#{identity.logout}" /></li>
+				<li><h:commandLink value="Logout" action="#{identity.logout()}" /></li>
 			</c:if>
 		</ul>
 		</div>

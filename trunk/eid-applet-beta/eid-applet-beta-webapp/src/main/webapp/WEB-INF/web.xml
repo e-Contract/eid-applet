@@ -124,13 +124,30 @@
 			<param-value>fedict/eid/applet/beta/AdministratorServiceBean</param-value>
 		</init-param>
 		<init-param>
-			<param-name>Logoff</param-name>
+			<param-name>RemoveCard</param-name>
 			<param-value>true</param-value>
 		</init-param>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>AppletAdministratorServiceServlet</servlet-name>
 		<url-pattern>/applet-administrator-service</url-pattern>
+	</servlet-mapping>
+	<!-- eID Applet Administrator Registration -->
+	<servlet>
+		<servlet-name>AppletAdministratorRegistrationServiceServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+		<init-param>
+			<param-name>AuthenticationService</param-name>
+			<param-value>fedict/eid/applet/beta/AdministratorRegistrationServiceBean</param-value>
+		</init-param>
+		<init-param>
+			<param-name>RemoveCard</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AppletAdministratorRegistrationServiceServlet</servlet-name>
+		<url-pattern>/admin/applet-admin-reg-service</url-pattern>
 	</servlet-mapping>
 	<!-- Beta Feedback configuration -->
 	<listener>

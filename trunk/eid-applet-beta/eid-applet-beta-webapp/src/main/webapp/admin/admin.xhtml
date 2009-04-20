@@ -52,7 +52,19 @@
 					</f:facet>
 					<h:outputText value="#{adminItem.serialNumber}" />
 				</rich:column>
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="Actions" />
+					</f:facet>
+					<h:commandLink value="Delete" action="#{adminAdmins.delete}">
+						<n:nav outcome="view" viewId="/admin/admin.xhtml" />
+					</h:commandLink>
+				</rich:column>
 			</rich:dataTable>
+			<h:commandButton value="Add" action="add">
+				<n:nav outcome="add" viewId="/admin/admin-add.xhtml" />
+			</h:commandButton>
+			<h:messages globalOnly="true" style="color: red;" />
 		</h:form>
 	</ui:define>
 </ui:composition>
