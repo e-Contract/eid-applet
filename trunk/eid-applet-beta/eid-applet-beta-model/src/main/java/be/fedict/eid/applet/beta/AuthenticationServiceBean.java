@@ -34,6 +34,12 @@ import org.jboss.ejb3.annotation.LocalBinding;
 
 import be.fedict.eid.applet.service.spi.AuthenticationService;
 
+/**
+ * Authentication Service that manages the eID authentication test.
+ * 
+ * @author fcorneli
+ * 
+ */
 @Stateless
 @Local(AuthenticationService.class)
 @LocalBinding(jndiBinding = "fedict/eid/applet/beta/AuthenticationServiceBean")

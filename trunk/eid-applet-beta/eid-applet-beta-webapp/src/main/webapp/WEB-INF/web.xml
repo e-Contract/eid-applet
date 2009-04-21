@@ -149,6 +149,15 @@
 		<servlet-name>AppletAdministratorRegistrationServiceServlet</servlet-name>
 		<url-pattern>/admin/applet-admin-reg-service</url-pattern>
 	</servlet-mapping>
+	<!-- JAAS login configuration -->
+	<filter>
+		<filter-name>JAASLoginFilter</filter-name>
+		<filter-class>be.fedict.eid.applet.beta.webapp.JAASLoginFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>JAASLoginFilter</filter-name>
+		<servlet-name>AppletAdministratorRegistrationServiceServlet</servlet-name>
+	</filter-mapping>
 	<!-- Beta Feedback configuration -->
 	<listener>
 		<listener-class>be.fedict.eid.applet.beta.webapp.SessionContextListener</listener-class>

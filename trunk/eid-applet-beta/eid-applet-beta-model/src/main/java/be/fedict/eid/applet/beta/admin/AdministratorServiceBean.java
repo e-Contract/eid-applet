@@ -40,6 +40,12 @@ import org.jboss.seam.util.Hex;
 
 import be.fedict.eid.applet.service.spi.AuthenticationService;
 
+/**
+ * Authentication Services that manages administrator login.
+ * 
+ * @author fcorneli
+ * 
+ */
 @Stateless
 @Local(AuthenticationService.class)
 @LocalBinding(jndiBinding = "fedict/eid/applet/beta/AdministratorServiceBean")

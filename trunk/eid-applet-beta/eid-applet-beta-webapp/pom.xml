@@ -106,5 +106,10 @@
 			<artifactId>itext</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.jboss.security</groupId>
+			<artifactId>jbosssx-client</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 </project>
