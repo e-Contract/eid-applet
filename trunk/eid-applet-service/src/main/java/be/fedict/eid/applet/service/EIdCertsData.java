@@ -21,6 +21,12 @@ package be.fedict.eid.applet.service;
 import java.io.Serializable;
 import java.security.cert.X509Certificate;
 
+/**
+ * Data structure to hold the eID X509 certificates.
+ * 
+ * @author fcorneli
+ * 
+ */
 public class EIdCertsData implements Serializable {
 
 	private static final long serialVersionUID = 1L;
