@@ -30,9 +30,9 @@ We provide a JBoss AS 5.0.x package artifact named:
 	eid-applet-jboss-as
 
 Missing dependencies can be added to your local Maven repository via:
-        mvn install:install-file -Dfile=Download/jboss-5.0.0.GA-jdk6.zip \
+        mvn install:install-file -Dfile=Download/jboss-5.0.1.GA-jdk6.zip \
 	-DgroupId=org.jboss -DartifactId=jboss-as-distribution \
-	-Dversion=5.0.0.GA -Dpackaging=zip -DgeneratePom=true -Dclassifier=jdk6
+	-Dversion=5.0.1.GA -Dpackaging=zip -DgeneratePom=true -Dclassifier=jdk6
 
 During the build process a token is required to sign the applet JAR.
 By default the Maven build will use a software token to sign the applet JAR.
