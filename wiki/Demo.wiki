@@ -6,7 +6,7 @@ The eID Applet Demo package contains a configured JBoss AS together with some eI
 
 You'll need Java 6 to run the demo.
 
-Download and unzip the [http://eid-applet.googlecode.com/files/eid-applet-demo.zip eid-applet-demo.zip] package and execute
+Download and unzip the [http://eid-applet.googlecode.com/files/eid-applet-demo-1.0.0-beta-1.zip eid-applet-demo-1.0.0-beta-1.zip] package and execute
 {{{
 bin\run.bat
 }}}
