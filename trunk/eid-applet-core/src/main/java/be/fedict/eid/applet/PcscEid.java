@@ -703,7 +703,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		if (0x9000 != responseApdu.getSW()) {
 			this.view
 					.addDetailMessage("could not select the BELPIC JavaCard Applet");
+		} else {
+			this.view.addDetailMessage("BELPIC JavaCard applet selected");
 		}
-		this.view.addDetailMessage("BELPIC JavaCard applet selected");
 	}
 }
