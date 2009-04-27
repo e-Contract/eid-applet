@@ -62,9 +62,9 @@ public class ReleaseTest {
 
 	private static final Log LOG = LogFactory.getLog(ReleaseTest.class);
 
-	private static final String CURRENT_VERSION = "1.0.0-SNAPSHOT";
+	private static final String CURRENT_VERSION = "1.0.0-beta-1";
 
-	private static final String NEW_VERSION = "1.0.0-beta-1";
+	private static final String NEW_VERSION = "1.0.0-SNAPSHOT";
 
 	@Test
 	public void testVersioning() throws Exception {
@@ -106,6 +106,7 @@ public class ReleaseTest {
 						.getTextContent());
 				dependencyVersionTextNode.setTextContent(NEW_VERSION);
 			}
+
 			Node projectVersionTextNode = XPathAPI
 					.selectSingleNode(
 							pomDocument.getDocumentElement(),
@@ -116,6 +117,7 @@ public class ReleaseTest {
 						.getTextContent());
 				projectVersionTextNode.setTextContent(NEW_VERSION);
 			}
+
 			Node parentVersionTextNode = XPathAPI
 					.selectSingleNode(
 							pomDocument.getDocumentElement(),
@@ -126,6 +128,22 @@ public class ReleaseTest {
 						.getTextContent());
 				parentVersionTextNode.setTextContent(NEW_VERSION);
 			}
+
+			NodeList pluginVersionTextNodeList = XPathAPI
+					.selectNodeList(
+							pomDocument.getDocumentElement(),
+							"//:plugins//:plugin[:groupId/text()='be.fedict.eid-applet']/:version/text()",
+							pomDocument.getDocumentElement());
+			LOG.debug("# plugin nodes: "
+					+ pluginVersionTextNodeList.getLength());
+			for (int idx = 0; idx < pluginVersionTextNodeList.getLength(); idx++) {
+				Node pluginVersionTextNode = pluginVersionTextNodeList
+						.item(idx);
+				assertEquals(CURRENT_VERSION, pluginVersionTextNode
+						.getTextContent());
+				pluginVersionTextNode.setTextContent(NEW_VERSION);
+			}
+
 			storeDocument(pomDocument, pomFile);
 		}
 	}
