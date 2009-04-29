@@ -413,6 +413,7 @@ public class Applet extends JApplet {
 				setStatusMessage(Status.ERROR, Applet.this.messages
 						.getMessage(MESSAGE_ID.SECURITY_ERROR));
 				addDetailMessage("web application not trusted.");
+				addDetailMessage("use the web application via \"https\" instead of \"http\"");
 				return;
 			}
 			URL codeBase = getCodeBase();
