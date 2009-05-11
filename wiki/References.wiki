@@ -39,3 +39,4 @@
   * [http://code.google.com/p/eid-javascript-lib/ JavaScript library to be used with the eID middleware applet.]
   * [http://egovlabs.gv.at/scm/?group_id=13 Mocca]
   * [http://smartcardservices.macosforge.org/ Mac OS X SmartCard Services]
+  * [http://forge.wallonie.be/gf/project/esignbox/ eSignBox]
