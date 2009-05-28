@@ -19,9 +19,11 @@
 package test.be.fedict.eid.applet.model;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
 import java.security.MessageDigest;
@@ -60,6 +62,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.signature.XMLSignature;
@@ -183,7 +186,8 @@ public class XmlSignatureServiceBean implements SignatureService {
 			throws ParserConfigurationException, NoSuchAlgorithmException,
 			InvalidAlgorithmParameterException, MarshalException,
 			javax.xml.crypto.dsig.XMLSignatureException,
-			TransformerFactoryConfigurationError, TransformerException {
+			TransformerFactoryConfigurationError, TransformerException,
+			MalformedURLException {
 
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
 				.newInstance();
@@ -220,9 +224,12 @@ public class XmlSignatureServiceBean implements SignatureService {
 
 			DigestMethod digestMethod = signatureFactory.newDigestMethod(
 					getXmlDigestAlgo(digestInfo.digestAlgo), null);
-			Reference reference = signatureFactory.newReference(
-					digestInfo.description, digestMethod, null, null, null,
-					documentDigestValue);
+
+			String uri = FilenameUtils.getName(new File(digestInfo.description)
+					.toURI().toURL().getFile());
+
+			Reference reference = signatureFactory.newReference(uri,
+					digestMethod, null, null, null, documentDigestValue);
 			references.add(reference);
 		}
 
