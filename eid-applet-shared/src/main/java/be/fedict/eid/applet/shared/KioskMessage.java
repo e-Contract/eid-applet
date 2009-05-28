@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2009 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -20,23 +20,18 @@ package be.fedict.eid.applet.shared;
 
 import be.fedict.eid.applet.shared.annotation.HttpHeader;
 import be.fedict.eid.applet.shared.annotation.MessageDiscriminator;
-import be.fedict.eid.applet.shared.annotation.ResponsesAllowed;
-import be.fedict.eid.applet.shared.annotation.StartRequestMessage;
-import be.fedict.eid.applet.shared.protocol.ProtocolState;
+import be.fedict.eid.applet.shared.annotation.StopResponseMessage;
 
 /**
- * Hello Message transfer object.
+ * Kiosk message transfer object.
  * 
  * @author fcorneli
  * 
  */
-@ResponsesAllowed( { IdentificationRequestMessage.class,
-		CheckClientMessage.class, AuthenticationRequestMessage.class,
-		AdministrationMessage.class, SignRequestMessage.class,
-		FilesDigestRequestMessage.class, KioskMessage.class })
-@StartRequestMessage(ProtocolState.INIT)
-public class HelloMessage extends AbstractProtocolMessage {
+@StopResponseMessage
+public class KioskMessage extends AbstractProtocolMessage {
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator
-	public static final String TYPE = HelloMessage.class.getSimpleName();
+	public static final String TYPE = KioskMessage.class.getSimpleName();
+
 }

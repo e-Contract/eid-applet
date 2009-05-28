@@ -84,6 +84,7 @@ import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.servlet.SessionHandler;
 import org.mortbay.jetty.testing.ServletTester;
 
+import be.fedict.eid.applet.Applet;
 import be.fedict.eid.applet.Controller;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.Runtime;
@@ -300,6 +301,11 @@ public class ControllerTest {
 		public void gotoTargetPage() {
 			LOG.debug("gotoTargetPage()");
 		}
+
+		@Override
+		public Applet getApplet() {
+			return null;
+		}
 	}
 
 	private static class TestView implements View {
@@ -422,6 +428,28 @@ public class ControllerTest {
 		assertNull(httpSession.getAttribute("eid.identifier"));
 		assertNotNull(httpSession.getAttribute("eid.address"));
 		assertNotNull(httpSession.getAttribute("eid.photo"));
+	}
+
+	@Test
+	public void controllerKioskMode() throws Exception {
+		// setup
+		Messages messages = new Messages(Locale.getDefault());
+		Runtime runtime = new TestRuntime();
+		View view = new TestView();
+		Controller controller = new Controller(view, runtime, messages);
+
+		// make sure that the session cookies are passed during conversations
+		CookieManager cookieManager = new CookieManager();
+		cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+		CookieHandler.setDefault(cookieManager);
+
+		this.servletHolder.setInitParameter("Kiosk", "true");
+
+		// operate
+		controller.run();
+
+		// verify
+		LOG.debug("verify...");
 	}
 
 	public static class TestAuthenticationService implements

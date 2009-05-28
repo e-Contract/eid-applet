@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -40,6 +42,7 @@ import java.util.Observer;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import sun.security.pkcs11.wrapper.PKCS11Exception;
 import be.fedict.eid.applet.Messages.MESSAGE_ID;
 import be.fedict.eid.applet.shared.AdministrationMessage;
 import be.fedict.eid.applet.shared.AppletProtocolMessageCatalog;
@@ -56,6 +59,7 @@ import be.fedict.eid.applet.shared.HelloMessage;
 import be.fedict.eid.applet.shared.IdentificationRequestMessage;
 import be.fedict.eid.applet.shared.IdentityDataMessage;
 import be.fedict.eid.applet.shared.InsecureClientMessage;
+import be.fedict.eid.applet.shared.KioskMessage;
 import be.fedict.eid.applet.shared.SignRequestMessage;
 import be.fedict.eid.applet.shared.SignatureDataMessage;
 import be.fedict.eid.applet.shared.annotation.ResponsesAllowed;
@@ -264,6 +268,9 @@ public class Controller {
 					}
 				}
 			}
+			if (resultMessage instanceof KioskMessage) {
+				kioskMode();
+			}
 			if (resultMessage instanceof AdministrationMessage) {
 				AdministrationMessage administrationMessage = (AdministrationMessage) resultMessage;
 				boolean changePin = administrationMessage.changePin;
@@ -358,6 +365,48 @@ public class Controller {
 				.getMessage(MESSAGE_ID.DONE));
 		this.runtime.gotoTargetPage();
 		return null;
+	}
+
+	private void kioskMode() throws IllegalArgumentException,
+			SecurityException, IOException, PKCS11Exception,
+			InterruptedException, NoSuchFieldException, IllegalAccessException,
+			InvocationTargetException, NoSuchMethodException, Exception {
+		addDetailMessage("entering Kiosk Mode...");
+		this.view.setStatusMessage(Status.NORMAL, "Kiosk Mode...");
+		while (true) {
+			if (false == this.pkcs11Eid.isEidPresent()) {
+				this.pkcs11Eid.waitForEidPresent();
+			}
+			addDetailMessage("waiting for card removal...");
+			this.pkcs11Eid.removeCard();
+			addDetailMessage("card removed");
+			ClassLoader classLoader = Controller.class.getClassLoader();
+			Class<?> jsObjectClass;
+			try {
+				jsObjectClass = classLoader
+						.loadClass("netscape.javascript.JSObject");
+			} catch (ClassNotFoundException e) {
+				addDetailMessage("JSObject class not found");
+				addDetailMessage("not running inside a browser?");
+				continue;
+			}
+			Method getWindowMethod = jsObjectClass.getMethod("getWindow",
+					new Class<?>[] { java.applet.Applet.class });
+			Object jsObject = getWindowMethod.invoke(null, this.runtime
+					.getApplet());
+			Method callMethod = jsObjectClass.getMethod("call", new Class<?>[] {
+					String.class, Class.forName("[Ljava.lang.Object;") });
+			String removeCardCallback = this.runtime
+					.getParameter("RemoveCardCallback");
+			if (null != removeCardCallback) {
+				addDetailMessage("invoking javascript callback: "
+						+ removeCardCallback);
+				callMethod
+						.invoke(jsObject, removeCardCallback, new Object[] {});
+			} else {
+				addDetailMessage("missing RemoveCardCallback parameter");
+			}
+		}
 	}
 
 	/**
@@ -896,11 +945,12 @@ public class Controller {
 		this.currentProgress = 0;
 		this.view.progressIndication(this.maxProgress, this.currentProgress);
 
+		TaskRunner taskRunner = new TaskRunner(this.pcscEidSpi, this.view);
 		/*
 		 * Next design pattern is the only way to handle the case where multiple
 		 * application access the smart card at the same time.
 		 */
-		byte[] idFile = invokeAndBackoffOnException(new Task<byte[]>() {
+		byte[] idFile = taskRunner.run(new Task<byte[]>() {
 			public byte[] run() throws Exception {
 				return Controller.this.pcscEidSpi
 						.readFile(PcscEid.IDENTITY_FILE_ID);
@@ -911,7 +961,7 @@ public class Controller {
 		byte[] addressFile = null;
 		if (includeAddress) {
 			addDetailMessage("Read address file...");
-			addressFile = invokeAndBackoffOnException(new Task<byte[]>() {
+			addressFile = taskRunner.run(new Task<byte[]>() {
 
 				public byte[] run() throws Exception {
 					return Controller.this.pcscEidSpi
@@ -924,7 +974,7 @@ public class Controller {
 		byte[] photoFile = null;
 		if (includePhoto) {
 			addDetailMessage("Read photo file...");
-			photoFile = invokeAndBackoffOnException(new Task<byte[]>() {
+			photoFile = taskRunner.run(new Task<byte[]>() {
 
 				public byte[] run() throws Exception {
 					return Controller.this.pcscEidSpi
@@ -939,7 +989,7 @@ public class Controller {
 		byte[] rootCertFile = null;
 		if (includeIntegrityData) {
 			addDetailMessage("Read identity signature file...");
-			identitySignatureFile = invokeAndBackoffOnException(new Task<byte[]>() {
+			identitySignatureFile = taskRunner.run(new Task<byte[]>() {
 				public byte[] run() throws Exception {
 					return Controller.this.pcscEidSpi
 							.readFile(PcscEid.IDENTITY_SIGN_FILE_ID);
@@ -947,7 +997,7 @@ public class Controller {
 			});
 			if (includeAddress) {
 				addDetailMessage("Read address signature file...");
-				addressSignatureFile = invokeAndBackoffOnException(new Task<byte[]>() {
+				addressSignatureFile = taskRunner.run(new Task<byte[]>() {
 					public byte[] run() throws Exception {
 						return Controller.this.pcscEidSpi
 								.readFile(PcscEid.ADDRESS_SIGN_FILE_ID);
@@ -955,14 +1005,14 @@ public class Controller {
 				});
 			}
 			addDetailMessage("Read national registry certificate file...");
-			rrnCertFile = invokeAndBackoffOnException(new Task<byte[]>() {
+			rrnCertFile = taskRunner.run(new Task<byte[]>() {
 				public byte[] run() throws Exception {
 					return Controller.this.pcscEidSpi
 							.readFile(PcscEid.RRN_CERT_FILE_ID);
 				}
 			});
 			addDetailMessage("reading root certificate file...");
-			rootCertFile = invokeAndBackoffOnException(new Task<byte[]>() {
+			rootCertFile = taskRunner.run(new Task<byte[]>() {
 				public byte[] run() throws Exception {
 					return Controller.this.pcscEidSpi
 							.readFile(PcscEid.ROOT_CERT_FILE_ID);
@@ -975,7 +1025,7 @@ public class Controller {
 		byte[] caCertFile = null;
 		if (includeCertificates) {
 			addDetailMessage("reading authn certificate file...");
-			authnCertFile = invokeAndBackoffOnException(new Task<byte[]>() {
+			authnCertFile = taskRunner.run(new Task<byte[]>() {
 				public byte[] run() throws Exception {
 					return Controller.this.pcscEidSpi
 							.readFile(PcscEid.AUTHN_CERT_FILE_ID);
@@ -983,7 +1033,7 @@ public class Controller {
 			});
 
 			addDetailMessage("reading sign certificate file...");
-			signCertFile = invokeAndBackoffOnException(new Task<byte[]>() {
+			signCertFile = taskRunner.run(new Task<byte[]>() {
 				public byte[] run() throws Exception {
 					return Controller.this.pcscEidSpi
 							.readFile(PcscEid.SIGN_CERT_FILE_ID);
@@ -991,7 +1041,7 @@ public class Controller {
 			});
 
 			addDetailMessage("reading citizen CA certificate file...");
-			caCertFile = invokeAndBackoffOnException(new Task<byte[]>() {
+			caCertFile = taskRunner.run(new Task<byte[]>() {
 				public byte[] run() throws Exception {
 					return Controller.this.pcscEidSpi
 							.readFile(PcscEid.CA_CERT_FILE_ID);
@@ -1000,7 +1050,7 @@ public class Controller {
 
 			if (null == rootCertFile) {
 				addDetailMessage("reading root certificate file...");
-				rootCertFile = invokeAndBackoffOnException(new Task<byte[]>() {
+				rootCertFile = taskRunner.run(new Task<byte[]>() {
 					public byte[] run() throws Exception {
 						return Controller.this.pcscEidSpi
 								.readFile(PcscEid.ROOT_CERT_FILE_ID);
@@ -1051,50 +1101,6 @@ public class Controller {
 		HttpURLConnection connection = (HttpURLConnection) appletServiceUrl
 				.openConnection();
 		return connection;
-	}
-
-	private interface Task<T> {
-		T run() throws Exception;
-	};
-
-	private static final int TRIES = 3;
-
-	private static final int BACKOFF_SLEEP = 1000 * 2;
-
-	private <T> T invokeAndBackoffOnException(Task<T> task) {
-		int tries = TRIES;
-		while (tries != 0) {
-			try {
-				T result = task.run();
-				return result;
-			} catch (Exception e) {
-				addDetailMessage("task exception detected: " + e.getMessage());
-				addDetailMessage("exception type: " + e.getClass().getName());
-				Throwable cause = e.getCause();
-				if (null != cause) {
-					addDetailMessage("exception cause: " + cause.getMessage());
-					addDetailMessage("exception cause type: "
-							+ cause.getClass().getName());
-				}
-				addDetailMessage("will sleep and retry...");
-			}
-			try {
-				Thread.sleep(BACKOFF_SLEEP);
-			} catch (InterruptedException e) {
-				throw new RuntimeException("error sleeping");
-			}
-			tries--;
-			/*
-			 * Because software like ActivClient select the JavaCard card
-			 * manager to browse the available JavaCard applets on inserted
-			 * smart cards, we risk of not having the Belpic JavaCard applet
-			 * selected per default. To circumvent this situation we explicitly
-			 * select the Belpic JavaCard applet after a failed eID APDU
-			 * sequence.
-			 */
-			Controller.this.pcscEidSpi.selectBelpicJavaCardApplet();
-		}
-		throw new RuntimeException("maximum tries exceeded. I give up.");
 	}
 
 	private void setStatusMessage(Status status, String statusMessage) {

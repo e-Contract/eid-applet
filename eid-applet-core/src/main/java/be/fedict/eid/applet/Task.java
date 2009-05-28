@@ -18,21 +18,13 @@
 
 package be.fedict.eid.applet;
 
-import java.net.URL;
-
 /**
- * Interface for runtime component.
+ * Interface for a generic task.
  * 
  * @author fcorneli
  * 
+ * @param <T>
  */
-public interface Runtime {
-
-	void gotoTargetPage();
-
-	URL getDocumentBase();
-
-	String getParameter(String name);
-	
-	Applet getApplet();
+public interface Task<T> {
+	T run() throws Exception;
 }

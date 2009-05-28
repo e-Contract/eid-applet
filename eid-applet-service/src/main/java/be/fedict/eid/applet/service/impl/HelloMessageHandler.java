@@ -40,6 +40,7 @@ import be.fedict.eid.applet.shared.CheckClientMessage;
 import be.fedict.eid.applet.shared.FilesDigestRequestMessage;
 import be.fedict.eid.applet.shared.HelloMessage;
 import be.fedict.eid.applet.shared.IdentificationRequestMessage;
+import be.fedict.eid.applet.shared.KioskMessage;
 import be.fedict.eid.applet.shared.SignRequestMessage;
 
 /**
@@ -76,6 +77,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	public static final String LOGOFF_INIT_PARAM_NAME = "Logoff";
 
+	public static final String KIOSK_INIT_PARAM_NAME = "Kiosk";
+
 	private boolean includePhoto;
 
 	private boolean includeAddress;
@@ -93,6 +96,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 	private boolean logoff;
 
 	private boolean includeCertificates;
+
+	private boolean kiosk;
 
 	private ServiceLocator<SecureClientEnvironmentService> secureClientEnvServiceLocator;
 
@@ -112,6 +117,11 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 		if (null != secureClientEnvService) {
 			CheckClientMessage checkClientMessage = new CheckClientMessage();
 			return checkClientMessage;
+		}
+		if (this.kiosk) {
+			LOG.debug("operating in Kiosk Mode");
+			KioskMessage kioskMessage = new KioskMessage();
+			return kioskMessage;
 		}
 		if (this.changePin || this.unblockPin) {
 			AdministrationMessage administrationMessage = new AdministrationMessage(
@@ -225,6 +235,11 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 		String logoff = config.getInitParameter(LOGOFF_INIT_PARAM_NAME);
 		if (null != logoff) {
 			this.logoff = Boolean.parseBoolean(logoff);
+		}
+
+		String kiosk = config.getInitParameter(KIOSK_INIT_PARAM_NAME);
+		if (null != kiosk) {
+			this.kiosk = Boolean.parseBoolean(kiosk);
 		}
 	}
 }
