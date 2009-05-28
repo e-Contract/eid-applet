@@ -45,6 +45,8 @@ public interface SignatureService {
 	 * Pre-sign callback method. Depending on the configuration some parameters
 	 * are passed. The returned value will be signed by the eID Applet.
 	 * 
+	 * TODO: service must be able to throw some exception on failure.
+	 * 
 	 * @param digestInfos
 	 * @param signingCertificateChain
 	 * @return the digest to be signed.
@@ -57,6 +59,8 @@ public interface SignatureService {
 	/**
 	 * Post-sign callback method. Received the signature value. Depending on the
 	 * configuration the signing certificate chain is also obtained.
+	 * 
+	 * TODO: service must be able to throw some exception on failure.
 	 * 
 	 * @param signatureValue
 	 * @param signingCertificateChain

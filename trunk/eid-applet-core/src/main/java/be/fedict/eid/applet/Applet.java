@@ -461,6 +461,10 @@ public class Applet extends JApplet {
 		public void gotoTargetPage() {
 			Applet.this.gotoTargetPage();
 		}
+
+		public Applet getApplet() {
+			return Applet.this;
+		}
 	}
 
 	private class AppletView implements View {

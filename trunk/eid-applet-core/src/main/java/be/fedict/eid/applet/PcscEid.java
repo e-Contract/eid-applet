@@ -91,6 +91,13 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	public static final byte[] RRN_CERT_FILE_ID = new byte[] { 0x3F, 0x00,
 			(byte) 0xDF, 0x00, 0x50, 0x3C };
 
+	public static final byte[] BELPIC_AID = new byte[] { (byte) 0xA0, 0x00,
+			0x00, 0x01, 0x77, 0x50, 0x4B, 0x43, 0x53, 0x2D, 0x31, 0x35 };
+
+	public static final byte[] APPLET_AID = new byte[] { (byte) 0xA0, 0x00,
+			0x00, 0x00, 0x30, 0x29, 0x05, 0x70, 0x00, (byte) 0xAD, 0x13, 0x10,
+			0x01, 0x01, (byte) 0xFF };
+
 	private final View view;
 
 	private final CardTerminals cardTerminals;
@@ -287,7 +294,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		ResponseAPDU responseApdu = cardChannel.transmit(selectFileApdu);
 		if (0x9000 != responseApdu.getSW()) {
 			throw new FileNotFoundException(
-					"wrong status word after selecting file");
+					"wrong status word after selecting file: "
+							+ Integer.toHexString(responseApdu.getSW()));
 		}
 		try {
 			// SCARD_E_SHARING_VIOLATION fix
@@ -687,22 +695,35 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	}
 
 	public void selectBelpicJavaCardApplet() {
-		byte[] belpicAID = new byte[] { (byte) 0xA0, 0x00, 0x00, 0x00, 0x30,
-				0x29, 0x05, 0x70, 0x00, (byte) 0xAD, 0x13, 0x10, 0x01, 0x01,
-				(byte) 0xFF };
 		CommandAPDU selectApplicationApdu = new CommandAPDU(0x00, 0xA4, 0x04,
-				0x0C, belpicAID);
+				0x0C, BELPIC_AID);
 		ResponseAPDU responseApdu;
 		try {
 			responseApdu = this.cardChannel.transmit(selectApplicationApdu);
 		} catch (CardException e) {
-			this.view
-					.addDetailMessage("error selecting BELPIC JavaCard Applet");
+			this.view.addDetailMessage("error selecting BELPIC");
 			return;
 		}
 		if (0x9000 != responseApdu.getSW()) {
-			this.view
-					.addDetailMessage("could not select the BELPIC JavaCard Applet");
+			this.view.addDetailMessage("could not select BELPIC");
+			this.view.addDetailMessage("status word: "
+					+ Integer.toHexString(responseApdu.getSW()));
+			/*
+			 * Try to select the Applet.
+			 */
+			selectApplicationApdu = new CommandAPDU(0x00, 0xA4, 0x04, 0x00,
+					APPLET_AID);
+			try {
+				responseApdu = this.cardChannel.transmit(selectApplicationApdu);
+			} catch (CardException e) {
+				this.view.addDetailMessage("error selecting Applet");
+				return;
+			}
+			if (0x9000 != responseApdu.getSW()) {
+				this.view.addDetailMessage("could not select applet");
+			} else {
+				this.view.addDetailMessage("BELPIC JavaCard applet selected");
+			}
 		} else {
 			this.view.addDetailMessage("BELPIC JavaCard applet selected");
 		}

@@ -263,6 +263,7 @@
 			<dependency>
 				<groupId>com.caucho</groupId>
 				<artifactId>resin-quercus</artifactId>
+				<!-- GPL license! -->
 				<version>3.2.1</version>
 			</dependency>
 			<dependency>
@@ -289,6 +290,11 @@
 				<groupId>javax.jms</groupId>
 				<artifactId>jms</artifactId>
 				<version>1.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.santuario</groupId>
+				<artifactId>xmlsec</artifactId>
+				<version>1.4.2</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

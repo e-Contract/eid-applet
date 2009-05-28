@@ -283,6 +283,26 @@
 		<url-pattern>/applet-service-sign-files</url-pattern>
 	</servlet-mapping>
 	<servlet>
+		<servlet-name>AppletSignXmlFilesServiceServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+		<init-param>
+			<param-name>SignatureService</param-name>
+			<param-value>test/eid/applet/model/XmlSignatureServiceBean</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AppletSignXmlFilesServiceServlet</servlet-name>
+		<url-pattern>/applet-service-sign-xml-files</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>XmlSignatureServlet</servlet-name>
+		<servlet-class>test.be.fedict.eid.applet.XmlSignatureServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>XmlSignatureServlet</servlet-name>
+		<url-pattern>/signature.xml</url-pattern>
+	</servlet-mapping>
+	<servlet>
 		<servlet-name>AppletSignFilesAllServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
 		<init-param>

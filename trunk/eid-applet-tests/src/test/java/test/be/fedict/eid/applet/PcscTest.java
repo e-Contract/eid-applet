@@ -34,6 +34,7 @@ import java.util.Locale;
 import javax.imageio.ImageIO;
 import javax.smartcardio.Card;
 import javax.smartcardio.CardChannel;
+import javax.smartcardio.CardException;
 import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 
@@ -47,6 +48,8 @@ import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.PcscEid;
 import be.fedict.eid.applet.PcscEidSpi;
 import be.fedict.eid.applet.Status;
+import be.fedict.eid.applet.Task;
+import be.fedict.eid.applet.TaskRunner;
 import be.fedict.eid.applet.View;
 
 /**
@@ -169,6 +172,67 @@ public class PcscTest {
 		LOG.debug("height: " + image.getHeight());
 
 		pcscEidSpi.close();
+	}
+
+	private void selectCardManager(CardChannel cardChannel) {
+		CommandAPDU selectApplicationApdu = new CommandAPDU(0x00, 0xA4, 0x04,
+				0x00);
+		ResponseAPDU responseApdu;
+		try {
+			responseApdu = cardChannel.transmit(selectApplicationApdu);
+		} catch (CardException e) {
+			LOG.debug("error selecting application");
+			return;
+		} catch (ArrayIndexOutOfBoundsException e) {
+			LOG.debug("array error");
+			return;
+		}
+		if (0x9000 != responseApdu.getSW()) {
+			LOG.debug("could not select application");
+		} else {
+			LOG.debug("application selected");
+		}
+	}
+
+	@Test
+	public void testSelectBelpic() throws Exception {
+		final PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEid.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEid.waitForEidPresent();
+		}
+
+		try {
+			pcscEid.selectBelpicJavaCardApplet();
+		} finally {
+			pcscEid.close();
+		}
+	}
+
+	@Test
+	public void testCardManager() throws Exception {
+		final PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEid.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEid.waitForEidPresent();
+		}
+		View view = new TestView();
+
+		CardChannel cardChannel = pcscEid.getCardChannel();
+		selectCardManager(cardChannel);
+		// card manager active
+
+		TaskRunner taskRunner = new TaskRunner(pcscEid, view);
+		try {
+			byte[] data = taskRunner.run(new Task<byte[]>() {
+				public byte[] run() throws Exception {
+					return pcscEid.readFile(PcscEid.IDENTITY_FILE_ID);
+				}
+			});
+			assertNotNull(data);
+		} finally {
+			pcscEid.close();
+		}
 	}
 
 	@Test

@@ -14,6 +14,7 @@
 		<rich:panel>
 			<f:facet name="header">eID Applet Identification</f:facet>
 			This test will execute an eID identification via the eID Applet.
+			A simple eID readout will take place.
 			<p><a
 				href="#{facesContext.externalContext.requestContextPath}/identification.seam">Click
 			here to run the eID Applet Identification test.</a></p>
@@ -22,9 +23,20 @@
 		<rich:panel>
 			<f:facet name="header">eID Applet Authentication</f:facet>
 			This test will execute an eID authentication via the eID Applet.
+			This test requires you to enter your PIN code.
 			<p><a
 				href="#{facesContext.externalContext.requestContextPath}/authentication.seam">Click
 			here to run the eID Applet Authentication test.</a></p>
+		</rich:panel>
+		<rich:spacer height="10" />
+		<rich:panel>
+			<f:facet name="header">eID Applet Authentication - Kiosk Mode</f:facet>
+			This test will execute an eID authentication via the eID Applet.
+			This test requires you to enter your PIN code.
+			The eID Applet kiosk mode features detection of eID card removal.
+			<p><a
+				href="#{facesContext.externalContext.requestContextPath}/authentication-kiosk.seam">Click
+			here to run the eID Applet Authentication (Kiosk Mode) test.</a></p>
 		</rich:panel>
 	</ui:define>
 </ui:composition>
