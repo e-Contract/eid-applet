@@ -82,6 +82,10 @@ public class ClientEnvironmentMessageHandler implements
 
 	private boolean includeCertificates;
 
+	private boolean sessionIdChannelBinding;
+
+	private boolean serverCertificateChannelBinding;
+
 	private ServiceLocator<SignatureService> signatureServiceLocator;
 
 	public Object handleMessage(ClientEnvironmentMessage message,
@@ -150,7 +154,8 @@ public class ClientEnvironmentMessageHandler implements
 					.generateChallenge(session);
 			AuthenticationRequestMessage authenticationRequestMessage = new AuthenticationRequestMessage(
 					challenge, this.includeHostname, this.includeInetAddress,
-					this.logoff, this.removeCard);
+					this.logoff, this.removeCard, this.sessionIdChannelBinding,
+					this.serverCertificateChannelBinding);
 			return authenticationRequestMessage;
 		} else {
 			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
@@ -231,6 +236,19 @@ public class ClientEnvironmentMessageHandler implements
 				.getInitParameter(HelloMessageHandler.LOGOFF_INIT_PARAM_NAME);
 		if (null != logoff) {
 			this.logoff = Boolean.parseBoolean(logoff);
+		}
+
+		String sessionIdChannelBinding = config
+				.getInitParameter(HelloMessageHandler.SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME);
+		if (null != sessionIdChannelBinding) {
+			this.sessionIdChannelBinding = Boolean
+					.parseBoolean(sessionIdChannelBinding);
+		}
+
+		String channelBindingServerCertificate = config
+				.getInitParameter(HelloMessageHandler.CHANNEL_BINDING_SERVER_CERTIFICATE);
+		if (null != channelBindingServerCertificate) {
+			this.serverCertificateChannelBinding = true;
 		}
 	}
 }

@@ -706,6 +706,8 @@ public class Controller {
 		boolean includeHostname = authnRequest.includeHostname;
 		boolean includeInetAddress = authnRequest.includeInetAddress;
 		boolean logoff = authnRequest.logoff;
+		boolean sessionIdChannelBinding = authnRequest.sessionIdChannelBinding;
+		boolean serverCertificateChannelBinding = authnRequest.serverCertificateChannelBinding;
 		if (challenge.length < 20) {
 			throw new SecurityException(
 					"challenge should be at least 20 bytes long.");
@@ -714,6 +716,10 @@ public class Controller {
 		addDetailMessage("include inet address: " + includeInetAddress);
 		addDetailMessage("remove card after authn: " + removeCard);
 		addDetailMessage("logoff: " + logoff);
+		addDetailMessage("TLS session Id channel binding: "
+				+ sessionIdChannelBinding);
+		addDetailMessage("server certificate channel binding: "
+				+ serverCertificateChannelBinding);
 
 		SecureRandom secureRandom = new SecureRandom();
 		byte[] salt = new byte[20];
@@ -741,10 +747,24 @@ public class Controller {
 			inetAddress = null;
 		}
 
-		byte[] sessionId = AppletSSLSocketFactory.getActualSessionId();
+		byte[] sessionId;
+		if (sessionIdChannelBinding) {
+			sessionId = AppletSSLSocketFactory.getActualSessionId();
+		} else {
+			sessionId = null;
+		}
+
+		byte[] encodedServerCertificate;
+		if (serverCertificateChannelBinding) {
+			encodedServerCertificate = AppletSSLSocketFactory
+					.getActualEncodedServerCertificate();
+		} else {
+			encodedServerCertificate = null;
+		}
 
 		AuthenticationContract authenticationContract = new AuthenticationContract(
-				salt, hostname, inetAddress, sessionId, challenge);
+				salt, hostname, inetAddress, sessionId,
+				encodedServerCertificate, challenge);
 		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
 
 		setStatusMessage(Status.NORMAL, this.messages

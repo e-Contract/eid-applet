@@ -94,7 +94,7 @@ public class AuthenticationDataMessageHandlerTest {
 				.generateChallenge(testHttpSession);
 
 		AuthenticationContract authenticationContract = new AuthenticationContract(
-				salt, null, null, sessionId, challenge);
+				salt, null, null, sessionId, null, challenge);
 		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
 		Signature signature = Signature.getInstance("SHA1withRSA");
 		signature.initSign(keyPair.getPrivate());
@@ -139,6 +139,16 @@ public class AuthenticationDataMessageHandlerTest {
 								.getInitParameter(AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME
 										+ "Class")).andReturn(
 						AuditTestService.class.getName());
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.CHANNEL_BINDING_SERVER_CERTIFICATE))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME))
+				.andStubReturn(null);
 
 		EasyMock.expect(
 				mockServletRequest
@@ -193,7 +203,7 @@ public class AuthenticationDataMessageHandlerTest {
 		Thread.sleep(1000); // > 1 ms
 
 		AuthenticationContract authenticationContract = new AuthenticationContract(
-				salt, null, null, sessionId, challenge);
+				salt, null, null, sessionId, null, challenge);
 		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
 		Signature signature = Signature.getInstance("SHA1withRSA");
 		signature.initSign(keyPair.getPrivate());
@@ -227,6 +237,16 @@ public class AuthenticationDataMessageHandlerTest {
 						mockServletConfig
 								.getInitParameter(HelloMessageHandler.INET_ADDRESS_INIT_PARAM_NAME))
 				.andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.CHANNEL_BINDING_SERVER_CERTIFICATE))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME))
+				.andStubReturn(null);
 		EasyMock
 				.expect(
 						mockServletConfig
@@ -297,7 +317,8 @@ public class AuthenticationDataMessageHandlerTest {
 		AuthenticationChallenge.generateChallenge(testHttpSession);
 
 		AuthenticationContract authenticationContract = new AuthenticationContract(
-				salt, null, null, sessionId, "foobar-challenge".getBytes());
+				salt, null, null, sessionId, null, "foobar-challenge"
+						.getBytes());
 		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
 		Signature signature = Signature.getInstance("SHA1withRSA");
 		signature.initSign(keyPair.getPrivate());
@@ -331,6 +352,16 @@ public class AuthenticationDataMessageHandlerTest {
 						mockServletConfig
 								.getInitParameter(HelloMessageHandler.INET_ADDRESS_INIT_PARAM_NAME))
 				.andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.CHANNEL_BINDING_SERVER_CERTIFICATE))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME))
+				.andStubReturn(null);
 		EasyMock
 				.expect(
 						mockServletConfig
@@ -406,7 +437,7 @@ public class AuthenticationDataMessageHandlerTest {
 				.generateChallenge(testHttpSession);
 
 		AuthenticationContract authenticationContract = new AuthenticationContract(
-				salt, null, null, sessionId, challenge);
+				salt, null, null, sessionId, null, challenge);
 		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
 		Signature signature = Signature.getInstance("SHA1withRSA");
 		signature.initSign(keyPair.getPrivate());
@@ -440,6 +471,16 @@ public class AuthenticationDataMessageHandlerTest {
 						mockServletConfig
 								.getInitParameter(HelloMessageHandler.INET_ADDRESS_INIT_PARAM_NAME))
 				.andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.CHANNEL_BINDING_SERVER_CERTIFICATE))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME))
+				.andStubReturn(null);
 		EasyMock
 				.expect(
 						mockServletConfig

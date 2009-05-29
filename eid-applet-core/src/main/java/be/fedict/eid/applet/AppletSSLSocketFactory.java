@@ -22,12 +22,15 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.util.Arrays;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -52,6 +55,8 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 	private final SSLSocketFactory originalSslSocketFactory;
 
 	private byte[] sslSessionId;
+
+	private byte[] encodedPeerCertificate;
 
 	public AppletSSLSocketFactory(View view,
 			SSLSocketFactory originalSslSocketFactory) {
@@ -139,6 +144,13 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 		return this.sslSessionId;
 	}
 
+	public byte[] getEncodedPeerCertificate() {
+		if (null == this.encodedPeerCertificate) {
+			throw new IllegalStateException("SSL peer certificate unknown");
+		}
+		return this.encodedPeerCertificate;
+	}
+
 	@Override
 	public Socket createSocket() throws IOException {
 		Socket socket = this.originalSslSocketFactory.createSocket();
@@ -160,6 +172,15 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 			this.view.addDetailMessage("SSL session Id mismatch");
 		}
 		this.sslSessionId = sslSessionId;
+		try {
+			Certificate[] peerCertificates = sslSession.getPeerCertificates();
+			this.encodedPeerCertificate = peerCertificates[0].getEncoded();
+		} catch (SSLPeerUnverifiedException e) {
+			this.view.addDetailMessage("SSL peer unverified");
+		} catch (CertificateEncodingException e) {
+			this.view.addDetailMessage("certificate encoding error: "
+					+ e.getMessage());
+		}
 	}
 
 	public static SocketFactory getDefault() {
@@ -199,13 +220,26 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 	 * @return
 	 */
 	public static byte[] getActualSessionId() {
+		AppletSSLSocketFactory appletSslSocketFactory = getAppletSSLSocketFactory();
+		byte[] sessionId = appletSslSocketFactory.getSessionId();
+		return sessionId;
+	}
+
+	private static AppletSSLSocketFactory getAppletSSLSocketFactory() {
 		SSLSocketFactory sslSocketFactory = HttpsURLConnection
 				.getDefaultSSLSocketFactory();
 		if (false == sslSocketFactory instanceof AppletSSLSocketFactory) {
 			throw new SecurityException("wrong SSL socket factory");
 		}
+		// TODO: the AppletSSLSocketFactory is shared across all eID Applets...
 		AppletSSLSocketFactory appletSslSocketFactory = (AppletSSLSocketFactory) sslSocketFactory;
-		byte[] sessionId = appletSslSocketFactory.getSessionId();
-		return sessionId;
+		return appletSslSocketFactory;
+	}
+
+	public static byte[] getActualEncodedServerCertificate() {
+		AppletSSLSocketFactory appletSslSocketFactory = getAppletSSLSocketFactory();
+		byte[] encodedPeerCertificate = appletSslSocketFactory
+				.getEncodedPeerCertificate();
+		return encodedPeerCertificate;
 	}
 }

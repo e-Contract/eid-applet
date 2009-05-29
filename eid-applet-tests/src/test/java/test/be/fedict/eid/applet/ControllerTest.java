@@ -61,6 +61,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -95,7 +96,8 @@ import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
 
 /**
- * Integration tests for the eID Applet controller component.
+ * Integration tests for the eID Applet controller component and the eID Applet
+ * Service.
  * 
  * @author fcorneli
  * 
@@ -205,6 +207,8 @@ public class ControllerTest {
 
 	private ServletHolder servletHolder;
 
+	private X509Certificate certificate;
+
 	@Before
 	public void setUp() throws Exception {
 		this.servletTester = new ServletTester();
@@ -216,11 +220,11 @@ public class ControllerTest {
 		KeyPair keyPair = generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusMonths(1);
-		X509Certificate certificate = generateSelfSignedCertificate(keyPair,
+		this.certificate = generateSelfSignedCertificate(keyPair,
 				"CN=localhost", notBefore, notAfter);
 		File tmpP12File = File.createTempFile("ssl-", ".p12");
 		LOG.debug("p12 file: " + tmpP12File.getAbsolutePath());
-		persistKey(tmpP12File, keyPair.getPrivate(), certificate, "secret"
+		persistKey(tmpP12File, keyPair.getPrivate(), this.certificate, "secret"
 				.toCharArray(), "secret".toCharArray());
 
 		SslSocketConnector sslSocketConnector = new SslSocketConnector();
@@ -241,7 +245,7 @@ public class ControllerTest {
 		this.servletTester.start();
 
 		SSLContext sslContext = SSLContext.getInstance("TLS");
-		TrustManager trustManager = new TestTrustManager(certificate);
+		TrustManager trustManager = new TestTrustManager(this.certificate);
 		sslContext.init(null, new TrustManager[] { trustManager }, null);
 		SSLContext.setDefault(sslContext);
 	}
@@ -481,6 +485,156 @@ public class ControllerTest {
 		this.servletHolder.setInitParameter("AuthenticationServiceClass",
 				TestAuthenticationService.class.getName());
 		this.servletHolder.setInitParameter("Logoff", "true");
+
+		// operate
+		controller.run();
+
+		// verify
+		LOG.debug("verify...");
+		SessionHandler sessionHandler = this.servletTester.getContext()
+				.getSessionHandler();
+		SessionManager sessionManager = sessionHandler.getSessionManager();
+		LOG.debug("session manager type: "
+				+ sessionManager.getClass().getName());
+		HashSessionManager hashSessionManager = (HashSessionManager) sessionManager;
+		LOG.debug("# sessions: " + hashSessionManager.getSessions());
+		assertEquals(1, hashSessionManager.getSessions());
+		Map<String, HttpSession> sessionMap = hashSessionManager
+				.getSessionMap();
+		LOG.debug("session map: " + sessionMap);
+		Entry<String, HttpSession> sessionEntry = sessionMap.entrySet()
+				.iterator().next();
+		HttpSession httpSession = sessionEntry.getValue();
+		assertNotNull(httpSession.getAttribute("eid"));
+		assertNull(httpSession.getAttribute("eid.identity"));
+		assertNull(httpSession.getAttribute("eid.address"));
+		assertNull(httpSession.getAttribute("eid.photo"));
+		String identifier = (String) httpSession.getAttribute("eid.identifier");
+		assertNotNull(identifier);
+		LOG.debug("identifier: " + identifier);
+		assertTrue(TestAuthenticationService.called);
+	}
+
+	@Test
+	public void testAuthnSessionIdChannelBinding() throws Exception {
+		// setup
+		Messages messages = new Messages(Locale.getDefault());
+		Runtime runtime = new TestRuntime();
+		View view = new TestView();
+		Controller controller = new Controller(view, runtime, messages);
+
+		// make sure that the session cookies are passed during conversations
+		CookieManager cookieManager = new CookieManager();
+		cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+		CookieHandler.setDefault(cookieManager);
+
+		this.servletHolder.setInitParameter("AuthenticationServiceClass",
+				TestAuthenticationService.class.getName());
+		this.servletHolder.setInitParameter("Logoff", "true");
+		this.servletHolder.setInitParameter("SessionIdChannelBinding", "true");
+
+		// operate
+		controller.run();
+
+		// verify
+		LOG.debug("verify...");
+		SessionHandler sessionHandler = this.servletTester.getContext()
+				.getSessionHandler();
+		SessionManager sessionManager = sessionHandler.getSessionManager();
+		LOG.debug("session manager type: "
+				+ sessionManager.getClass().getName());
+		HashSessionManager hashSessionManager = (HashSessionManager) sessionManager;
+		LOG.debug("# sessions: " + hashSessionManager.getSessions());
+		assertEquals(1, hashSessionManager.getSessions());
+		Map<String, HttpSession> sessionMap = hashSessionManager
+				.getSessionMap();
+		LOG.debug("session map: " + sessionMap);
+		Entry<String, HttpSession> sessionEntry = sessionMap.entrySet()
+				.iterator().next();
+		HttpSession httpSession = sessionEntry.getValue();
+		assertNotNull(httpSession.getAttribute("eid"));
+		assertNull(httpSession.getAttribute("eid.identity"));
+		assertNull(httpSession.getAttribute("eid.address"));
+		assertNull(httpSession.getAttribute("eid.photo"));
+		String identifier = (String) httpSession.getAttribute("eid.identifier");
+		assertNotNull(identifier);
+		LOG.debug("identifier: " + identifier);
+		assertTrue(TestAuthenticationService.called);
+	}
+
+	@Test
+	public void testAuthnServerCertificateChannelBinding() throws Exception {
+		// setup
+		Messages messages = new Messages(Locale.getDefault());
+		Runtime runtime = new TestRuntime();
+		View view = new TestView();
+		Controller controller = new Controller(view, runtime, messages);
+
+		// make sure that the session cookies are passed during conversations
+		CookieManager cookieManager = new CookieManager();
+		cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+		CookieHandler.setDefault(cookieManager);
+
+		this.servletHolder.setInitParameter("AuthenticationServiceClass",
+				TestAuthenticationService.class.getName());
+		this.servletHolder.setInitParameter("Logoff", "true");
+		File tmpCertFile = File.createTempFile("ssl-server-cert-", ".crt");
+		FileUtils.writeByteArrayToFile(tmpCertFile, this.certificate
+				.getEncoded());
+		this.servletHolder.setInitParameter("ChannelBindingServerCertificate",
+				tmpCertFile.toString());
+
+		// operate
+		controller.run();
+
+		// verify
+		LOG.debug("verify...");
+		SessionHandler sessionHandler = this.servletTester.getContext()
+				.getSessionHandler();
+		SessionManager sessionManager = sessionHandler.getSessionManager();
+		LOG.debug("session manager type: "
+				+ sessionManager.getClass().getName());
+		HashSessionManager hashSessionManager = (HashSessionManager) sessionManager;
+		LOG.debug("# sessions: " + hashSessionManager.getSessions());
+		assertEquals(1, hashSessionManager.getSessions());
+		Map<String, HttpSession> sessionMap = hashSessionManager
+				.getSessionMap();
+		LOG.debug("session map: " + sessionMap);
+		Entry<String, HttpSession> sessionEntry = sessionMap.entrySet()
+				.iterator().next();
+		HttpSession httpSession = sessionEntry.getValue();
+		assertNotNull(httpSession.getAttribute("eid"));
+		assertNull(httpSession.getAttribute("eid.identity"));
+		assertNull(httpSession.getAttribute("eid.address"));
+		assertNull(httpSession.getAttribute("eid.photo"));
+		String identifier = (String) httpSession.getAttribute("eid.identifier");
+		assertNotNull(identifier);
+		LOG.debug("identifier: " + identifier);
+		assertTrue(TestAuthenticationService.called);
+	}
+
+	@Test
+	public void testAuthnHybridChannelBinding() throws Exception {
+		// setup
+		Messages messages = new Messages(Locale.getDefault());
+		Runtime runtime = new TestRuntime();
+		View view = new TestView();
+		Controller controller = new Controller(view, runtime, messages);
+
+		// make sure that the session cookies are passed during conversations
+		CookieManager cookieManager = new CookieManager();
+		cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+		CookieHandler.setDefault(cookieManager);
+
+		this.servletHolder.setInitParameter("AuthenticationServiceClass",
+				TestAuthenticationService.class.getName());
+		this.servletHolder.setInitParameter("Logoff", "true");
+		File tmpCertFile = File.createTempFile("ssl-server-cert-", ".crt");
+		FileUtils.writeByteArrayToFile(tmpCertFile, this.certificate
+				.getEncoded());
+		this.servletHolder.setInitParameter("ChannelBindingServerCertificate",
+				tmpCertFile.toString());
+		this.servletHolder.setInitParameter("SessionIdChannelBinding", "true");
 
 		// operate
 		controller.run();

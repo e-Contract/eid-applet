@@ -18,6 +18,7 @@
 
 package be.fedict.eid.applet.service.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -36,6 +37,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.util.encoders.Hex;
@@ -71,6 +73,10 @@ public class AuthenticationDataMessageHandler implements
 
 	private Long maxMaturity;
 
+	private byte[] encodedServerCertificate;
+
+	private boolean sessionIdChannelBinding;
+
 	public static final String AUTHN_SERVICE_INIT_PARAM_NAME = "AuthenticationService";
 
 	public static final String AUDIT_SERVICE_INIT_PARAM_NAME = "AuditService";
@@ -85,34 +91,25 @@ public class AuthenticationDataMessageHandler implements
 		byte[] signatureValue = message.signatureValue;
 		List<X509Certificate> certificateChain = message.certificateChain;
 		X509Certificate signingCertificate = certificateChain.get(0);
-		LOG.debug("authn signing certificate: " + signingCertificate);
+		LOG.debug("authn signing certificate subject: "
+				+ signingCertificate.getSubjectX500Principal());
 		PublicKey signingKey = signingCertificate.getPublicKey();
 
-		byte[] sessionId = message.sessionId;
-		/*
-		 * Next is Tomcat specific.
-		 */
-		String actualSessionId = (String) request
-				.getAttribute("javax.servlet.request.ssl_session");
-		if (null == actualSessionId) {
-			/*
-			 * Servlet specs v3.0
-			 */
-			actualSessionId = (String) request
-					.getAttribute("javax.servlet.request.ssl_session_id");
-		}
-		if (null == actualSessionId) {
-			LOG.warn("could not verify the SSL session identifier");
-		} else {
-			if (false == Arrays.equals(sessionId, Hex.decode(actualSessionId))) {
-				LOG.warn("SSL session Id mismatch");
-				LOG.debug("signed SSL session Id: "
-						+ new String(Hex.encode(sessionId)));
-				LOG.debug("actual SSL session Id: " + actualSessionId);
-				throw new SecurityException("SSL session Id mismatch");
-			} else {
-				LOG.debug("SSL session identifier checked");
+		if (this.sessionIdChannelBinding) {
+			checkSessionIdChannelBinding(message, request);
+			if (null == this.encodedServerCertificate) {
+				LOG
+						.warn("adviced to use in combination with server certificate channel binding");
 			}
+		}
+
+		if (null != this.encodedServerCertificate) {
+			LOG.debug("using server certificate channel binding");
+		}
+
+		if (false == this.sessionIdChannelBinding
+				&& null == this.encodedServerCertificate) {
+			LOG.warn("no using any secure channel binding");
 		}
 
 		byte[] challenge;
@@ -131,7 +128,7 @@ public class AuthenticationDataMessageHandler implements
 		}
 		AuthenticationContract authenticationContract = new AuthenticationContract(
 				message.saltValue, this.hostname, this.inetAddress,
-				message.sessionId, challenge);
+				message.sessionId, this.encodedServerCertificate, challenge);
 		byte[] toBeSigned;
 		try {
 			toBeSigned = authenticationContract.calculateToBeSigned();
@@ -198,6 +195,36 @@ public class AuthenticationDataMessageHandler implements
 		return new FinishedMessage();
 	}
 
+	private void checkSessionIdChannelBinding(
+			AuthenticationDataMessage message, HttpServletRequest request) {
+		LOG.debug("using TLS session Id channel binding");
+		byte[] sessionId = message.sessionId;
+		/*
+		 * Next is Tomcat specific.
+		 */
+		String actualSessionId = (String) request
+				.getAttribute("javax.servlet.request.ssl_session");
+		if (null == actualSessionId) {
+			/*
+			 * Servlet specs v3.0
+			 */
+			actualSessionId = (String) request
+					.getAttribute("javax.servlet.request.ssl_session_id");
+		}
+		if (null == actualSessionId) {
+			LOG.warn("could not verify the SSL session identifier");
+			return;
+		}
+		if (false == Arrays.equals(sessionId, Hex.decode(actualSessionId))) {
+			LOG.warn("SSL session Id mismatch");
+			LOG.debug("signed SSL session Id: "
+					+ new String(Hex.encode(sessionId)));
+			LOG.debug("actual SSL session Id: " + actualSessionId);
+			throw new SecurityException("SSL session Id mismatch");
+		}
+		LOG.debug("SSL session identifier checked");
+	}
+
 	public void init(ServletConfig config) throws ServletException {
 		this.authenticationServiceLocator = new ServiceLocator<AuthenticationService>(
 				AuthenticationDataMessageHandler.AUTHN_SERVICE_INIT_PARAM_NAME,
@@ -227,6 +254,31 @@ public class AuthenticationDataMessageHandler implements
 			LOG.debug("explicit max maturity: " + this.maxMaturity);
 		} else {
 			this.maxMaturity = null;
+		}
+
+		String sessionIdChannelBinding = config
+				.getInitParameter(HelloMessageHandler.SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME);
+		if (null != sessionIdChannelBinding) {
+			this.sessionIdChannelBinding = Boolean
+					.parseBoolean(sessionIdChannelBinding);
+		}
+
+		String channelBindingServerCertificate = config
+				.getInitParameter(HelloMessageHandler.CHANNEL_BINDING_SERVER_CERTIFICATE);
+		if (null != channelBindingServerCertificate) {
+			File serverCertificateFile = new File(
+					channelBindingServerCertificate);
+			if (false == serverCertificateFile.exists()) {
+				throw new ServletException("server certificate not found: "
+						+ serverCertificateFile);
+			}
+			try {
+				this.encodedServerCertificate = FileUtils
+						.readFileToByteArray(serverCertificateFile);
+			} catch (IOException e) {
+				throw new ServletException("error reading server certificate: "
+						+ e.getMessage(), e);
+			}
 		}
 	}
 }
