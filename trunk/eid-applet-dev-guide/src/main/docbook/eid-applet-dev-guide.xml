@@ -11,7 +11,7 @@
 			<year>2008-2009</year>
 			<holder>FedICT</holder>
 		</copyright>
-		<releaseinfo>draft 12 May 2009</releaseinfo>
+		<releaseinfo>draft 29 May 2009</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -616,6 +616,51 @@
 				sequence. The hostname and IP address are the same as seen by the
 				web browser.
 			</para>
+			<para>
+				Tunneled entity authentication protocols like the one implemented in
+				the eID Applet are subject to man-in-the-middle attacks without
+				proper secure channel binding put in place. Cryptographic end-point
+				channel binding has been implemented by means of digesting the TLS
+				server certificate as part of the authentication signature. This
+				option can be activated via the following
+				<code>init-param</code>
+				on the
+				<code>AppletServiceServlet</code>
+				:
+			</para>
+			<programlisting role="XML"><![CDATA[<init-param>
+	<param-name>ChannelBindingServerCertificate</param-name>
+	<param-value>/path/to/your/server/certificate.der</param-value>
+</init-param>]]></programlisting>
+			<warning>
+				<title>Server Certificate Channel Binding</title>
+				<para>It is strongly advised to activate server certificate
+					cryptographic channel binding to have equivalent security
+					properties compared to bilateral TLS entity authentication.</para>
+			</warning>
+			<para>
+				Besides server certificate channel binding the eID Applet also
+				supports unique channel binding using the TLS session identifier.
+				This option can be activated via the following
+				<code>init-param</code>
+				on the
+				<code>AppletServiceServlet</code>
+				:
+			</para>
+			<programlisting role="XML"><![CDATA[<init-param>
+	<param-name>SessionIdChannelBinding</param-name>
+	<param-value>true</param-value>
+</init-param>]]></programlisting>
+			<para>This will make the authentication signature to also digest
+				the TLS session identifier.</para>
+			<warning>
+				<title>Channel Binding</title>
+				<para>Secure channel binding based on unique channel binding
+					using the TLS session identifier alone is not enough! Always use at
+					least server certificate cryptographic channel binding. You can
+					combine this with (unsecure) unique channel binding using the TLS
+					session identifier if appropriate.</para>
+			</warning>
 		</section>
 		<section>
 			<title>eID Signatures</title>

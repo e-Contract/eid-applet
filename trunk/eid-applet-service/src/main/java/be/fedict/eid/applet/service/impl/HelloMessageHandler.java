@@ -79,6 +79,10 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	public static final String KIOSK_INIT_PARAM_NAME = "Kiosk";
 
+	public static final String SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME = "SessionIdChannelBinding";
+
+	public static final String CHANNEL_BINDING_SERVER_CERTIFICATE = "ChannelBindingServerCertificate";
+
 	private boolean includePhoto;
 
 	private boolean includeAddress;
@@ -98,6 +102,10 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 	private boolean includeCertificates;
 
 	private boolean kiosk;
+
+	private boolean sessionIdChannelBinding;
+
+	private boolean serverCertificateChannelBinding;
 
 	private ServiceLocator<SecureClientEnvironmentService> secureClientEnvServiceLocator;
 
@@ -163,7 +171,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 					.generateChallenge(session);
 			AuthenticationRequestMessage authenticationRequestMessage = new AuthenticationRequestMessage(
 					challenge, this.includeHostname, this.includeInetAddress,
-					this.logoff, this.removeCard);
+					this.logoff, this.removeCard, this.sessionIdChannelBinding,
+					this.serverCertificateChannelBinding);
 			return authenticationRequestMessage;
 		}
 
@@ -240,6 +249,19 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 		String kiosk = config.getInitParameter(KIOSK_INIT_PARAM_NAME);
 		if (null != kiosk) {
 			this.kiosk = Boolean.parseBoolean(kiosk);
+		}
+
+		String sessionIdChannelBinding = config
+				.getInitParameter(SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME);
+		if (null != sessionIdChannelBinding) {
+			this.sessionIdChannelBinding = Boolean
+					.parseBoolean(sessionIdChannelBinding);
+		}
+
+		String channelBindingServerCertificate = config
+				.getInitParameter(CHANNEL_BINDING_SERVER_CERTIFICATE);
+		if (null != channelBindingServerCertificate) {
+			this.serverCertificateChannelBinding = true;
 		}
 	}
 }

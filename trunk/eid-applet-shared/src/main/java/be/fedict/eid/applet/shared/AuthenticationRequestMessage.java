@@ -51,6 +51,12 @@ public class AuthenticationRequestMessage extends AbstractProtocolMessage {
 	@HttpHeader(HTTP_HEADER_PREFIX + "Logoff")
 	public boolean logoff;
 
+	@HttpHeader(HTTP_HEADER_PREFIX + "SessionIdChannelBinding")
+	public boolean sessionIdChannelBinding;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "ServerCertificateChannelBinding")
+	public boolean serverCertificateChannelBinding;
+
 	@HttpBody
 	@NotNull
 	@Description("The challenge to be signed using the authentication certificate. If IncludeHostname is set, then prefix the challenge with the server hostname before signing.")
@@ -62,11 +68,15 @@ public class AuthenticationRequestMessage extends AbstractProtocolMessage {
 
 	public AuthenticationRequestMessage(byte[] challenge,
 			boolean includeHostname, boolean includeInetAddress,
-			boolean logoff, boolean removeCard) {
+			boolean logoff, boolean removeCard,
+			boolean sessionIdChannelBinding,
+			boolean serverCertificateChannelBinding) {
 		this.challenge = challenge;
 		this.includeHostname = includeHostname;
 		this.includeInetAddress = includeInetAddress;
 		this.logoff = logoff;
 		this.removeCard = removeCard;
+		this.sessionIdChannelBinding = sessionIdChannelBinding;
+		this.serverCertificateChannelBinding = serverCertificateChannelBinding;
 	}
 }

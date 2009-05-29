@@ -61,6 +61,8 @@ public class AuthenticationContract {
 
 	private final byte[] sessionId;
 
+	private final byte[] encodedServerCertificate;
+
 	private final byte[] challenge;
 
 	/**
@@ -72,15 +74,19 @@ public class AuthenticationContract {
 	 * @param inetAddress
 	 *            the optional internet address.
 	 * @param sessionId
-	 *            the SSL session identifier.
+	 *            the optional SSL session identifier.
+	 * @param encodedServerCertificate
+	 *            the optional DER encoded X509 server certificate.
 	 * @param challenge
 	 */
 	public AuthenticationContract(byte[] salt, String hostname,
-			InetAddress inetAddress, byte[] sessionId, byte[] challenge) {
+			InetAddress inetAddress, byte[] sessionId,
+			byte[] encodedServerCertificate, byte[] challenge) {
 		this.salt = salt;
 		this.hostname = hostname;
 		this.inetAddress = inetAddress;
 		this.sessionId = sessionId;
+		this.encodedServerCertificate = encodedServerCertificate;
 		this.challenge = challenge;
 	}
 
@@ -109,7 +115,12 @@ public class AuthenticationContract {
 		 * signature claim on this cryptographic authentication signature.
 		 */
 		toBeSignedOutputStream.write(LEGAL_NOTICE.getBytes());
-		toBeSignedOutputStream.write(this.sessionId);
+		if (null != this.sessionId) {
+			toBeSignedOutputStream.write(this.sessionId);
+		}
+		if (null != this.encodedServerCertificate) {
+			toBeSignedOutputStream.write(this.encodedServerCertificate);
+		}
 		/*
 		 * Of course we also digest the challenge as the server needs some mean
 		 * to authenticate us.
