@@ -25,6 +25,8 @@
 				<exclude>server/web/**</exclude>
 				<!-- commons-collections via Richfaces -->
 				<exclude>common/lib/commons-collections.jar</exclude>
+				<!-- we provider our own commons-httpclient -->
+				<exclude>common/lib/commons-httpclient.jar</exclude>
 				<!-- chmod+x on the UNIX scripts -->
 				<exclude>bin/run.sh</exclude>
 				<exclude>bin/shutdown.sh</exclude>
