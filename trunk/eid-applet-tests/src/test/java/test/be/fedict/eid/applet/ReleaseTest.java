@@ -62,9 +62,9 @@ public class ReleaseTest {
 
 	private static final Log LOG = LogFactory.getLog(ReleaseTest.class);
 
-	private static final String CURRENT_VERSION = "1.0.0-beta-1";
+	private static final String CURRENT_VERSION = "1.0.0-SNAPSHOT";
 
-	private static final String NEW_VERSION = "1.0.0-SNAPSHOT";
+	private static final String NEW_VERSION = "1.0.0-beta-2";
 
 	@Test
 	public void testVersioning() throws Exception {
@@ -172,7 +172,7 @@ public class ReleaseTest {
 		return document;
 	}
 
-	public void storeDocument(Document document, File file)
+	private void storeDocument(Document document, File file)
 			throws FileNotFoundException, TransformerException {
 		OutputStream outputStream = new FileOutputStream(file);
 		Source source = new DOMSource(document);
