@@ -39,6 +39,13 @@
 				<exclude>META-INF/**</exclude>
 			</excludes>
 		</fileSet>
+		<fileSet>
+			<directory>target/service-signer-javadoc</directory>
+			<outputDirectory>eid-applet-service-signer-javadoc</outputDirectory>
+			<excludes>
+				<exclude>META-INF/**</exclude>
+			</excludes>
+		</fileSet>
 	</fileSets>
 	<dependencySets>
 		<dependencySet>
