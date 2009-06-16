@@ -48,7 +48,9 @@ public interface SignatureService {
 	 * TODO: service must be able to throw some exception on failure.
 	 * 
 	 * @param digestInfos
+	 *            the optional list of digest infos.
 	 * @param signingCertificateChain
+	 *            the optional list of certificates.
 	 * @return the digest to be signed.
 	 * @throws NoSuchAlgorithmException
 	 */
@@ -64,6 +66,7 @@ public interface SignatureService {
 	 * 
 	 * @param signatureValue
 	 * @param signingCertificateChain
+	 *            the optional chain of signing certificates.
 	 */
 	void postSign(byte[] signatureValue,
 			List<X509Certificate> signingCertificateChain);

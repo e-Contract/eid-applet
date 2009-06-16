@@ -11,7 +11,7 @@
 			<year>2008-2009</year>
 			<holder>FedICT</holder>
 		</copyright>
-		<releaseinfo>draft 29 May 2009</releaseinfo>
+		<releaseinfo>draft 16 Jun 2009</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -21,7 +21,8 @@
 		</authorgroup>
 		<abstract>
 			<para>This developer's guide serves as an entry point for
-				integrating the eID Applet in your web applications.</para>
+				integrating the eID Applet in your web applications. The target
+				audience is web developers and web application architects.</para>
 		</abstract>
 	</articleinfo>
 	<section>
@@ -42,6 +43,24 @@
 				<para>Interactive eID card handling.</para>
 			</listitem>
 		</itemizedlist>
+		<para>The eID Applet uses Java applet technology. This minimized
+			the client web browser requirements.</para>
+		<tip>
+			<title>eID Applet Source Code</title>
+			<para>
+				The eID Applet source code is available at
+				<ulink url="http://code.google.com/p/eid-applet/">eID Applet Google Code</ulink>
+				.
+			</para>
+		</tip>
+		<tip>
+			<title>eID Applet Support</title>
+			<para>
+				Best-effort support on the eID Applet is provided via the
+				<ulink url="http://groups.google.com/group/eid-applet">eID Applet Google Group</ulink>
+				.
+			</para>
+		</tip>
 		<note>
 			<title>Mac OS X</title>
 			<para>Because Apple does not fully support the Java 6 runtime
@@ -213,10 +232,11 @@
 			and a JRE version 1.5.</para>
 		<note>
 			<title>eID Applet Service implementations</title>
-			<para>For the moment we only support Java EE servlet containers
-				out of the box. Depending on the success of the eID Applet SDK, we
-				will also provide backends for other web application frameworks like
-				PHP or ASP.NET.</para>
+			<para>For the moment we only fully support Java EE servlet
+				containers out of the box. Depending on the success of the eID
+				Applet SDK, we will also provide backends for other web application
+				frameworks like PHP or ASP.NET. We already have initial support for
+				the ASP.NET web application environment.</para>
 		</note>
 		<section>
 			<title>eID Identification</title>
@@ -242,43 +262,11 @@
 					The eID Applet Service, which can be found in the
 					<code>eid-applet-service-x.x.x.jar
 					</code>
-					artifact, has the following dependencies:
-					<itemizedlist>
-						<listitem>
-							<para>
-								<code>eid-applet-shared-x.x.x.jar
-								</code>
-							</para>
-						</listitem>
-						<listitem>
-							<para>
-								<code>eid-applet-service-spi-x.x.x.jar
-								</code>
-							</para>
-						</listitem>
-						<listitem>
-							<para>
-								<code>commons-codec-1.3.jar</code>
-							</para>
-						</listitem>
-						<listitem>
-							<para>
-								<code>commons-io-1.4.jar</code>
-							</para>
-						</listitem>
-						<listitem>
-							<para>
-								<code>commons-logging-api-1.1.jar
-								</code>
-							</para>
-						</listitem>
-						<listitem>
-							<para>
-								<code>bcprov-jdk16-140.jar</code>
-							</para>
-						</listitem>
-					</itemizedlist>
-					You should place these JAR files under the
+					artifact, has some 3rd party dependencies. These artifacts are
+					located under the
+					<code>lib/</code>
+					directory inside the eID Applet SDK package. Depending on your Java
+					EE runtime environment you should place these JAR files under the
 					<code>META-INF/lib</code>
 					directory of your web application.
 				</para>
@@ -513,6 +501,17 @@
 				the eID card. eID based authentication is much safer than a simple
 				password based authentication scheme since the eID card makes a
 				two-factor authentication possible.</para>
+			<tip>
+				<title>eID Applet Authentication Configuration</title>
+				<para>
+					There are different eID Applet configurations possible for eID
+					Authentication. The optimal configuration highly depends on your
+					application requirements. In case of doubt it can be useful to
+					contact us at the
+					<ulink url="http://groups.google.com/group/eid-applet">eID Applet Google Group</ulink>
+					for additional advice.
+				</para>
+			</tip>
 			<para>
 				To perform an eID authentication, you need to implement the
 				<code>AuthenticationService</code>
@@ -752,6 +751,12 @@
 					component and the identity integrity component need to implement
 					PKI validation of the citizen certificates itself. PKI validation
 					is out of scope of the provided eID Applet Service.</para>
+				<para>
+					A PKI validation module tailored for the Belgian eID PKI is
+					available at the
+					<ulink url="http://code.google.com/p/jtrust/">jTrust Google Code</ulink>
+					site.
+				</para>
 			</warning>
 		</section>
 		<section>
@@ -1055,6 +1060,11 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 						<entry>22 Apr 2009</entry>
 						<entry>Frank Cornelis</entry>
 						<entry>1.0.0-beta-1</entry>
+					</row>
+					<row>
+						<entry>29 May 2009</entry>
+						<entry>Frank Cornelis</entry>
+						<entry>1.0.0-beta-2</entry>
 					</row>
 				</tbody>
 			</tgroup>
