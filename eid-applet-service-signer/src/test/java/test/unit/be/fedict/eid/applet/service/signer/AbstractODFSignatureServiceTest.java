@@ -84,11 +84,18 @@ public class AbstractODFSignatureServiceTest {
 	public void testVerifySignature() throws Exception {
 		URL odfUrl = AbstractODFSignatureServiceTest.class
 				.getResource("/hello-world-signed.odt");
-		assertTrue(hasOdfSignature(odfUrl));
+		assertTrue(hasOdfSignature(odfUrl, 1));
 	}
 
-	private boolean hasOdfSignature(URL odfUrl) throws IOException,
-			ParserConfigurationException, SAXException,
+	@Test
+	public void testVerifyCoSignature() throws Exception {
+		URL odfUrl = AbstractODFSignatureServiceTest.class
+				.getResource("/hello-world-signed-twice.odt");
+		assertTrue(hasOdfSignature(odfUrl, 2));
+	}
+
+	private boolean hasOdfSignature(URL odfUrl, int signatureCount)
+			throws IOException, ParserConfigurationException, SAXException,
 			org.apache.xml.security.signature.XMLSignatureException,
 			XMLSecurityException, MarshalException, XMLSignatureException {
 		InputStream odfInputStream = odfUrl.openStream();
@@ -104,15 +111,17 @@ public class AbstractODFSignatureServiceTest {
 				Document documentSignatures = loadDocument(odfZipInputStream);
 				NodeList signatureNodeList = documentSignatures
 						.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
-				assertEquals(1, signatureNodeList.getLength());
-				Node signatureNode = signatureNodeList.item(0);
-				if (false == verifySignatureApache(odfUrl, signatureNode)) {
-					LOG.debug("apache says invalid signature");
-					return false;
-				}
-				if (false == verifySignature(odfUrl, signatureNode)) {
-					LOG.debug("JSR105 says invalid signature");
-					return false;
+				assertEquals(signatureCount, signatureNodeList.getLength());
+				for (int idx = 0; idx < signatureNodeList.getLength(); idx++) {
+					Node signatureNode = signatureNodeList.item(idx);
+					if (false == verifySignatureApache(odfUrl, signatureNode)) {
+						LOG.debug("apache says invalid signature");
+						return false;
+					}
+					if (false == verifySignature(odfUrl, signatureNode)) {
+						LOG.debug("JSR105 says invalid signature");
+						return false;
+					}
 				}
 				return true;
 			}
@@ -161,9 +170,19 @@ public class AbstractODFSignatureServiceTest {
 
 	@Test
 	public void testSign() throws Exception {
+		sign("/hello-world.odt", 1);
+	}
+
+	//@Test
+	public void testCoSign() throws Exception {
+		sign("/hello-world-signed.odt", 2);
+	}
+
+	private void sign(String resourceName, int signatureCount) throws Exception {
 		// setup
+		LOG.debug("test sign: " + resourceName);
 		URL odfUrl = AbstractODFSignatureServiceTest.class
-				.getResource("/hello-world.odt");
+				.getResource(resourceName);
 		assertNotNull(odfUrl);
 		ODFTestSignatureService odfSignatureService = new ODFTestSignatureService();
 		odfSignatureService.setOdfUrl(odfUrl);
@@ -205,7 +224,7 @@ public class AbstractODFSignatureServiceTest {
 		File tmpFile = File.createTempFile("signed-", ".odt");
 		FileUtils.writeByteArrayToFile(tmpFile, signedODFData);
 		LOG.debug("signed ODF file: " + tmpFile.getAbsolutePath());
-		assertTrue(hasOdfSignature(tmpFile.toURI().toURL()));
+		assertTrue(hasOdfSignature(tmpFile.toURI().toURL(), signatureCount));
 		LOG.debug("signed ODF file: " + tmpFile.getAbsolutePath());
 	}
 
