@@ -22,8 +22,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,7 +35,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import javax.crypto.Cipher;
-import javax.xml.crypto.KeySelector;
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureException;
@@ -45,6 +44,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -84,8 +84,17 @@ public class AbstractODFSignatureServiceTest {
 	public void testVerifySignature() throws Exception {
 		URL odfUrl = AbstractODFSignatureServiceTest.class
 				.getResource("/hello-world-signed.odt");
+		assertTrue(hasOdfSignature(odfUrl));
+	}
+
+	private boolean hasOdfSignature(URL odfUrl) throws IOException,
+			ParserConfigurationException, SAXException,
+			org.apache.xml.security.signature.XMLSignatureException,
+			XMLSecurityException, MarshalException, XMLSignatureException {
 		InputStream odfInputStream = odfUrl.openStream();
-		assertNotNull(odfInputStream);
+		if (null == odfInputStream) {
+			return false;
+		}
 		ZipInputStream odfZipInputStream = new ZipInputStream(odfInputStream);
 		ZipEntry zipEntry;
 		while (null != (zipEntry = odfZipInputStream.getNextEntry())) {
@@ -97,11 +106,19 @@ public class AbstractODFSignatureServiceTest {
 						.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 				assertEquals(1, signatureNodeList.getLength());
 				Node signatureNode = signatureNodeList.item(0);
-				verifySignatureApache(odfUrl, signatureNode);
-				verifySignature(odfUrl, signatureNode);
-				return;
+				if (false == verifySignatureApache(odfUrl, signatureNode)) {
+					LOG.debug("apache says invalid signature");
+					return false;
+				}
+				if (false == verifySignature(odfUrl, signatureNode)) {
+					LOG.debug("JSR105 says invalid signature");
+					return false;
+				}
+				return true;
 			}
 		}
+		LOG.debug("no documentsignatures.xml entry present");
+		return false;
 	}
 
 	private static class ODFTestSignatureService extends
@@ -111,11 +128,11 @@ public class AbstractODFSignatureServiceTest {
 
 		private final TemporaryTestDataStorage temporaryDataStorage;
 
-		private final ByteArrayOutputStream signedDocumentOutputStream;
+		private final ByteArrayOutputStream signedODFOutputStream;
 
 		public ODFTestSignatureService() {
 			this.temporaryDataStorage = new TemporaryTestDataStorage();
-			this.signedDocumentOutputStream = new ByteArrayOutputStream();
+			this.signedODFOutputStream = new ByteArrayOutputStream();
 		}
 
 		@Override
@@ -132,13 +149,13 @@ public class AbstractODFSignatureServiceTest {
 			return this.temporaryDataStorage;
 		}
 
-		@Override
-		protected OutputStream getSignedDocumentOutputStream() {
-			return this.signedDocumentOutputStream;
+		public byte[] getSignedODFData() {
+			return this.signedODFOutputStream.toByteArray();
 		}
 
-		public byte[] getSignedDocumentData() {
-			return this.signedDocumentOutputStream.toByteArray();
+		@Override
+		protected OutputStream getSignedOpenDocumentOutputStream() {
+			return this.signedODFOutputStream;
 		}
 	}
 
@@ -182,30 +199,17 @@ public class AbstractODFSignatureServiceTest {
 		odfSignatureService.postSign(signatureValue, Collections
 				.singletonList(certificate));
 
-		byte[] signedDocumentData = odfSignatureService.getSignedDocumentData();
-		assertNotNull(signedDocumentData);
-		Document signedDocument = loadDocument(new ByteArrayInputStream(
-				signedDocumentData));
-		LOG.debug("signed document: " + PkiTestUtils.toString(signedDocument));
-
-		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(
-				XMLSignature.XMLNS, "Signature");
-		assertEquals(1, signatureNodeList.getLength());
-		Node signatureNode = signatureNodeList.item(0);
-
-		DOMValidateContext domValidateContext = new DOMValidateContext(
-				KeySelector.singletonKeySelector(keyPair.getPublic()),
-				signatureNode);
-		domValidateContext.setURIDereferencer(new ODFURIDereferencer(odfUrl));
-		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-				.getInstance();
-		XMLSignature xmlSignature = xmlSignatureFactory
-				.unmarshalXMLSignature(domValidateContext);
-		boolean validity = xmlSignature.validate(domValidateContext);
-		assertTrue(validity);
+		byte[] signedODFData = odfSignatureService.getSignedODFData();
+		assertNotNull(signedODFData);
+		LOG.debug("signed ODF size: " + signedODFData.length);
+		File tmpFile = File.createTempFile("signed-", ".odt");
+		FileUtils.writeByteArrayToFile(tmpFile, signedODFData);
+		LOG.debug("signed ODF file: " + tmpFile.getAbsolutePath());
+		assertTrue(hasOdfSignature(tmpFile.toURI().toURL()));
+		LOG.debug("signed ODF file: " + tmpFile.getAbsolutePath());
 	}
 
-	private void verifySignatureApache(URL odfUrl, Node signatureNode)
+	private boolean verifySignatureApache(URL odfUrl, Node signatureNode)
 			throws org.apache.xml.security.signature.XMLSignatureException,
 			XMLSecurityException {
 		org.apache.xml.security.signature.XMLSignature xmlSignature = new org.apache.xml.security.signature.XMLSignature(
@@ -216,7 +220,7 @@ public class AbstractODFSignatureServiceTest {
 		KeyInfo keyInfo = xmlSignature.getKeyInfo();
 		X509Certificate certificate = keyInfo.getX509Certificate();
 		boolean validity = xmlSignature.checkSignatureValue(certificate);
-		assertTrue(validity);
+		return validity;
 	}
 
 	/**
@@ -228,7 +232,7 @@ public class AbstractODFSignatureServiceTest {
 	 * @throws MarshalException
 	 * @throws XMLSignatureException
 	 */
-	private void verifySignature(URL odfUrl, Node signatureNode)
+	private boolean verifySignature(URL odfUrl, Node signatureNode)
 			throws MarshalException, XMLSignatureException {
 		DOMValidateContext domValidateContext = new DOMValidateContext(
 				new KeyInfoKeySelector(), signatureNode);
@@ -244,7 +248,7 @@ public class AbstractODFSignatureServiceTest {
 		XMLSignature xmlSignature = xmlSignatureFactory
 				.unmarshalXMLSignature(domValidateContext);
 		boolean validity = xmlSignature.validate(domValidateContext);
-		assertTrue(validity);
+		return validity;
 	}
 
 	private Document loadDocument(InputStream documentInputStream)
