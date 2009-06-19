@@ -33,6 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.dom.DOMCryptoContext;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.DigestMethod;
@@ -120,15 +121,24 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 	}
 
 	/**
-	 * Gives back a list of reference Ids that refer to elements inside the
-	 * enveloping document. Only makes sense of course in case of an enveloping
-	 * document. Implementations should override this method if they want to
-	 * sign elements of the enveloping document.
+	 * Gives back a list of reference URIs that need to be signed. These URIs
+	 * can refer to elements inside the enveloping document or to external
+	 * resources. Override this method to feed in other ds:Reference URIs.
 	 * 
 	 * @return
 	 */
-	protected List<String> getReferenceIds() {
+	protected List<String> getReferenceUris() {
 		return new LinkedList<String>();
+	}
+
+	/**
+	 * Override this method to change the URI dereferener used by the signing
+	 * engine.
+	 * 
+	 * @return
+	 */
+	protected URIDereferencer getURIDereferencer() {
+		return null;
 	}
 
 	/**
@@ -252,6 +262,10 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			}
 		};
 		XMLSignContext xmlSignContext = new DOMSignContext(key, document);
+		URIDereferencer uriDereferencer = getURIDereferencer();
+		if (null != uriDereferencer) {
+			xmlSignContext.setURIDereferencer(uriDereferencer);
+		}
 		xmlSignContext.putNamespacePrefix(
 				javax.xml.crypto.dsig.XMLSignature.XMLNS, "ds");
 
@@ -331,15 +345,15 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			XMLSignContext xmlSignContext, List<Reference> references)
 			throws NoSuchAlgorithmException,
 			InvalidAlgorithmParameterException, XMLSignatureException {
-		List<String> referenceIds = getReferenceIds();
-		if (null == referenceIds) {
+		List<String> referenceUris = getReferenceUris();
+		if (null == referenceUris) {
 			return;
 		}
 		DigestMethod digestMethod = signatureFactory.newDigestMethod(
 				DigestMethod.SHA1, null);
-		for (String referenceId : referenceIds) {
-			Reference reference = signatureFactory.newReference("#"
-					+ referenceId, digestMethod);
+		for (String referenceUri : referenceUris) {
+			Reference reference = signatureFactory.newReference(referenceUri,
+					digestMethod);
 			references.add(reference);
 		}
 	}

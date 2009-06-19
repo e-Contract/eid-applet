@@ -30,6 +30,7 @@ import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.URIReference;
 import javax.xml.crypto.URIReferenceException;
 import javax.xml.crypto.XMLCryptoContext;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,19 +48,33 @@ public class ODFURIDereferencer implements URIDereferencer {
 
 	private final URL odfUrl;
 
+	private final URIDereferencer baseUriDereferener;
+
 	public ODFURIDereferencer(URL odfUrl) {
 		this.odfUrl = odfUrl;
+		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
+				.getInstance();
+		this.baseUriDereferener = xmlSignatureFactory.getURIDereferencer();
 	}
 
 	public Data dereference(URIReference uriReference, XMLCryptoContext context)
 			throws URIReferenceException {
+		if (null == uriReference) {
+			throw new NullPointerException("URIReference cannot be null");
+		}
+		if (null == context) {
+			throw new NullPointerException("XMLCrytoContext cannot be null");
+		}
+
 		String uri = uriReference.getURI();
 		LOG.debug("dereference: " + uri);
 		try {
 			InputStream dataInputStream = findDataInputStream(uri);
 			if (null == dataInputStream) {
-				LOG.debug("return null");
-				return null;
+				LOG
+						.debug("cannot resolve, delegating to base DOM URI dereferener");
+				return this.baseUriDereferener.dereference(uriReference,
+						context);
 			}
 			return new OctetStreamData(dataInputStream, uri, null);
 		} catch (IOException e) {
