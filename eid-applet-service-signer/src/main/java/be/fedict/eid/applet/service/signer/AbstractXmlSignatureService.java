@@ -31,6 +31,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.URIDereferencer;
@@ -116,7 +117,8 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 	 * 
 	 * @return
 	 */
-	protected Document getEnvelopingDocument() {
+	protected Document getEnvelopingDocument()
+			throws ParserConfigurationException {
 		return null;
 	}
 
@@ -185,6 +187,18 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		return new DigestInfo(digestValue, digestAlgo, description);
 	}
 
+	/**
+	 * Can be overridden by XML signature service implementation to further
+	 * process the signed XML document.
+	 * 
+	 * @param signedDocument
+	 * @param signingCertificateChain
+	 */
+	protected void postSign(Document signedDocument,
+			List<X509Certificate> signingCertificateChain) {
+		// empty
+	}
+
 	public void postSign(byte[] signatureValue,
 			List<X509Certificate> signingCertificateChain) {
 		LOG.debug("postSign");
@@ -207,6 +221,8 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 				.item(0);
 		signatureValueElement.setTextContent(Base64.encode(signatureValue));
 
+		postSign(document, signingCertificateChain);
+
 		OutputStream signedDocumentOutputStream = getSignedDocumentOutputStream();
 		if (null == signedDocumentOutputStream) {
 			throw new IllegalArgumentException(
@@ -228,7 +244,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			NoSuchAlgorithmException, InvalidAlgorithmParameterException,
 			MarshalException, javax.xml.crypto.dsig.XMLSignatureException,
 			TransformerFactoryConfigurationError, TransformerException,
-			MalformedURLException {
+			IOException {
 
 		/*
 		 * DOM Document construction.
@@ -288,8 +304,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(
 				getSignatureMethod(digestAlgo), null);
 		CanonicalizationMethod canonicalizationMethod = signatureFactory
-				.newCanonicalizationMethod(
-						CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
+				.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE,
 						(C14NMethodParameterSpec) null);
 		SignedInfo signedInfo = signatureFactory.newSignedInfo(
 				canonicalizationMethod, signatureMethod, references);
@@ -297,8 +312,9 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		/*
 		 * ds:Signature marshalling
 		 */
+		String signatureId = "xmldsig-" + UUID.randomUUID().toString();
 		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory
-				.newXMLSignature(signedInfo, null);
+				.newXMLSignature(signedInfo, null, null, signatureId, null);
 		DOMXMLSignature domXmlSignature = (DOMXMLSignature) xmlSignature;
 		Node documentNode = document.getDocumentElement();
 		if (null == documentNode) {
@@ -416,14 +432,16 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 	}
 
 	private void writeDocument(Document document,
-			OutputStream tempDocumentOutputStream)
+			OutputStream documentOutputStream)
 			throws TransformerConfigurationException,
-			TransformerFactoryConfigurationError, TransformerException {
-		Result result = new StreamResult(tempDocumentOutputStream);
+			TransformerFactoryConfigurationError, TransformerException,
+			IOException {
+		Result result = new StreamResult(documentOutputStream);
 		Transformer xformer = TransformerFactory.newInstance().newTransformer();
 		xformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		Source source = new DOMSource(document);
 		xformer.transform(source, result);
+		documentOutputStream.close();
 	}
 
 	private Document loadDocument(InputStream documentInputStream)
