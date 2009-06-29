@@ -141,8 +141,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	}
 
 	public byte[] readFile(byte[] fileId) throws CardException, IOException {
-		selectFile(fileId, this.cardChannel);
-		byte[] data = readBinary(this.cardChannel);
+		selectFile(fileId);
+		byte[] data = readBinary();
 		return data;
 	}
 
@@ -160,8 +160,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		}
 	}
 
-	private byte[] readBinary(CardChannel cardChannel) throws CardException,
-			IOException {
+	private byte[] readBinary() throws CardException, IOException {
 		int offset = 0;
 		this.view.addDetailMessage("read binary");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -169,7 +168,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		do {
 			CommandAPDU readBinaryApdu = new CommandAPDU(0x00, 0xB0,
 					offset >> 8, offset & 0xFF, 0xFF);
-			ResponseAPDU responseApdu = cardChannel.transmit(readBinaryApdu);
+			ResponseAPDU responseApdu = transmit(readBinaryApdu);
 			if (0x9000 != responseApdu.getSW()) {
 				throw new IOException("APDU response error: "
 						+ responseApdu.getSW());
@@ -285,12 +284,12 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		return false;
 	}
 
-	private void selectFile(byte[] fileId, CardChannel cardChannel)
-			throws CardException, FileNotFoundException {
+	private void selectFile(byte[] fileId) throws CardException,
+			FileNotFoundException {
 		this.view.addDetailMessage("selecting file");
 		CommandAPDU selectFileApdu = new CommandAPDU(0x00, 0xA4, 0x08, 0x0C,
 				fileId);
-		ResponseAPDU responseApdu = cardChannel.transmit(selectFileApdu);
+		ResponseAPDU responseApdu = transmit(selectFileApdu);
 		if (0x9000 != responseApdu.getSW()) {
 			throw new FileNotFoundException(
 					"wrong status word after selecting file: "
@@ -396,7 +395,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 						0x01, // rsa pkcs#1
 						(byte) 0x84, // tag for private key ref
 						keyId });
-		ResponseAPDU responseApdu = this.cardChannel.transmit(setApdu);
+		ResponseAPDU responseApdu = transmit(setApdu);
 		if (0x9000 != responseApdu.getSW()) {
 			throw new RuntimeException("SELECT error");
 		}
@@ -427,7 +426,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 				0x9E, 0x9A, digestInfo.toByteArray());
 
 		this.view.addDetailMessage("computing digital signature...");
-		responseApdu = this.cardChannel.transmit(computeDigitalSignatureApdu);
+		responseApdu = transmit(computeDigitalSignatureApdu);
 		if (0x9000 == responseApdu.getSW()) {
 			/*
 			 * OK, we could use the card PIN caching feature.
@@ -470,7 +469,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			CommandAPDU verifyApdu = new CommandAPDU(0x00, 0x20, 0x00, 0x01,
 					verifyData);
 			try {
-				responseApdu = this.cardChannel.transmit(verifyApdu);
+				responseApdu = transmit(verifyApdu);
 			} finally {
 				Arrays.fill(verifyData, (byte) 0); // minimize exposure
 			}
@@ -547,7 +546,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 					0x00, // user password change
 					0x01, changePinData);
 			try {
-				responseApdu = this.cardChannel.transmit(changePinApdu);
+				responseApdu = transmit(changePinApdu);
 			} finally {
 				Arrays.fill(changePinData, (byte) 0);
 			}
@@ -600,7 +599,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			CommandAPDU changePinApdu = new CommandAPDU(0x00, 0x2C, 0x00, 0x01,
 					changePinData);
 			try {
-				responseApdu = this.cardChannel.transmit(changePinApdu);
+				responseApdu = transmit(changePinApdu);
 			} finally {
 				Arrays.fill(changePinData, (byte) 0);
 			}
@@ -660,7 +659,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	public void logoff() throws Exception {
 		CommandAPDU logoffApdu = new CommandAPDU(0x80, 0xE6, 0x00, 0x00);
 		this.view.addDetailMessage("logoff...");
-		ResponseAPDU responseApdu = this.cardChannel.transmit(logoffApdu);
+		ResponseAPDU responseApdu = transmit(logoffApdu);
 		if (0x9000 != responseApdu.getSW()) {
 			throw new RuntimeException("logoff failed");
 		}
@@ -693,12 +692,30 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		}
 	}
 
+	private ResponseAPDU transmit(CommandAPDU commandApdu) throws CardException {
+		ResponseAPDU responseApdu = this.cardChannel.transmit(commandApdu);
+		if (0x6c == responseApdu.getSW1()) {
+			/*
+			 * A minimum delay of 10 msec between the answer ‘6C xx’ and the
+			 * next APDU is mandatory for eID v1.0 and v1.1 cards.
+			 */
+			this.view.addDetailMessage("sleeping...");
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				throw new RuntimeException("cannot sleep");
+			}
+			responseApdu = this.cardChannel.transmit(commandApdu);
+		}
+		return responseApdu;
+	}
+
 	public void selectBelpicJavaCardApplet() {
 		CommandAPDU selectApplicationApdu = new CommandAPDU(0x00, 0xA4, 0x04,
 				0x0C, BELPIC_AID);
 		ResponseAPDU responseApdu;
 		try {
-			responseApdu = this.cardChannel.transmit(selectApplicationApdu);
+			responseApdu = transmit(selectApplicationApdu);
 		} catch (CardException e) {
 			this.view.addDetailMessage("error selecting BELPIC");
 			return;
@@ -713,7 +730,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			selectApplicationApdu = new CommandAPDU(0x00, 0xA4, 0x04, 0x00,
 					APPLET_AID);
 			try {
-				responseApdu = this.cardChannel.transmit(selectApplicationApdu);
+				responseApdu = transmit(selectApplicationApdu);
 			} catch (CardException e) {
 				this.view.addDetailMessage("error selecting Applet");
 				return;
