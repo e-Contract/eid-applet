@@ -20,6 +20,9 @@ package be.fedict.eid.applet.service.tlv;
 
 import java.util.GregorianCalendar;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Convertor for eID date of birth field.
  * 
@@ -29,13 +32,18 @@ import java.util.GregorianCalendar;
 public class DateOfBirthDataConvertor implements
 		DataConvertor<GregorianCalendar> {
 
+	private static final Log LOG = LogFactory
+			.getLog(DateOfBirthDataConvertor.class);
+
 	public GregorianCalendar convert(byte[] value)
 			throws DataConvertorException {
 		String dateOfBirthStr = new String(value);
-		String dayStr = dateOfBirthStr.substring(0, 2);
+		LOG.debug(dateOfBirthStr);
+		int spaceIdx = dateOfBirthStr.indexOf(' ');
+		String dayStr = dateOfBirthStr.substring(0, spaceIdx);
 		int day = Integer.parseInt(dayStr);
-		String monthStr = dateOfBirthStr.substring(3,
-				dateOfBirthStr.length() - 4 - 1);
+		String monthStr = dateOfBirthStr.substring(spaceIdx + 1, dateOfBirthStr
+				.length() - 4 - 1);
 		String yearStr = dateOfBirthStr.substring(dateOfBirthStr.length() - 4);
 		int year = Integer.parseInt(yearStr);
 		int month = toMonth(monthStr);

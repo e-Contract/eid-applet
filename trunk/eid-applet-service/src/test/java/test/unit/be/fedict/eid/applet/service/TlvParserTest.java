@@ -83,6 +83,50 @@ public class TlvParserTest {
 	}
 
 	@Test
+	public void parseIdentityFile2() throws Exception {
+		// setup
+		InputStream idInputStream = TlvParserTest.class
+				.getResourceAsStream("/id-alice-2.tlv");
+		byte[] idFile = IOUtils.toByteArray(idInputStream);
+
+		// operate
+		Identity identity = TlvParser.parse(idFile, Identity.class);
+
+		// verify
+		assertNotNull(identity);
+		LOG.debug("name: " + identity.name);
+		assertEquals("SPECIMEN", identity.name);
+		LOG.debug("first name: " + identity.firstName);
+		assertEquals("Alice Geldigekaart0126", identity.firstName);
+		LOG.debug("card number: " + identity.cardNumber);
+		assertEquals("000000012629", identity.cardNumber);
+		LOG.debug("card validity date begin: "
+				+ identity.cardValidityDateBegin.getTime());
+		assertEquals(new GregorianCalendar(2003, 9, 24),
+				identity.cardValidityDateBegin);
+		LOG.debug("card validity date end: "
+				+ identity.cardValidityDateEnd.getTime());
+		assertEquals(new GregorianCalendar(2008, 9, 24),
+				identity.cardValidityDateEnd);
+		LOG.debug("Card Delivery Municipality: "
+				+ identity.cardDeliveryMunicipality);
+		assertEquals("Certipost Specimen", identity.cardDeliveryMunicipality);
+		LOG.debug("national number: " + identity.nationalNumber);
+		assertEquals("71715100070", identity.nationalNumber);
+		LOG.debug("middle name: " + identity.middleName);
+		assertEquals("A", identity.middleName);
+		LOG.debug("nationality: " + identity.nationality);
+		assertEquals("Belg", identity.nationality);
+		LOG.debug("place of birth: " + identity.placeOfBirth);
+		assertEquals("Hamont-Achel", identity.placeOfBirth);
+		LOG.debug("gender: " + identity.gender);
+		assertEquals(Gender.FEMALE, identity.gender);
+		assertNotNull(identity.dateOfBirth);
+		LOG.debug("date of birth: " + identity.dateOfBirth.getTime());
+		assertEquals(new GregorianCalendar(1971, 0, 1), identity.dateOfBirth);
+	}
+
+	@Test
 	public void parseAddressFile() throws Exception {
 		// setup
 		InputStream addressInputStream = TlvParserTest.class
