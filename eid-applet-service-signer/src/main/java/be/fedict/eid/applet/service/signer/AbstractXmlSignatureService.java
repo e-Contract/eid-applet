@@ -41,11 +41,13 @@ import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.SignatureMethod;
 import javax.xml.crypto.dsig.SignedInfo;
+import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLSignContext;
 import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -131,6 +133,38 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 	 */
 	protected List<String> getReferenceUris() {
 		return new LinkedList<String>();
+	}
+
+	public static class ReferenceInfo {
+		private final String uri;
+		private final String transform;
+
+		public ReferenceInfo(String uri, String transform) {
+			this.uri = uri;
+			this.transform = transform;
+		}
+
+		public ReferenceInfo(String uri) {
+			this(uri, null);
+		}
+
+		public String getUri() {
+			return this.uri;
+		}
+
+		public String getTransform() {
+			return this.transform;
+		}
+	}
+
+	/**
+	 * Gives back a list of references that need to be signed. Implementation
+	 * can override this method.
+	 * 
+	 * @return
+	 */
+	protected List<ReferenceInfo> getReferences() {
+		return new LinkedList<ReferenceInfo>();
 	}
 
 	/**
@@ -245,7 +279,6 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			MarshalException, javax.xml.crypto.dsig.XMLSignatureException,
 			TransformerFactoryConfigurationError, TransformerException,
 			IOException {
-
 		/*
 		 * DOM Document construction.
 		 */
@@ -282,8 +315,10 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		if (null != uriDereferencer) {
 			xmlSignContext.setURIDereferencer(uriDereferencer);
 		}
-		xmlSignContext.putNamespacePrefix(
-				javax.xml.crypto.dsig.XMLSignature.XMLNS, "ds");
+
+		// OOo doesn't like ds namespaces.
+		// xmlSignContext.putNamespacePrefix(
+		// javax.xml.crypto.dsig.XMLSignature.XMLNS, "ds");
 
 		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
 				"DOM", new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
@@ -297,14 +332,16 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		addDigestInfosAsReferences(serviceDigestInfos, signatureFactory,
 				references);
 		addReferenceIds(signatureFactory, xmlSignContext, references);
+		addReferences(signatureFactory, references);
 
 		/*
 		 * ds:SignedInfo
 		 */
 		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(
 				getSignatureMethod(digestAlgo), null);
+		// CanonicalizationMethod.INCLUSIVE fails for OOo
 		CanonicalizationMethod canonicalizationMethod = signatureFactory
-				.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE,
+				.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE,
 						(C14NMethodParameterSpec) null);
 		SignedInfo signedInfo = signatureFactory.newSignedInfo(
 				canonicalizationMethod, signatureMethod, references);
@@ -323,7 +360,9 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			 */
 			documentNode = document;
 		}
-		domXmlSignature.marshal(documentNode, "ds",
+		String dsPrefix = null;
+		// String dsPrefix = "ds";
+		domXmlSignature.marshal(documentNode, dsPrefix,
 				(DOMCryptoContext) xmlSignContext);
 
 		/*
@@ -370,6 +409,33 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		for (String referenceUri : referenceUris) {
 			Reference reference = signatureFactory.newReference(referenceUri,
 					digestMethod);
+			references.add(reference);
+		}
+	}
+
+	private void addReferences(XMLSignatureFactory xmlSignatureFactory,
+			List<Reference> references) throws NoSuchAlgorithmException,
+			InvalidAlgorithmParameterException {
+		List<ReferenceInfo> referenceInfos = getReferences();
+		if (null == referenceInfos) {
+			return;
+		}
+		if (referenceInfos.isEmpty()) {
+			return;
+		}
+		DigestMethod digestMethod = xmlSignatureFactory.newDigestMethod(
+				DigestMethod.SHA1, null);
+		for (ReferenceInfo referenceInfo : referenceInfos) {
+			List<Transform> transforms = new LinkedList<Transform>();
+			if (null != referenceInfo.getTransform()) {
+				Transform transform = xmlSignatureFactory.newTransform(
+						referenceInfo.getTransform(),
+						(TransformParameterSpec) null);
+				transforms.add(transform);
+			}
+			Reference reference = xmlSignatureFactory.newReference(
+					referenceInfo.getUri(), digestMethod, transforms, null,
+					null);
 			references.add(reference);
 		}
 	}
