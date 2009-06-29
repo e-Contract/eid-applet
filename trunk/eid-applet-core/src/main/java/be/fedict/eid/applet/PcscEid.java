@@ -52,14 +52,13 @@ import javax.smartcardio.TerminalFactory;
  */
 public class PcscEid extends Observable implements PcscEidSpi {
 
-	private final static byte[] ATR = new byte[] { 0x3b, (byte) 0x98, 0x00,
-			0x40, 0x00, (byte) 0xa5, 0x03, 0x01, 0x01, 0x01, (byte) 0xad, 0x13,
-			0x00 };
+	private final static byte[] ATR_PATTERN = new byte[] { 0x3b, (byte) 0x98,
+			0x00, 0x40, 0x00, (byte) 0x00, 0x00, 0x00, 0x01, 0x01, (byte) 0xad,
+			0x13, 0x10 };
 
 	private final static byte[] ATR_MASK = new byte[] { (byte) 0xff,
-			(byte) 0xff, (byte) 0x00, (byte) 0xff, (byte) 0x00, (byte) 0xff,
-			(byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff,
-			(byte) 0xff, (byte) 0x00 };
+			(byte) 0xff, 0x00, (byte) 0xff, 0x00, 0x00, 0x00, 0x00,
+			(byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xf0 };
 
 	public static final byte[] IDENTITY_FILE_ID = new byte[] { 0x3F, 0x00,
 			(byte) 0xDF, 0x01, 0x40, 0x31 };
@@ -307,13 +306,13 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	private boolean matchesEidAtr(ATR atr) {
 		byte[] atrBytes = atr.getBytes();
-		if (atrBytes.length != ATR.length) {
+		if (atrBytes.length != ATR_PATTERN.length) {
 			return false;
 		}
 		for (int idx = 0; idx < atrBytes.length; idx++) {
 			atrBytes[idx] &= ATR_MASK[idx];
 		}
-		if (Arrays.equals(atrBytes, ATR)) {
+		if (Arrays.equals(atrBytes, ATR_PATTERN)) {
 			return true;
 		}
 		return false;
