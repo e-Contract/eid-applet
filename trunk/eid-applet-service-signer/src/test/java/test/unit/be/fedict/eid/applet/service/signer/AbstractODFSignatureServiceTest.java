@@ -173,7 +173,7 @@ public class AbstractODFSignatureServiceTest {
 		sign("/hello-world.odt", 1);
 	}
 
-	//@Test
+	// @Test
 	public void testCoSign() throws Exception {
 		sign("/hello-world-signed.odt", 2);
 	}
@@ -238,6 +238,7 @@ public class AbstractODFSignatureServiceTest {
 		xmlSignature.addResourceResolver(resourceResolver);
 		KeyInfo keyInfo = xmlSignature.getKeyInfo();
 		X509Certificate certificate = keyInfo.getX509Certificate();
+		LOG.debug("cert subject: " + certificate.getSubjectX500Principal());
 		boolean validity = xmlSignature.checkSignatureValue(certificate);
 		return validity;
 	}

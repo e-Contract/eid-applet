@@ -25,6 +25,7 @@ import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.security.Signature;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -39,6 +40,7 @@ import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
@@ -174,6 +176,20 @@ public class PcscTest {
 		pcscEidSpi.close();
 	}
 
+	@Test
+	public void testReadAddress() throws Exception {
+		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEidSpi.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEidSpi.waitForEidPresent();
+		}
+
+		pcscEidSpi.readFile(PcscEid.IDENTITY_FILE_ID);
+		pcscEidSpi.readFile(PcscEid.ADDRESS_FILE_ID);
+
+		pcscEidSpi.close();
+	}
+
 	private void selectCardManager(CardChannel cardChannel) {
 		CommandAPDU selectApplicationApdu = new CommandAPDU(0x00, 0xA4, 0x04,
 				0x00);
@@ -259,6 +275,24 @@ public class PcscTest {
 		LOG.debug("sign cert size: " + signCertFile.length);
 
 		pcscEidSpi.close();
+	}
+
+	@Test
+	public void testReadIdentityFile() throws Exception {
+		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEidSpi.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEidSpi.waitForEidPresent();
+		}
+		byte[] identityFile;
+		try {
+			identityFile = pcscEidSpi.readFile(PcscEid.IDENTITY_FILE_ID);
+		} finally {
+			pcscEidSpi.close();
+		}
+		File tmpIdentityFile = File.createTempFile("identity-", ".tlv");
+		LOG.debug("tmp identity file: " + tmpIdentityFile.getAbsolutePath());
+		FileUtils.writeByteArrayToFile(tmpIdentityFile, identityFile);
 	}
 
 	@Test

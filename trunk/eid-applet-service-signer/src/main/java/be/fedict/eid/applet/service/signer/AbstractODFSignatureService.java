@@ -34,6 +34,7 @@ import java.util.zip.ZipOutputStream;
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.dom.DOMCryptoContext;
+import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.XMLSignContext;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
@@ -73,15 +74,20 @@ abstract public class AbstractODFSignatureService extends
 	}
 
 	@Override
-	protected final List<String> getReferenceUris() {
-		List<String> referenceUris = new LinkedList<String>();
-		referenceUris.add("content.xml");
-		referenceUris.add("styles.xml");
-		referenceUris.add("meta.xml");
-		referenceUris.add("settings.xml");
-		referenceUris.add("Thumbnails/thumbnail.png");
-		referenceUris.add("Configurations2/accelerator/current.xml");
-		return referenceUris;
+	protected List<ReferenceInfo> getReferences() {
+		List<ReferenceInfo> referenceInfos = new LinkedList<ReferenceInfo>();
+		referenceInfos.add(new ReferenceInfo("content.xml",
+				CanonicalizationMethod.INCLUSIVE));
+		referenceInfos.add(new ReferenceInfo("styles.xml",
+				CanonicalizationMethod.INCLUSIVE));
+		referenceInfos.add(new ReferenceInfo("meta.xml",
+				CanonicalizationMethod.INCLUSIVE));
+		referenceInfos.add(new ReferenceInfo("settings.xml",
+				CanonicalizationMethod.INCLUSIVE));
+		referenceInfos.add(new ReferenceInfo(
+				"Configurations2/accelerator/current.xml", null));
+		referenceInfos.add(new ReferenceInfo("Thumbnails/thumbnail.png"));
+		return referenceInfos;
 	}
 
 	/**
@@ -204,8 +210,10 @@ abstract public class AbstractODFSignatureService extends
 		};
 		XMLSignContext xmlSignContext = new DOMSignContext(key, signedDocument);
 		DOMCryptoContext domCryptoContext = (DOMCryptoContext) xmlSignContext;
+		String dsPrefix = null;
+		// String dsPrefix = "ds";
 		try {
-			domKeyInfo.marshal(signatureElement, "ds", domCryptoContext);
+			domKeyInfo.marshal(signatureElement, dsPrefix, domCryptoContext);
 		} catch (MarshalException e) {
 			throw new RuntimeException("marshall error: " + e.getMessage(), e);
 		}
@@ -223,6 +231,7 @@ abstract public class AbstractODFSignatureService extends
 		Element rootElement = document.createElementNS(
 				"urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0",
 				"dsig:document-signatures");
+		// next is required for correct validation in Java, but fails in OOo
 		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:dsig",
 				"urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0");
 		document.appendChild(rootElement);
