@@ -38,6 +38,17 @@
 				href="#{facesContext.externalContext.requestContextPath}/authentication-kiosk.seam">Click
 			here to run the eID Applet Authentication (Kiosk Mode) test.</a></p>
 		</rich:panel>
+		<rich:spacer height="10" />
+		<rich:panel>
+			<f:facet name="header">eID Applet ODF Signature</f:facet>
+			This test will execute an eID Signature creation via the eID Applet.
+			The demonstrated signature format is ODF.
+			The ODF signature format is also supported by 
+			<a href="http://www.openoffice.org/" target="_top">OpenOffice.org</a> version 3.1.
+			<p><a
+				href="#{facesContext.externalContext.requestContextPath}/upload-odf.seam">Click
+			here to run the eID Applet Signature test.</a></p>
+		</rich:panel>
 	</ui:define>
 </ui:composition>
 </body>
