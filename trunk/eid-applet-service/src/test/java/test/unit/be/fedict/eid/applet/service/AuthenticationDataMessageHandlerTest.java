@@ -48,6 +48,7 @@ import org.junit.Test;
 import be.fedict.eid.applet.service.impl.AuthenticationChallenge;
 import be.fedict.eid.applet.service.impl.AuthenticationDataMessageHandler;
 import be.fedict.eid.applet.service.impl.HelloMessageHandler;
+import be.fedict.eid.applet.service.impl.UserIdentifierUtil;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
 import be.fedict.eid.applet.shared.AuthenticationContract;
 import be.fedict.eid.applet.shared.AuthenticationDataMessage;
@@ -149,6 +150,11 @@ public class AuthenticationDataMessageHandlerTest {
 						mockServletConfig
 								.getInitParameter(HelloMessageHandler.SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME))
 				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.NRCID_SECRET_INIT_PARAM_NAME))
+				.andStubReturn(null);
 
 		EasyMock.expect(
 				mockServletRequest
@@ -168,6 +174,135 @@ public class AuthenticationDataMessageHandlerTest {
 		assertTrue(AuthenticationTestService.isCalled());
 		assertEquals(userId, AuditTestService.getAuditUserId());
 		assertEquals(userId, testHttpSession.getAttribute("eid.identifier"));
+	}
+
+	@Test
+	public void testHandleMessageNRCID() throws Exception {
+		// setup
+		KeyPair keyPair = MiscTestUtils.generateKeyPair();
+		DateTime notBefore = new DateTime();
+		DateTime notAfter = notBefore.plusYears(1);
+		String userId = "1234";
+		X509Certificate certificate = MiscTestUtils.generateCertificate(keyPair
+				.getPublic(), "CN=Test, SERIALNUMBER=" + userId, notBefore,
+				notAfter, null, keyPair.getPrivate(), true, 0, null, null);
+
+		byte[] salt = "salt".getBytes();
+		byte[] sessionId = "session-id".getBytes();
+
+		AuthenticationDataMessage message = new AuthenticationDataMessage();
+		message.certificateChain = new LinkedList<X509Certificate>();
+		message.certificateChain.add(certificate);
+		message.saltValue = salt;
+		message.sessionId = sessionId;
+
+		Map<String, String> httpHeaders = new HashMap<String, String>();
+		HttpSession testHttpSession = new HttpTestSession();
+		HttpServletRequest mockServletRequest = EasyMock
+				.createMock(HttpServletRequest.class);
+		ServletConfig mockServletConfig = EasyMock
+				.createMock(ServletConfig.class);
+
+		byte[] challenge = AuthenticationChallenge
+				.generateChallenge(testHttpSession);
+
+		AuthenticationContract authenticationContract = new AuthenticationContract(
+				salt, null, null, sessionId, null, challenge);
+		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
+		Signature signature = Signature.getInstance("SHA1withRSA");
+		signature.initSign(keyPair.getPrivate());
+		signature.update(toBeSigned);
+		byte[] signatureValue = signature.sign();
+		message.signatureValue = signatureValue;
+
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.CHALLENGE_MAX_MATURITY_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.AUTHN_SERVICE_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.AUTHN_SERVICE_INIT_PARAM_NAME
+										+ "Class")).andReturn(
+						AuthenticationTestService.class.getName());
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.HOSTNAME_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INET_ADDRESS_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME
+										+ "Class")).andReturn(
+						AuditTestService.class.getName());
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.CHANNEL_BINDING_SERVER_CERTIFICATE))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		String nrcidSecret = "my-secret-secret";
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.NRCID_SECRET_INIT_PARAM_NAME))
+				.andStubReturn(nrcidSecret);
+		String nrcidAppId = "my-app-id";
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.NRCID_APP_ID_INIT_PARAM_NAME))
+				.andStubReturn(nrcidAppId);
+		String nrcidOrgId = "my-org-id";
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.NRCID_ORG_ID_INIT_PARAM_NAME))
+				.andStubReturn(nrcidOrgId);
+
+		EasyMock.expect(
+				mockServletRequest
+						.getAttribute("javax.servlet.request.ssl_session"))
+				.andStubReturn(new String(Hex.encodeHex(sessionId)));
+
+		// prepare
+		EasyMock.replay(mockServletRequest, mockServletConfig);
+
+		// operate
+		this.testedInstance.init(mockServletConfig);
+		this.testedInstance.handleMessage(message, httpHeaders,
+				mockServletRequest, testHttpSession);
+
+		// verify
+		EasyMock.verify(mockServletRequest, mockServletConfig);
+		assertTrue(AuthenticationTestService.isCalled());
+
+		String nrcid = UserIdentifierUtil.getNonReversibleCitizenIdentifier(
+				userId, nrcidOrgId, nrcidAppId, nrcidSecret);
+
+		assertTrue(nrcid.equals(AuditTestService.getAuditUserId()));
+		assertTrue(nrcid.equals(testHttpSession.getAttribute("eid.identifier")));
 	}
 
 	@Test
@@ -265,6 +400,11 @@ public class AuthenticationDataMessageHandlerTest {
 				mockServletRequest
 						.getAttribute("javax.servlet.request.ssl_session"))
 				.andStubReturn(new String(Hex.encodeHex(sessionId)));
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.NRCID_SECRET_INIT_PARAM_NAME))
+				.andStubReturn(null);
 
 		// prepare
 		EasyMock.replay(mockServletRequest, mockServletConfig);
@@ -373,6 +513,11 @@ public class AuthenticationDataMessageHandlerTest {
 								.getInitParameter(AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME
 										+ "Class")).andReturn(
 						AuditTestService.class.getName());
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.NRCID_SECRET_INIT_PARAM_NAME))
+				.andStubReturn(null);
 
 		EasyMock.expect(
 				mockServletRequest
@@ -486,6 +631,11 @@ public class AuthenticationDataMessageHandlerTest {
 						mockServletConfig
 								.getInitParameter(AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME))
 				.andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.NRCID_SECRET_INIT_PARAM_NAME))
+				.andStubReturn(null);
 		EasyMock
 				.expect(
 						mockServletConfig

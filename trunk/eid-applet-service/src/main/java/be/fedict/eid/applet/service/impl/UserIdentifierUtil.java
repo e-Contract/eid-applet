@@ -18,9 +18,18 @@
 
 package be.fedict.eid.applet.service.impl;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
+
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Utility class for user identifier construction.
@@ -29,6 +38,8 @@ import javax.security.auth.x500.X500Principal;
  * 
  */
 public class UserIdentifierUtil {
+
+	private static final Log LOG = LogFactory.getLog(UserIdentifierUtil.class);
 
 	private UserIdentifierUtil() {
 		super();
@@ -58,5 +69,73 @@ public class UserIdentifierUtil {
 		String userId = name.substring(serialNumberValueBeginIdx,
 				serialNumberValueEndIdx);
 		return userId;
+	}
+
+	public static final String HMAC_ALGO = "HmacSHA1";
+
+	/**
+	 * Gives back a non-reversible citizen identifier (NRCID).
+	 * 
+	 * @param userId
+	 *            the primary user identifier, i.e. the national registry
+	 *            number.
+	 * @param orgId
+	 *            the optional organization identifier.
+	 * @param appId
+	 *            the optional application identifier.
+	 * @param secret
+	 *            the application specific secret.
+	 * @return
+	 */
+	public static String getNonReversibleCitizenIdentifier(String userId,
+			String orgId, String appId, String secret) {
+		if (null == secret) {
+			throw new IllegalArgumentException("secret key is null");
+		}
+		/*
+		 * Avoid XML formatting issues introduced by some web.xml XML editors.
+		 */
+		secret = secret.trim();
+		if (null != orgId) {
+			orgId = orgId.trim();
+		} else {
+			LOG.warn("it is advised to use an orgId");
+		}
+		if (null != appId) {
+			appId = appId.trim();
+		} else {
+			LOG.warn("it is advised to use an appId");
+		}
+
+		/*
+		 * Construct the HMAC input sequence.
+		 */
+		String input = userId;
+		if (null != appId) {
+			input += appId;
+		}
+		if (null != orgId) {
+			input += orgId;
+		}
+		byte[] inputData = input.getBytes();
+
+		SecretKey macKey = new SecretKeySpec(secret.getBytes(), HMAC_ALGO);
+		Mac mac;
+		try {
+			mac = Mac.getInstance(macKey.getAlgorithm());
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException("HMAC algo not available: "
+					+ e.getMessage());
+		}
+		try {
+			mac.init(macKey);
+		} catch (InvalidKeyException e) {
+			LOG.error("invalid secret key: " + e.getMessage(), e);
+			throw new RuntimeException("invalid secret");
+		}
+		mac.update(inputData);
+		byte[] resultHMac = mac.doFinal();
+		String resultHex = new String(Hex.encodeHex(resultHMac)).toUpperCase();
+		return resultHex;
 	}
 }

@@ -6,12 +6,13 @@
 	<articleinfo>
 		<title>FedICT eID Applet Developer's Guide</title>
 		<subtitle>Integrating the eID Applet within your web
-			applications.</subtitle>
+			applications.
+		</subtitle>
 		<copyright>
 			<year>2008-2009</year>
 			<holder>FedICT</holder>
 		</copyright>
-		<releaseinfo>draft 16 Jun 2009</releaseinfo>
+		<releaseinfo>draft 6 July 2009</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -21,8 +22,10 @@
 		</authorgroup>
 		<abstract>
 			<para>This developer's guide serves as an entry point for
-				integrating the eID Applet in your web applications. The target
-				audience is web developers and web application architects.</para>
+				integrating
+				the eID Applet in your web applications. The target
+				audience is web
+				developers and web application architects.</para>
 		</abstract>
 	</articleinfo>
 	<section>
@@ -44,7 +47,8 @@
 			</listitem>
 		</itemizedlist>
 		<para>The eID Applet uses Java applet technology. This minimized
-			the client web browser requirements.</para>
+			the
+			client web browser requirements.</para>
 		<tip>
 			<title>eID Applet Source Code</title>
 			<para>
@@ -64,17 +68,20 @@
 		<note>
 			<title>Mac OS X</title>
 			<para>Because Apple does not fully support the Java 6 runtime
-				on their Mac OS X operating systems, the identification
-				functionality will not work.</para>
+				on their
+				Mac OS X operating systems, the identification
+				functionality will not
+				work.</para>
 			<para>The strategy is to no longer support operating systems, but
-				to support a specific Java platform. For the eID Applet this is the
+				to
+				support a specific Java platform. For the eID Applet this is the
 				Java 6 platform (for eID identification that is. eID authentication
 				and eID signature creation can also run using a Java 1.5 JRE). We
 				can only give advice on how to configure Java 6 on your operating
 				system.</para>
 		</note>
 		<note>
-			<title>Linux Fedora 9</title>
+			<title>Linux Fedora 9, 10, 11</title>
 			<para>
 				The Fedora operating system comes by default with the IcedTea JRE
 				which is based on the OpenJDK. If the Firefox browser uses this JRE
@@ -115,16 +122,25 @@
 	deployJava.runApplet(attributes, parameters, version);
 </script>]]></programlisting>
 		<para>The web application in which the eID Applet is embedded
-			should use SSL for securing the communication between the web browser
-			and the web application server. The eID Applet will not proceed when
-			it detects a non SSL browser session.</para>
+			should
+			use SSL for securing the communication between the web browser
+			and the
+			web application server. The eID Applet will not proceed when
+			it
+			detects a non SSL browser session.</para>
 		<para>The eID Applet will also not proceed when it detects that it
-			has insufficient privileges to do so. This implies that the eID
-			Applet JAR has to be signed and trusted by the citizen. The eID
-			Applet that ships with an officially released eID Applet SDK has been
-			signed by FedICT. In case of a security breach with the eID Applet,
-			FedICT can revoke the corresponding code signing certificate to
-			guarantee maximal safety of the citizen.</para>
+			has
+			insufficient privileges to do so. This implies that the eID
+			Applet JAR
+			has to be signed and trusted by the citizen. The eID
+			Applet that ships
+			with an officially released eID Applet SDK has been
+			signed by FedICT.
+			In case of a security breach with the eID Applet,
+			FedICT can revoke
+			the corresponding code signing certificate to
+			guarantee maximal safety
+			of the citizen.</para>
 		<para>
 			The available eID Applet parameters are summarized in
 			<xref linkend="table-applet-params" />
@@ -208,7 +224,8 @@
 						</entry>
 						<entry>optional</entry>
 						<entry>When the eID Applet runs in kiosk mode a web developer
-							can use this parameter to set a Javascript callback. The callback
+							can
+							use this parameter to set a Javascript callback. The callback
 							function will be invoked on an eID card removal event.</entry>
 					</row>
 				</tbody>
@@ -233,10 +250,14 @@
 		<note>
 			<title>eID Applet Service implementations</title>
 			<para>For the moment we only fully support Java EE servlet
-				containers out of the box. Depending on the success of the eID
-				Applet SDK, we will also provide backends for other web application
-				frameworks like PHP or ASP.NET. We already have initial support for
-				the ASP.NET web application environment.</para>
+				containers
+				out of the box. Depending on the success of the eID
+				Applet SDK, we
+				will also provide backends for other web application
+				frameworks like
+				PHP or ASP.NET. We already have initial support for
+				the ASP.NET web
+				application environment.</para>
 		</note>
 		<section>
 			<title>eID Identification</title>
@@ -371,13 +392,15 @@
 	<url-pattern>/photo.jpg</url-pattern>
 </servlet-mapping>]]></programlisting>
 				<para>Then you can display the eID photo simply by putting next
-					HTML tag in your web page:</para>
+					HTML
+					tag in your web page:</para>
 				<programlisting role="XML"><![CDATA[<img src="photo.jpg" />]]></programlisting>
 			</section>
 			<section>
 				<title>eID Certificates</title>
 				<para>If for somehow reason you need to have explicit access to
-					the eID citizen certificates, you can instruct the eID Applet to
+					the
+					eID citizen certificates, you can instruct the eID Applet to
 					extract the certificates via the following eID Applet Service
 					servlet configuration:</para>
 				<programlisting role="XML"><![CDATA[<init-param>
@@ -404,10 +427,14 @@
 			<section>
 				<title>Output to PDF</title>
 				<para>The eID Applet SDK comes with a servlet component that
-					allows you to output the eID identity data to PDF. This can be
-					useful if you want to print the eID identity data from within your
-					web application pages. The PDF servlet can be configured as
-					follows:</para>
+					allows
+					you to output the eID identity data to PDF. This can be
+					useful if
+					you want to print the eID identity data from within your
+					web
+					application pages. The PDF servlet can be configured as
+					follows:
+				</para>
 				<programlisting role="XML"><![CDATA[<servlet>
 	<servlet-name>PdfServlet</servlet-name>
 	<servlet-class>be.fedict.eid.applet.service.PdfServlet</servlet-class>
@@ -422,9 +449,12 @@
 			<section>
 				<title>Identity Data Integrity</title>
 				<para>During an eID identification operation the eID Applet
-					Service can perform integrity verification on the retrieved eID
-					identity data. This feature prevents malicious parties to alter
-					critical identity data.</para>
+					Service
+					can perform integrity verification on the retrieved eID
+					identity
+					data. This feature prevents malicious parties to alter
+					critical
+					identity data.</para>
 				<para>
 					To enable this functionality as part of an eID identification
 					operation, you need to implement the
@@ -498,7 +528,8 @@
 		<section>
 			<title>eID Authentication</title>
 			<para>The eID Applet can be used to authenticate an end user via
-				the eID card. eID based authentication is much safer than a simple
+				the
+				eID card. eID based authentication is much safer than a simple
 				password based authentication scheme since the eID card makes a
 				two-factor authentication possible.</para>
 			<tip>
@@ -544,8 +575,10 @@
 			<note>
 				<title>Mac OS X</title>
 				<para>Because Mac OS X does not support the Java 6 runtime we
-					made the eID Applet to also run on a Java 5 runtime for the basic
-					eID authentication (and eID signature) functionality.</para>
+					made
+					the eID Applet to also run on a Java 5 runtime for the basic
+					eID
+					authentication (and eID signature) functionality.</para>
 			</note>
 			<note>
 				<title>Sun JRE</title>
@@ -562,11 +595,50 @@
 					authentication (and eID signatures). This requires that the eID
 					Middleware has been installed on the client system.</para>
 				<para>If no PKCS#11 library has been found and the applet runtime
-					is Java 6, then the eID Applet will fallback to the Java 6 Smart
-					Card I/O API to generate the authentication (or in case of eID
-					signature the non-repudiation) digital signature via the direct
-					PC/SC smart card interface.</para>
+					is
+					Java 6, then the eID Applet will fallback to the Java 6 Smart
+					Card
+					I/O API to generate the authentication (or in case of eID
+					signature
+					the non-repudiation) digital signature via the direct
+					PC/SC smart
+					card interface.</para>
 			</note>
+			<para>
+				After a successful eID authentication took place, the
+				<code>eid.identifier</code>
+				session attribute will contain the national registry number. In some
+				cases the national registry number cannot be used as is as unique
+				user identifier. The eID
+				Applet Service features a Non-Reversible
+				Citizen
+				Identifier (NRCID)
+				functionality to transform the national
+				registry
+				number into an
+				application domain specific identifier. The
+				NRCID is based on the HMAC-SHA1 of the National Registry Number,
+				optionally appended with an application identifier and/or
+				organization identifier.
+				This feature can be enabled by setting the
+				following
+				<code>init-param</code>
+				on the
+				<code>AppletServiceServlet</code>
+				:
+			</para>
+			<programlisting role="XML"><![CDATA[<init-param>
+	<param-name>NRCIDSecret</param-name>
+	<param-value>place-your-application-secret-here</param-value>
+</init-param>]]></programlisting>
+			<para>
+				The optional application identifier and organization identifier can
+				be specified via the
+				<code>NRCIDAppId</code>
+				and
+				<code>NRCIDOrgId</code>
+				init parameters.
+			</para>
 			<para>
 				By default the eID Applet will sign a
 				<code>(salt, challenge)</code>
@@ -651,14 +723,19 @@
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
 			<para>This will make the authentication signature to also digest
-				the TLS session identifier.</para>
+				the
+				TLS session identifier.</para>
 			<warning>
 				<title>Channel Binding</title>
 				<para>Secure channel binding based on unique channel binding
-					using the TLS session identifier alone is not enough! Always use at
-					least server certificate cryptographic channel binding. You can
-					combine this with (unsecure) unique channel binding using the TLS
-					session identifier if appropriate.</para>
+					using
+					the TLS session identifier alone is not enough! Always use at
+					least
+					server certificate cryptographic channel binding. You can
+					combine
+					this with (unsecure) unique channel binding using the TLS
+					session
+					identifier if appropriate.</para>
 			</warning>
 		</section>
 		<section>
@@ -687,9 +764,12 @@
 			<warning>
 				<title>Legally Binding eID Digital Signatures</title>
 				<para>Please be aware that the eID digital signatures are
-					legally binding by law. Don't make the citizen sign electronic
-					documents unless it is absolutely necessary from a legal point of
-					view for the correct functioning of your business work flow.</para>
+					legally
+					binding by law. Don't make the citizen sign electronic
+					documents
+					unless it is absolutely necessary from a legal point of
+					view for the
+					correct functioning of your business work flow.</para>
 			</warning>
 			<para>
 				To use this functionality you need to implement the
@@ -709,7 +789,8 @@
 	<param-value>your/location/in/jndi/SignatureServiceBean</param-value>
 </init-param>]]></programlisting>
 			<para>The eID Applet Service can be configured to perform two
-				basic types of digital signatures:</para>
+				basic
+				types of digital signatures:</para>
 			<itemizedlist>
 				<listitem>
 					<para>
@@ -747,10 +828,14 @@
 			<warning>
 				<title>PKI Validation</title>
 				<para>The eID Applet Service does not perform any PKI validation.
-					So the signature service component, authentication service
-					component and the identity integrity component need to implement
-					PKI validation of the citizen certificates itself. PKI validation
-					is out of scope of the provided eID Applet Service.</para>
+					So
+					the signature service component, authentication service
+					component
+					and the identity integrity component need to implement
+					PKI
+					validation of the citizen certificates itself. PKI validation
+					is out
+					of scope of the provided eID Applet Service.</para>
 				<para>
 					A PKI validation module tailored for the Belgian eID PKI is
 					available at the
@@ -846,8 +931,10 @@
 		<section>
 			<title>Generic eID Applet Service settings</title>
 			<para>The settings listed in this section apply to eID
-				identification operations, eID authentication operations, eID
-				signature operations, and eID administration operations.</para>
+				identification
+				operations, eID authentication operations, eID
+				signature operations,
+				and eID administration operations.</para>
 			<section>
 				<title>Secure Client Environment</title>
 				<para>
@@ -862,7 +949,8 @@
 						</listitem>
 						<listitem>
 							<para>show a warning message and ask the citizen whether
-								he/she wants to continue or not.</para>
+								he/she
+								wants to continue or not.</para>
 						</listitem>
 					</itemizedlist>
 				</para>
@@ -885,15 +973,18 @@
 	<param-value>your/location/in/jndi/SecureClientEnvironmentServiceBean</param-value>
 </init-param>]]></programlisting>
 				<para>Additional client environment information can be
-					pushed to the eID Applet Service by adding the following eID Applet
-					parameters within your web page eID Applet configuration:</para>
+					pushed to the
+					eID Applet Service by adding the following eID Applet
+					parameters
+					within your web page eID Applet configuration:</para>
 				<programlisting role="XML"><![CDATA[NavigatorUserAgent : navigator.userAgent,
 NavigatorAppName : navigator.appName,
 NavigatorAppVersion : navigator.appVersion]]></programlisting>
 				<note>
 					<title>Java 6</title>
 					<para>This eID Applet feature requires a Java 6 browser runtime
-						or an installed eID Middleware PKCS#11 library.</para>
+						or
+						an installed eID Middleware PKCS#11 library.</para>
 				</note>
 			</section>
 			<section>
@@ -940,14 +1031,19 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
 				<para>This feature requires a Java 6 browser runtime as it is
-					using the Smart Card I/O API. If no Java 6 runtime is available
-					this feature will default to an eID card removal as this yields the
-					same result.</para>
+					using
+					the Smart Card I/O API. If no Java 6 runtime is available
+					this
+					feature will default to an eID card removal as this yields the
+					same
+					result.</para>
 				<warning>
 					<title>Enable eID card logoff</title>
 					<para>It is strongly advised to enable the eID card logoff
-						feature to prevent abuse of the authentication functionality of
-						the eID card.</para>
+						feature
+						to prevent abuse of the authentication functionality of
+						the eID
+						card.</para>
 				</warning>
 			</section>
 			<section>
@@ -986,7 +1082,8 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 			application developers that use other web frameworks than a Java EE
 			servlet container based framework.</para>
 		<para>The eID Applet Protocol is based on the HTTP protocol using
-			the POST method. Parameters are passed as HTTP headers and for binary
+			the
+			POST method. Parameters are passed as HTTP headers and for binary
 			data the HTTP body is used. The messages should be transported over a
 			secure SSL connection.</para>
 		<xi:include href="../../../target/protocol-messages.xml"
@@ -1033,7 +1130,8 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 	<appendix>
 		<title>eID Applet License</title>
 		<para>The eID Applet source code has been released under the GNU
-			LGPL version 3.0.</para>
+			LGPL
+			version 3.0.</para>
 	</appendix>
 	<appendix>
 		<title>Revision history</title>
