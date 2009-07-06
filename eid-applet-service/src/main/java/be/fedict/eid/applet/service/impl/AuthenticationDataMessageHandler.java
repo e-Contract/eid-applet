@@ -83,6 +83,18 @@ public class AuthenticationDataMessageHandler implements
 
 	public static final String CHALLENGE_MAX_MATURITY_INIT_PARAM_NAME = "ChallengeMaxMaturity";
 
+	public static final String NRCID_SECRET_INIT_PARAM_NAME = "NRCIDSecret";
+
+	public static final String NRCID_ORG_ID_INIT_PARAM_NAME = "NRCIDOrgId";
+
+	public static final String NRCID_APP_ID_INIT_PARAM_NAME = "NRCIDAppId";
+
+	private String nrcidSecret;
+
+	private String nrcidOrgId;
+
+	private String nrcidAppId;
+
 	public Object handleMessage(AuthenticationDataMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
 			HttpSession session) throws ServletException {
@@ -163,17 +175,21 @@ public class AuthenticationDataMessageHandler implements
 				.locateService();
 		authenticationService.validateCertificateChain(certificateChain);
 
-		/*
-		 * Push authenticated used Id into the HTTP session.
-		 */
 		String userId = UserIdentifierUtil.getUserId(signingCertificate);
-
+		if (null != this.nrcidSecret) {
+			userId = UserIdentifierUtil.getNonReversibleCitizenIdentifier(
+					userId, this.nrcidOrgId, this.nrcidAppId, this.nrcidSecret);
+		}
 		/*
 		 * Some people state that you cannot use the national register number
 		 * without hashing. Problem is that hashing introduces hash collision
 		 * problems. The probability is very low, but what if it's your leg
 		 * they're cutting of because of a patient mismatch based on the SHA1 of
 		 * your national register number?
+		 */
+
+		/*
+		 * Push authenticated used Id into the HTTP session.
 		 */
 		session.setAttribute(AUTHENTICATED_USER_IDENTIFIER_SESSION_ATTRIBUTE,
 				userId);
@@ -279,6 +295,15 @@ public class AuthenticationDataMessageHandler implements
 				throw new ServletException("error reading server certificate: "
 						+ e.getMessage(), e);
 			}
+		}
+
+		this.nrcidSecret = config
+				.getInitParameter(NRCID_SECRET_INIT_PARAM_NAME);
+		if (null != this.nrcidSecret) {
+			this.nrcidAppId = config
+					.getInitParameter(NRCID_APP_ID_INIT_PARAM_NAME);
+			this.nrcidOrgId = config
+					.getInitParameter(NRCID_ORG_ID_INIT_PARAM_NAME);
 		}
 	}
 }
