@@ -19,6 +19,7 @@
 using System;
 using System.Web;
 using System.Web.SessionState;
+using System.Web.Configuration;
 using System.IO;
 using System.Text;
 using System.Reflection;
@@ -30,7 +31,17 @@ namespace Be.FedICT.EID.Applet.Service {
 		public AppletService() {
 		}
 		
+		private void Log(string message) {
+			System.Console.WriteLine(message);
+		}
+		
 		public void ProcessRequest(HttpContext httpContext) {
+			Log("process request");
+			
+			//WebConfigurationManager.
+			//object T = WebConfigurationManager.GetWebApplicationSection("httpHandlers") ;
+    		//Log("config available: " + (T != null));
+			
 			HttpRequest httpRequest = httpContext.Request;
 			HttpResponse httpResponse = httpContext.Response;
 			if ("GET".Equals(httpRequest.HttpMethod)) {
