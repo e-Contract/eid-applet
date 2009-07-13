@@ -9,13 +9,12 @@ IHttpHandler component.
 We're using Linux as development platform though the code should also run
 on the Microsoft Windows platforms.
 We're using MonoDevelop as development environment for the ASP.NET code.
-The ASP.NET DLL can be tested using xsp2.
+The ASP.NET DLL can be tested using xsp2 (Mono).
 
 
 === 2. Usage
 
-Configure the AppletService HTTP handler via you web.config file:
-<?xml version="1.0"?>
+Configure the AppletService HTTP handler via your web.config file:
 <configuration xmlns="http://schemas.microsoft.com/.NetConfiguration/v2.0">
 	<system.web>
 		<httpHandlers>
@@ -24,6 +23,18 @@ Configure the AppletService HTTP handler via you web.config file:
 	validate="True"/>
     		</httpHandlers>
 	</system.web>
+</configuration>
+
+Configure the AuthnAppletService HTTP handler via your web.config file:
+<configuration
+xmlns="http://schemas.microsoft.com/.NetConfiguration/v2.0">
+<system.web>
+    <httpHandlers>
+       <add path="/applet-authn-service" verb="*"
+type="Be.FedICT.EID.Applet.Service.AuthnAppletService, AppletService"
+validate="True"/>
+    </httpHandlers>
+</system.web>
 </configuration>
 
 
@@ -35,7 +46,7 @@ Generate an RSA keypair and self-signed certificate via:
 Create a PKCS#12 keystore via:
 	openssl pkcs12 -export -out keystore.p12 -inkey private-key.der -in cert.crt
 
-Start the ASP.NET web service via:
+Start the ASP.NET web service via (Mono):
 	xsp2 --https --port 8443 --p12file keystore.p12 --pkpwd secret
 --verbose
 
