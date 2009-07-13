@@ -27,6 +27,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
+import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -108,6 +109,25 @@ public class UserIdentifierUtil {
 		}
 
 		/*
+		 * Decode the secret key.
+		 */
+		byte[] secretKey;
+		try {
+			secretKey = Hex.decodeHex(secret.toCharArray());
+		} catch (DecoderException e) {
+			LOG.error("secret is not hexadecimal encoded: " + e.getMessage());
+			throw new IllegalArgumentException(
+					"secret is not hexadecimal encoded");
+		}
+		if ((128 / 8) > secretKey.length) {
+			/*
+			 * 128 bit is seen as secure these days.
+			 */
+			LOG.warn("secret key is too short");
+			throw new IllegalArgumentException("secret key is too short");
+		}
+
+		/*
 		 * Construct the HMAC input sequence.
 		 */
 		String input = userId;
@@ -119,7 +139,7 @@ public class UserIdentifierUtil {
 		}
 		byte[] inputData = input.getBytes();
 
-		SecretKey macKey = new SecretKeySpec(secret.getBytes(), HMAC_ALGO);
+		SecretKey macKey = new SecretKeySpec(secretKey, HMAC_ALGO);
 		Mac mac;
 		try {
 			mac = Mac.getInstance(macKey.getAlgorithm());

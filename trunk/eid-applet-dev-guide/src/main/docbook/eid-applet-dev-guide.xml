@@ -631,6 +631,9 @@
 	<param-name>NRCIDSecret</param-name>
 	<param-value>place-your-application-secret-here</param-value>
 </init-param>]]></programlisting>
+			<para>The secret should be hexadecimal encoded and at least 128 bits
+				(16 bytes) long. Thus the hexadecimal encoded secret should be at
+				least 32 characters long.</para>
 			<para>
 				The optional application identifier and organization identifier can
 				be specified via the

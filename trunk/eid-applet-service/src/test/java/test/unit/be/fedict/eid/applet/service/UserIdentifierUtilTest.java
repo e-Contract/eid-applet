@@ -21,6 +21,7 @@ package test.unit.be.fedict.eid.applet.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
@@ -77,13 +78,62 @@ public class UserIdentifierUtilTest {
 	}
 
 	@Test
+	public void testNonHexSecret() throws Exception {
+		// setup
+		String userId = "1234";
+		String orgId = "fedict";
+		String appId = "eid-applet-unit-test";
+		String secret = "the-secret-secret";
+
+		// operate & verify
+		try {
+			UserIdentifierUtil.getNonReversibleCitizenIdentifier(userId, orgId,
+					appId, secret);
+			fail();
+		} catch (IllegalArgumentException e) {
+			// expected
+		}
+	}
+
+	@Test
+	public void testTooShortSecret() throws Exception {
+		// setup
+		String userId = "1234";
+		String orgId = "fedict";
+		String appId = "eid-applet-unit-test";
+		String secret = "1234";
+
+		// operate & verify
+		try {
+			UserIdentifierUtil.getNonReversibleCitizenIdentifier(userId, orgId,
+					appId, secret);
+			fail();
+		} catch (IllegalArgumentException e) {
+			// expected
+		}
+	}
+
+	@Test
+	public void testHexadecimalEncoding() throws Exception {
+		char[] encodedMessage = Hex
+				.encodeHex("hello world. this is a long message.".getBytes());
+		LOG.debug("encoded message: " + new String(encodedMessage));
+		byte[] result = Hex.decodeHex(encodedMessage);
+		LOG.debug("decoded message: " + new String(result));
+
+		Hex
+				.decodeHex("123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0"
+						.trim().toCharArray());
+	}
+
+	@Test
 	public void testNRCID() throws Exception {
 		// setup
 		String userId1 = "1234";
 		String userId2 = "5678";
 		String orgId = "fedict";
 		String appId = "eid-applet-unit-test";
-		String secret = "the-secret-secret";
+		String secret = "123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0";
 
 		// operate
 		String result1 = UserIdentifierUtil.getNonReversibleCitizenIdentifier(
@@ -107,7 +157,7 @@ public class UserIdentifierUtilTest {
 
 		assertFalse(result1.equals(UserIdentifierUtil
 				.getNonReversibleCitizenIdentifier(userId1, orgId, appId,
-						secret + "foobar")));
+						secret + "1234")));
 		assertFalse(result1.equals(UserIdentifierUtil
 				.getNonReversibleCitizenIdentifier(userId1, orgId + "foobar",
 						appId, secret)));
