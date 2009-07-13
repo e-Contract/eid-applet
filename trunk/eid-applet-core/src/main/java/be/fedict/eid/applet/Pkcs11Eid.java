@@ -110,6 +110,15 @@ public class Pkcs11Eid {
 		this.messages = messages;
 	}
 
+	/**
+	 * Gives back the PKCS11 wrapper. This is just for debugging purposes.
+	 * 
+	 * @return
+	 */
+	public PKCS11 getPkcs11() {
+		return this.pkcs11;
+	}
+
 	private String getPkcs11Path() throws PKCS11NotFoundException {
 		String osName = System.getProperty("os.name");
 		File pkcs11File;
@@ -294,7 +303,16 @@ public class Pkcs11Eid {
 			this.view.addDetailMessage("reader: "
 					+ new String(slotInfo.slotDescription).trim());
 			if ((slotInfo.flags & PKCS11Constants.CKF_TOKEN_PRESENT) != 0) {
-				CK_TOKEN_INFO tokenInfo = this.pkcs11.C_GetTokenInfo(slotIdx);
+				CK_TOKEN_INFO tokenInfo;
+				try {
+					tokenInfo = this.pkcs11.C_GetTokenInfo(slotIdx);
+				} catch (PKCS11Exception e) {
+					/*
+					 * Can occur when someone just removed the eID card.
+					 * CKR_TOKEN_NOT_PRESENT.
+					 */
+					continue;
+				}
 				if (new String(tokenInfo.label).startsWith("BELPIC")) {
 					this.view.addDetailMessage("Belgium eID card in slot: "
 							+ slotIdx);
