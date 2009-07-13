@@ -138,10 +138,11 @@ public class Pkcs11Test {
 		long count = 0;
 		while (true) {
 			/*
-			 * Throws a CKR_BUFFER_TOO_SMALL exception when the eID card is
-			 * inserted/removed very fast.
+			 * C_GetSlotList(true) throws a CKR_BUFFER_TOO_SMALL exception when
+			 * the eID card is inserted/removed very fast. C_GetSlotList(false)
+			 * does not have this problem.
 			 */
-			pkcs11.C_GetSlotList(true);
+			pkcs11.C_GetSlotList(false);
 			LOG.debug("count: " + count++);
 		}
 	}
