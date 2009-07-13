@@ -49,6 +49,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import sun.security.pkcs11.wrapper.PKCS11;
 import sun.security.pkcs11.wrapper.PKCS11Exception;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.PcscEid;
@@ -116,6 +117,33 @@ public class Pkcs11Test {
 		signature.update(challenge);
 		boolean result = signature.verify(signatureValue);
 		assertTrue(result);
+	}
+
+	@Test
+	public void testInsertRemoveCard() throws Exception {
+		Pkcs11Eid pkcs11Eid = new Pkcs11Eid(new TestView(), this.messages);
+		while (true) {
+			if (false == pkcs11Eid.isEidPresent()) {
+				LOG.debug("insert eID...");
+				pkcs11Eid.waitForEidPresent();
+			}
+		}
+	}
+
+	@Test
+	public void testC_GetSlotList() throws Exception {
+		Pkcs11Eid pkcs11Eid = new Pkcs11Eid(new TestView(), this.messages);
+		pkcs11Eid.isEidPresent();
+		PKCS11 pkcs11 = pkcs11Eid.getPkcs11();
+		long count = 0;
+		while (true) {
+			/*
+			 * Throws a CKR_BUFFER_TOO_SMALL exception when the eID card is
+			 * inserted/removed very fast.
+			 */
+			pkcs11.C_GetSlotList(true);
+			LOG.debug("count: " + count++);
+		}
 	}
 
 	@Test
