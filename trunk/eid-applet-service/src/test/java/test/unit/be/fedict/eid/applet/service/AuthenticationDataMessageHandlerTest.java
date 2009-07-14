@@ -262,7 +262,7 @@ public class AuthenticationDataMessageHandlerTest {
 						mockServletConfig
 								.getInitParameter(HelloMessageHandler.SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME))
 				.andStubReturn(null);
-		String nrcidSecret = "my-secret-secret";
+		String nrcidSecret = "112233445566778899AABBCCDDEEFF00112233445566778899";
 		EasyMock
 				.expect(
 						mockServletConfig
