@@ -10,10 +10,17 @@ We're using Linux as development platform though the code should also run
 on the Microsoft Windows platforms.
 We're using MonoDevelop as development environment for the ASP.NET code.
 The ASP.NET DLL can be tested using xsp2 (Mono).
+MonoDevelop is available from:
+	http://monodevelop.com/
+Developers can use SharpDevelop 2.2 on the Windows platform.
+SharpDevelop is available from:
+	http://www.icsharpcode.net/
 
 
 === 2. Usage
 
+First compile the DLL using MonoDevelop. Copy the AppletService.dll to the
+bin directory of your ASP.NET web application.
 Configure the AppletService HTTP handler via your web.config file:
 <configuration xmlns="http://schemas.microsoft.com/.NetConfiguration/v2.0">
 	<system.web>
@@ -39,6 +46,9 @@ validate="True"/>
 
 
 === 3. ASP.NET runtime
+
+Mono comes with an ASP.NET runtime program named xsp2. Here we'll describe
+how to configure xsp2.
 
 Generate an RSA keypair and self-signed certificate via:
 	openssl req -x509 -nodes -days 365 -newkey rsa:1024 -keyout private-key.der -out cert.crt
