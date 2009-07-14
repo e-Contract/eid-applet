@@ -20,6 +20,7 @@ package test.unit.be.fedict.eid.applet.shared;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -45,7 +46,8 @@ public class UnmarshallerTest {
 	private static final Log LOG = LogFactory.getLog(UnmarshallerTest.class);
 
 	@Test
-	public void receiveNoHeaders() throws Exception {
+	public void receiveIdentityDataMessageWithoutRequiredHeaders()
+			throws Exception {
 		// setup
 		ProtocolMessageCatalog catalog = new AppletProtocolMessageCatalog();
 		Unmarshaller unmarshaller = new Unmarshaller(catalog);
@@ -75,7 +77,38 @@ public class UnmarshallerTest {
 		} catch (RuntimeException e) {
 			// expected input validation error
 			// verify
+			LOG.debug("expected exception: " + e.getMessage());
 			EasyMock.verify(mockHttpReceiver);
+		}
+	}
+
+	@Test
+	public void receiveNoHeadersAtAll() throws Exception {
+		// setup
+		ProtocolMessageCatalog catalog = new AppletProtocolMessageCatalog();
+		Unmarshaller unmarshaller = new Unmarshaller(catalog);
+
+		HttpReceiver mockHttpReceiver = EasyMock.createMock(HttpReceiver.class);
+
+		// stubs
+		EasyMock.expect(mockHttpReceiver.isSecure()).andStubReturn(true);
+		EasyMock.expect(
+				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version"))
+				.andStubReturn(null);
+
+		// prepare
+		EasyMock.replay(mockHttpReceiver);
+
+		// operate
+		try {
+			unmarshaller.receive(mockHttpReceiver);
+			fail();
+		} catch (RuntimeException e) {
+			// expected input validation error
+			// verify
+			LOG.debug("expected exception: " + e.getMessage());
+			EasyMock.verify(mockHttpReceiver);
+			assertFalse("null".equals(e.getMessage()));
 		}
 	}
 

@@ -47,8 +47,6 @@ import be.fedict.eid.applet.shared.annotation.ValidateSemanticalIntegrity;
  */
 public class Unmarshaller {
 
-	// TODO: cleanup exception handling
-
 	private String protocolMessageDiscriminatorHeaderName;
 
 	private Map<String, Class<?>> protocolMessageClasses;
@@ -201,7 +199,6 @@ public class Unmarshaller {
 	 * @param httpReceiver
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public Object receive(HttpReceiver httpReceiver) {
 		/*
 		 * Secure channel check
@@ -213,8 +210,12 @@ public class Unmarshaller {
 		/*
 		 * Message protocol check
 		 */
-		Integer protocolVersion = Integer.parseInt(httpReceiver
-				.getHeaderValue(this.protocolVersionHeaderName));
+		String protocolVersionHeader = httpReceiver
+				.getHeaderValue(this.protocolVersionHeaderName);
+		if (null == protocolVersionHeader) {
+			throw new RuntimeException("no protocol version header");
+		}
+		Integer protocolVersion = Integer.parseInt(protocolVersionHeader);
 		if (false == this.protocolVersion.equals(protocolVersion)) {
 			throw new RuntimeException("protocol version mismatch");
 		}
@@ -245,83 +246,39 @@ public class Unmarshaller {
 		 * First inject all HTTP headers. Is also performing some syntactical
 		 * input validation.
 		 */
-		List<String> headerNames = httpReceiver.getHeaderNames();
-		for (String headerName : headerNames) {
-			Field httpHeaderField = findHttpHeaderField(protocolMessageClass,
-					headerName);
-			if (null != httpHeaderField) {
-				String headerValue = httpReceiver.getHeaderValue(headerName);
-				if (0 != (httpHeaderField.getModifiers() & Modifier.FINAL)) {
-					/*
-					 * In this case we must check that the value corresponds.
-					 */
-					String constantValue;
-					if (String.class.equals(httpHeaderField.getType())) {
-						try {
-							constantValue = (String) httpHeaderField
-									.get(transferObject);
-						} catch (Exception e) {
-							throw new RuntimeException("error: "
-									+ e.getMessage(), e);
-						}
-					} else if (Integer.TYPE.equals(httpHeaderField.getType())) {
-						try {
-							constantValue = ((Integer) httpHeaderField
-									.get(transferObject)).toString();
-						} catch (Exception e) {
-							throw new RuntimeException("error: "
-									+ e.getMessage(), e);
-						}
-					} else {
-						throw new RuntimeException("unsupported type: "
-								+ httpHeaderField.getType().getName());
-					}
-					if (false == constantValue.equals(headerValue)) {
-						throw new RuntimeException("constant value mismatch: "
-								+ httpHeaderField.getName()
-								+ "; expected value: " + constantValue
-								+ "; actual value: " + headerValue);
-					}
-				} else {
-					if (String.class.equals(httpHeaderField.getType())) {
-						try {
-							httpHeaderField.set(transferObject, headerValue);
-						} catch (Exception e) {
-							throw new RuntimeException("error: "
-									+ e.getMessage(), e);
-						}
-					} else if (Integer.TYPE.equals(httpHeaderField.getType())
-							|| Integer.class.equals(httpHeaderField.getType())) {
-						Integer intValue = Integer.parseInt(headerValue);
-						try {
-							httpHeaderField.set(transferObject, intValue);
-						} catch (Exception e) {
-							throw new RuntimeException("error: "
-									+ e.getMessage(), e);
-						}
-						// TODO make this type handling more generic
-					} else if (Boolean.TYPE.equals(httpHeaderField.getType())
-							|| Boolean.class.equals(httpHeaderField.getType())) {
-						Boolean boolValue = Boolean.parseBoolean(headerValue);
-						try {
-							httpHeaderField.set(transferObject, boolValue);
-						} catch (Exception e) {
-							throw new RuntimeException("error: "
-									+ e.getMessage(), e);
-						}
-					} else {
-						throw new RuntimeException(
-								"unsupported http header field type: "
-										+ httpHeaderField.getType());
-					}
-				}
-			}
+		try {
+			injectHttpHeaderFields(httpReceiver, protocolMessageClass,
+					transferObject);
+		} catch (Exception e) {
+			throw new RuntimeException("error: " + e.getMessage(), e);
 		}
 
 		/*
 		 * Inject HTTP body.
 		 */
 		Field[] fields = protocolMessageClass.getFields();
+		injectHttpBody(httpReceiver, transferObject, fields);
+
+		/*
+		 * Input validation.
+		 */
+		inputValidation(transferObject, fields);
+
+		/*
+		 * Semantical integrity validation.
+		 */
+		semanticValidation(protocolMessageClass, transferObject);
+
+		/*
+		 * PostConstruct semantics
+		 */
+		postConstructSemantics(protocolMessageClass, transferObject);
+
+		return transferObject;
+	}
+
+	private void injectHttpBody(HttpReceiver httpReceiver,
+			Object transferObject, Field[] fields) {
 		Field bodyField = null;
 		for (Field field : fields) {
 			HttpBody httpBodyAnnotation = field.getAnnotation(HttpBody.class);
@@ -358,31 +315,28 @@ public class Unmarshaller {
 				throw new RuntimeException("error: " + e.getMessage(), e);
 			}
 		}
+	}
 
-		/*
-		 * Input validation.
-		 */
-		for (Field field : fields) {
-			NotNull notNullAnnotation = field.getAnnotation(NotNull.class);
-			if (null == notNullAnnotation) {
-				continue;
-			}
-			// XXX: doesn't make sense for primitive fields
-			Object fieldValue;
-			try {
-				fieldValue = field.get(transferObject);
-			} catch (Exception e) {
-				throw new RuntimeException("error: " + e.getMessage(), e);
-			}
-			if (null == fieldValue) {
-				throw new RuntimeException("field should not be null: "
-						+ field.getName());
+	private void postConstructSemantics(Class<?> protocolMessageClass,
+			Object transferObject) {
+		Method[] methods = protocolMessageClass.getMethods();
+		for (Method method : methods) {
+			PostConstruct postConstructAnnotation = method
+					.getAnnotation(PostConstruct.class);
+			if (null != postConstructAnnotation) {
+				try {
+					method.invoke(transferObject, new Object[] {});
+				} catch (Exception e) {
+					throw new RuntimeException("@PostConstruct error: "
+							+ e.getMessage(), e);
+				}
 			}
 		}
+	}
 
-		/*
-		 * Semantical integrity validation.
-		 */
+	@SuppressWarnings("unchecked")
+	private void semanticValidation(Class<?> protocolMessageClass,
+			Object transferObject) {
 		ValidateSemanticalIntegrity validateSemanticalIntegrity = protocolMessageClass
 				.getAnnotation(ValidateSemanticalIntegrity.class);
 		if (null != validateSemanticalIntegrity) {
@@ -401,25 +355,78 @@ public class Unmarshaller {
 						+ e.getMessage());
 			}
 		}
+	}
 
-		/*
-		 * PostConstruct semantics
-		 */
-		Method[] methods = protocolMessageClass.getMethods();
-		for (Method method : methods) {
-			PostConstruct postConstructAnnotation = method
-					.getAnnotation(PostConstruct.class);
-			if (null != postConstructAnnotation) {
-				try {
-					method.invoke(transferObject, new Object[] {});
-				} catch (Exception e) {
-					throw new RuntimeException("@PostConstruct error: "
-							+ e.getMessage(), e);
+	private void inputValidation(Object transferObject, Field[] fields) {
+		for (Field field : fields) {
+			NotNull notNullAnnotation = field.getAnnotation(NotNull.class);
+			if (null == notNullAnnotation) {
+				continue;
+			}
+			// XXX: doesn't make sense for primitive fields
+			Object fieldValue;
+			try {
+				fieldValue = field.get(transferObject);
+			} catch (Exception e) {
+				throw new RuntimeException("error: " + e.getMessage(), e);
+			}
+			if (null == fieldValue) {
+				throw new RuntimeException("field should not be null: "
+						+ field.getName());
+			}
+		}
+	}
+
+	private void injectHttpHeaderFields(HttpReceiver httpReceiver,
+			Class<?> protocolMessageClass, Object transferObject)
+			throws IllegalArgumentException, IllegalAccessException {
+		List<String> headerNames = httpReceiver.getHeaderNames();
+		for (String headerName : headerNames) {
+			Field httpHeaderField = findHttpHeaderField(protocolMessageClass,
+					headerName);
+			if (null != httpHeaderField) {
+				String headerValue = httpReceiver.getHeaderValue(headerName);
+				if (0 != (httpHeaderField.getModifiers() & Modifier.FINAL)) {
+					/*
+					 * In this case we must check that the value corresponds.
+					 */
+					String constantValue;
+					if (String.class.equals(httpHeaderField.getType())) {
+						constantValue = (String) httpHeaderField
+								.get(transferObject);
+					} else if (Integer.TYPE.equals(httpHeaderField.getType())) {
+						constantValue = ((Integer) httpHeaderField
+								.get(transferObject)).toString();
+					} else {
+						throw new RuntimeException("unsupported type: "
+								+ httpHeaderField.getType().getName());
+					}
+					if (false == constantValue.equals(headerValue)) {
+						throw new RuntimeException("constant value mismatch: "
+								+ httpHeaderField.getName()
+								+ "; expected value: " + constantValue
+								+ "; actual value: " + headerValue);
+					}
+				} else {
+					if (String.class.equals(httpHeaderField.getType())) {
+						httpHeaderField.set(transferObject, headerValue);
+					} else if (Integer.TYPE.equals(httpHeaderField.getType())
+							|| Integer.class.equals(httpHeaderField.getType())) {
+						Integer intValue = Integer.parseInt(headerValue);
+						httpHeaderField.set(transferObject, intValue);
+						// TODO make this type handling more generic
+					} else if (Boolean.TYPE.equals(httpHeaderField.getType())
+							|| Boolean.class.equals(httpHeaderField.getType())) {
+						Boolean boolValue = Boolean.parseBoolean(headerValue);
+						httpHeaderField.set(transferObject, boolValue);
+					} else {
+						throw new RuntimeException(
+								"unsupported http header field type: "
+										+ httpHeaderField.getType());
+					}
 				}
 			}
 		}
-
-		return transferObject;
 	}
 
 	private Field findHttpHeaderField(Class<?> protocolMessageClass,
