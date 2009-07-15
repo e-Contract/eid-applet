@@ -23,9 +23,11 @@ import java.io.Serializable;
 import be.fedict.eid.applet.service.tlv.TlvField;
 
 /**
- * Holds all the fields within the eID address file.
+ * Holds all the fields within the eID address file. The country (i.e.
+ * nationality) can be found in the eID identity file.
  * 
  * @author fcorneli
+ * @see Identity
  * 
  */
 public class Address implements Serializable {
