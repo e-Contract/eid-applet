@@ -11,6 +11,13 @@
   * [http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/package-summary.html Java Servlet API]
 
 
+== ASP.NET ==
+
+  * [http://mono-project.com/Main_Page Mono]
+  * [http://monodevelop.com/ MonoDevelop]
+  * [http://www.icsharpcode.net/OpenSource/SD/ SharpDevelop]
+
+
 == Smart Card ==
 
   * [http://www.esat.kuleuven.be/~decockd/slides/2007.03.01.smart.cards.pdf Smart Cards introduction]
