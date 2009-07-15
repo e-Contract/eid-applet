@@ -48,7 +48,6 @@ public class Transport {
 	 * @param httpTransmitter
 	 *            the transport component.
 	 */
-	@SuppressWarnings("unchecked")
 	public static void transfer(Object dataObject,
 			HttpTransmitter httpTransmitter) {
 		/*
@@ -65,27 +64,59 @@ public class Transport {
 		/*
 		 * Input validation.
 		 */
-		for (Field field : fields) {
-			NotNull notEmptyAnnotation = field.getAnnotation(NotNull.class);
-			if (null == notEmptyAnnotation) {
-				continue;
-			}
-			Object fieldValue;
-			try {
-				fieldValue = field.get(dataObject);
-			} catch (Exception e) {
-				throw new RuntimeException("error reading field: "
-						+ field.getName());
-			}
-			if (null == fieldValue) {
-				throw new IllegalArgumentException(
-						"input validation error: empty field: "
-								+ field.getName());
-			}
+		try {
+			inputValidation(dataObject, fields);
+		} catch (Exception e) {
+			throw new IllegalArgumentException("error: " + e.getMessage(), e);
 		}
+
 		/*
 		 * Add HTTP headers.
 		 */
+		Field bodyField = addHeaders(dataObject, httpTransmitter, fields);
+
+		/*
+		 * Add HTTP body.
+		 */
+		addBody(dataObject, httpTransmitter, bodyField);
+	}
+
+	@SuppressWarnings("unchecked")
+	private static void addBody(Object dataObject,
+			HttpTransmitter httpTransmitter, Field bodyField) {
+		if (null != bodyField) {
+			Object bodyValue;
+			try {
+				bodyValue = bodyField.get(dataObject);
+			} catch (Exception e) {
+				throw new RuntimeException("error reading field: "
+						+ bodyField.getName());
+			}
+			byte[] body;
+			if (bodyValue instanceof List<?>) {
+				List<String> bodyList = (List<String>) bodyValue;
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				PrintStream printStream = new PrintStream(baos);
+				for (String bodyStr : bodyList) {
+					printStream.println(bodyStr);
+				}
+				body = baos.toByteArray();
+			} else {
+				body = (byte[]) bodyValue;
+			}
+			/*
+			 * The Content-Length header is required for IIS 6 and 7.
+			 */
+			httpTransmitter.addHeader("Content-Length", Integer
+					.toString(body.length));
+			httpTransmitter.setBody(body);
+		} else {
+			httpTransmitter.addHeader("Content-Length", "0");
+		}
+	}
+
+	private static Field addHeaders(Object dataObject,
+			HttpTransmitter httpTransmitter, Field[] fields) {
 		Field bodyField = null;
 		for (Field field : fields) {
 			HttpBody httpBodyAnnotation = field.getAnnotation(HttpBody.class);
@@ -128,30 +159,22 @@ public class Transport {
 				httpTransmitter.addHeader(httpHeaderName, httpHeaderValue);
 			}
 		}
-		/*
-		 * Add HTTP body.
-		 */
-		if (null != bodyField) {
-			Object bodyValue;
-			try {
-				bodyValue = bodyField.get(dataObject);
-			} catch (Exception e) {
-				throw new RuntimeException("error reading field: "
-						+ bodyField.getName());
+		return bodyField;
+	}
+
+	private static void inputValidation(Object dataObject, Field[] fields)
+			throws IllegalArgumentException, IllegalAccessException {
+		for (Field field : fields) {
+			NotNull notEmptyAnnotation = field.getAnnotation(NotNull.class);
+			if (null == notEmptyAnnotation) {
+				continue;
 			}
-			byte[] body;
-			if (bodyValue instanceof List) {
-				List<String> bodyList = (List<String>) bodyValue;
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				PrintStream printStream = new PrintStream(baos);
-				for (String bodyStr : bodyList) {
-					printStream.println(bodyStr);
-				}
-				body = baos.toByteArray();
-			} else {
-				body = (byte[]) bodyValue;
+			Object fieldValue = field.get(dataObject);
+			if (null == fieldValue) {
+				throw new IllegalArgumentException(
+						"input validation error: empty field: "
+								+ field.getName());
 			}
-			httpTransmitter.setBody(body);
 		}
 	}
 }
