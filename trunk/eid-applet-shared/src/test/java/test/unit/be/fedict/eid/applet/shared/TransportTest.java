@@ -52,7 +52,10 @@ public class TransportTest {
 		mockHttpTransmitter
 				.addHeader("X-AppletProtocol-IdentityFileSize", "20");
 		mockHttpTransmitter.addHeader("X-AppletProtocol-AddressFileSize", "10");
-		mockHttpTransmitter.setBody(EasyMock.aryEq("hello world".getBytes()));
+		byte[] body = "hello world".getBytes();
+		mockHttpTransmitter.setBody(EasyMock.aryEq(body));
+		mockHttpTransmitter.addHeader("Content-Length", Integer
+				.toString(body.length));
 
 		// prepare
 		EasyMock.replay(mockHttpTransmitter);
@@ -88,6 +91,7 @@ public class TransportTest {
 		mockHttpTransmitter.addHeader("X-AppletProtocol-IncludeCertificates",
 				"false");
 		mockHttpTransmitter.addHeader("X-AppletProtocol-RemoveCard", "false");
+		mockHttpTransmitter.addHeader("Content-Length", "0");
 
 		// prepare
 		EasyMock.replay(mockHttpTransmitter);
@@ -127,8 +131,11 @@ public class TransportTest {
 		mockHttpTransmitter.addHeader("X-AppletProtocol-OSArch", "i386");
 		mockHttpTransmitter.addHeader("X-AppletProtocol-OSVersion", "2.6");
 		String lineSeparator = System.getProperty("line.separator");
-		mockHttpTransmitter.setBody(EasyMock.aryEq(("Reader 1" + lineSeparator
-				+ "Reader 2" + lineSeparator).getBytes()));
+		byte[] body = ("Reader 1" + lineSeparator + "Reader 2" + lineSeparator)
+				.getBytes();
+		mockHttpTransmitter.setBody(EasyMock.aryEq(body));
+		mockHttpTransmitter.addHeader("Content-Length", Integer
+				.toString(body.length));
 
 		// prepare
 		EasyMock.replay(mockHttpTransmitter);
