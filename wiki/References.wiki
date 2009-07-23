@@ -54,3 +54,4 @@
   * [http://egovlabs.gv.at/scm/?group_id=13 Mocca]
   * [http://smartcardservices.macosforge.org/ Mac OS X SmartCard Services]
   * [http://forge.wallonie.be/gf/project/esignbox/ eSignBox]
+  * [http://wiki.yobi.be/wiki/Belgian_eID Belgian eID @ YobiWiki]
