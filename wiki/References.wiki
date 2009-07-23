@@ -32,12 +32,13 @@
   * [http://www.ietf.org/rfc/rfc2246.txt TLS 1.0]
   * [http://www.rfc-editor.org/rfc/rfc3163.txt RFC3163 - ISO/IEC 9798-3 Authentication SASL Mechanism]
   * [http://tools.ietf.org/html/rfc5056 On the Use of Channel Bindings to Secure Channels]
-
+  * [http://www.owasp.org/ OWASP]
 
 == Belgian eID Card ==
 
   * [http://homes.esat.kuleuven.be/~decockd/slides/20081015.belgian.eid.cards.introduction.pdf Belgian eID Card Introduction]
   * [http://www.snelbalie.be/downloads/Belgian_Electronic_Identity_Card_content_v2.2_NL.pdf Belgian eID Card Content v2.2]
+  * [http://wiki.yobi.be/wiki/Belgian_eID Belgian eID @ YobiWiki]
 
 == Legal ==
 
@@ -54,4 +55,3 @@
   * [http://egovlabs.gv.at/scm/?group_id=13 Mocca]
   * [http://smartcardservices.macosforge.org/ Mac OS X SmartCard Services]
   * [http://forge.wallonie.be/gf/project/esignbox/ eSignBox]
-  * [http://wiki.yobi.be/wiki/Belgian_eID Belgian eID @ YobiWiki]
