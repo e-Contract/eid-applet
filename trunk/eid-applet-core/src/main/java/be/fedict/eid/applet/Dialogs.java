@@ -18,12 +18,25 @@
 
 package be.fedict.eid.applet;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Arrays;
 
 import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 
 import be.fedict.eid.applet.Messages.MESSAGE_ID;
@@ -154,13 +167,27 @@ public class Dialogs {
 	}
 
 	public char[] getPin(int retriesLeft) {
-		Box mainPanel = Box.createVerticalBox();
+		// main panel
+		JPanel mainPanel = new JPanel() {
+			private static final long serialVersionUID = 1L;
+
+			private static final int BORDER_SIZE = 20;
+
+			@Override
+			public Insets getInsets() {
+				return new Insets(BORDER_SIZE, BORDER_SIZE, BORDER_SIZE,
+						BORDER_SIZE);
+			}
+		};
+		BoxLayout boxLayout = new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS);
+		mainPanel.setLayout(boxLayout);
 
 		if (-1 != retriesLeft) {
 			Box retriesPanel = Box.createHorizontalBox();
 			JLabel retriesLabel = new JLabel(this.messages
 					.getMessage(MESSAGE_ID.RETRIES_LEFT)
 					+ ": " + retriesLeft);
+			retriesLabel.setForeground(Color.RED);
 			retriesPanel.add(retriesLabel);
 			retriesPanel.add(Box.createHorizontalGlue());
 			mainPanel.add(retriesPanel);
@@ -171,19 +198,88 @@ public class Dialogs {
 		JLabel promptLabel = new JLabel("eID PIN:");
 		passwordPanel.add(promptLabel);
 		passwordPanel.add(Box.createHorizontalStrut(5));
-		JPasswordField passwordField = new JPasswordField(8);
+		final JPasswordField passwordField = new JPasswordField(8);
 		passwordPanel.add(passwordField);
 		mainPanel.add(passwordPanel);
 
-		Component parentComponent = this.view.getParentComponent();
-		int result = JOptionPane.showOptionDialog(parentComponent, mainPanel,
-				"eID PIN?", JOptionPane.OK_CANCEL_OPTION,
-				JOptionPane.QUESTION_MESSAGE, null, null, null);
-		if (result == JOptionPane.OK_OPTION) {
+		// button panel
+		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT)) {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Insets getInsets() {
+				return new Insets(0, 0, 5, 5);
+			}
+		};
+		final JButton okButton = new JButton("OK");
+		okButton.setEnabled(false);
+		buttonPanel.add(okButton);
+		JButton cancelButton = new JButton("Cancel");
+		buttonPanel.add(cancelButton);
+
+		// dialog box
+		final JDialog dialog = new JDialog((Frame) null, "eID PIN?", true);
+		dialog.setLayout(new BorderLayout());
+		dialog.getContentPane().add(mainPanel, BorderLayout.CENTER);
+		dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+
+		final DialogResult dialogResult = new DialogResult();
+
+		okButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				dialogResult.result = DialogResult.Result.OK;
+				dialog.dispose();
+			}
+		});
+		cancelButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				dialogResult.result = DialogResult.Result.CANCEL;
+				dialog.dispose();
+			}
+		});
+		passwordField.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				if (passwordField.getPassword().length == 4) {
+					dialogResult.result = DialogResult.Result.OK;
+					dialog.dispose();
+				}
+			}
+		});
+		passwordField.addKeyListener(new KeyListener() {
+
+			public void keyPressed(KeyEvent e) {
+			}
+
+			public void keyReleased(KeyEvent e) {
+				if (passwordField.getPassword().length == 4) {
+					okButton.setEnabled(true);
+				} else {
+					okButton.setEnabled(false);
+				}
+			}
+
+			public void keyTyped(KeyEvent e) {
+			}
+		});
+
+		dialog.pack();
+		dialog.setLocationRelativeTo(this.view.getParentComponent());
+		dialog.setVisible(true);
+		// setVisible will wait until some button or so has been pressed
+
+		if (dialogResult.result == DialogResult.Result.OK) {
 			char[] pin = passwordField.getPassword();
 			return pin;
 		}
 		throw new RuntimeException("operation canceled.");
+	}
+
+	private static class DialogResult {
+		enum Result {
+			OK, CANCEL
+		};
+
+		public Result result = null;
 	}
 
 	public void showPinBlockedDialog() {
