@@ -72,6 +72,8 @@ class BEIDMessageAuthenticationData extends BEIDMessage {
     public function getAuthentication() {
         $stream = HttpResponse::getRequestBodyStream();
 
+        unset($_SESSION['Identifier']);
+
         $saltSize = $this->getSaltSize();
         $salt = stream_get_contents($stream, $saltSize);
 
@@ -90,14 +92,17 @@ class BEIDMessageAuthenticationData extends BEIDMessage {
         /* verification happens here */
         $pubkey = openssl_get_publickey($cert);
         $result = openssl_verify($toBeSigned, $signature, $pubkey);
+
+        if ($result == 1) {
+            $arr = openssl_x509_parse($cert);
+            $this->identifier = $arr['subject']['serialNumber'];
+            $_SESSION['Identifier'] = $this->identifier;
+        }
         openssl_x509_free($cert);
 
         if ($result < 0) {
             throw new BEIDMessageException('Unknown error when verifying signature');
         }
-
-        /* 0 = wrong signature, 1 = signature OK */
-        return ($result == 1);
     }
 
     /**
