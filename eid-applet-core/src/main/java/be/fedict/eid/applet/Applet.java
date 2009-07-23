@@ -106,7 +106,8 @@ public class Applet extends JApplet {
 				}
 			});
 		} catch (Exception e) {
-			System.err.println("createGUI didn't successfully complete");
+			System.err.println("initUI didn't successfully complete: "
+					+ e.getMessage());
 		}
 	}
 

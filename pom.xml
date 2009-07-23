@@ -302,6 +302,11 @@
 				<artifactId>xmlsec</artifactId>
 				<version>1.4.2</version>
 			</dependency>
+			<dependency>
+				<groupId>org.easytesting</groupId>
+				<artifactId>fest-swing</artifactId>
+				<version>1.2a2</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<build>
@@ -477,6 +482,10 @@
 			<releases>
 				<enabled>true</enabled>
 			</releases>
+		</repository>
+		<repository>
+			<id>Codehaus SVN Repository</id>
+			<url>http://svn.codehaus.org/fest/m2/repo/</url>
 		</repository>
 		<repository>
 			<id>maven-java.net</id>
