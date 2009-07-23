@@ -21,13 +21,13 @@ package be.fedict.eid.applet.service;
 import java.io.Serializable;
 import java.util.GregorianCalendar;
 
-import be.fedict.eid.applet.service.tlv.ChipNumberDataConvertor;
-import be.fedict.eid.applet.service.tlv.ConvertData;
-import be.fedict.eid.applet.service.tlv.DateOfBirthDataConvertor;
-import be.fedict.eid.applet.service.tlv.DocumentTypeConvertor;
-import be.fedict.eid.applet.service.tlv.GenderDataConvertor;
-import be.fedict.eid.applet.service.tlv.TlvField;
-import be.fedict.eid.applet.service.tlv.ValidityDateDataConvertor;
+import be.fedict.eid.applet.service.impl.tlv.ChipNumberDataConvertor;
+import be.fedict.eid.applet.service.impl.tlv.ConvertData;
+import be.fedict.eid.applet.service.impl.tlv.DateOfBirthDataConvertor;
+import be.fedict.eid.applet.service.impl.tlv.DocumentTypeConvertor;
+import be.fedict.eid.applet.service.impl.tlv.GenderDataConvertor;
+import be.fedict.eid.applet.service.impl.tlv.TlvField;
+import be.fedict.eid.applet.service.impl.tlv.ValidityDateDataConvertor;
 
 /**
  * Holds all fields within the eID identity file.

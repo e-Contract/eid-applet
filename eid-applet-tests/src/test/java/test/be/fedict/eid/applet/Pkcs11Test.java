@@ -52,11 +52,11 @@ import org.junit.Test;
 import sun.security.pkcs11.wrapper.PKCS11;
 import sun.security.pkcs11.wrapper.PKCS11Exception;
 import be.fedict.eid.applet.Messages;
-import be.fedict.eid.applet.PcscEid;
-import be.fedict.eid.applet.PcscEidSpi;
-import be.fedict.eid.applet.Pkcs11Eid;
 import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
+import be.fedict.eid.applet.sc.PcscEid;
+import be.fedict.eid.applet.sc.PcscEidSpi;
+import be.fedict.eid.applet.sc.Pkcs11Eid;
 
 public class Pkcs11Test {
 

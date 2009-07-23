@@ -43,7 +43,7 @@ import org.junit.Test;
 
 import be.fedict.eid.applet.service.EIdData;
 import be.fedict.eid.applet.service.Identity;
-import be.fedict.eid.applet.service.impl.IdentityDataMessageHandler;
+import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
 import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
 import be.fedict.eid.applet.shared.IdentityDataMessage;
 

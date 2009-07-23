@@ -47,12 +47,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import be.fedict.eid.applet.Messages;
-import be.fedict.eid.applet.PcscEid;
-import be.fedict.eid.applet.PcscEidSpi;
 import be.fedict.eid.applet.Status;
-import be.fedict.eid.applet.Task;
-import be.fedict.eid.applet.TaskRunner;
 import be.fedict.eid.applet.View;
+import be.fedict.eid.applet.sc.PcscEid;
+import be.fedict.eid.applet.sc.PcscEidSpi;
+import be.fedict.eid.applet.sc.Task;
+import be.fedict.eid.applet.sc.TaskRunner;
 
 /**
  * Integration tests for PC/SC eID component.

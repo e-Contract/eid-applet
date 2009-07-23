@@ -42,6 +42,11 @@ import be.fedict.eid.applet.shared.annotation.ValidateSemanticalIntegrity;
  * Unmarshaller component is responsible for governing the process of converting
  * HTTP transported data streams to Java objects.
  * 
+ * <p>
+ * Keep this class stateless as it can be shared across different HTTP requests
+ * inside AppletServiceServlet.
+ * </p>
+ * 
  * @author fcorneli
  * 
  */

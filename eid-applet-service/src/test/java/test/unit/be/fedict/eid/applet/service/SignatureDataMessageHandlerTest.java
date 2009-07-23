@@ -44,7 +44,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
-import be.fedict.eid.applet.service.impl.SignatureDataMessageHandler;
+import be.fedict.eid.applet.service.impl.handler.SignatureDataMessageHandler;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 import be.fedict.eid.applet.service.spi.SignatureService;
 import be.fedict.eid.applet.shared.SignatureDataMessage;

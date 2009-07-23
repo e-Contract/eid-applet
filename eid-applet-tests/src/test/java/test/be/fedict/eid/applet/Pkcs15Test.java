@@ -44,7 +44,7 @@ import org.junit.Test;
 
 import test.be.fedict.eid.applet.PcscTest.TestView;
 import be.fedict.eid.applet.Messages;
-import be.fedict.eid.applet.PcscEid;
+import be.fedict.eid.applet.sc.PcscEid;
 
 public class Pkcs15Test {
 
