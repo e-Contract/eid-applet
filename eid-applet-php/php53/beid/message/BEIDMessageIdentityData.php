@@ -97,6 +97,7 @@ class BEIDMessageIdentityData extends BEIDMessage {
         $stream = HttpResponse::getRequestBodyStream();
         $identity = new BEIDIdentity();
 
+        unset($_SESSION['Identity']);
         $end = $this->getIdentitySize();
 
         while (!feof($stream) && (ftell($stream) < $end)) {
@@ -209,6 +210,7 @@ class BEIDMessageIdentityData extends BEIDMessage {
             }
         }
         $identity->setAddress($address);
+        $_SESSION['Identity'] = $identity;
 
         return $identity;
     }
