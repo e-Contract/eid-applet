@@ -88,6 +88,59 @@ class BEIDMessageIdentityData extends BEIDMessage {
 
 
     /**
+     * Get address
+     *
+     * @param resource $stream
+     * @return BEIDAddress
+     */
+    private function getAddress($stream) {
+        $end = ftell($stream) + $this->getAddressSize(); /* end of address */
+        $address = new BEIDAddress();
+
+        while (!feof($stream) && (ftell($stream) < $end)) {
+            $tlv = BEIDHelperTLV::createFromStream($stream);
+            $buffer = $tlv->getValue();
+
+            switch ($tlv->getTag()) {
+                case BEIDAddress::STREET_NUMBER :
+                    $streetNumber = BEIDHelperConvert::bytesAsString($buffer);
+                    $address->setStreetAndNumber($streetNumber);
+                    break;
+                case BEIDAddress::ZIP :
+                    $zip = BEIDHelperConvert::bytesAsString($buffer);
+                    $address->setZip($zip);
+                    break;
+                case BEIDAddress::MUNICIPALITY :
+                    $municipality = BEIDHelperConvert::bytesAsString($buffer);
+                    $address->setMunicipality($municipality);
+                    break;
+                case 0: /* end of useful address info, rest is zero-padded */
+                    fseek($stream, $end);
+                    break;
+                default:
+                    BEIDHelperLogger::logger('Unknown address TLV tag:'.$tlv->getTag());
+                    break;
+            }
+        }
+        return $address;
+    }
+
+
+    /**
+     * Get citizen's photo (JPEG)
+     * 
+     * @param resource $stream
+     * @return string
+     */
+    private function getPhoto($stream) {
+        $end = ftell($stream) + $this->getPhotoSize(); /* end of photo */
+        $photo = stream_get_contents($stream, $end);
+
+        return $photo;
+    }
+
+
+    /**
      * Get the identity info
      *
      * @return BEIDIdentity
@@ -181,41 +234,20 @@ class BEIDMessageIdentityData extends BEIDMessage {
             }
         }
 
-        $end = ftell($stream) + $this->getAddressSize(); /* end of address */
-        $address = new BEIDAddress();
-
-        while (!feof($stream) && (ftell($stream) < $end)) {
-            $tlv = BEIDHelperTLV::createFromStream($stream);
-            $buffer = $tlv->getValue();
-
-            switch ($tlv->getTag()) {
-                case BEIDAddress::STREET_NUMBER :
-                    $streetNumber = BEIDHelperConvert::bytesAsString($buffer);
-                    $address->setStreetAndNumber($streetNumber);
-                    break;
-                case BEIDAddress::ZIP :
-                    $zip = BEIDHelperConvert::bytesAsString($buffer);
-                    $address->setZip($zip);
-                    break;
-                case BEIDAddress::MUNICIPALITY :
-                    $municipality = BEIDHelperConvert::bytesAsString($buffer);
-                    $address->setMunicipality($municipality);
-                    break;
-                case 0: /* end of useful address info, rest is zero-padded */
-                    fseek($end);
-                    break;
-                default:
-                    BEIDHelperLogger::logger('Unknown address TLV tag:'.$tlv->getTag());
-                    break;
-            }
-        }
+        $address = $this->getAddress($stream);
         $identity->setAddress($address);
+
+        $photo = $this->getPhoto($stream);
+        $identity->setPhoto($photo);
+
         $_SESSION['Identity'] = $identity;
 
         return $identity;
     }
 
-
+    /**
+     * Constructor
+     */
     public function __construct() {
         parent::__construct();
         $this->setProtocolType(BEIDMessageType::ID_DATA);
