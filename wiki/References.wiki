@@ -18,6 +18,11 @@
   * [http://www.icsharpcode.net/OpenSource/SD/ SharpDevelop]
 
 
+== PHP ==
+
+  * [http://www.php.net/ PHP]
+
+
 == Smart Card ==
 
   * [http://www.esat.kuleuven.be/~decockd/slides/2007.03.01.smart.cards.pdf Smart Cards introduction]
@@ -55,3 +60,4 @@
   * [http://egovlabs.gv.at/scm/?group_id=13 Mocca]
   * [http://smartcardservices.macosforge.org/ Mac OS X SmartCard Services]
   * [http://forge.wallonie.be/gf/project/esignbox/ eSignBox]
+  * [http://www.osor.eu/communities/eid OSOR eID Community]
