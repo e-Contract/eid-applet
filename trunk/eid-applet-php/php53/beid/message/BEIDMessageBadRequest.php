@@ -11,12 +11,20 @@
  */
 
 class BEIDMessageBadRequest extends BEIDMessage {
+    /**
+     * Create and immediately send a bad request message
+     *
+     * @param string $message
+     */
     public static function createAndSend($message) {
         $msg = new BEIDMessageBadRequest();
         $msg->setBody('<html><body>'.$message.'</body></html>');
         $msg->send();
     }
 
+    /**
+     * Constructor
+     */
     public function __construct() {
         parent::__construct();
         $this->createResponse();

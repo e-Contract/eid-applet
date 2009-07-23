@@ -28,6 +28,9 @@ class BEIDServiceIdentity {
 
         switch(true) {
             case $msg instanceof BEIDMessageHello :
+                $_SESSION['Identity'] = NULL;
+                unset($_SESSION['Identity']);
+
                 $reply = new BEIDMessageIdentificationRequest();
                 $reply->setIncludeAddress('true');
                 $reply->setIncludePhoto('true');
@@ -35,7 +38,9 @@ class BEIDServiceIdentity {
                 break;
 
             case $msg instanceof BEIDMessageIdentityData :
+                $_SESSION['Identity'] = NULL;
                 unset($_SESSION['Identity']);
+
                 $identity = $msg->getIdentity();
 
                 $_SESSION['Identity'] = $identity;

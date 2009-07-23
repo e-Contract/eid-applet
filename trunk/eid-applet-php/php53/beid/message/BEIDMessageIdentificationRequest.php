@@ -12,13 +12,26 @@
 
 class BEIDMessageIdentificationRequest extends BEIDMessage {
 
-    /** TODO create setHeader instead of addHeader **/
+    /**
+     * Set if applet must send citizen's photo
+     *
+     * @todo setHeader instead of addHeader
+     */
     public function setIncludePhoto($bool = FALSE) {
         $this->addHeader(BEIDMessageHeader::INCLUDE_PHOTO, $bool);
     }
+    /**
+     * Set if applet must send citizen's address info
+     *
+     * @param boole $bool
+     */
     public function setIncludeAddress($bool = FALSE) {
         $this->addHeader(BEIDMessageHeader::INCLUDE_ADDRESS, $bool);
     }
+
+    /**
+     * Constructor
+     */
     public function __construct() {
         parent::__construct();
         $this->setProtocolType(BEIDMessageType::ID_REQUEST);

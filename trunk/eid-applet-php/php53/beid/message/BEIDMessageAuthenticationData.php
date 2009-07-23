@@ -14,12 +14,23 @@ class BEIDMessageAuthenticationData extends BEIDMessage {
     private $sizeSalt;
     private $sizeSignature;
 
+    /* used in authentication */
     const LEGAL_NOTICE =
     "Declaration of authentication intension.\nThe following data should be interpreted as an authentication challenge.\n";
 
+    /**
+     * Get the size of the salt (number of bytes)
+     *
+     * @return int
+     */
     public function getSaltSize() {
         return $this->sizeSalt;
     }
+    /**
+     * Set the size of the salt
+     *
+     * @param int $sizeSalt
+     */
     public function setSaltSize($sizeSalt) {
         if (! is_int($sizeSalt)) {
             throw new BEIDMessageException('Size for salt must be integer');
@@ -30,9 +41,19 @@ class BEIDMessageAuthenticationData extends BEIDMessage {
         $this->sizeSalt = $sizeSalt;
     }
 
+    /**
+     * Get signature size (number of bytes)
+     *
+     * @return int
+     */
     public function getSignatureSize() {
         return $this->sizeSignature;
     }
+    /**
+     * Set signature size
+     *
+     * @param int $sizeSignature
+     */
     public function setSignatureSize($sizeSignature) {
         if (! is_int($sizeSignature)) {
             throw new BEIDMessageException('Size for signature must be integer');
@@ -44,6 +65,8 @@ class BEIDMessageAuthenticationData extends BEIDMessage {
     }
 
     /**
+     * Get authentication
+     *
      * @todo add more exception handling code
      */
     public function getAuthentication() {
@@ -55,30 +78,31 @@ class BEIDMessageAuthenticationData extends BEIDMessage {
         $signatureSize = $this->getSignatureSize();
         $signature = stream_get_contents($stream, $signatureSize);
 
+        /* citizen's authentication certificate that was used to sign the challenge */
         $cert = stream_get_contents($stream);
         $pem = BEIDHelperConvert::certToPEM($cert);
         $cert = openssl_x509_read($pem);
         
         $challenge = $_SESSION['Challenge'];
         $toBeSigned = $salt . self::LEGAL_NOTICE . $challenge;
+        unset($_SESSION['Challenge']);
 
+        /* verification happens here */
         $pubkey = openssl_get_publickey($cert);
         $result = openssl_verify($toBeSigned, $signature, $pubkey);
         openssl_x509_free($cert);
-       
-        switch($result) {
-            case 1:
-                BEIDHelperLogger::logger('Signature OK');
-                break;
-            case 0:
-                BEIDHelperLogger::logger('Signature not correct');
-                break;
-            case -1:
-                throw new BEIDMessageException('Unknown error when verifying signature');
-                break;
+
+        if ($result < 0) {
+            throw new BEIDMessageException('Unknown error when verifying signature');
         }
+
+        /* 0 = wrong signature, 1 = signature OK */
+        return ($result == 1);
     }
 
+    /**
+     * Constructor
+     */
     public function __construct() {
         parent::__construct();
         $this->setProtocolType(BEIDMessageType::AUTH_DATA);

@@ -11,12 +11,18 @@
  */
 
 class BEIDMessageHello extends BEIDMessage {
+    /**
+     * Create and immediately send an Hello message
+     */
     public static function createAndSend() {
         $msg = new BEIDMessageHello();
         $msg->createResponse();
         $msg->send();
     }
-    
+
+    /**
+     * Constructor
+     */
     public function __construct() {
         parent::__construct();
         $this->setProtocolType(BEIDMessageType::HELLO);

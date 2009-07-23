@@ -11,12 +11,18 @@
  */
 
 class BEIDMessageKiosk extends BEIDMessage {
+    /**
+     * Create and immediately send a Kiosk message
+     */
     public static function createAndSend() {
         $msg = new BEIDMessageKiosk();
         $msg->createResponse();
         $msg->send();
     }
 
+    /**
+     * Constructor
+     */
     public function __construct() {
         parent::__construct();
         $this->setProtocolType(BEIDMessageType::KIOSK);

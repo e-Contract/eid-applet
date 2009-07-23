@@ -74,7 +74,7 @@ class BEIDHelperConvert {
      * @param string $byte bytes to unpack
      * @return DateTime
      *
-     * @todo createFromFormat in PHP 5.3
+     * @todo use createFromFormat in PHP 5.3
      */
     public static function bytesAsDate($byte) {
         $arr = unpack('a*', $byte);
