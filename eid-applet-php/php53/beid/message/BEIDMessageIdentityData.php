@@ -66,6 +66,7 @@ class BEIDMessageIdentityData extends BEIDMessage {
             $tlv = BEIDHelperTLV::createFromStream($stream);
             $buffer = $tlv->getValue();
 
+            /* TODO: sequence ? */
             switch($tlv->getTag()) {
                 case BEIDIdentity::CARD_NUMBER :
                     $cardNumber = BEIDHelperConvert::bytesAsString($buffer);
@@ -127,7 +128,7 @@ class BEIDMessageIdentityData extends BEIDMessage {
                     $document = BEIDHelperConvert::byteAsInt($buffer);
                     $identity->setDocumentType(document);
                     break;
-                case BEIDIdentity::UNKNOWN1 :
+                case BEIDIdentity::SPECIAL_STATUS :
                     break;
                 case BEIDIdentity::PHOTO_DIGEST :
                     $digest = BEIDHelperConvert::bytesAsHexString($buffer);
@@ -142,8 +143,7 @@ class BEIDMessageIdentityData extends BEIDMessage {
             }
         }
 
-        /** FIXME: is this correct ? */
-        $end = ftell($stream) + $this->getIdentitySize() - $this->getAddressSize(); /* end of address */
+        $end = ftell($stream) + $this->getAddressSize(); /* end of address */
         $address = new BEIDAddress();
 
         while (!feof($stream) && (ftell($stream) < $end)) {
@@ -163,14 +163,15 @@ class BEIDMessageIdentityData extends BEIDMessage {
                     $municipality = BEIDHelperConvert::bytesAsString($buffer);
                     $address->setMunicipality($municipality);
                     break;
+                case 0: /* end of useful address info, rest is zero-padded */
+                    fseek($end);
+                    break;
                 default:
                     BEIDHelperLogger::logger('Unknown address TLV tag:'.$tlv->getTag());
                     break;
             }
         }
         $identity->setAddress($address);
-
-   BEIDHelperLogger::logger($address->getStreetAndNumber());
 
         return $identity;
     }

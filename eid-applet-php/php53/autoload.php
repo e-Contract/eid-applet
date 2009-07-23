@@ -1,6 +1,6 @@
 <?php
 /**
- * Placeholder for autoloader
+ * Autoloader
  *
  * @package BEIDApplet-PHP5
  * @author Bart Hanssens
@@ -10,33 +10,37 @@
  * $Id$
  */
 
- /** TODO replace with smart autoloader **/
+function __autoload($className) {
+    if (!is_string($className)) {
+        throw Exception('Autoloader: className must be string');
+    }
+    /* only alphanumeric and underscore are allowed */
+    if (preg_match('/\W/', $className)) {
+        throw Exception('Autoloader: illegal character in name');
+    }
 
-require_once('beid/dao/BEIDAddress.php');
-require_once('beid/dao/BEIDDocumentType.php');
-require_once('beid/dao/BEIDIdentity.php');
-require_once('beid/dao/BEIDIdentityException.php');
+    /* get the "root folder" for the beid files */
+    $base = dirname(__FILE__);
 
-require_once('beid/helper/BEIDHelperConvert.php');
-require_once('beid/helper/BEIDHelperException.php');
-require_once('beid/helper/BEIDHelperLogger.php');
-require_once('beid/helper/BEIDHelperTLV.php');
+    $beidPart = DIRECTORY_SEPARATOR.'beid'.DIRECTORY_SEPARATOR;
+    $inSub = strpos($base, $beidPart);
+    if ($insub > 0) {
+        $base = substr($base, 0, $inSub);
+    }
+    
+    $subdirs = array(
+        '',
+        $beidPart.'dao',
+        $beidPart.'helper',
+        $beidPart.'message',
+        $beidPart.'service');
 
-require_once('beid/message/BEIDMessage.php');
-require_once('beid/message/BEIDMessageBadRequest.php');
-require_once('beid/message/BEIDMessageAuthenticationData.php');
-require_once('beid/message/BEIDMessageAuthenticationRequest.php');
-require_once('beid/message/BEIDMessageException.php');
-require_once('beid/message/BEIDMessageFactory.php');
-require_once('beid/message/BEIDMessageFinished.php');
-require_once('beid/message/BEIDMessageHeader.php');
-require_once('beid/message/BEIDMessageHello.php');
-require_once('beid/message/BEIDMessageIdentificationRequest.php');
-require_once('beid/message/BEIDMessageIdentityData.php');
-require_once('beid/message/BEIDMessageKiosk.php');
-require_once('beid/message/BEIDMessageType.php');
-
-require_once('beid/service/BEIDServiceAuthentication.php');
-require_once('beid/service/BEIDServiceIdentity.php');
-
+    /** could be smarter */
+    foreach ($subdirs as $sub) {
+        $classFile = $base . $sub . DIRECTORY_SEPARATOR . $className . '.php';
+        if (file_exists($classFile)) {
+            require($classFile);
+        }
+    }
+}        
 ?>

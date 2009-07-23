@@ -2,6 +2,9 @@
 /**
  * Citizen identity class, containing the citizen's name, address, photo etc
  *
+ * More information on the content structure of the Belgian eID card can be found here:
+ * @link http://www.snelbalie.be/downloads/Belgian_Electronic_Identity_Card_content_v2.2_NL.pdf
+ * 
  * @package BEIDApplet-PHP5
  * @author Bart Hanssens
  * @copyright 2009, Fedict
@@ -46,7 +49,7 @@ class BEIDIdentity {
     const GENDER = 13;
     const NOBLE_CONDITION = 14;
     const DOCUMENT_TYPE = 15;
-    const UNKNOWN1 =16;
+    const SPECIAL_STATUS =16;
     const PHOTO_DIGEST = 17;
 
 
@@ -180,6 +183,7 @@ class BEIDIdentity {
 
     /**
      * Get the citizen's first (two) name(s)
+     * The firstname field on the eID may contain two first names
      *
      * @return string one or two first name(s)
      */
@@ -219,19 +223,18 @@ class BEIDIdentity {
     }
 
     /**
-     * Get the citizen's middle name
+     * Get the first letter of the citizen's middle name
      *
-     * @return string middle name
+     * @return string first letter of the middle name
      */
      public function getMiddleName() {
         return $this->middleName;
     }
     /**
-     * Set the citizen's middle name
+     * Set the first letter of the citizen's middle name
      *
      * @param string $name middle name
      */
-
     public function setMiddleName($middleName) {
         if (! is_string($middleName)) {
             return new BEIDException('Middle name must be a string');
@@ -259,9 +262,19 @@ class BEIDIdentity {
         $this->nationality = $nationality;
     }
 
+    /**
+     * Get the (localized) name of the place/municipality where the citizen is born
+     *
+     * @return string
+     */
     public function getPlaceOfBirth() {
         return $this->placeOfBirth;
     }
+    /**
+     * Set the (localized) name of the municipality where the citizen is born
+     *
+     * @param string $placeOfBirth
+     */
     public function setPlaceOfBirth($placeOfBirth) {
         if (! is_string($placeOfBirth)) {
             return new BEIDException('Place of birth must be a string');
@@ -269,17 +282,37 @@ class BEIDIdentity {
         $this->placeOfBirth = $placeOfBirth;
     }
 
+    /**
+     * Get the date of birth of the citizen
+     *
+     * @return DateTime
+     */
     public function getDateOfBirth() {
         return $this->dateOfBirth;
     }
+    /**
+     * Set the date of birth of the citizen
+     *
+     * @param DateTime $dateOfBirth
+     */
     public function setDateOfBirth(DateTime $dateOfBirth) {
         $this->dateOfBirth = $dateOfBirth;
     }
 
-    /** TODO: make gender classe */
+    /**
+     * Get the gender of the citizen
+     *
+     * @todo make a gender class
+     * @return string letter indicating the gender
+     */
     public function getGender() {
         return $this->gender;
     }
+    /**
+     * Set the gender of the citizen
+     *
+     * @param string $gender
+     */
     public function setGender($gender) {
         if (! is_string($gender)) {
             return new BEIDException('Gender must be a string');
@@ -287,43 +320,106 @@ class BEIDIdentity {
         $this->gender = $gender;
     }
 
+    /**
+     * Get the noble condition
+     *
+     * @todo
+     * @return string
+     */
     public function getNobleCondition() {
         return $this->nobleCondition;
     }
+    /**
+     * Set the noble condition
+     *
+     * @param string $nobleCondition
+     */
     public function setNobleCondition($nobleCondition) {
         $this->nobleCondition = $nobleCondition;
     }
 
+    /**
+     * Get the document type: eID card, kids-ID, ...
+     *
+     * @return BEIDDocument
+     */
     public function getDocumentType() {
         return $this->documentType;
     }
+    /**
+     * Set the document type
+     *
+     * @param int $documentType
+     */
     public function setDocumentType($documentType) {
         $this->documentType = $documentType;
     }
 
+    /**
+     * Get the SHA-1 hash of the citizen's photo
+     *
+     * @return bytes
+     */
     public function getPhotoDigest() {
         return $this->photoDigest;
     }
+    /**
+     * Set the SHA-1 hash of the citizen's photo
+     *
+     * @param bytes $photoDigest
+     */
     public function setPhotoDigest($photoDigest) {
         $this->photoDigest = $photoDigest;
     }
 
+    /**
+     * Get the citizen's current address
+     *
+     * Note that you have to explicitely ask the applet to provide this info
+     * @see BEIDMessageIdentificationRequest::setIncludeAddress()
+     *
+     * @return BEIDAddress
+     */
     public function getAddress() {
         return $this->address;
     }
+    /**
+     * Set the citizen's current address
+     *
+     * @param BEIDAddress $address
+     */
     public function setAddress(BEIDAddress $address) {
         $this->address = $address;
     }
 
+    /**
+     * Get the citizen's photo as a raw JPEG bytestream
+     *
+     * Note that you have to explicitely ask the applet to provide this photo
+     * @see BEIDMessageIdentificationRequest::setIncludePhoto()
+     *
+     * @todo make it a GD class ?
+     * @return bytes
+     */
     public function getPhoto() {
         return $this->photo;
     }
+    /**
+     * Set the citizen's photo
+     *
+     * @param bytes $photo
+     */
     public function setPhoto($photo) {
         $this->photo = $photo;
     }
 
+    /**
+     * "Magic" PHP convenience method
+     *
+     * @return string
+     */
     public function __toString() {
-        return $this->firstName . ' ' . $this->name;
+        return "$this->firstName $this->name ($this->placeOfBirth)";
     }
 }
 ?>
