@@ -643,7 +643,19 @@ public class Controller {
 			signatureValue = this.pcscEidSpi.sign(
 					signRequestMessage.digestValue,
 					signRequestMessage.digestAlgo);
+
+			this.maxProgress = 0;
+			this.maxProgress += (1050 / 255) + 1; // sign cert file
+			this.maxProgress += (1050 / 255) + 1; // CA cert file
+			this.maxProgress += (1050 / 255) + 1; // Root cert file
+			this.currentProgress = 0;
+			this.view
+					.progressIndication(this.maxProgress, this.currentProgress);
+
 			signCertChain = this.pcscEidSpi.getSignCertificateChain();
+
+			this.view.progressIndication(-1, 0);
+
 			if (signRequestMessage.logoff && !signRequestMessage.removeCard) {
 				this.pcscEidSpi.logoff();
 			}
@@ -856,7 +868,19 @@ public class Controller {
 		List<X509Certificate> authnCertChain;
 		try {
 			signatureValue = this.pcscEidSpi.signAuthn(toBeSigned);
+
+			this.maxProgress = 0;
+			this.maxProgress += (1050 / 255) + 1; // authn cert file
+			this.maxProgress += (1050 / 255) + 1; // CA cert file
+			this.maxProgress += (1050 / 255) + 1; // Root cert file
+			this.currentProgress = 0;
+			this.view
+					.progressIndication(this.maxProgress, this.currentProgress);
+
 			authnCertChain = this.pcscEidSpi.getAuthnCertificateChain();
+
+			this.view.progressIndication(-1, 0);
+
 			if (logoff && !removeCard) {
 				this.pcscEidSpi.logoff();
 			}
