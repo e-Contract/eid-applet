@@ -19,9 +19,11 @@
 package be.fedict.eid.applet;
 
 import java.applet.AppletContext;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -42,6 +44,7 @@ import java.util.Locale;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JApplet;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -108,6 +111,12 @@ public class Applet extends JApplet {
 		} catch (Exception e) {
 			System.err.println("initUI didn't successfully complete: "
 					+ e.getMessage());
+			StackTraceElement[] stackTrace = e.getStackTrace();
+			for (StackTraceElement stackTraceElement : stackTrace) {
+				System.err.println(stackTraceElement.getClassName() + "."
+						+ stackTraceElement.getMethodName() + ":"
+						+ stackTraceElement.getLineNumber());
+			}
 		}
 	}
 
@@ -195,7 +204,7 @@ public class Applet extends JApplet {
 		contentPane.add(Box.createVerticalStrut(10));
 		initProgressBar(contentPane);
 		contentPane.add(Box.createVerticalStrut(10));
-		initDetailMessages(contentPane);
+		initDetailPanel(contentPane);
 
 		setupColors(contentPane);
 	}
@@ -222,7 +231,28 @@ public class Applet extends JApplet {
 		this.messages = new Messages(locale);
 	}
 
-	private void initDetailMessages(Container contentPane) {
+	private void initDetailPanel(Container container) {
+		CardLayout cardLayout = new CardLayout();
+		JPanel detailPanel = new JPanel(cardLayout);
+		initDetailButton(detailPanel, cardLayout);
+		initDetailMessages(detailPanel);
+		container.add(detailPanel);
+	}
+
+	private void initDetailButton(final Container container,
+			final CardLayout cardLayout) {
+		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JButton detailButton = new JButton("Details >>");
+		detailButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent actionEvent) {
+				cardLayout.next(container);
+			}
+		});
+		panel.add(detailButton);
+		container.add(panel, "button");
+	}
+
+	private void initDetailMessages(Container container) {
 		this.detailMessages = new JTextArea(10, 80);
 		this.detailMessages.setEditable(false);
 		JPopupMenu popupMenu = new JPopupMenu();
@@ -243,16 +273,16 @@ public class Applet extends JApplet {
 		JScrollPane scrollPane = new JScrollPane(this.detailMessages,
 				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		contentPane.add(scrollPane);
+		container.add(scrollPane, "details");
 	}
 
-	private void initProgressBar(Container contentPane) {
+	private void initProgressBar(Container container) {
 		this.progressBar = new JProgressBar();
 		this.progressBar.setIndeterminate(true);
-		contentPane.add(this.progressBar);
+		container.add(this.progressBar);
 	}
 
-	private void initStatusPanel(Container contentPane) {
+	private void initStatusPanel(Container container) {
 		JPanel statusPanel = new JPanel();
 		statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.LINE_AXIS));
 		this.statusLabel = new JLabel(this.messages
@@ -263,10 +293,10 @@ public class Applet extends JApplet {
 		this.statusLabel.setFont(font);
 		statusPanel.add(this.statusLabel);
 		statusPanel.add(Box.createHorizontalGlue());
-		contentPane.add(statusPanel);
+		container.add(statusPanel);
 	}
 
-	private void setupColors(Container contentPane) {
+	private void setupColors(Container container) {
 		String backgroundColorParam = super
 				.getParameter(BACKGROUND_COLOR_PARAM);
 		Color backgroundColor;
@@ -275,7 +305,7 @@ public class Applet extends JApplet {
 		} else {
 			backgroundColor = Color.WHITE;
 		}
-		setBackgroundColor(contentPane, backgroundColor);
+		setBackgroundColor(container, backgroundColor);
 
 		String foregroundColorParam = super
 				.getParameter(FOREGROUND_COLOR_PARAM);
