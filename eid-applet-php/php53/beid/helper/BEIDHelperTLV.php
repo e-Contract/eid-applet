@@ -1,6 +1,6 @@
 <?php
 /**
- * Description of BEIDHelperTLV
+ * Tag-Length-Value helper class
  *
  * @package BEIDApplet
  * @author Bart Hanssens

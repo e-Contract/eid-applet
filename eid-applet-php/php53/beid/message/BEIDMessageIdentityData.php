@@ -16,9 +16,19 @@ class BEIDMessageIdentityData extends BEIDMessage {
     private $sizePhoto;
 
 
+    /**
+     * Get the size of the citizen's identity info (data sent by the applet)
+     *
+     * @return int
+     */
     public function getIdentitySize() {
         return $this->sizeIdentity;
     }
+    /**
+     * Set the size of the identity info
+     *
+     * @param int $sizeIdentity
+     */
     public function setIdentitySize($sizeIdentity) {
         if (! is_int($sizeIdentity)) {
             throw new BEIDMessageException('Size for identity must be integer');
@@ -29,9 +39,19 @@ class BEIDMessageIdentityData extends BEIDMessage {
         $this->sizeIdentity = $sizeIdentity;
     }
 
+    /**
+     * Get the size of the (zero-padded) citizen's address
+     *
+     * @return int
+     */
     public function getAddressSize() {
         return $this->sizeAddress;
     }
+    /**
+     * Set the size of the citizen's address info
+     *
+     * @param int $sizeAddress
+     */
     public function setAddressSize($sizeAddress) {
         if (! is_int($sizeAddress)) {
             throw new BEIDMessageException('Size for address must be integer');
@@ -42,9 +62,20 @@ class BEIDMessageIdentityData extends BEIDMessage {
         $this->sizeAddress = $sizeAddress;
     }
 
+    /**
+     * Get the size of the photo
+     *
+     * @return int
+     */
+
     public function getPhotoSize() {
         return $this->sizePhoto;
     }
+    /**
+     * Set the size of the photo
+     *
+     * @param int $sizePhoto
+     */
     public function setPhotoSize($sizePhoto) {
         if (! is_int($sizePhoto)) {
             throw new BEIDMessageException('Size for photo must be integer');
@@ -56,6 +87,12 @@ class BEIDMessageIdentityData extends BEIDMessage {
     }
 
 
+    /**
+     * Get the identity info
+     *
+     * @return BEIDIdentity
+     * @todo save photo
+     */
     public function getIdentity() {
         $stream = HttpResponse::getRequestBodyStream();
         $identity = new BEIDIdentity();

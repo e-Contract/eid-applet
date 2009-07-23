@@ -43,6 +43,8 @@ class BEIDServiceAuthentication {
                 break;
 
             default:
+                unset($_SESSION['Identifier']);
+                unset($_SESSION['Challenge']);
                 BEIDMessageBadRequest::createAndSend('Bad request '.$messageType);
                 throw new BEIDMessageException('Bad request'.$messageType);
                 break;

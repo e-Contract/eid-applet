@@ -11,6 +11,12 @@
  */
 
 class BEIDMessageFactory {
+    /**
+     * Create a BEID message from an HTTP request
+     *
+     * @param HTTPMessage $request
+     * @return BEIDMessage or child class
+     */
     public static function createFromRequest(HTTPMessage $request) {
         /* only accept POST requests */
         $method = $request->getRequestMethod();
@@ -21,6 +27,7 @@ class BEIDMessageFactory {
             throw new BEIDMessageException('Bad method '.$method);
         }
 
+        /* verify protocol version */
         $version = $request->getHeader(BEIDMessageHeader::VERSION);
         if ('1' != $version) {
             throw new BEIDMessageException('Wrong protocol version '.$version);

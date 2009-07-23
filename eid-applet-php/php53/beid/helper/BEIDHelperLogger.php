@@ -1,6 +1,6 @@
 <?php
 /**
- * Helper class for logging
+ * Logger helper class
  *
  * @package BEIDApplet-PHP5
  * @author Bart Hanssens
