@@ -18,6 +18,8 @@
 
 package test.be.fedict.eid.applet;
 
+import javax.swing.JFrame;
+
 import org.fest.swing.applet.AppletViewer;
 import org.fest.swing.fixture.FrameFixture;
 import org.fest.swing.launcher.AppletLauncher;
@@ -32,5 +34,14 @@ public class GuiTest {
 		AppletViewer appletViewer = AppletLauncher.applet(new Applet()).start();
 		FrameFixture applet = new FrameFixture(appletViewer);
 		applet.show();
+	}
+
+	@Test
+	public void testAppletInJFrame() throws Exception {
+		JFrame frame = new JFrame();
+		final Applet applet = new Applet();
+		frame.getContentPane().add(applet);
+		frame.setVisible(true);
+		applet.init();
 	}
 }
