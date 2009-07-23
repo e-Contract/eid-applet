@@ -35,18 +35,18 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import be.fedict.eid.applet.service.impl.AuthenticationDataMessageHandler;
 import be.fedict.eid.applet.service.impl.CleanSessionProtocolStateListener;
-import be.fedict.eid.applet.service.impl.ClientEnvironmentMessageHandler;
-import be.fedict.eid.applet.service.impl.ContinueInsecureMessageHandler;
-import be.fedict.eid.applet.service.impl.FileDigestsDataMessageHandler;
-import be.fedict.eid.applet.service.impl.HelloMessageHandler;
 import be.fedict.eid.applet.service.impl.HttpServletProtocolContext;
 import be.fedict.eid.applet.service.impl.HttpServletRequestHttpReceiver;
 import be.fedict.eid.applet.service.impl.HttpServletResponseHttpTransmitter;
-import be.fedict.eid.applet.service.impl.IdentityDataMessageHandler;
 import be.fedict.eid.applet.service.impl.MessageHandler;
-import be.fedict.eid.applet.service.impl.SignatureDataMessageHandler;
+import be.fedict.eid.applet.service.impl.handler.AuthenticationDataMessageHandler;
+import be.fedict.eid.applet.service.impl.handler.ClientEnvironmentMessageHandler;
+import be.fedict.eid.applet.service.impl.handler.ContinueInsecureMessageHandler;
+import be.fedict.eid.applet.service.impl.handler.FileDigestsDataMessageHandler;
+import be.fedict.eid.applet.service.impl.handler.HelloMessageHandler;
+import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
+import be.fedict.eid.applet.service.impl.handler.SignatureDataMessageHandler;
 import be.fedict.eid.applet.shared.AppletProtocolMessageCatalog;
 import be.fedict.eid.applet.shared.AuthenticationDataMessage;
 import be.fedict.eid.applet.shared.ClientEnvironmentMessage;
@@ -95,6 +95,8 @@ public class AppletServiceServlet extends HttpServlet {
 
 	private Map<Class<?>, MessageHandler<?>> messageHandlers;
 
+	private Unmarshaller unmarshaller;
+
 	public AppletServiceServlet() {
 		super();
 		LOG.debug("constructor");
@@ -127,6 +129,8 @@ public class AppletServiceServlet extends HttpServlet {
 		for (MessageHandler<?> messageHandler : messageHandlers) {
 			messageHandler.init(config);
 		}
+
+		this.unmarshaller = new Unmarshaller(new AppletProtocolMessageCatalog());
 	}
 
 	@Override
@@ -163,13 +167,11 @@ public class AppletServiceServlet extends HttpServlet {
 		/*
 		 * Incoming message unmarshaller.
 		 */
-		Unmarshaller unmarshaller = new Unmarshaller(
-				new AppletProtocolMessageCatalog());
 		HttpServletRequestHttpReceiver httpReceiver = new HttpServletRequestHttpReceiver(
 				request);
 		Object transferObject;
 		try {
-			transferObject = unmarshaller.receive(httpReceiver);
+			transferObject = this.unmarshaller.receive(httpReceiver);
 		} catch (Exception e) {
 			LOG.debug("unmarshaller error: " + e.getMessage(), e);
 			throw new RuntimeException("unmarshaller error: " + e.getMessage(),

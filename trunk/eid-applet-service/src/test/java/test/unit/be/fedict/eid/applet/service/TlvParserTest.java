@@ -32,7 +32,7 @@ import org.junit.Test;
 import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.Gender;
 import be.fedict.eid.applet.service.Identity;
-import be.fedict.eid.applet.service.tlv.TlvParser;
+import be.fedict.eid.applet.service.impl.tlv.TlvParser;
 
 public class TlvParserTest {
 

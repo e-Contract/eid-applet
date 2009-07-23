@@ -85,9 +85,9 @@ import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.testing.ServletTester;
 
 import be.fedict.eid.applet.Messages;
-import be.fedict.eid.applet.Pkcs11Eid;
 import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
+import be.fedict.eid.applet.sc.Pkcs11Eid;
 
 public class SslTest {
 	private static final Log LOG = LogFactory.getLog(SslTest.class);

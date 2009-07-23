@@ -25,6 +25,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import be.fedict.eid.applet.service.EIdData;
+import be.fedict.eid.applet.service.impl.handler.AuthenticationDataMessageHandler;
+import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
 import be.fedict.eid.applet.shared.protocol.ProtocolState;
 import be.fedict.eid.applet.shared.protocol.ProtocolStateListener;
 

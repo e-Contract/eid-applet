@@ -44,6 +44,16 @@ import javax.swing.JOptionPane;
 
 import sun.security.pkcs11.wrapper.PKCS11Exception;
 import be.fedict.eid.applet.Messages.MESSAGE_ID;
+import be.fedict.eid.applet.io.AppletSSLSocketFactory;
+import be.fedict.eid.applet.io.HttpURLConnectionHttpReceiver;
+import be.fedict.eid.applet.io.HttpURLConnectionHttpTransmitter;
+import be.fedict.eid.applet.io.LocalAppletProtocolContext;
+import be.fedict.eid.applet.sc.PKCS11NotFoundException;
+import be.fedict.eid.applet.sc.PcscEid;
+import be.fedict.eid.applet.sc.PcscEidSpi;
+import be.fedict.eid.applet.sc.Pkcs11Eid;
+import be.fedict.eid.applet.sc.Task;
+import be.fedict.eid.applet.sc.TaskRunner;
 import be.fedict.eid.applet.shared.AdministrationMessage;
 import be.fedict.eid.applet.shared.AppletProtocolMessageCatalog;
 import be.fedict.eid.applet.shared.AuthenticationContract;
@@ -106,14 +116,16 @@ public class Controller {
 			 */
 			try {
 				Class<? extends PcscEidSpi> pcscEidClass = (Class<? extends PcscEidSpi>) Class
-						.forName("be.fedict.eid.applet.PcscEid");
+						.forName("be.fedict.eid.applet.sc.PcscEid");
 				Constructor<? extends PcscEidSpi> pcscEidConstructor = pcscEidClass
 						.getConstructor(View.class, Messages.class);
 				this.pcscEidSpi = pcscEidConstructor.newInstance(this.view,
 						this.messages);
 			} catch (Exception e) {
-				throw new RuntimeException("Error loading pcsc eid component: "
-						+ e.getMessage());
+				String msg = "error loading PC/SC eID component: "
+						+ e.getMessage();
+				this.view.addDetailMessage(msg);
+				throw new RuntimeException(msg);
 			}
 			this.pcscEidSpi.addObserver(new PcscEidObserver());
 		} else {

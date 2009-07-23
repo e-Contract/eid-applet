@@ -46,9 +46,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import be.fedict.eid.applet.service.impl.AuthenticationChallenge;
-import be.fedict.eid.applet.service.impl.AuthenticationDataMessageHandler;
-import be.fedict.eid.applet.service.impl.HelloMessageHandler;
 import be.fedict.eid.applet.service.impl.UserIdentifierUtil;
+import be.fedict.eid.applet.service.impl.handler.AuthenticationDataMessageHandler;
+import be.fedict.eid.applet.service.impl.handler.HelloMessageHandler;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
 import be.fedict.eid.applet.shared.AuthenticationContract;
 import be.fedict.eid.applet.shared.AuthenticationDataMessage;

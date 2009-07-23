@@ -470,6 +470,7 @@ public class Applet extends JApplet {
 			 */
 			AccessController.doPrivileged(new PrivilegedAction() {
 				public Object run() {
+					addDetailMessage("running privileged code...");
 					Controller controller = new Controller(new AppletView(),
 							new AppletRuntime(), Applet.this.messages);
 					controller.run();

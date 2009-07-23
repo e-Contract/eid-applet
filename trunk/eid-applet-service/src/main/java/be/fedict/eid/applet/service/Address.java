@@ -20,7 +20,7 @@ package be.fedict.eid.applet.service;
 
 import java.io.Serializable;
 
-import be.fedict.eid.applet.service.tlv.TlvField;
+import be.fedict.eid.applet.service.impl.tlv.TlvField;
 
 /**
  * Holds all the fields within the eID address file. The country (i.e.
