@@ -101,6 +101,7 @@ class BEIDHelperTLV {
             $tlv->setTag($tag);
         } else {
             BEIDHelperLogger::logger('TLV: tag 0');
+            return $tlv;
         }
 
         $length = BEIDHelperConvert::byteAsInt(stream_get_contents($stream, 1));
