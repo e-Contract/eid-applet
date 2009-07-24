@@ -6,6 +6,8 @@ README for the FedICT eID Applet SDK
 This package contains the FedICT eID Applet SDK. It includes the following
 primary artifacts:
 
+- README.txt			This file.
+- ChangeLog.txt			The change log.
 - eid-applet-dev-guide.pdf	The eID Applet developer's guide.
 - eid-applet-package-x.y.z.jar	The FedICT signed eID Applet JAR itself.
 - eid-applet-service-x.y.z.jar	The eID Applet Service JAR.
