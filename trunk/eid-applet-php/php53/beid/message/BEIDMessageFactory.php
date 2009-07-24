@@ -39,30 +39,23 @@ class BEIDMessageFactory {
             case BEIDMessageType::HELLO :
                 $msg = new BEIDMessageHello();
                 break;
+
+            case BEIDMessageType::CLIENT_REQUEST :
+                $msg = new BEIDMessageCheckClient();
+                break;
+            case BEIDMessageType::CLIENT_DATA :
+                $msg = new BEIDMessageClientEnvironment();
+                break;
+            
             case BEIDMessageType::ID_DATA :
                 $msg = new BEIDMessageIdentityData();
-
-                $idSize = $request->getHeader(BEIDMessageHeader::ID_SIZE);
-                $addressSize = $request->getHeader(BEIDMessageHeader::ADDRESS_SIZE);
-                $photoSize = $request->getHeader(BEIDMessageHeader::PHOTO_SIZE);
-                
-                $msg->setIdentitySize(intval($idSize));
-                $msg->setAddressSize(intval($addressSize));
-                $msg->setPhotoSize(intval($photoSize));
-                
                 break;
             case BEIDMessageType::ID_REQUEST :
                 $msg = new BEIDMessageIdentificationRequest();
                 break;
-            case BEIDMessageType::AUTH_DATA :
-                $msg = new BEIDMessageAuthenticationData();
 
-                $salt = $request->getHeader(BEIDMessageHeader::SALT_SIZE);
-                $sig = $request->getHeader(BEIDMessageHeader::SIG_SIZE);
-                
-                $msg->setSaltSize(intval($salt));
-                $msg->setSignatureSize(intval($sig));
-                
+            case BEIDMessageType::AUTH_DATA :
+                $msg = new BEIDMessageAuthenticationData($request);
                 break;
             case BEIDMessageType::AUTH_REQUEST :
                 $msg = new BEIDMessageAuthenticationRequest();
