@@ -40,6 +40,11 @@ public class HttpServletRequestHttpReceiver implements HttpReceiver {
 
 	private final HttpServletRequest httpServletRequest;
 
+	/**
+	 * Main constructor.
+	 * 
+	 * @param httpServletRequest
+	 */
 	public HttpServletRequestHttpReceiver(HttpServletRequest httpServletRequest) {
 		this.httpServletRequest = httpServletRequest;
 	}

@@ -37,6 +37,8 @@ import com.lowagie.text.DocumentException;
 
 /**
  * Servlet that outputs the eID identity data from the HTTP session to a PDF.
+ * Can be used by web applications in case they want to print-out the identity
+ * information of a citizen.
  * 
  * @author fcorneli
  * 

@@ -30,10 +30,20 @@ public class InsecureClientEnvironmentException extends Exception {
 
 	private final boolean warnOnly;
 
+	/**
+	 * Default constructor.
+	 */
 	public InsecureClientEnvironmentException() {
 		this(false);
 	}
 
+	/**
+	 * Main constructor.
+	 * 
+	 * @param warnOnly
+	 *            only makes that the citizen is warned about a possible
+	 *            insecure enviroment.
+	 */
 	public InsecureClientEnvironmentException(boolean warnOnly) {
 		this.warnOnly = warnOnly;
 	}

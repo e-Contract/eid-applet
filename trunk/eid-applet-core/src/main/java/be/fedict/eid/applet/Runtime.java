@@ -28,11 +28,15 @@ import java.net.URL;
  */
 public interface Runtime {
 
+	/**
+	 * Navigates the web browser to the target page as configured on the eID
+	 * Applet.
+	 */
 	void gotoTargetPage();
 
 	URL getDocumentBase();
 
 	String getParameter(String name);
-	
+
 	Applet getApplet();
 }

@@ -40,6 +40,11 @@ public interface IdentityIntegrityService {
 	 * the national registration certificate. Processing the incoming identity
 	 * data should be handled as part of the eID Applet target page.
 	 * 
+	 * <p>
+	 * Check out <a href="http://code.google.com/p/jtrust/">jTrust</a> for an
+	 * implementation of a PKI validation framework.
+	 * </p>
+	 * 
 	 * @param certificateChain
 	 *            the national registration X509 certificate chain.
 	 * @throws SecurityException

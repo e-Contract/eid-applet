@@ -55,7 +55,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
- * Signature Service implementation for OpenDocument.
+ * Signature Service implementation for OpenDocument format signatures. The
+ * signatures created with this class are accepted as valid signature within
+ * OpenOffice.org.
+ * 
+ * <p>
+ * See also <a href="http://www.openoffice.org/">OpenOffice.org</a>.
+ * </p>
  * 
  * @author fcorneli
  * 

@@ -32,6 +32,11 @@ public class LocalAppletProtocolContext implements ProtocolContext {
 
 	private final View view;
 
+	/**
+	 * Main constructor.
+	 * 
+	 * @param view
+	 */
 	public LocalAppletProtocolContext(View view) {
 		this.view = view;
 	}

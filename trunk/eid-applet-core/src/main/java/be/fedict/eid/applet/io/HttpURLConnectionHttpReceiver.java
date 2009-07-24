@@ -28,10 +28,22 @@ import java.util.Map;
 
 import be.fedict.eid.applet.shared.protocol.HttpReceiver;
 
+/**
+ * Implementation of an {@link HttpReceiver} based on the
+ * {@link HttpURLConnection}.
+ * 
+ * @author fcorneli
+ * 
+ */
 public class HttpURLConnectionHttpReceiver implements HttpReceiver {
 
 	private final HttpURLConnection connection;
 
+	/**
+	 * Main constructor.
+	 * 
+	 * @param connection
+	 */
 	public HttpURLConnectionHttpReceiver(HttpURLConnection connection) {
 		this.connection = connection;
 	}

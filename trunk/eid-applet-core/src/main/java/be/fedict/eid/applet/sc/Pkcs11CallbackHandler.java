@@ -41,6 +41,12 @@ public class Pkcs11CallbackHandler implements CallbackHandler {
 
 	private final Dialogs dialogs;
 
+	/**
+	 * Main constructor.
+	 * 
+	 * @param view
+	 * @param messages
+	 */
 	public Pkcs11CallbackHandler(View view, Messages messages) {
 		this.view = view;
 		this.dialogs = new Dialogs(this.view, messages);

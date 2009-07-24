@@ -49,6 +49,11 @@ public class CleanSessionProtocolStateListener implements ProtocolStateListener 
 
 	private final HttpSession httpSession;
 
+	/**
+	 * Main constructor.
+	 * 
+	 * @param request
+	 */
 	public CleanSessionProtocolStateListener(HttpServletRequest request) {
 		this.httpSession = request.getSession();
 	}

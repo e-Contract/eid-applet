@@ -12,7 +12,7 @@
 			<year>2008-2009</year>
 			<holder>FedICT</holder>
 		</copyright>
-		<releaseinfo>draft 6 July 2009</releaseinfo>
+		<releaseinfo>draft 24 July 2009</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -1166,6 +1166,11 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 						<entry>29 May 2009</entry>
 						<entry>Frank Cornelis</entry>
 						<entry>1.0.0-beta-2</entry>
+					</row>
+					<row>
+						<entry>24 Jul 2009</entry>
+						<entry>Frank Cornelis</entry>
+						<entry>1.0.0-beta-3</entry>
 					</row>
 				</tbody>
 			</tgroup>

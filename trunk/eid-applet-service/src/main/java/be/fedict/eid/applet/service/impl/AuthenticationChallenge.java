@@ -28,7 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Authentication Challenge. Manages challenge freshness.
+ * Authentication Challenge. Manages challenge freshness and randomness.
  * 
  * @author fcorneli
  * 
@@ -56,6 +56,9 @@ public class AuthenticationChallenge implements Serializable {
 
 	static {
 		secureRandom = new SecureRandom();
+		/*
+		 * We put some initial seed.
+		 */
 		secureRandom.setSeed(System.currentTimeMillis());
 	}
 

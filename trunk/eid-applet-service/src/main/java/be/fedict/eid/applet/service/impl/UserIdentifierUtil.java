@@ -85,7 +85,8 @@ public class UserIdentifierUtil {
 	 * @param appId
 	 *            the optional application identifier.
 	 * @param secret
-	 *            the application specific secret.
+	 *            the application specific secret. Should be at least 128 bit
+	 *            long. Encoded in hexadecimal format.
 	 * @return
 	 */
 	public static String getNonReversibleCitizenIdentifier(String userId,

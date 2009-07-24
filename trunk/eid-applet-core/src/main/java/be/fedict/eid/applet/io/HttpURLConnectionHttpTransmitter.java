@@ -26,7 +26,7 @@ import java.net.ProtocolException;
 import be.fedict.eid.applet.shared.protocol.HttpTransmitter;
 
 /**
- * Implementation of a transport component using {@link HttpURLConnection}.
+ * Implementation of an {@link HttpTransmitter} using {@link HttpURLConnection}.
  * 
  * @author fcorneli
  * 

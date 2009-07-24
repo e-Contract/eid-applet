@@ -31,6 +31,7 @@ import javax.servlet.ServletException;
  * @author fcorneli
  * 
  * @param <T>
+ *            the service type.
  */
 public class ServiceLocator<T> {
 

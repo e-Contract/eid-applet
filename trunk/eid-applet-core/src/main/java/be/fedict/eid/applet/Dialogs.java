@@ -49,6 +49,10 @@ import be.fedict.eid.applet.Messages.MESSAGE_ID;
  */
 public class Dialogs {
 
+	/*
+	 * TODO: should somehow also be declared in the View interface.
+	 */
+
 	private final View view;
 
 	private final Messages messages;

@@ -30,9 +30,14 @@ import be.fedict.eid.applet.service.impl.tlv.TlvField;
 import be.fedict.eid.applet.service.impl.tlv.ValidityDateDataConvertor;
 
 /**
- * Holds all fields within the eID identity file.
+ * Holds all fields within the eID identity file. The annotations are used by
+ * the TLV parser to parse the identity file as stored in the eID card to an
+ * object of this class.
  * 
  * @author fcorneli
+ * @see Address
+ * @see TlvField
+ * @see ConvertData
  * 
  */
 public class Identity implements Serializable {
