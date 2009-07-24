@@ -1,17 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0-beta-3</version>
 	</parent>
 	<name>FedICT eID Applet SDK</name>
 	<description>SDK for the eID applet.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-sdk</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0-beta-3</version>
 	<packaging>pom</packaging>
 	<build>
 		<plugins>
@@ -84,22 +82,22 @@
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-dev-guide</artifactId>
 			<type>zip</type>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-beta-3</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-package</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-beta-3</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-beta-3</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service-signer</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-beta-3</version>
 			<exclusions>
 				<exclusion>
 					<groupId>javax.security</groupId>
@@ -111,21 +109,21 @@
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service</artifactId>
 			<classifier>javadoc</classifier>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-beta-3</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service-spi</artifactId>
 			<classifier>javadoc</classifier>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-beta-3</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service-signer</artifactId>
 			<classifier>javadoc</classifier>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-beta-3</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
