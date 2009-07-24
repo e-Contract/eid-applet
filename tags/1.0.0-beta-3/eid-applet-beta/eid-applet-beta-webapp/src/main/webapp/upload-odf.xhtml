@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:n="http://gravel.jboss.org/jsf/1.0/navigation">
+<body>
+<ui:composition template="/WEB-INF/template.xhtml">
+	<ui:param name="activeMenu" value="test" />
+	<ui:define name="body">
+		<h2>eID Applet Signature Test</h2>
+		<p>Via this page you can test the eID Applet Signature
+		functionality. This test will demo the creation and verification of
+		ODF signatures. ODF signatures are also supported by <a
+			href="http://www.openoffice.org/" target="_top">OpenOffice.org</a>
+		version 3.1.</p>
+		<h:form>
+			<h:panelGrid columns="2">
+				<rich:fileUpload uploadData="#{odfUploader.files}"
+					immediateUpload="true" acceptedTypes="odt"
+					addControlLabel="Add ODF file...">
+					<a4j:support event="onuploadcomplete" reRender="info" />
+					<f:facet name="label">
+						<h:outputText value="{_KB}KB from {KB}KB uploaded --- {mm}:{ss}">
+						</h:outputText>
+					</f:facet>
+				</rich:fileUpload>
+				<h:panelGroup id="info">
+					<rich:panel>
+						<f:facet name="header">
+							<h:outputText value="ODF Information" />
+						</f:facet>
+						<h:outputText value="No files currently uploaded"
+							rendered="#{odfUploader.size == 0}" />
+						<rich:dataGrid columns="1" value="#{odfUploader.files}" var="file">
+							<h:panelGrid columns="2">
+								<h:outputText value="File name: " />
+								<h:outputText value="#{file.fileName}" />
+
+								<h:outputText value="File size: " />
+								<h:outputText value="#{file.fileSize}" />
+							</h:panelGrid>
+						</rich:dataGrid>
+					</rich:panel>
+				</h:panelGroup>
+			</h:panelGrid>
+		</h:form>
+	</ui:define>
+</ui:composition>
+</body>
+</html>
