@@ -40,7 +40,8 @@ import org.apache.commons.logging.LogFactory;
 import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
 
 /**
- * Servlet to display the session photo.
+ * Servlet to display the citizen's photo that is stored in the HTTP session
+ * after a successful eID identification operation via the eID Applet.
  * 
  * @author fcorneli
  * 
@@ -68,6 +69,9 @@ public class PhotoServlet extends HttpServlet {
 			BufferedImage photo = ImageIO.read(new ByteArrayInputStream(
 					photoData));
 			if (null == photo) {
+				/*
+				 * In this case we render a photo containing some error message.
+				 */
 				photo = new BufferedImage(140, 200, BufferedImage.TYPE_INT_RGB);
 				Graphics2D graphics = (Graphics2D) photo.getGraphics();
 				RenderingHints renderingHints = new RenderingHints(

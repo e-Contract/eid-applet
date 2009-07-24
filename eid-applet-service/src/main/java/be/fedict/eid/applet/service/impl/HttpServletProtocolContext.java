@@ -44,6 +44,11 @@ public class HttpServletProtocolContext implements ProtocolContext {
 
 	private final HttpSession session;
 
+	/**
+	 * Main constructor.
+	 * 
+	 * @param request
+	 */
 	public HttpServletProtocolContext(HttpServletRequest request) {
 		this.session = request.getSession();
 	}

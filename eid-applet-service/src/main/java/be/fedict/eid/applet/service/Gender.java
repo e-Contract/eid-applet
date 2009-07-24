@@ -19,11 +19,18 @@
 package be.fedict.eid.applet.service;
 
 /**
- * Gender enumeration.
+ * Gender enumeration. For the moment we only have 2 values.
  * 
  * @author fcorneli
  * 
  */
 public enum Gender {
-	MALE, FEMALE
+	/**
+	 * Male.
+	 */
+	MALE,
+	/**
+	 * Female.
+	 */
+	FEMALE
 }

@@ -31,7 +31,7 @@ public interface AuthenticationService {
 
 	/**
 	 * Validates the given certificate chain. After the eID Applet Service has
-	 * verified the authentication signature it will invoke this method on your
+	 * verified the authentication signature, it will invoke this method on your
 	 * authentication service component. The implementation of this method
 	 * should validate the given certificate chain. This validation could be
 	 * based on PKI validation, or could be based on simply trusting the
@@ -40,7 +40,13 @@ public interface AuthenticationService {
 	 * validation. Processing the incoming citizen identifier (if required at
 	 * all) should be handled as part of the eID Applet target page.
 	 * 
+	 * <p>
+	 * Check out <a href="http://code.google.com/p/jtrust/">jTrust</a> for an
+	 * implementation of a PKI validation framework.
+	 * </p>
+	 * 
 	 * @param certificateChain
+	 *            the X509 authentication certificate chain of the citizen.
 	 * @throws SecurityException
 	 *             in case the certificate chain is invalid/not accepted.
 	 */

@@ -42,6 +42,9 @@ public class GenderDataConvertor implements DataConvertor<Gender> {
 		if ("W".equals(genderStr)) {
 			return Gender.FEMALE;
 		}
+		/*
+		 * A painful moment here.
+		 */
 		throw new DataConvertorException("unknown gender: " + genderStr);
 	}
 

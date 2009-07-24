@@ -66,7 +66,7 @@ public enum DocumentType {
 		int key = value[0];
 		DocumentType documentType = DocumentType.documentTypes.get(key);
 		/*
-		 * It the key is unknown, we simply return null.
+		 * If the key is unknown, we simply return null.
 		 */
 		return documentType;
 	}

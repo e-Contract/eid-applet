@@ -58,6 +58,13 @@ import javax.swing.UIManager;
 
 import be.fedict.eid.applet.Messages.MESSAGE_ID;
 
+/**
+ * The main class of the eID Applet. The {@link #init()} method is where it all
+ * starts.
+ * 
+ * @author fcorneli
+ * @see Applet#init()
+ */
 public class Applet extends JApplet {
 
 	private static final long serialVersionUID = 1L;

@@ -39,18 +39,39 @@ public class EIdCertsData implements Serializable {
 
 	public X509Certificate root;
 
+	/**
+	 * Citizen's authentication X509 certificate.
+	 * 
+	 * @return
+	 */
 	public X509Certificate getAuthn() {
 		return this.authn;
 	}
 
+	/**
+	 * Citizen's non-repudiation X509 certificate.
+	 * 
+	 * @return
+	 */
 	public X509Certificate getSign() {
 		return this.sign;
 	}
 
+	/**
+	 * Citizen CA X509 certificate.
+	 * 
+	 * @return
+	 */
 	public X509Certificate getCa() {
 		return this.ca;
 	}
 
+	/**
+	 * Root CA (or Root CA2, depending on the age of the eID card) X509
+	 * certificate.
+	 * 
+	 * @return
+	 */
 	public X509Certificate getRoot() {
 		return this.root;
 	}

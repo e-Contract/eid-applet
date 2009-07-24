@@ -21,7 +21,7 @@ package be.fedict.eid.applet.service.impl.tlv;
 import java.util.GregorianCalendar;
 
 /**
- * Data convertor for identity validity dates.
+ * Data convertor for eID identity validity dates.
  * 
  * @author fcorneli
  * 

@@ -62,7 +62,7 @@ public class HttpServletResponseHttpTransmitter implements HttpTransmitter {
 
 	public boolean isSecure() {
 		/*
-		 * We assume here that the request was already approved.
+		 * We assume here that the request was already verified as being secure.
 		 */
 		return true;
 	}

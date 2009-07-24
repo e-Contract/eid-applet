@@ -35,6 +35,7 @@ import be.fedict.eid.applet.service.AppletServiceServlet;
  * 
  * @param <T>
  *            the message type.
+ * @see AppletServiceServlet
  */
 public interface MessageHandler<T> {
 	/**

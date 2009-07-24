@@ -38,12 +38,14 @@ import javax.net.ssl.SSLSocketFactory;
 import be.fedict.eid.applet.View;
 
 /**
- * eID Applet specific implementation of an SSL Socket Factory.
+ * eID Applet specific implementation of an SSL Socket Factory. This is actually
+ * a decorator component over the original SSL socket factory object.
  * 
  * <p>
  * Makes sure that the SSL session doesn't change during eID Applet operations.
- * Gives us access to the SSL session identifier so we can implement secure
- * tunnel binding in our authentication protocol.
+ * Gives us access to the SSL session identifier and SSL server certificate so
+ * we can implement secure tunnel binding as part of our authentication
+ * protocol.
  * </p>
  * 
  * @author fcorneli
@@ -60,6 +62,12 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 
 	private byte[] encodedPeerCertificate;
 
+	/**
+	 * Main constructor.
+	 * 
+	 * @param view
+	 * @param originalSslSocketFactory
+	 */
 	public AppletSSLSocketFactory(View view,
 			SSLSocketFactory originalSslSocketFactory) {
 		this.view = view;
@@ -146,6 +154,11 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 		return this.sslSessionId;
 	}
 
+	/**
+	 * Gives back the DER encoded SSL server certificate.
+	 * 
+	 * @return
+	 */
 	public byte[] getEncodedPeerCertificate() {
 		if (null == this.encodedPeerCertificate) {
 			throw new IllegalStateException("SSL peer certificate unknown");
@@ -238,6 +251,11 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 		return appletSslSocketFactory;
 	}
 
+	/**
+	 * Gives back the actual DER encoded SSL server certificate.
+	 * 
+	 * @return
+	 */
 	public static byte[] getActualEncodedServerCertificate() {
 		AppletSSLSocketFactory appletSslSocketFactory = getAppletSSLSocketFactory();
 		byte[] encodedPeerCertificate = appletSslSocketFactory

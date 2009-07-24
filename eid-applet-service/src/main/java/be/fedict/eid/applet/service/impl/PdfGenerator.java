@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.EIdData;
 import be.fedict.eid.applet.service.Identity;
+import be.fedict.eid.applet.service.PdfServlet;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -39,10 +40,10 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 
 /**
- * PDF generator for eID identity data.
+ * PDF generator for eID identity data. The implementation is using iText.
  * 
  * @author fcorneli
- * 
+ * @see PdfServlet
  */
 public class PdfGenerator {
 

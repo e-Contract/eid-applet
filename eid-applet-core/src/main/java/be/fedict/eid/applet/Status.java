@@ -25,5 +25,12 @@ package be.fedict.eid.applet;
  * 
  */
 public enum Status {
-	NORMAL, ERROR
+	/**
+	 * Message will be shown in normal color.
+	 */
+	NORMAL,
+	/**
+	 * Message will be shown in red. Progress bar also stops running around.
+	 */
+	ERROR
 }

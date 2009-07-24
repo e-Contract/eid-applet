@@ -34,23 +34,35 @@ public interface SecureClientEnvironmentService {
 	 * application.
 	 * 
 	 * @param javaVersion
+	 *            the version of the Java JRE on the client machine.
 	 * @param javaVendor
+	 *            the vendor of the Java JRE on the client machine.
 	 * @param osName
+	 *            the name of the operating system on the client machine.
 	 * @param osArch
+	 *            the architecture of the client machine.
 	 * @param osVersion
+	 *            the operating system version of the client machine.
 	 * @param userAgent
+	 *            the user agent, i.e. browser, used on the client machine.
 	 * @param navigatorAppName
-	 *            optional
+	 *            the optional navigator application name (browser)
 	 * @param navigatorAppVersion
-	 *            optional
+	 *            the optional navigator application version (browser version)
 	 * @param navigatorUserAgent
-	 *            optional
+	 *            the optional optional navigator user agent name.
 	 * @param remoteAddress
+	 *            the address of the client machine.
 	 * @param sslKeySize
+	 *            the key size of the SSL session used between server and
+	 *            client.
 	 * @param sslCipherSuite
+	 *            the cipher suite of the SSL session used between server and
+	 *            client.
 	 * @param readerList
+	 *            the list of smart card readers present on the client machine.
 	 * @throws InsecureClientEnvironmentException
-	 *             if the client env is not secure enough.
+	 *             if the client env is found not to be secure enough.
 	 */
 	void checkSecureClientEnvironment(String javaVersion, String javaVendor,
 			String osName, String osArch, String osVersion, String userAgent,
