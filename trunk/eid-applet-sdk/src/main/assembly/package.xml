@@ -16,6 +16,10 @@
 			<fileMode>0644</fileMode>
 		</file>
 		<file>
+			<source>src/main/assembly/ChangeLog.txt</source>
+			<fileMode>0644</fileMode>
+		</file>
+		<file>
 			<source>../LICENSE.txt</source>
 			<fileMode>0644</fileMode>
 		</file>
