@@ -38,7 +38,7 @@ class BEIDServiceAuthentication {
                 break;
 
             case $msg instanceof BEIDMessageAuthenticationData :
-                $msg->getAuthentication();
+                $msg->getAuthentication($request);
                 BEIDMessageFinished::createAndSend();
                 break;
 

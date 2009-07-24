@@ -67,12 +67,21 @@ class BEIDMessageAuthenticationData extends BEIDMessage {
     /**
      * Get authentication
      *
+     * @param HttpMessage $request
      * @todo add more exception handling code
      */
-    public function getAuthentication() {
+    public function getAuthentication(HttpMessage $request) {
         $stream = HttpResponse::getRequestBodyStream();
 
         unset($_SESSION['Identifier']);
+
+        /* TODO : cleanup */
+        $saltSize = $request->getHeader(BEIDMessageHeader::SALT_SIZE);
+        $signatureSize = $request->getHeader(BEIDMessageHeader::SIG_SIZE);
+
+        $this->setSaltSize(intval($saltSize));
+        $this->setSignatureSize(intval($signatureSize));
+
 
         $saltSize = $this->getSaltSize();
         $salt = stream_get_contents($stream, $saltSize);

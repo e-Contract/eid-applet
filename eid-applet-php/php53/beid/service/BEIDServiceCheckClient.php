@@ -1,6 +1,6 @@
 <?php
 /**
- * Identity service, retrieves ID, address etc from eID card
+ * Check client environment service
  *
  * @package BEIDApplet-PHP5
  * @author Bart Hanssens
@@ -10,7 +10,7 @@
  * $Id$
  */
 
-class BEIDServiceIdentity {
+class BEIDServiceCheckClient {
     /**
      * Handles the conversation between the server and the EID applet.
      * This conversation is done using HTTP requests and responses
@@ -28,16 +28,11 @@ class BEIDServiceIdentity {
 
         switch(true) {
             case $msg instanceof BEIDMessageHello :
-                unset($_SESSION['Identity']);
-
-                $reply = new BEIDMessageIdentificationRequest();
-                $reply->setIncludeAddress('true');
-                $reply->setIncludePhoto('true');
-                $reply->send();
+                BEIDMessageCheckClient::createAndSend();
                 break;
 
-            case $msg instanceof BEIDMessageIdentityData :
-                $identity = $msg->getIdentity($request);
+            case $msg instanceof BEIDMessageClientEnvironment :
+                $configuration = $msg->getClientEnvironment($request);
                 BEIDMessageFinished::createAndSend();
                 break;
 

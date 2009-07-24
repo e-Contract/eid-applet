@@ -143,14 +143,25 @@ class BEIDMessageIdentityData extends BEIDMessage {
     /**
      * Get the identity info
      *
+     * @param HttpMessage $request
      * @return BEIDIdentity
      * @todo save photo
      */
-    public function getIdentity() {
+    public function getIdentity(HttpMessage $request) {
         $stream = HttpResponse::getRequestBodyStream();
         $identity = new BEIDIdentity();
 
         unset($_SESSION['Identity']);
+
+        /* get HTTP header */
+        $idSize = $request->getHeader(BEIDMessageHeader::ID_SIZE);
+        $addressSize = $request->getHeader(BEIDMessageHeader::ADDRESS_SIZE);
+        $photoSize = $request->getHeader(BEIDMessageHeader::PHOTO_SIZE);
+
+        $this->setIdentitySize(intval($idSize));
+        $this->setAddressSize(intval($addressSize));
+        $this->setPhotoSize(intval($photoSize));
+
         $end = $this->getIdentitySize();
 
         while (!feof($stream) && (ftell($stream) < $end)) {

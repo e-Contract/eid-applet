@@ -11,13 +11,16 @@
  */
 
 class BEIDMessageType {
+    const HELLO = 'HelloMessage';
+    const CLIENT_REQUEST = 'CheckClientMessage';
+    const CLIENT_DATA = 'ClientEnvironmentMessage';
     const AUTH_REQUEST = 'AuthenticationRequestMessage';
     const AUTH_DATA = 'AuthenticationDataMessage';
     const ID_REQUEST = 'IdentificationRequestMessage';
     const ID_DATA = 'IdentityDataMessage';
-    const HELLO = 'HelloMessage';
-    const FINISHED = 'FinishedMessage';
     const KIOSK = 'KioskMessage';
     const BAD_REQUEST = 'BadRequest';
+    const FINISHED = 'FinishedMessage';
+
 }
 ?>
