@@ -6,7 +6,7 @@ The eID Applet Demo package contains a configured JBoss AS together with some eI
 
 You'll need Java 6 to run the demo.
 
-Download and unzip the [http://eid-applet.googlecode.com/files/eid-applet-demo-1.0.0-beta-2.zip eid-applet-demo-1.0.0-beta-2.zip] package and execute
+Download and unzip the [http://eid-applet.googlecode.com/files/eid-applet-demo-1.0.0-beta-3.zip eid-applet-demo-1.0.0-beta-3.zip] package and execute
 {{{
 bin\run.bat
 }}}
@@ -22,5 +22,6 @@ After JBoss AS has booted you can visit the eID Applet demo web application at:
 
 Anyone can host the eID Applet Beta Site (source code license is LGPL 3.0, content license is CC 3.0). Known hosting sites:
   * https://www.e-contract.be/eid-applet-beta/
+  * https://www.e-contract.be/eid-applet-test/
 
 If you intent to host the eID Applet Beta Site yourself, please report this via the mailing list so we can add your URL to the above list.
