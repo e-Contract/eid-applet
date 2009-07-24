@@ -1,0 +1,7 @@
+1.0.0-beta-3 - 24 July 2009
+	* initial eID Applet Service Signer implementation (XML + ODF)
+	* non-reversible citizen identifiers (NRCID) support
+	* Details button on the eID Applet
+	* various small fixes, improvements and refactorings
+	* initial ASP.NET eID Applet Service (not part of SDK yet)
+	* initial PHP eID Applet Service (not part of SDK yet)
