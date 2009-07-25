@@ -21,6 +21,8 @@ class BEIDMessageClientEnvironment extends BEIDMessage {
     public function getClientEnvironment(HttpMessage $request) {
         $stream = HttpResponse::getRequestBodyStream();
 
+        BEIDHelperLogger::logger(print_r($request->getHeaders(), TRUE));
+
         $client = new BEIDClientEnvironment();
 
         /* JVM the applet is running in */
@@ -30,10 +32,12 @@ class BEIDMessageClientEnvironment extends BEIDMessage {
         $client->setJavaVendor($javaVendor);
         $client->setJavaVersion($javaVersion);
 
-        /* browser */
+        /* browser, must be set as applet parameter */
         $navigatorUA = $request->getHeader(BEIDMessageHeader::NAVIGATOR_UA);
         $navigatorName = $request->getHeader(BEIDMessageHeader::NAVIGATOR_NAME);
         $navigatorVersion = $request->getHeader(BEIDMessageHeader::NAVIGATOR_VERSION);
+
+        /* TODO: add fallback using standard HTTP header User-Agent */
 
         $client->setNavigatorUA($navigatorUA);
         $client->setNavigatorName($navigatorName);
@@ -41,7 +45,7 @@ class BEIDMessageClientEnvironment extends BEIDMessage {
 
         /* readers */
         $eidReaders = stream_get_contents($stream);
-        $client->setReaders($eidReaders);
+        $client->setEidReaders($eidReaders);
 
         $_SESSION['Configuration'] = $client;
         return $client;

@@ -17,7 +17,10 @@
             var parameters = {
                 TargetPage :'CheckClientResult.php',
                 AppletService : 'CheckClientService.php',
-                BackgroundColor : '#ffffff'
+                BackgroundColor : '#ffffff',
+                NavigatorUserAgent : navigator.userAgent,
+                NavigatorAppName : navigator.appName,
+                NavigatorAppVersion : navigator.appVersion
             };
 
             var version = '1.6';

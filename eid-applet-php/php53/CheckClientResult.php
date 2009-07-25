@@ -24,7 +24,7 @@
                 <td><?php echo $config->getNavigatorUA(); ?></td>
             </tr>
             <tr><th>Readers</th>
-                <td><?php echo $config->getReaders(); ?></td>
+                <td><?php echo $config->getEidReaders(); ?></td>
             </tr>
         </table>
     </body>
