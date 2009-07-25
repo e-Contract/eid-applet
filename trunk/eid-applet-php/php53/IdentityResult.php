@@ -4,6 +4,8 @@
     session_start();
     $identity = $_SESSION['Identity'];
     $photoData = $identity->getPhoto();
+
+    /* TODO: do it the right way. This is just a quick hack to see if it works */
     $photoFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'photo.jpg';
 
     file_put_contents($photoFile, $photoData);
