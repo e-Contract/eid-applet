@@ -926,10 +926,9 @@ public class Controller {
 		}
 	}
 
-	public static final String VERSION = "0.0.11";
-
 	private void printEnvironment() {
-		addDetailMessage("eID browser applet version: " + VERSION);
+		Version version = new Version();
+		addDetailMessage("eID browser applet version: " + version.getVersion());
 		addDetailMessage("Java version: " + System.getProperty("java.version"));
 		addDetailMessage("Java vendor: " + System.getProperty("java.vendor"));
 		addDetailMessage("OS: " + System.getProperty("os.name"));
