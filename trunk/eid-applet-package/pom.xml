@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict</groupId>
@@ -44,7 +46,7 @@
 							<goal>unpack-dependencies</goal>
 						</goals>
 						<configuration>
-							<includes>**/*.class,**/Messages*.properties</includes>
+							<includes>**/*.class,**/*.properties</includes>
 							<outputDirectory>${project.build.directory}/classes</outputDirectory>
 						</configuration>
 					</execution>
@@ -121,7 +123,10 @@
 						<artifactId>maven-jar-plugin</artifactId>
 						<version>2.3-MJAR-112</version>
 						<!-- http://jira.codehaus.org/browse/MJAR-112 -->
-						<!-- XXX: overriding plugin version does not work for multi-module build -->
+						<!--
+							XXX: overriding plugin version does not work for multi-module
+							build
+						-->
 						<executions>
 							<execution>
 								<goals>
