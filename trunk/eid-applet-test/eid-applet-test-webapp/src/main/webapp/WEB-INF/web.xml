@@ -323,6 +323,18 @@
 		<url-pattern>/applet-service-sign-files-all</url-pattern>
 	</servlet-mapping>
 	<servlet>
+		<servlet-name>AppletKioskServiceServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+		<init-param>
+			<param-name>Kiosk</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AppletKioskServiceServlet</servlet-name>
+		<url-pattern>/applet-kiosk-service</url-pattern>
+	</servlet-mapping>
+	<servlet>
 		<servlet-name>PhotoServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.PhotoServlet</servlet-class>
 	</servlet>
