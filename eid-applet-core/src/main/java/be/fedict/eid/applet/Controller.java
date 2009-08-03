@@ -386,11 +386,24 @@ public class Controller {
 		addDetailMessage("entering Kiosk Mode...");
 		this.view.setStatusMessage(Status.NORMAL, "Kiosk Mode...");
 		while (true) {
-			if (false == this.pkcs11Eid.isEidPresent()) {
-				this.pkcs11Eid.waitForEidPresent();
+			try {
+				if (false == this.pkcs11Eid.isEidPresent()) {
+					this.pkcs11Eid.waitForEidPresent();
+				}
+				addDetailMessage("waiting for card removal...");
+				this.pkcs11Eid.removeCard();
+			} catch (PKCS11NotFoundException e) {
+				addDetailMessage("fallback to PC/SC interface...");
+				if (null == this.pcscEidSpi) {
+					addDetailMessage("no PC/SC interface fallback possible.");
+					throw e;
+				}
+				if (false == this.pcscEidSpi.isEidPresent()) {
+					this.pcscEidSpi.waitForEidPresent();
+				}
+				addDetailMessage("waiting for card removal...");
+				this.pcscEidSpi.removeCard();
 			}
-			addDetailMessage("waiting for card removal...");
-			this.pkcs11Eid.removeCard();
 			addDetailMessage("card removed");
 			ClassLoader classLoader = Controller.class.getClassLoader();
 			Class<?> jsObjectClass;
