@@ -44,7 +44,6 @@ import org.bouncycastle.util.encoders.Hex;
 
 import be.fedict.eid.applet.service.EIdData;
 import be.fedict.eid.applet.service.impl.AuthenticationChallenge;
-import be.fedict.eid.applet.service.impl.MessageHandler;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.impl.UserIdentifierUtil;
 import be.fedict.eid.applet.service.spi.AuditService;
@@ -59,6 +58,7 @@ import be.fedict.eid.applet.shared.FinishedMessage;
  * @author fcorneli
  * 
  */
+@HandlesMessage(AuthenticationDataMessage.class)
 public class AuthenticationDataMessageHandler implements
 		MessageHandler<AuthenticationDataMessage> {
 

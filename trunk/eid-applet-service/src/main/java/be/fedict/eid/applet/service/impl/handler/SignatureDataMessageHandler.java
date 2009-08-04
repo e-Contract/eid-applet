@@ -36,7 +36,6 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.DigestInfo;
 import org.bouncycastle.util.Arrays;
 
-import be.fedict.eid.applet.service.impl.MessageHandler;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.impl.UserIdentifierUtil;
 import be.fedict.eid.applet.service.spi.AuditService;
@@ -50,6 +49,7 @@ import be.fedict.eid.applet.shared.SignatureDataMessage;
  * @author fcorneli
  * 
  */
+@HandlesMessage(SignatureDataMessage.class)
 public class SignatureDataMessageHandler implements
 		MessageHandler<SignatureDataMessage> {
 
