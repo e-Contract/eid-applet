@@ -74,7 +74,12 @@ repository location. Do this via:
     mvn eclipse:add-maven-repo -Declipse.workspace=<location of your workspace>
 
 
-=== 6. License
+=== 6. NetBeans IDE
+
+As of NetBeans version 6.7 this free IDE from Sun has native Maven 2 support.
+
+
+=== 7. License
 
 The license conditions can be found in the file: LICENSE.txt
 
