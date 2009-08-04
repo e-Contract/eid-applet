@@ -64,3 +64,4 @@
   * [http://smartcardservices.macosforge.org/ Mac OS X SmartCard Services]
   * [http://forge.wallonie.be/gf/project/esignbox/ eSignBox]
   * [http://www.osor.eu/communities/eid OSOR eID Community]
+  * [http://code.google.com/p/jtrust/ jTrust - Java library for PKI validation]
