@@ -20,6 +20,7 @@ package be.fedict.eid.applet.sc;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -109,9 +110,29 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	public PcscEid(View view, Messages messages) {
 		this.view = view;
+		linuxPcscliteLibraryConfig();
 		TerminalFactory factory = TerminalFactory.getDefault();
 		this.cardTerminals = factory.terminals();
 		this.dialogs = new Dialogs(this.view, messages);
+	}
+
+	private void linuxPcscliteLibraryConfig() {
+		String osName = System.getProperty("os.name");
+		if (osName.startsWith("Linux")) {
+			/*
+			 * Workaround for Linux. Apparently the libj2pcsc.so from the JRE
+			 * links to libpcsclite.so instead of libpcsclite.so.1. This can
+			 * cause linking problems on Linux distributions that don't have the
+			 * libpcsclite.so symbolic link.
+			 * 
+			 * See also: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=529339
+			 */
+			File libPcscLite = new File("/usr/lib/libpcsclite.so.1");
+			if (libPcscLite.exists()) {
+				System.setProperty("sun.security.smartcardio.library",
+						libPcscLite.getAbsolutePath());
+			}
+		}
 	}
 
 	public List<String> getReaderList() {
