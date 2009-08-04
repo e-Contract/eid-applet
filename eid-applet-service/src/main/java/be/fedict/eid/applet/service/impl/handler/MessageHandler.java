@@ -16,7 +16,7 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.service.impl;
+package be.fedict.eid.applet.service.impl.handler;
 
 import java.util.Map;
 

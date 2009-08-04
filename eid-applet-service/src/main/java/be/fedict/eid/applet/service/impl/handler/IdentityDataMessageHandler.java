@@ -45,7 +45,6 @@ import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.EIdCertsData;
 import be.fedict.eid.applet.service.EIdData;
 import be.fedict.eid.applet.service.Identity;
-import be.fedict.eid.applet.service.impl.MessageHandler;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
 import be.fedict.eid.applet.service.spi.AuditService;
@@ -59,6 +58,7 @@ import be.fedict.eid.applet.shared.IdentityDataMessage;
  * @author fcorneli
  * 
  */
+@HandlesMessage(IdentityDataMessage.class)
 public class IdentityDataMessageHandler implements
 		MessageHandler<IdentityDataMessage> {
 

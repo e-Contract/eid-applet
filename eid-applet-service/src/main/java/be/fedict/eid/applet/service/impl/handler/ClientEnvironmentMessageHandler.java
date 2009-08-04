@@ -31,7 +31,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import be.fedict.eid.applet.service.impl.AuthenticationChallenge;
-import be.fedict.eid.applet.service.impl.MessageHandler;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
 import be.fedict.eid.applet.service.spi.DigestInfo;
@@ -53,6 +52,7 @@ import be.fedict.eid.applet.shared.SignRequestMessage;
  * @author fcorneli
  * 
  */
+@HandlesMessage(ClientEnvironmentMessage.class)
 public class ClientEnvironmentMessageHandler implements
 		MessageHandler<ClientEnvironmentMessage> {
 

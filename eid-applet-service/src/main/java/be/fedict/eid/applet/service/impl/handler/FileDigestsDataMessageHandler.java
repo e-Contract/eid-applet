@@ -32,7 +32,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
-import be.fedict.eid.applet.service.impl.MessageHandler;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 import be.fedict.eid.applet.service.spi.SignatureService;
@@ -45,6 +44,7 @@ import be.fedict.eid.applet.shared.SignRequestMessage;
  * @author fcorneli
  * 
  */
+@HandlesMessage(FileDigestsDataMessage.class)
 public class FileDigestsDataMessageHandler implements
 		MessageHandler<FileDigestsDataMessage> {
 

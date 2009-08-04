@@ -39,22 +39,17 @@ import be.fedict.eid.applet.service.impl.CleanSessionProtocolStateListener;
 import be.fedict.eid.applet.service.impl.HttpServletProtocolContext;
 import be.fedict.eid.applet.service.impl.HttpServletRequestHttpReceiver;
 import be.fedict.eid.applet.service.impl.HttpServletResponseHttpTransmitter;
-import be.fedict.eid.applet.service.impl.MessageHandler;
 import be.fedict.eid.applet.service.impl.handler.AuthenticationDataMessageHandler;
 import be.fedict.eid.applet.service.impl.handler.ClientEnvironmentMessageHandler;
 import be.fedict.eid.applet.service.impl.handler.ContinueInsecureMessageHandler;
 import be.fedict.eid.applet.service.impl.handler.FileDigestsDataMessageHandler;
+import be.fedict.eid.applet.service.impl.handler.HandlesMessage;
 import be.fedict.eid.applet.service.impl.handler.HelloMessageHandler;
 import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
+import be.fedict.eid.applet.service.impl.handler.MessageHandler;
 import be.fedict.eid.applet.service.impl.handler.SignatureDataMessageHandler;
+import be.fedict.eid.applet.shared.AbstractProtocolMessage;
 import be.fedict.eid.applet.shared.AppletProtocolMessageCatalog;
-import be.fedict.eid.applet.shared.AuthenticationDataMessage;
-import be.fedict.eid.applet.shared.ClientEnvironmentMessage;
-import be.fedict.eid.applet.shared.ContinueInsecureMessage;
-import be.fedict.eid.applet.shared.FileDigestsDataMessage;
-import be.fedict.eid.applet.shared.HelloMessage;
-import be.fedict.eid.applet.shared.IdentityDataMessage;
-import be.fedict.eid.applet.shared.SignatureDataMessage;
 import be.fedict.eid.applet.shared.annotation.ResponsesAllowed;
 import be.fedict.eid.applet.shared.protocol.ProtocolStateMachine;
 import be.fedict.eid.applet.shared.protocol.Transport;
@@ -84,6 +79,11 @@ import be.fedict.eid.applet.shared.protocol.Unmarshaller;
  * corresponding HTTP session attribute is called <code>eid.photo</code>.
  * </p>
  * 
+ * <p>
+ * More information on all available init-param configuration parameters is
+ * available in the eID Applet developer's guide.
+ * </p>
+ * 
  * @author fcorneli
  */
 public class AppletServiceServlet extends HttpServlet {
@@ -92,6 +92,14 @@ public class AppletServiceServlet extends HttpServlet {
 
 	private static final Log LOG = LogFactory
 			.getLog(AppletServiceServlet.class);
+
+	private static final Class<? extends MessageHandler<?>>[] MESSAGE_HANDLER_CLASSES = new Class[] {
+			IdentityDataMessageHandler.class, HelloMessageHandler.class,
+			ClientEnvironmentMessageHandler.class,
+			AuthenticationDataMessageHandler.class,
+			SignatureDataMessageHandler.class,
+			FileDigestsDataMessageHandler.class,
+			ContinueInsecureMessageHandler.class };
 
 	private Map<Class<?>, MessageHandler<?>> messageHandlers;
 
@@ -109,20 +117,24 @@ public class AppletServiceServlet extends HttpServlet {
 		LOG.debug("init");
 
 		this.messageHandlers = new HashMap<Class<?>, MessageHandler<?>>();
-		// TODO: @HandlesMessage(MessageClass.class)
-		this.messageHandlers.put(IdentityDataMessage.class,
-				new IdentityDataMessageHandler());
-		this.messageHandlers.put(HelloMessage.class, new HelloMessageHandler());
-		this.messageHandlers.put(ClientEnvironmentMessage.class,
-				new ClientEnvironmentMessageHandler());
-		this.messageHandlers.put(AuthenticationDataMessage.class,
-				new AuthenticationDataMessageHandler());
-		this.messageHandlers.put(SignatureDataMessage.class,
-				new SignatureDataMessageHandler());
-		this.messageHandlers.put(FileDigestsDataMessage.class,
-				new FileDigestsDataMessageHandler());
-		this.messageHandlers.put(ContinueInsecureMessage.class,
-				new ContinueInsecureMessageHandler());
+		for (Class<? extends MessageHandler> messageHandlerClass : MESSAGE_HANDLER_CLASSES) {
+			HandlesMessage handlesMessageAnnotation = messageHandlerClass
+					.getAnnotation(HandlesMessage.class);
+			if (null == handlesMessageAnnotation) {
+				throw new ServletException(
+						"missing meta-data on message handler");
+			}
+			Class<? extends AbstractProtocolMessage> protocolMessageClass = handlesMessageAnnotation
+					.value();
+			MessageHandler<?> messageHandler;
+			try {
+				messageHandler = messageHandlerClass.newInstance();
+			} catch (Exception e) {
+				throw new ServletException(
+						"cannot create message handler instance");
+			}
+			this.messageHandlers.put(protocolMessageClass, messageHandler);
+		}
 
 		Collection<MessageHandler<?>> messageHandlers = this.messageHandlers
 				.values();
