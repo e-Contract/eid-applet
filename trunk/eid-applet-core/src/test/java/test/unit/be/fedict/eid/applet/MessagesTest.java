@@ -61,7 +61,9 @@ public class MessagesTest {
 		Properties properties = new Properties();
 		properties.load(messagesInputStream);
 		for (MESSAGE_ID messageId : MESSAGE_ID.values()) {
-			assertTrue(properties.containsKey(messageId.getId()));
+			assertTrue("missing message \"" + messageId.getId()
+					+ "\" for language \"" + language + "\"", properties
+					.containsKey(messageId.getId()));
 		}
 	}
 }

@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.security.auth.login.FailedLoginException;
+import javax.security.auth.login.LoginException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -355,6 +357,27 @@ public class Controller {
 					addDetailMessage("at " + stackTraceElement.getClassName()
 							+ "." + stackTraceElement.getMethodName() + ":"
 							+ stackTraceElement.getLineNumber());
+				}
+				/*
+				 * Next is specific for the OpenSC PKCS#11 library.
+				 */
+				if (FailedLoginException.class == cause.getClass()) {
+					setStatusMessage(Status.ERROR, Controller.this.messages
+							.getMessage(MESSAGE_ID.PIN_INCORRECT));
+					return null;
+				}
+				if (LoginException.class == cause.getClass()) {
+					if (null == cause.getMessage()) {
+						/*
+						 * This seems to be the case for OpenSC.
+						 */
+						setStatusMessage(Status.ERROR, Controller.this.messages
+								.getMessage(MESSAGE_ID.PIN_BLOCKED));
+						return null;
+					}
+					setStatusMessage(Status.ERROR, Controller.this.messages
+							.getMessage(MESSAGE_ID.SECURITY_ERROR));
+					return null;
 				}
 			}
 			/*

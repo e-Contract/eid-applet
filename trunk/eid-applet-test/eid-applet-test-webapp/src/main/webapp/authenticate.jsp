@@ -2,10 +2,10 @@
 	pageEncoding="UTF-8"%>
 <html>
 <head>
-<title>eID Applet Identification Demo</title>
+<title>eID Applet Authentication Demo</title>
 </head>
 <body>
-<h1>eID Applet Identification Demo</h1>
+<h1>eID Applet Authentication Demo</h1>
 <script src="https://www.java.com/js/deployJava.js"></script>
 <script>
 	var attributes = {
