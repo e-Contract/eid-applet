@@ -315,7 +315,7 @@ public class PcscTest {
 				+ hasFeature(FEATURE_VERIFY_PIN_DIRECT_TAG, features));
 		Integer verifyPinControl = findFeature(FEATURE_VERIFY_PIN_DIRECT_TAG,
 				features);
-		LOG.debug("VERIFY PIN control: "
+		LOG.debug("VERIFY PIN control: 0x"
 				+ Integer.toHexString(verifyPinControl));
 
 		CardChannel cardChannel = pcscEid.getCardChannel();
@@ -352,11 +352,20 @@ public class PcscTest {
 		verifyCommand.write(0x00); // ulDataLength[3]
 		verifyCommand.write(verifyApdu); // abData
 
-		card.transmitControlCommand(verifyPinControl, verifyCommand
-				.toByteArray());
+		byte[] result = card.transmitControlCommand(verifyPinControl,
+				verifyCommand.toByteArray());
+		responseApdu = new ResponseAPDU(result);
+		LOG.debug("status work: " + Integer.toHexString(responseApdu.getSW()));
+		if (0x9000 == responseApdu.getSW()) {
+			LOG.debug("status OK");
+		} else if (0x6401 == responseApdu.getSW()) {
+			LOG.debug("canceled by user");
+		} else if (0x6400 == responseApdu.getSW()) {
+			LOG.debug("timeout");
+		}
 	}
 
-	public static final byte FEATURE_VERIFY_PIN_DIRECT_TAG = 0x07;
+	public static final byte FEATURE_VERIFY_PIN_DIRECT_TAG = 0x06;
 
 	private boolean hasFeature(byte featureTag, byte[] features) {
 		int idx = 0;

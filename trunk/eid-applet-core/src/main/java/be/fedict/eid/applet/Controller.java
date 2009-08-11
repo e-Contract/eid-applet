@@ -660,13 +660,7 @@ public class Controller {
 
 	private void performEidPcscSignOperation(
 			SignRequestMessage signRequestMessage) throws Exception {
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.DETECTING_CARD));
-		if (false == this.pcscEidSpi.isEidPresent()) {
-			setStatusMessage(Status.NORMAL, this.messages
-					.getMessage(MESSAGE_ID.INSERT_CARD_QUESTION));
-			this.pcscEidSpi.waitForEidPresent();
-		}
+		waitForEIdCard();
 
 		setStatusMessage(Status.NORMAL, this.messages
 				.getMessage(MESSAGE_ID.SIGNING));
@@ -726,13 +720,7 @@ public class Controller {
 
 	private void administration(boolean unblockPin, boolean changePin,
 			boolean logoff, boolean removeCard) throws Exception {
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.DETECTING_CARD));
-		if (false == this.pcscEidSpi.isEidPresent()) {
-			setStatusMessage(Status.NORMAL, this.messages
-					.getMessage(MESSAGE_ID.INSERT_CARD_QUESTION));
-			this.pcscEidSpi.waitForEidPresent();
-		}
+		waitForEIdCard();
 		try {
 			if (unblockPin) {
 				setStatusMessage(Status.NORMAL, "Unblock PIN...");
@@ -902,13 +890,7 @@ public class Controller {
 	private void performEidPcscAuthnOperation(byte[] salt, byte[] sessionId,
 			byte[] toBeSigned, boolean logoff, boolean removeCard)
 			throws Exception {
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.DETECTING_CARD));
-		if (false == this.pcscEidSpi.isEidPresent()) {
-			setStatusMessage(Status.NORMAL, this.messages
-					.getMessage(MESSAGE_ID.INSERT_CARD_QUESTION));
-			this.pcscEidSpi.waitForEidPresent();
-		}
+		waitForEIdCard();
 
 		setStatusMessage(Status.NORMAL, this.messages
 				.getMessage(MESSAGE_ID.AUTHENTICATING));
@@ -986,13 +968,7 @@ public class Controller {
 	private void performEidIdentificationOperation(boolean includeAddress,
 			boolean includePhoto, boolean includeIntegrityData,
 			boolean includeCertificates, boolean removeCard) throws Exception {
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.DETECTING_CARD));
-		if (false == this.pcscEidSpi.isEidPresent()) {
-			setStatusMessage(Status.NORMAL, this.messages
-					.getMessage(MESSAGE_ID.INSERT_CARD_QUESTION));
-			this.pcscEidSpi.waitForEidPresent();
-		}
+		waitForEIdCard();
 
 		setStatusMessage(Status.NORMAL, this.messages
 				.getMessage(MESSAGE_ID.READING_IDENTITY));
@@ -1168,6 +1144,21 @@ public class Controller {
 				addressSignatureFile, rrnCertFile, rootCertFile, authnCertFile,
 				signCertFile, caCertFile);
 		sendMessage(identityData, FinishedMessage.class);
+	}
+
+	private void waitForEIdCard() throws Exception {
+		setStatusMessage(Status.NORMAL, this.messages
+				.getMessage(MESSAGE_ID.DETECTING_CARD));
+		if (false == this.pcscEidSpi.hasCardReader()) {
+			setStatusMessage(Status.NORMAL, this.messages
+					.getMessage(MESSAGE_ID.CONNECT_READER));
+			this.pcscEidSpi.waitForCardReader();
+		}
+		if (false == this.pcscEidSpi.isEidPresent()) {
+			setStatusMessage(Status.NORMAL, this.messages
+					.getMessage(MESSAGE_ID.INSERT_CARD_QUESTION));
+			this.pcscEidSpi.waitForEidPresent();
+		}
 	}
 
 	public static final String APPLET_SERVICE_PARAM = "AppletService";
