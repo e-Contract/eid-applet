@@ -56,6 +56,21 @@ public interface PcscEidSpi {
 	boolean isEidPresent() throws Exception;
 
 	/**
+	 * Checks whether there is a smart card reader available on the system.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	boolean hasCardReader() throws Exception;
+
+	/**
+	 * Wait until a smart card reader has been connected to the system.
+	 * 
+	 * @throws Exception
+	 */
+	void waitForCardReader() throws Exception;
+
+	/**
 	 * Waits for an eID card to be present in one of the available smart card
 	 * readers.
 	 * 

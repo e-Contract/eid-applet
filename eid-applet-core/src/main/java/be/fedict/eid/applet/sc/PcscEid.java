@@ -233,6 +233,27 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		return this.cardChannel;
 	}
 
+	public boolean hasCardReader() {
+		try {
+			List<CardTerminal> cardTerminalList = this.cardTerminals.list();
+			return false == cardTerminalList.isEmpty();
+		} catch (CardException e) {
+			this.view.addDetailMessage("card terminals list error: "
+					+ e.getMessage());
+			return false;
+		}
+	}
+
+	public void waitForCardReader() throws CardException {
+		while (false == hasCardReader()) {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
 	public boolean isEidPresent() throws CardException {
 		List<CardTerminal> cardTerminalList;
 		try {

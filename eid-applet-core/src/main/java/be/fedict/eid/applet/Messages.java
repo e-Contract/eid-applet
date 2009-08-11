@@ -42,7 +42,8 @@ public class Messages {
 				"digestingFiles"), COPY_ALL("copyAll"), MAIL("mail"), NO_MIDDLEWARE_ERROR(
 				"noMiddlewareError"), PIN_BLOCKED("pinBlocked"), PIN_CHANGED(
 				"pinChanged"), PIN_UNBLOCKED("pinUnblocked"), RETRIES_LEFT(
-				"retriesLeft"), PIN_INCORRECT("pinIncorrect");
+				"retriesLeft"), PIN_INCORRECT("pinIncorrect"), CONNECT_READER(
+				"connectReader");
 
 		private final String id;
 
