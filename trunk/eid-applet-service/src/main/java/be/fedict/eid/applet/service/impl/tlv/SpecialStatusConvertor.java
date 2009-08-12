@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2009 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -16,23 +16,21 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.service;
+package be.fedict.eid.applet.service.impl.tlv;
 
-import java.io.Serializable;
+import be.fedict.eid.applet.service.SpecialStatus;
 
 /**
- * Gender enumeration. For the moment we only have 2 values.
+ * Data convertor for eID special status.
  * 
  * @author fcorneli
- * 
+ * @see SpecialStatus
  */
-public enum Gender implements Serializable {
-	/**
-	 * Male.
-	 */
-	MALE,
-	/**
-	 * Female.
-	 */
-	FEMALE
+public class SpecialStatusConvertor implements DataConvertor<SpecialStatus> {
+
+	public SpecialStatus convert(byte[] value) throws DataConvertorException {
+		String strValue = new String(value);
+		SpecialStatus specialStatus = SpecialStatus.toSpecialStatus(strValue);
+		return specialStatus;
+	}
 }
