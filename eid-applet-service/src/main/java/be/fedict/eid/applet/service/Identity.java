@@ -26,6 +26,7 @@ import be.fedict.eid.applet.service.impl.tlv.ConvertData;
 import be.fedict.eid.applet.service.impl.tlv.DateOfBirthDataConvertor;
 import be.fedict.eid.applet.service.impl.tlv.DocumentTypeConvertor;
 import be.fedict.eid.applet.service.impl.tlv.GenderDataConvertor;
+import be.fedict.eid.applet.service.impl.tlv.SpecialStatusConvertor;
 import be.fedict.eid.applet.service.impl.tlv.TlvField;
 import be.fedict.eid.applet.service.impl.tlv.ValidityDateDataConvertor;
 
@@ -103,8 +104,15 @@ public class Identity implements Serializable {
 	@ConvertData(DocumentTypeConvertor.class)
 	public DocumentType documentType;
 
+	@TlvField(16)
+	@ConvertData(SpecialStatusConvertor.class)
+	public SpecialStatus specialStatus;
+
 	@TlvField(17)
 	public byte[] photoDigest;
+
+	@TlvField(18)
+	public String duplicate;
 
 	/*
 	 * We're also providing getters and a toString to make this class more
@@ -173,6 +181,14 @@ public class Identity implements Serializable {
 
 	public byte[] getPhotoDigest() {
 		return this.photoDigest;
+	}
+
+	public SpecialStatus getSpecialStatus() {
+		return this.specialStatus;
+	}
+
+	public String getDuplicate() {
+		return this.duplicate;
 	}
 
 	@Override

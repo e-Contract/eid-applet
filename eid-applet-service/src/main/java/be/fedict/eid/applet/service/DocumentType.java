@@ -18,6 +18,7 @@
 
 package be.fedict.eid.applet.service;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +28,7 @@ import java.util.Map;
  * @author fcorneli
  * 
  */
-public enum DocumentType {
+public enum DocumentType implements Serializable {
 
 	BELGIAN_CITIZEN("1"), KIDS_CARD("6"), BOOTSTRAP_CARD("7"), HABILITATION_CARD(
 			"8"), FOREIGNER_A("11"), FOREIGNER_B("12"), FOREIGNER_C("13"), FOREIGNER_D(

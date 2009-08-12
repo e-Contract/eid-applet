@@ -84,14 +84,13 @@ public class TlvParser {
 		while (idx < file.length - 1) {
 			byte tag = file[idx];
 			idx++;
-			int length = 0;
 			byte lengthByte = file[idx];
-			while ((lengthByte & 0xff) == 0xff) {
-				length += 0xff;
+			int length = lengthByte & 0x7f;
+			while ((lengthByte & 0x80) == 0x80) {
 				idx++;
 				lengthByte = file[idx];
+				length = (length << 7) + (lengthByte & 0x7f);
 			}
-			length += lengthByte & 0xff; // make it an unsigned int
 			idx++;
 			if (0 == tag) {
 				idx += length;
@@ -126,6 +125,9 @@ public class TlvParser {
 				}
 				tlvField.setAccessible(true);
 				tlvField.set(tlvObject, fieldValue);
+			} else {
+				LOG.debug("unknown tag: " + (tag & 0xff) + ", length: "
+						+ length);
 			}
 			idx += length;
 		}

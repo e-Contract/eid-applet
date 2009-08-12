@@ -66,11 +66,23 @@
 	<tr>
 		<td>Date Of Birth</td>
 		<td><%=((Identity) session.getAttribute("eid.identity")).dateOfBirth
-							.getTime()%></td>
+									.getTime()%></td>
 	</tr>
 	<tr>
 		<td>Gender</td>
 		<td><%=((Identity) session.getAttribute("eid.identity")).gender%></td>
+	</tr>
+	<tr>
+		<td>Document Type</td>
+		<td><%=((Identity) session.getAttribute("eid.identity")).documentType%></td>
+	</tr>
+	<tr>
+		<td>Special Status</td>
+		<td><%=((Identity) session.getAttribute("eid.identity")).specialStatus%></td>
+	</tr>
+	<tr>
+		<td>Noble Condition</td>
+		<td><%=((Identity) session.getAttribute("eid.identity")).nobleCondition%></td>
 	</tr>
 	<tr>
 		<td>Street and number</td>
