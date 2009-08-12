@@ -26,6 +26,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.security.Signature;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -330,30 +331,10 @@ public class PcscTest {
 			throw new RuntimeException("SELECT error");
 		}
 
-		ByteArrayOutputStream verifyCommand = new ByteArrayOutputStream();
-		verifyCommand.write(30); // bTimeOut
-		verifyCommand.write(30); // bTimeOut2
-		verifyCommand.write(0x89); // bmFormatString: BCD PIN - SPR532 only,
-		// else 0x01
-		verifyCommand.write(0x47); // bmPINBlockString
-		verifyCommand.write(0x04); // bmPINLengthFormat
-		verifyCommand.write(new byte[] { 0x0C, 0x04 }); // wPINMaxExtraDigit
-		verifyCommand.write(0x02); // bEntryValidationCondition
-		verifyCommand.write(0x01); // bNumberMessage
-		verifyCommand.write(new byte[] { 0x13, 0x08 }); // wLangId
-		verifyCommand.write(0x00); // bMsgIndex
-		verifyCommand.write(new byte[] { 0x00, 0x00, 0x00 }); // bTeoPrologue
-		byte[] verifyApdu = new byte[] { 0x00, 0x20, 0x00, 0x01, 0x08, 0x20,
-				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
-				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
-		verifyCommand.write(verifyApdu.length & 0xff); // ulDataLength[0]
-		verifyCommand.write(0x00); // ulDataLength[1]
-		verifyCommand.write(0x00); // ulDataLength[2]
-		verifyCommand.write(0x00); // ulDataLength[3]
-		verifyCommand.write(verifyApdu); // abData
+		byte[] verifyCommandData = createPINVerificationDataStructure();
 
 		byte[] result = card.transmitControlCommand(verifyPinControl,
-				verifyCommand.toByteArray());
+				verifyCommandData);
 		responseApdu = new ResponseAPDU(result);
 		LOG.debug("status work: " + Integer.toHexString(responseApdu.getSW()));
 		if (0x9000 == responseApdu.getSW()) {
@@ -363,6 +344,86 @@ public class PcscTest {
 		} else if (0x6400 == responseApdu.getSW()) {
 			LOG.debug("timeout");
 		}
+		/*
+		 * The other SW values are those from the VERIFY APDU itself.
+		 */
+	}
+
+	private byte[] createPINVerificationDataStructure() throws IOException {
+		ByteArrayOutputStream verifyCommand = new ByteArrayOutputStream();
+		verifyCommand.write(30); // bTimeOut
+		verifyCommand.write(30); // bTimeOut2
+		verifyCommand.write(0x89); // bmFormatString
+		/*
+		 * bmFormatString. bit 7: 1 = system units are bytes
+		 * 
+		 * bit 6-3: 1 = PIN position in APDU command after Lc, so just after the
+		 * 0x20.
+		 * 
+		 * bit 2: 0 = left justify data
+		 * 
+		 * bit 1-0: 1 = BCD
+		 */
+		verifyCommand.write(0x47); // bmPINBlockString
+		/*
+		 * bmPINBlockString
+		 * 
+		 * bit 7-4: 4 = PIN length
+		 * 
+		 * bit 3-0: 7 = PIN block size (7 times 0xff)
+		 */
+		verifyCommand.write(0x04); // bmPINLengthFormat
+		/*
+		 * bmPINLengthFormat. weird... the values do not make any sense to me.
+		 * 
+		 * bit 7-5: 0 = RFU
+		 * 
+		 * bit 4: 0 = system units are bits
+		 * 
+		 * bit 3-0: 4 = PIN length position in APDU
+		 */
+		verifyCommand.write(new byte[] { 0x04, 0x04 }); // wPINMaxExtraDigit
+		/*
+		 * 0x04 = minimum PIN size in digit
+		 * 
+		 * 0x04 = maximum PIN size in digit. This was 0x0C
+		 */
+		verifyCommand.write(0x02); // bEntryValidationCondition
+		/*
+		 * 0x02 = validation key pressed. So the user must press the green
+		 * button on his pinpad.
+		 */
+		verifyCommand.write(0x01); // bNumberMessage
+		/*
+		 * 0x01 = message with index in bMsgIndex
+		 */
+		verifyCommand.write(new byte[] { 0x13, 0x08 }); // wLangId
+		/*
+		 * 0x13, 0x08 = ?
+		 */
+		verifyCommand.write(0x00); // bMsgIndex
+		/*
+		 * 0x00 = PIN insertion prompt
+		 */
+		verifyCommand.write(new byte[] { 0x00, 0x00, 0x00 }); // bTeoPrologue
+		/*
+		 * bTeoPrologue : only significant for T=1 protocol.
+		 */
+		byte[] verifyApdu = new byte[] {
+				0x00, // CLA
+				0x20, // INS
+				0x00, // P1
+				0x01, // P2
+				0x08, // Lc = 8 bytes in command data
+				0x20, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
+		verifyCommand.write(verifyApdu.length & 0xff); // ulDataLength[0]
+		verifyCommand.write(0x00); // ulDataLength[1]
+		verifyCommand.write(0x00); // ulDataLength[2]
+		verifyCommand.write(0x00); // ulDataLength[3]
+		verifyCommand.write(verifyApdu); // abData
+		byte[] verifyCommandData = verifyCommand.toByteArray();
+		return verifyCommandData;
 	}
 
 	public static final byte FEATURE_VERIFY_PIN_DIRECT_TAG = 0x06;

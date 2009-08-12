@@ -34,6 +34,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -168,6 +169,45 @@ public class Dialogs {
 
 	public char[] getPin() {
 		return getPin(-1);
+	}
+
+	private JFrame pinPadFrame;
+
+	public void showPINPadFrame(int retriesLeft) {
+		if (null != this.pinPadFrame) {
+			disposePINPadFrame();
+		}
+		this.pinPadFrame = new JFrame("PIN");
+		JPanel panel = new JPanel() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Insets getInsets() {
+				return new Insets(10, 30, 10, 30);
+			}
+		};
+		BoxLayout boxLayout = new BoxLayout(panel, BoxLayout.PAGE_AXIS);
+		panel.setLayout(boxLayout);
+
+		if (-1 != retriesLeft) {
+			JLabel retriesLabel = new JLabel(this.messages
+					.getMessage(MESSAGE_ID.RETRIES_LEFT)
+					+ ": " + retriesLeft);
+			retriesLabel.setForeground(Color.RED);
+			panel.add(retriesLabel);
+		}
+		panel.add(new JLabel(this.messages.getMessage(MESSAGE_ID.PIN_PAD)));
+		this.pinPadFrame.getContentPane().add(panel);
+		this.pinPadFrame.pack();
+		this.pinPadFrame.setLocationRelativeTo(this.view.getParentComponent());
+		this.pinPadFrame.setVisible(true);
+	}
+
+	public void disposePINPadFrame() {
+		if (null != this.pinPadFrame) {
+			this.pinPadFrame.dispose();
+			this.pinPadFrame = null;
+		}
 	}
 
 	public char[] getPin(int retriesLeft) {

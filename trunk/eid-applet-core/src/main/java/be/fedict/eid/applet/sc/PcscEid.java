@@ -431,8 +431,49 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		return authnCertificateChain;
 	}
 
+	public static final byte FEATURE_VERIFY_PIN_DIRECT_TAG = 0x06;
+
+	private Integer getFeature(byte featureTag) {
+		byte[] features;
+		try {
+			features = card.transmitControlCommand(0x42000D48, new byte[0]);
+		} catch (CardException e) {
+			this.view.addDetailMessage("GET_FEATURES IOCTL error: "
+					+ e.getMessage());
+			return null;
+		}
+		if (0 == features.length) {
+			return null;
+		}
+		Integer feature = findFeature(featureTag, features);
+		return feature;
+	}
+
+	private Integer findFeature(byte featureTag, byte[] features) {
+		int idx = 0;
+		while (idx < features.length) {
+			byte tag = features[idx];
+			idx++;
+			idx++;
+			if (featureTag == tag) {
+				int feature = 0;
+				for (int count = 0; count < 3; count++) {
+					feature |= features[idx] & 0xff;
+					idx++;
+					feature <<= 8;
+				}
+				feature |= features[idx] & 0xff;
+				return feature;
+			}
+			idx += 4;
+		}
+		return null;
+	}
+
 	private byte[] sign(byte[] digestValue, String digestAlgo, byte keyId)
 			throws CardException, IOException {
+		Integer directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
+
 		// select the key
 		this.view.addDetailMessage("selecting key...");
 		CommandAPDU setApdu = new CommandAPDU(0x00, 0x22, 0x41, 0xB6,
@@ -496,28 +537,11 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 		int retriesLeft = -1;
 		do {
-			char[] pin = this.dialogs.getPin(retriesLeft);
-			if (4 != pin.length) {
-				throw new RuntimeException("PIN length should be 4 digits");
-			}
-			byte[] verifyData = new byte[] { (byte) (0x20 | pin.length),
-					(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
-					(byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
-			for (int idx = 0; idx < pin.length; idx += 2) {
-				char digit1 = pin[idx];
-				char digit2 = pin[idx + 1];
-				byte value = (byte) (byte) ((digit1 - '0' << 4) + (digit2 - '0'));
-				verifyData[idx / 2 + 1] = value;
-			}
-			Arrays.fill(pin, (char) 0); // minimize exposure
-
-			this.view.addDetailMessage("verifying PIN...");
-			CommandAPDU verifyApdu = new CommandAPDU(0x00, 0x20, 0x00, 0x01,
-					verifyData);
-			try {
-				responseApdu = transmit(verifyApdu);
-			} finally {
-				Arrays.fill(verifyData, (byte) 0); // minimize exposure
+			if (null == directPinVerifyFeature) {
+				responseApdu = verifyPin(retriesLeft);
+			} else {
+				responseApdu = verifyPinDirect(retriesLeft,
+						directPinVerifyFeature);
 			}
 			if (0x9000 != responseApdu.getSW()) {
 				this.view.addDetailMessage("VERIFY_PIN error");
@@ -544,6 +568,132 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 		byte[] signatureValue = responseApdu.getData();
 		return signatureValue;
+	}
+
+	private ResponseAPDU verifyPinDirect(int retriesLeft,
+			Integer directPinVerifyFeature) throws IOException, CardException {
+		this.view.addDetailMessage("direct PIN verification...");
+		byte[] verifyCommandData = createPINVerificationDataStructure();
+		this.dialogs.showPINPadFrame(retriesLeft);
+		byte[] result;
+		try {
+			result = card.transmitControlCommand(directPinVerifyFeature,
+					verifyCommandData);
+		} finally {
+			this.dialogs.disposePINPadFrame();
+		}
+		ResponseAPDU responseApdu = new ResponseAPDU(result);
+		if (0x6401 == responseApdu.getSW()) {
+			this.view.addDetailMessage("canceled by user");
+			throw new SecurityException("canceled by user");
+		} else if (0x6400 == responseApdu.getSW()) {
+			this.view.addDetailMessage("PIN pad timeout");
+		}
+		return responseApdu;
+	}
+
+	private byte[] createPINVerificationDataStructure() throws IOException {
+		ByteArrayOutputStream verifyCommand = new ByteArrayOutputStream();
+		verifyCommand.write(30); // bTimeOut
+		verifyCommand.write(30); // bTimeOut2
+		verifyCommand.write(0x89); // bmFormatString
+		/*
+		 * bmFormatString. bit 7: 1 = system units are bytes
+		 * 
+		 * bit 6-3: 1 = PIN position in APDU command after Lc, so just after the
+		 * 0x20.
+		 * 
+		 * bit 2: 0 = left justify data
+		 * 
+		 * bit 1-0: 1 = BCD
+		 */
+		verifyCommand.write(0x47); // bmPINBlockString
+		/*
+		 * bmPINBlockString
+		 * 
+		 * bit 7-4: 4 = PIN length
+		 * 
+		 * bit 3-0: 7 = PIN block size (7 times 0xff)
+		 */
+		verifyCommand.write(0x04); // bmPINLengthFormat
+		/*
+		 * bmPINLengthFormat. weird... the values do not make any sense to me.
+		 * 
+		 * bit 7-5: 0 = RFU
+		 * 
+		 * bit 4: 0 = system units are bits
+		 * 
+		 * bit 3-0: 4 = PIN length position in APDU
+		 */
+		verifyCommand.write(new byte[] { 0x04, 0x04 }); // wPINMaxExtraDigit
+		/*
+		 * 0x04 = minimum PIN size in digit
+		 * 
+		 * 0x04 = maximum PIN size in digit. This was 0x0C
+		 */
+		verifyCommand.write(0x02); // bEntryValidationCondition
+		/*
+		 * 0x02 = validation key pressed. So the user must press the green
+		 * button on his pinpad.
+		 */
+		verifyCommand.write(0x01); // bNumberMessage
+		/*
+		 * 0x01 = message with index in bMsgIndex
+		 */
+		verifyCommand.write(new byte[] { 0x13, 0x08 }); // wLangId
+		/*
+		 * 0x13, 0x08 = ?
+		 */
+		verifyCommand.write(0x00); // bMsgIndex
+		/*
+		 * 0x00 = PIN insertion prompt
+		 */
+		verifyCommand.write(new byte[] { 0x00, 0x00, 0x00 }); // bTeoPrologue
+		/*
+		 * bTeoPrologue : only significant for T=1 protocol.
+		 */
+		byte[] verifyApdu = new byte[] {
+				0x00, // CLA
+				0x20, // INS
+				0x00, // P1
+				0x01, // P2
+				0x08, // Lc = 8 bytes in command data
+				0x20, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
+		verifyCommand.write(verifyApdu.length & 0xff); // ulDataLength[0]
+		verifyCommand.write(0x00); // ulDataLength[1]
+		verifyCommand.write(0x00); // ulDataLength[2]
+		verifyCommand.write(0x00); // ulDataLength[3]
+		verifyCommand.write(verifyApdu); // abData
+		byte[] verifyCommandData = verifyCommand.toByteArray();
+		return verifyCommandData;
+	}
+
+	private ResponseAPDU verifyPin(int retriesLeft) throws CardException {
+		char[] pin = this.dialogs.getPin(retriesLeft);
+		if (4 != pin.length) {
+			throw new RuntimeException("PIN length should be 4 digits");
+		}
+		byte[] verifyData = new byte[] { (byte) (0x20 | pin.length),
+				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
+		for (int idx = 0; idx < pin.length; idx += 2) {
+			char digit1 = pin[idx];
+			char digit2 = pin[idx + 1];
+			byte value = (byte) (byte) ((digit1 - '0' << 4) + (digit2 - '0'));
+			verifyData[idx / 2 + 1] = value;
+		}
+		Arrays.fill(pin, (char) 0); // minimize exposure
+
+		this.view.addDetailMessage("verifying PIN...");
+		CommandAPDU verifyApdu = new CommandAPDU(0x00, 0x20, 0x00, 0x01,
+				verifyData);
+		try {
+			ResponseAPDU responseApdu = transmit(verifyApdu);
+			return responseApdu;
+		} finally {
+			Arrays.fill(verifyData, (byte) 0); // minimize exposure
+		}
 	}
 
 	public byte[] signAuthn(byte[] toBeSigned) throws NoSuchAlgorithmException,
