@@ -18,9 +18,11 @@
 
 package test.unit.be.fedict.eid.applet.service;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.GregorianCalendar;
 
@@ -32,6 +34,7 @@ import org.junit.Test;
 import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.Gender;
 import be.fedict.eid.applet.service.Identity;
+import be.fedict.eid.applet.service.impl.tlv.TlvField;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
 
 public class TlvParserTest {
@@ -144,5 +147,40 @@ public class TlvParserTest {
 		assertEquals("2000", address.zip);
 		LOG.debug("municipality: " + address.municipality);
 		assertEquals("Antwerpen", address.municipality);
+	}
+
+	public static class LargeField {
+		@TlvField(1)
+		public byte[] field1;
+
+		@TlvField(2)
+		public byte[] field2;
+	}
+
+	@Test
+	public void testLargeField() throws Exception {
+		// setup
+		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+		byteStream.write(1);
+		byteStream.write(255);
+		byteStream.write(250);
+		for (int i = 0; i < 255 + 250; i++) {
+			byteStream.write(0x12);
+		}
+		byteStream.write(2);
+		byteStream.write(4);
+		byteStream.write(0xca);
+		byteStream.write(0xfe);
+		byteStream.write(0xba);
+		byteStream.write(0xbe);
+		byte[] file = byteStream.toByteArray();
+
+		// operate
+		LargeField largeField = TlvParser.parse(file, LargeField.class);
+
+		// verify
+		assertEquals(255 + 250, largeField.field1.length);
+		assertArrayEquals(new byte[] { (byte) 0xca, (byte) 0xfe, (byte) 0xba,
+				(byte) 0xbe }, largeField.field2);
 	}
 }

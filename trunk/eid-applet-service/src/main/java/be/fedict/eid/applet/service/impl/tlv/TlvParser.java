@@ -84,16 +84,17 @@ public class TlvParser {
 		while (idx < file.length - 1) {
 			byte tag = file[idx];
 			idx++;
-			byte length = 0;
+			int length = 0;
 			byte lengthByte = file[idx];
-			while (lengthByte == 0xff) {
+			while ((lengthByte & 0xff) == 0xff) {
 				length += 0xff;
 				idx++;
 				lengthByte = file[idx];
 			}
-			length += lengthByte;
+			length += lengthByte & 0xff; // make it an unsigned int
 			idx++;
 			if (0 == tag) {
+				idx += length;
 				continue;
 			}
 			if (tlvFields.containsKey(new Integer(tag))) {
@@ -119,6 +120,10 @@ public class TlvParser {
 							"unsupported field type: " + tlvType.getName());
 				}
 				LOG.debug("setting field: " + tlvField.getName());
+				if (null != tlvField.get(tlvObject)) {
+					throw new RuntimeException("field was already set: "
+							+ tlvField.getName());
+				}
 				tlvField.setAccessible(true);
 				tlvField.set(tlvObject, fieldValue);
 			}
