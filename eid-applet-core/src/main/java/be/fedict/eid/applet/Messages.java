@@ -43,7 +43,7 @@ public class Messages {
 				"noMiddlewareError"), PIN_BLOCKED("pinBlocked"), PIN_CHANGED(
 				"pinChanged"), PIN_UNBLOCKED("pinUnblocked"), RETRIES_LEFT(
 				"retriesLeft"), PIN_INCORRECT("pinIncorrect"), CONNECT_READER(
-				"connectReader");
+				"connectReader"), PIN_PAD("pinPad");
 
 		private final String id;
 
