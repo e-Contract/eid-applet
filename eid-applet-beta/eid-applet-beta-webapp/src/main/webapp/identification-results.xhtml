@@ -42,6 +42,14 @@
 
 							<h:outputText value="Gender" />
 							<h:outputText value="#{eid.identity.gender}" />
+
+							<h:outputText value="Noble Condition"
+								rendered="#{!empty eid.identity.nobleCondition}" />
+							<h:outputText value="#{eid.identity.nobleCondition}"
+								rendered="#{!empty eid.identity.nobleCondition}" />
+
+							<h:outputText value="Special Status" />
+							<h:outputText value="#{eid.identity.specialStatus}" />
 						</h:panelGrid>
 					</h:panelGroup>
 					<p><a href="identity.pdf" target="_blank">View as PDF</a></p>
@@ -81,6 +89,14 @@
 
 					<h:outputText value="Card Delivery Municipality" />
 					<h:outputText value="#{eid.identity.cardDeliveryMunicipality}" />
+
+					<h:outputText value="Document Type" />
+					<h:outputText value="#{eid.identity.documentType}" />
+
+					<h:outputText value="Duplicate"
+						rendered="#{!empty eid.identity.duplicate}" />
+					<h:outputText value="#{eid.identity.duplicate}"
+						rendered="#{!empty eid.identity.duplicate}" />
 				</h:panelGrid>
 			</rich:tab>
 			<rich:tab label="Client Environment">

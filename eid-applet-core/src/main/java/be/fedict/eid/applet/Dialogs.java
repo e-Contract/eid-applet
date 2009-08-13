@@ -54,6 +54,10 @@ public class Dialogs {
 	 * TODO: should somehow also be declared in the View interface.
 	 */
 
+	public static final int PIN_SIZE = 4;
+
+	public static final int PUK_SIZE = 6;
+
 	private final View view;
 
 	private final Messages messages;
@@ -71,6 +75,7 @@ public class Dialogs {
 			JLabel retriesLabel = new JLabel(this.messages
 					.getMessage(MESSAGE_ID.RETRIES_LEFT)
 					+ ": " + retriesLeft);
+			retriesLabel.setForeground(Color.RED);
 			retriesPanel.add(retriesLabel);
 			retriesPanel.add(Box.createHorizontalGlue());
 			mainPanel.add(retriesPanel);
@@ -86,6 +91,8 @@ public class Dialogs {
 			puk1Panel.add(puk1Field);
 			mainPanel.add(puk1Panel);
 		}
+
+		mainPanel.add(Box.createVerticalStrut(5));
 
 		JPasswordField puk2Field = new JPasswordField(8);
 		{
@@ -104,8 +111,17 @@ public class Dialogs {
 		if (result != JOptionPane.OK_OPTION) {
 			throw new RuntimeException("operation canceled.");
 		}
-		System.arraycopy(puk1Field.getPassword(), 0, puk1, 0, 6);
-		System.arraycopy(puk2Field.getPassword(), 0, puk2, 0, 6);
+		try {
+			if (puk1Field.getPassword().length != PUK_SIZE
+					|| puk2Field.getPassword().length != PUK_SIZE) {
+				throw new RuntimeException("PUK size incorrect");
+			}
+			System.arraycopy(puk1Field.getPassword(), 0, puk1, 0, PUK_SIZE);
+			System.arraycopy(puk2Field.getPassword(), 0, puk2, 0, PUK_SIZE);
+		} finally {
+			Arrays.fill(puk1Field.getPassword(), (char) 0);
+			Arrays.fill(puk2Field.getPassword(), (char) 0);
+		}
 	}
 
 	public void getPins(int retriesLeft, char[] oldPin, char[] newPin) {
@@ -116,6 +132,7 @@ public class Dialogs {
 			JLabel retriesLabel = new JLabel(this.messages
 					.getMessage(MESSAGE_ID.RETRIES_LEFT)
 					+ ": " + retriesLeft);
+			retriesLabel.setForeground(Color.RED);
 			retriesPanel.add(retriesLabel);
 			retriesPanel.add(Box.createHorizontalGlue());
 			mainPanel.add(retriesPanel);
@@ -125,27 +142,37 @@ public class Dialogs {
 		JPasswordField oldPinField = new JPasswordField(8);
 		{
 			Box oldPinPanel = Box.createHorizontalBox();
-			JLabel oldPinLabel = new JLabel("Current eID PIN:");
+			JLabel oldPinLabel = new JLabel(this.messages
+					.getMessage(MESSAGE_ID.CURRENT_PIN)
+					+ ":");
 			oldPinPanel.add(oldPinLabel);
 			oldPinPanel.add(Box.createHorizontalStrut(5));
 			oldPinPanel.add(oldPinField);
 			mainPanel.add(oldPinPanel);
 		}
 
+		mainPanel.add(Box.createVerticalStrut(5));
+
 		JPasswordField newPinField = new JPasswordField(8);
 		{
 			Box newPinPanel = Box.createHorizontalBox();
-			JLabel newPinLabel = new JLabel("New eID PIN:");
+			JLabel newPinLabel = new JLabel(this.messages
+					.getMessage(MESSAGE_ID.NEW_PIN)
+					+ ":");
 			newPinPanel.add(newPinLabel);
 			newPinPanel.add(Box.createHorizontalStrut(5));
 			newPinPanel.add(newPinField);
 			mainPanel.add(newPinPanel);
 		}
 
+		mainPanel.add(Box.createVerticalStrut(5));
+
 		JPasswordField new2PinField = new JPasswordField(8);
 		{
 			Box new2PinPanel = Box.createHorizontalBox();
-			JLabel new2PinLabel = new JLabel("New eID PIN:");
+			JLabel new2PinLabel = new JLabel(this.messages
+					.getMessage(MESSAGE_ID.NEW_PIN)
+					+ ":");
 			new2PinPanel.add(new2PinLabel);
 			new2PinPanel.add(Box.createHorizontalStrut(5));
 			new2PinPanel.add(new2PinField);
@@ -163,8 +190,10 @@ public class Dialogs {
 				.getPassword())) {
 			throw new RuntimeException("new PINs not equal");
 		}
-		System.arraycopy(oldPinField.getPassword(), 0, oldPin, 0, 4);
-		System.arraycopy(newPinField.getPassword(), 0, newPin, 0, 4);
+		System.arraycopy(oldPinField.getPassword(), 0, oldPin, 0, PIN_SIZE);
+		Arrays.fill(oldPinField.getPassword(), (char) 0);
+		System.arraycopy(newPinField.getPassword(), 0, newPin, 0, PIN_SIZE);
+		Arrays.fill(newPinField.getPassword(), (char) 0);
 	}
 
 	public char[] getPin() {
@@ -255,10 +284,12 @@ public class Dialogs {
 				return new Insets(0, 0, 5, 5);
 			}
 		};
-		final JButton okButton = new JButton("OK");
+		final JButton okButton = new JButton(this.messages
+				.getMessage(MESSAGE_ID.OK));
 		okButton.setEnabled(false);
 		buttonPanel.add(okButton);
-		JButton cancelButton = new JButton("Cancel");
+		JButton cancelButton = new JButton(this.messages
+				.getMessage(MESSAGE_ID.CANCEL));
 		buttonPanel.add(cancelButton);
 
 		// dialog box
@@ -283,7 +314,7 @@ public class Dialogs {
 		});
 		passwordField.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				if (passwordField.getPassword().length == 4) {
+				if (passwordField.getPassword().length == PIN_SIZE) {
 					dialogResult.result = DialogResult.Result.OK;
 					dialog.dispose();
 				}
@@ -295,7 +326,7 @@ public class Dialogs {
 			}
 
 			public void keyReleased(KeyEvent e) {
-				if (passwordField.getPassword().length == 4) {
+				if (passwordField.getPassword().length == PIN_SIZE) {
 					okButton.setEnabled(true);
 				} else {
 					okButton.setEnabled(false);
