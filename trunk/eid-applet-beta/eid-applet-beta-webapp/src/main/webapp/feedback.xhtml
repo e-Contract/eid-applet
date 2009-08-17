@@ -2,7 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:n="http://gravel.jboss.org/jsf/1.0/navigation"
 	xmlns:t="http://myfaces.apache.org/tomahawk">
 <body>
 <ui:composition template="/WEB-INF/template.xhtml">
@@ -28,9 +27,7 @@
 			<h:inputTextarea id="message" rows="10" cols="60" required="true"
 				value="#{feedbackEntry.message}" />
 			<h:message for="message" style="color: red;" />
-			<p><h:commandButton value="Submit" action="#{feedback.save}">
-				<n:nav outcome="success" viewId="/feedback-ack.xhtml" />
-			</h:commandButton></p>
+			<p><h:commandButton value="Submit" action="#{feedback.save}" /></p>
 			<h:messages globalOnly="true" style="color: red;" />
 		</h:form>
 	</ui:define>

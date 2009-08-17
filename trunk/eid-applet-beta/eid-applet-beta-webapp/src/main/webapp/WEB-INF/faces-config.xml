@@ -3,9 +3,61 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_1_2.xsd"
 	version="1.2">
-	<!-- Facelets and Gravel configuration -->
+	<!-- Facelets -->
 	<application>
 		<view-handler>com.sun.facelets.FaceletViewHandler</view-handler>
-		<navigation-handler>org.jboss.gravel.navigation.GravelNavigationHandler</navigation-handler>
 	</application>
+
+	<!--
+		Next could be removed when using JBoss Gravel. But there seems to be a
+		major issue with JBoss Gravel when using JBoss Seam fileUpload
+		component in a multipart/form-data h:form.
+	-->
+
+	<navigation-rule>
+		<from-view-id>/upload-odf.xhtml</from-view-id>
+		<navigation-case>
+			<from-outcome>success</from-outcome>
+			<to-view-id>/view-odf.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+
+	<navigation-rule>
+		<from-view-id>/feedback.xhtml</from-view-id>
+		<navigation-case>
+			<from-outcome>success</from-outcome>
+			<to-view-id>/feedback-ack.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+
+	<navigation-rule>
+		<from-view-id>/admin/admin.xhtml</from-view-id>
+		<navigation-case>
+			<from-action>#{feedbackAdmin.view}</from-action>
+			<from-outcome>view</from-outcome>
+			<to-view-id>/admin/feedback-view.xhtml</to-view-id>
+		</navigation-case>
+		<navigation-case>
+			<from-action>#{adminAdmins.delete}</from-action>
+			<from-outcome>view</from-outcome>
+			<to-view-id>/admin/admin.xhtml</to-view-id>
+		</navigation-case>
+		<navigation-case>
+			<from-action>add</from-action>
+			<from-outcome>add</from-outcome>
+			<to-view-id>/admin/admin-add.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+
+	<navigation-rule>
+		<from-view-id>/admin/feedback-view.xhtml</from-view-id>
+		<navigation-case>
+			<from-outcome>back</from-outcome>
+			<to-view-id>/admin/admin.xhtml</to-view-id>
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>success</from-outcome>
+			<to-view-id>/admin/admin.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
 </faces-config>

@@ -226,6 +226,71 @@ public class PcscTest {
 		}
 	}
 
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testRetrievePIN() throws Exception {
+		final PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEid.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEid.waitForEidPresent();
+		}
+
+		byte[] puk12 = new byte[] { 0x22, 0x22, 0x22, 0x11, 0x11, 0x11 };
+
+		try {
+			CardChannel cardChannel = pcscEid.getCardChannel();
+			for (int pin = 9999; pin >= 0; pin--) {
+				LOG.debug("trying PIN: " + pin);
+				byte[] bcdPin = new byte[2];
+				int dec = pin;
+				bcdPin[1] = (byte) (dec % 10);
+				dec /= 10;
+				bcdPin[1] |= (byte) (dec % 10) << 4;
+				dec /= 10;
+				bcdPin[0] = (byte) (dec % 10);
+				dec /= 10;
+				bcdPin[0] |= (byte) (dec % 10) << 4;
+				ResponseAPDU responseApdu = verifyPin(bcdPin, cardChannel);
+				int sw = responseApdu.getSW();
+				if (0x9000 == sw) {
+					LOG.debug("PIN is: " + pin);
+					break;
+				}
+				if (0x6983 == sw) {
+					unblockPin(puk12, cardChannel);
+				}
+			}
+		} finally {
+			pcscEid.close();
+		}
+	}
+
+	private void unblockPin(byte[] puk12, CardChannel cardChannel)
+			throws CardException {
+		byte[] unblockPinData = new byte[] { 0x2C, puk12[0], puk12[1],
+				puk12[2], puk12[3], puk12[4], puk12[5], (byte) 0xFF };
+
+		CommandAPDU changePinApdu = new CommandAPDU(0x00, 0x2C, 0x00, 0x01,
+				unblockPinData);
+		ResponseAPDU responseApdu = cardChannel.transmit(changePinApdu);
+		if (0x9000 != responseApdu.getSW()) {
+			throw new RuntimeException("could not unblock PIN code");
+		}
+	}
+
+	private ResponseAPDU verifyPin(byte[] pin, CardChannel cardChannel)
+			throws CardException {
+		byte[] verifyData = new byte[] { 0x24, pin[0], pin[1], (byte) 0xFF,
+				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
+
+		CommandAPDU verifyApdu = new CommandAPDU(0x00, 0x20, 0x00, 0x01,
+				verifyData);
+		ResponseAPDU responseApdu = cardChannel.transmit(verifyApdu);
+		return responseApdu;
+	}
+
 	@Test
 	public void testCardManager() throws Exception {
 		final PcscEid pcscEid = new PcscEid(new TestView(), this.messages);

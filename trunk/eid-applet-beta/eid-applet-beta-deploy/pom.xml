@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict.eid-applet</groupId>
@@ -22,6 +24,10 @@
 							<groupId>be.fedict.eid-applet</groupId>
 							<artifactId>eid-applet-beta-service</artifactId>
 						</sarModule>
+						<ejbModule>
+							<groupId>org.jboss.seam</groupId>
+							<artifactId>jboss-seam</artifactId>
+						</ejbModule>
 						<jarModule>
 							<groupId>be.fedict.eid-applet</groupId>
 							<artifactId>eid-applet-service-spi</artifactId>
@@ -36,6 +42,18 @@
 							<artifactId>eid-applet-beta-webapp</artifactId>
 							<contextRoot>/eid-applet-beta</contextRoot>
 						</webModule>
+						<jarModule>
+							<groupId>org.jboss.el</groupId>
+							<artifactId>jboss-el</artifactId>
+							<includeInApplicationXml>true</includeInApplicationXml>
+							<bundleDir>lib</bundleDir>
+						</jarModule>
+						<jarModule>
+							<groupId>com.sun.facelets</groupId>
+							<artifactId>jsf-facelets</artifactId>
+							<includeInApplicationXml>true</includeInApplicationXml>
+							<bundleDir>lib</bundleDir>
+						</jarModule>
 					</modules>
 					<version>5</version>
 				</configuration>
@@ -87,11 +105,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.seam</groupId>
-			<artifactId>jboss-seam</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>javax.persistence</groupId>
 			<artifactId>persistence-api</artifactId>
 			<scope>provided</scope>
@@ -105,6 +118,16 @@
 			<groupId>javax.faces</groupId>
 			<artifactId>jsf-api</artifactId>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.seam</groupId>
+			<artifactId>jboss-seam</artifactId>
+			<type>ejb</type>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.facelets</groupId>
+			<artifactId>jsf-facelets</artifactId>
+			<version>1.1.15.B1</version>
 		</dependency>
 	</dependencies>
 </project>
