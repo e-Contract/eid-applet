@@ -11,18 +11,7 @@
 	<ui:param name="activeMenu" value="test" />
 	<ui:define name="body">
 		<h2>eID Applet Signature Test</h2>
-		<p>Via this page you can test the eID Applet Signature
-		functionality. This test will demo the creation and verification of
-		ODF signatures. ODF signatures are also supported by <a
-			href="http://www.openoffice.org/" target="_top">OpenOffice.org</a>
-		version 3.1.</p>
-		<h:form enctype="multipart/form-data">
-			<h:panelGrid columns="2">
-				<s:fileUpload data="#{odfUploader.uploadedFile}"
-					fileName="#{odfUploader.fileName}" size="40" />
-			</h:panelGrid>
-			<h:commandButton action="#{odfUploader.upload}" value="Upload" />
-		</h:form>
+		<p>This page gives an overview of the uploaded ODF file.</p>
 	</ui:define>
 </ui:composition>
 </body>

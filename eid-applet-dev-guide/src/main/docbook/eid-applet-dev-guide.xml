@@ -30,9 +30,24 @@
 	</articleinfo>
 	<section>
 		<title>Introduction</title>
-		<para>The FedICT eID Applet is a browser component that exposes the
-			functionality of an eID card to your web applications. The main
-			features of the eID Applet are:</para>
+		<para>
+			The FedICT eID Applet is a browser component that exposes the
+			functionality of an eID card to your web applications. In
+			<xref linkend="eid-applet-screenshot" />
+			you find a screen shot of the eID Applet.
+		</para>
+		<figure id="eid-applet-screenshot">
+			<title>eID Applet Screenshot</title>
+			<screenshot>
+				<mediaobject>
+					<imageobject>
+						<imagedata format="PNG" fileref="eid-applet-screenshot.png"
+							scale="60" />
+					</imageobject>
+				</mediaobject>
+			</screenshot>
+		</figure>
+		<para>The main features of the eID Applet are:</para>
 		<itemizedlist>
 			<listitem>
 				<para>Easy to integrate within an existing web application.
@@ -62,7 +77,7 @@
 			<para>
 				Best-effort support on the eID Applet is provided via the
 				<ulink url="http://groups.google.com/group/eid-applet">eID Applet Google Group</ulink>
-				.
+				mailing list. Feel free to join in.
 			</para>
 		</tip>
 		<note>
@@ -86,8 +101,8 @@
 				The Fedora operating system comes by default with the IcedTea JRE
 				which is based on the OpenJDK. If the Firefox browser uses this JRE
 				the eID Applet refuses to run. Please download the official Sun Java
-				6 JRE and also enable it in the Firefox browser. The Firefox plugins
-				can be configured via symbolic links under:
+				6 JRE and enable it in the Firefox browser. The Firefox plugins can
+				be configured via symbolic links under:
 				<prompt>/usr/lib/mozilla/plugins</prompt>
 				. Remove the IcedTea JRE link via:
 				<prompt>rm /usr/lib/mozilla/plugins/libjavaplugin.so</prompt>
@@ -103,13 +118,13 @@
 	</section>
 	<section>
 		<title>eID Applet</title>
-		<para>The eID Applet can be used within a web page as shown in the
+		<para>The eID Applet should be used within a web page as shown in the
 			following example:</para>
 		<programlisting role="XML"><![CDATA[<script src="https://www.java.com/js/deployJava.js"></script>
 <script>
 	var attributes = {
 		code :'be.fedict.eid.applet.Applet.class',
-		archive :'eid-applet.jar',
+		archive :'eid-applet-package.jar',
 		width :400,
 		height :300
 	};
@@ -121,6 +136,9 @@
 	var version = '1.6';
 	deployJava.runApplet(attributes, parameters, version);
 </script>]]></programlisting>
+		<para>Notice that we are using the Deployment Toolkit to load the eID
+			Applet. This avoids browser compatibility issues and features an
+			automatic installation of the required Java browser plugin.</para>
 		<para>The web application in which the eID Applet is embedded
 			should
 			use SSL for securing the communication between the web browser
@@ -166,8 +184,8 @@
 						</entry>
 						<entry>required</entry>
 						<entry>
-							Indicates the page to which the eID Applet navigates at the end
-							of the requested eID operation. For example:
+							Indicates the page to which the eID Applet navigates after
+							performing the requested eID operation. For example:
 							<code>result.jsp</code>
 						</entry>
 					</row>
@@ -212,7 +230,7 @@
 						<entry>optional</entry>
 						<entry>
 							The language that is used by the eID Applet user interface for
-							internationalization on the status messages. If it is not
+							internationalization of the status messages. If it is not
 							provided, the eID Applet defaults to the JRE runtime locale
 							settings. For example:
 							<code>nl</code>
@@ -223,7 +241,7 @@
 							<code>RemoveCardCallback</code>
 						</entry>
 						<entry>optional</entry>
-						<entry>When the eID Applet runs in kiosk mode a web developer
+						<entry>When the eID Applet runs in kiosk mode, a web developer
 							can
 							use this parameter to set a Javascript callback. The callback
 							function will be invoked on an eID card removal event.</entry>
@@ -233,7 +251,8 @@
 		</table>
 		<note>
 			<title>Javascript</title>
-			<para>The eID Applet cannot be accessed from Javascript for XSS
+			<para>The eID Applet cannot be accessed from Javascript for
+				cross-site scripting
 				security reasons.</para>
 		</note>
 	</section>
@@ -241,10 +260,10 @@
 		<title>eID Applet Service</title>
 		<para> The eID Applet requires a server-side service component to
 			communicate the identity or authentication data from the web browser
-			to the server using a secure channel. We will call this component the
+			to the server using a secure channel. We call this component the
 			eID Applet Service. The eID Applet SDK comes with eID Applet Service
-			servlet components to ease integration of the eID Applet within a
-			servlet container Java EE based web application. The eID Applet
+			servlet components to ease integration of the eID Applet within
+			servlet container Java EE based web applications. The eID Applet
 			Service components require at least a servlet version 2.4 container
 			and a JRE version 1.5.</para>
 		<note>

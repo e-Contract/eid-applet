@@ -2,7 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:n="http://gravel.jboss.org/jsf/1.0/navigation"
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:f="http://java.sun.com/jsf/core">
 <body>
@@ -53,12 +52,8 @@
 		</rich:panel>
 		<rich:spacer height="10" />
 		<h:form>
-			<h:commandButton value="Back" action="back">
-				<n:nav outcome="back" viewId="/admin/admin.xhtml" />
-			</h:commandButton>
-			<h:commandButton value="Delete" action="#{feedbackAdmin.delete}">
-				<n:nav outcome="success" viewId="/admin/admin.xhtml" />
-			</h:commandButton>
+			<h:commandButton value="Back" action="back" />
+			<h:commandButton value="Delete" action="#{feedbackAdmin.delete}" />
 		</h:form>
 	</ui:define>
 </ui:composition>

@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict</groupId>
@@ -12,6 +14,9 @@
 	<artifactId>eid-applet-jboss-as</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
+	<properties>
+		<jboss.version>5.0.1.GA</jboss.version>
+	</properties>
 	<build>
 		<plugins>
 			<plugin>
@@ -31,6 +36,7 @@
 									<artifactId>jboss-as-distribution</artifactId>
 									<type>zip</type>
 									<classifier>jdk6</classifier>
+									<outputDirectory>${project.build.directory}/dependency</outputDirectory>
 								</artifactItem>
 							</artifactItems>
 						</configuration>
@@ -48,7 +54,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<keystore>target/dependency/jboss-5.0.1.GA/server/default/conf/ssl.p12</keystore>
+					<keystore>target/dependency/jboss-${jboss.version}/server/default/conf/ssl.p12</keystore>
 					<dname><![CDATA[CN=localhost, OU=eID Test, L=Brussels, ST=Brussels, O=FedICT, C=BE]]></dname>
 					<keypass>secret</keypass>
 					<storepass>secret</storepass>
@@ -69,7 +75,7 @@
 							<goal>apply</goal>
 						</goals>
 						<configuration>
-							<targetDirectory>target/dependency/jboss-5.0.1.GA</targetDirectory>
+							<targetDirectory>target/dependency/jboss-${jboss.version}</targetDirectory>
 							<patches>
 								<patch>jboss-log4j.patch</patch>
 								<patch>jbossweb-ssl.patch</patch>
@@ -104,7 +110,7 @@
 			<artifactId>jboss-as-distribution</artifactId>
 			<type>zip</type>
 			<classifier>jdk6</classifier>
-			<version>5.0.1.GA</version>
+			<version>${jboss.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -115,36 +121,16 @@
 			<artifactId>commons-codec</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.seam</groupId>
-			<artifactId>jboss-seam</artifactId>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.seam</groupId>
-			<artifactId>jboss-seam-ui</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.facelets</groupId>
-			<artifactId>jsf-facelets</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.richfaces.framework</groupId>
-			<artifactId>richfaces-impl</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.richfaces.ui</groupId>
-			<artifactId>richfaces-ui</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.gravel</groupId>
-			<artifactId>gravel</artifactId>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>bouncycastle</groupId>
 			<artifactId>bcprov-jdk16</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.myfaces.tomahawk</groupId>
-			<artifactId>tomahawk12</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.lowagie</groupId>

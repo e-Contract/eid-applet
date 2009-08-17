@@ -3,7 +3,6 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:n="http://gravel.jboss.org/jsf/1.0/navigation"
 	xmlns:rich="http://richfaces.org/rich">
 <body>
 <ui:composition template="/WEB-INF/template.xhtml">
@@ -18,9 +17,7 @@
 						<h:outputText value="Subject" />
 					</f:facet>
 					<h:commandLink value="#{feedbackItem.subject}"
-						action="#{feedbackAdmin.view}">
-						<n:nav outcome="view" viewId="/admin/feedback-view.xhtml" />
-					</h:commandLink>
+						action="#{feedbackAdmin.view}" />
 				</rich:column>
 				<rich:column>
 					<f:facet name="header">
@@ -56,14 +53,10 @@
 					<f:facet name="header">
 						<h:outputText value="Actions" />
 					</f:facet>
-					<h:commandLink value="Delete" action="#{adminAdmins.delete}">
-						<n:nav outcome="view" viewId="/admin/admin.xhtml" />
-					</h:commandLink>
+					<h:commandLink value="Delete" action="#{adminAdmins.delete}" />
 				</rich:column>
 			</rich:dataTable>
-			<h:commandButton value="Add" action="add">
-				<n:nav outcome="add" viewId="/admin/admin-add.xhtml" />
-			</h:commandButton>
+			<h:commandButton value="Add" action="add" />
 			<h:messages globalOnly="true" style="color: red;" />
 		</h:form>
 	</ui:define>

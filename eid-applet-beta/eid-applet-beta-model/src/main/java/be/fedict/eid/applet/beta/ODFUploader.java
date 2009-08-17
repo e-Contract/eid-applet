@@ -18,21 +18,31 @@
 
 package be.fedict.eid.applet.beta;
 
-import java.io.File;
-import java.util.List;
-
 import javax.ejb.Local;
 import javax.ejb.Remove;
 
 @Local
 public interface ODFUploader {
 
-	List<File> getFiles();
+	/*
+	 * Accessors.
+	 */
+	String getFileName();
 
-	void setFiles(List<File> files);
+	void setFileName(String fileName);
 
-	int getSize();
+	byte[] getUploadedFile();
 
+	void setUploadedFile(byte[] uploadedFile);
+
+	/*
+	 * Actions.
+	 */
+	String upload();
+
+	/*
+	 * Lifecycle.
+	 */
 	@Remove
 	void destroy();
 }
