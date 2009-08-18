@@ -12,6 +12,30 @@
 	<ui:define name="body">
 		<h2>eID Applet Signature Test</h2>
 		<p>This page gives an overview of the uploaded ODF file.</p>
+		<h:panelGrid columns="2">
+			<h:outputText value="Filename:" />
+			<h:outputText value="#{odfFileName}" />
+
+			<h:outputText value="File size:" />
+			<h:outputText value="#{odfFileSize} bytes" />
+		</h:panelGrid>
+		<h:form>
+			<rich:dataTable var="signer" value="#{signers}" rows="10"
+				rendered="#{!signers.isEmpty()}">
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="Signer" />
+					</f:facet>
+					<h:outputText value="#{signer.subjectX500Principal}" />
+				</rich:column>
+				<f:facet name="footer">
+					<rich:datascroller />
+				</f:facet>
+			</rich:dataTable>
+			<h:messages globalOnly="true" style="color: red;" />
+			<h:commandButton value="Add Signature" action="add" />
+			<h:commandButton value="Back" action="back" />
+		</h:form>
 	</ui:define>
 </ui:composition>
 </body>

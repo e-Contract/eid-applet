@@ -76,6 +76,12 @@ public class KeyInfoKeySelector extends KeySelector implements
 		return this.certificate.getPublicKey();
 	}
 
+	/**
+	 * Gives back the X509 certificate used during the last signature
+	 * verification operation.
+	 * 
+	 * @return
+	 */
 	public X509Certificate getCertificate() {
 		return this.certificate;
 	}

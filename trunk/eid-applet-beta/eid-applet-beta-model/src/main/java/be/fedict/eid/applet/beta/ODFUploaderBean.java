@@ -18,13 +18,25 @@
 
 package be.fedict.eid.applet.beta;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+
+import javax.ejb.EJB;
 import javax.ejb.Remove;
 import javax.ejb.Stateful;
 
+import org.apache.commons.io.IOUtils;
 import org.jboss.ejb3.annotation.LocalBinding;
+import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Destroy;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.Out;
 import org.jboss.seam.log.Log;
 
 @Stateful
@@ -37,7 +49,20 @@ public class ODFUploaderBean implements ODFUploader {
 
 	private String fileName;
 
-	private byte[] uploadedFile;
+	private InputStream uploadedFile;
+
+	private int fileSize;
+
+	@EJB
+	private ODFTempFileManager odfTempFileManager;
+
+	@SuppressWarnings("unused")
+	@Out(scope = ScopeType.SESSION, required = false)
+	private int odfFileSize;
+
+	@SuppressWarnings("unused")
+	@Out(scope = ScopeType.SESSION, required = false)
+	private String odfFileName;
 
 	@Remove
 	@Destroy
@@ -49,7 +74,7 @@ public class ODFUploaderBean implements ODFUploader {
 		return this.fileName;
 	}
 
-	public byte[] getUploadedFile() {
+	public InputStream getUploadedFile() {
 		return this.uploadedFile;
 	}
 
@@ -57,13 +82,33 @@ public class ODFUploaderBean implements ODFUploader {
 		this.fileName = fileName;
 	}
 
-	public void setUploadedFile(byte[] uploadedFile) {
+	public void setUploadedFile(InputStream uploadedFile) {
 		this.uploadedFile = uploadedFile;
 	}
 
 	public String upload() {
 		this.log.debug("upload: " + this.fileName);
-		this.log.debug("file size: " + this.uploadedFile.length);
+		this.log.debug("file size: " + this.fileSize);
+		this.odfFileName = this.fileName;
+		this.odfFileSize = this.fileSize;
+		try {
+			URL tmpFileUrl = this.odfTempFileManager.createTempFile();
+			File tmpFile = new File(tmpFileUrl.toURI());
+			OutputStream outputStream = new FileOutputStream(tmpFile);
+			IOUtils.copy(this.uploadedFile, outputStream);
+		} catch (IOException e) {
+			throw new RuntimeException("IO error: " + e.getMessage(), e);
+		} catch (URISyntaxException e) {
+			throw new RuntimeException("URI error: " + e.getMessage(), e);
+		}
 		return "success";
+	}
+
+	public int getFileSize() {
+		return this.fileSize;
+	}
+
+	public void setFileSize(int fileSize) {
+		this.fileSize = fileSize;
 	}
 }

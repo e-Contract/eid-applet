@@ -6,6 +6,7 @@
 	<listener>
 		<listener-class>org.jboss.seam.servlet.SeamListener</listener-class>
 	</listener>
+
 	<servlet>
 		<servlet-name>Seam Resource Servlet</servlet-name>
 		<servlet-class>org.jboss.seam.servlet.SeamResourceServlet</servlet-class>
@@ -14,6 +15,7 @@
 		<servlet-name>Seam Resource Servlet</servlet-name>
 		<url-pattern>/seam/resource/*</url-pattern>
 	</servlet-mapping>
+
 	<filter>
 		<filter-name>Seam Filter</filter-name>
 		<filter-class>org.jboss.seam.servlet.SeamFilter</filter-class>
@@ -22,6 +24,7 @@
 		<filter-name>Seam Filter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+
 	<!-- JBoss Richfaces -->
 	<context-param>
 		<param-name>org.richfaces.SKIN</param-name>
@@ -31,6 +34,7 @@
 		<param-name>org.ajax4jsf.VIEW_HANDLERS</param-name>
 		<param-value>com.sun.facelets.FaceletViewHandler</param-value>
 	</context-param>
+
 	<!-- Facelets -->
 	<context-param>
 		<param-name>javax.faces.DEFAULT_SUFFIX</param-name>
@@ -40,6 +44,7 @@
 		<param-name>facelets.DEVELOPMENT</param-name>
 		<param-value>true</param-value>
 	</context-param>
+
 	<!-- JSF -->
 	<servlet>
 		<servlet-name>Faces Servlet</servlet-name>
@@ -50,6 +55,7 @@
 		<servlet-name>Faces Servlet</servlet-name>
 		<url-pattern>*.seam</url-pattern>
 	</servlet-mapping>
+
 	<!-- eID Applet -->
 	<servlet>
 		<servlet-name>AppletIdentificationServiceServlet</servlet-name>
@@ -79,6 +85,7 @@
 		<servlet-name>AppletIdentificationServiceServlet</servlet-name>
 		<url-pattern>/applet-identification-service</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletAuthenticationServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -99,6 +106,24 @@
 		<servlet-name>AppletAuthenticationServiceServlet</servlet-name>
 		<url-pattern>/applet-authentication-service</url-pattern>
 	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>AppletSignatureServiceServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+		<init-param>
+			<param-name>SignatureService</param-name>
+			<param-value>fedict/eid/applet/beta/SignatureServiceBean</param-value>
+		</init-param>
+		<init-param>
+			<param-name>AuditService</param-name>
+			<param-value>fedict/eid/applet/beta/AuditServiceBean</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AppletSignatureServiceServlet</servlet-name>
+		<url-pattern>/applet-sign-service</url-pattern>
+	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletKioskServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -111,6 +136,7 @@
 		<servlet-name>AppletKioskServiceServlet</servlet-name>
 		<url-pattern>/applet-kiosk-service</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>PhotoServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.PhotoServlet</servlet-class>
@@ -119,6 +145,7 @@
 		<servlet-name>PhotoServlet</servlet-name>
 		<url-pattern>/photo</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>PdfServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.PdfServlet</servlet-class>
@@ -127,6 +154,7 @@
 		<servlet-name>PdfServlet</servlet-name>
 		<url-pattern>/identity.pdf</url-pattern>
 	</servlet-mapping>
+
 	<!-- eID Applet Administrator -->
 	<servlet>
 		<servlet-name>AppletAdministratorServiceServlet</servlet-name>
@@ -144,6 +172,7 @@
 		<servlet-name>AppletAdministratorServiceServlet</servlet-name>
 		<url-pattern>/applet-administrator-service</url-pattern>
 	</servlet-mapping>
+
 	<!-- eID Applet Administrator Registration -->
 	<servlet>
 		<servlet-name>AppletAdministratorRegistrationServiceServlet</servlet-name>
@@ -161,6 +190,7 @@
 		<servlet-name>AppletAdministratorRegistrationServiceServlet</servlet-name>
 		<url-pattern>/admin/applet-admin-reg-service</url-pattern>
 	</servlet-mapping>
+
 	<!-- JAAS login configuration -->
 	<filter>
 		<filter-name>JAASLoginFilter</filter-name>
@@ -170,9 +200,13 @@
 		<filter-name>JAASLoginFilter</filter-name>
 		<servlet-name>AppletAdministratorRegistrationServiceServlet</servlet-name>
 	</filter-mapping>
+
 	<!-- Beta Feedback configuration -->
 	<listener>
 		<listener-class>be.fedict.eid.applet.beta.webapp.SessionContextListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>be.fedict.eid.applet.beta.webapp.ODFTempFileManagerListener</listener-class>
 	</listener>
 	<session-config>
 		<!-- Increase for production environments -->

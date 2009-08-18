@@ -51,7 +51,6 @@ public class AdminAdminsBean implements AdminAdmins {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	@SuppressWarnings("unused")
 	@DataModel(scope = ScopeType.PAGE)
 	private List<AdministratorEntity> adminList;
 

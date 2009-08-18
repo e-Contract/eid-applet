@@ -18,37 +18,19 @@
 
 package be.fedict.eid.applet.beta;
 
-import java.io.InputStream;
+import java.io.IOException;
+import java.net.URL;
 
 import javax.ejb.Local;
-import javax.ejb.Remove;
 
 @Local
-public interface ODFUploader {
+public interface ODFTempFileManager {
 
-	/*
-	 * Accessors.
-	 */
-	String getFileName();
+	static final String ODF_URL_SESSION_ATTRIBUTE = "odfUrl";
 
-	void setFileName(String fileName);
+	URL createTempFile() throws IOException;
 
-	InputStream getUploadedFile();
-
-	void setUploadedFile(InputStream uploadedFile);
-
-	int getFileSize();
-
-	void setFileSize(int fileSize);
-
-	/*
-	 * Actions.
-	 */
-	String upload();
-
-	/*
-	 * Lifecycle.
-	 */
-	@Remove
-	void destroy();
+	URL getTempFile();
+	
+	void cleanup();
 }
