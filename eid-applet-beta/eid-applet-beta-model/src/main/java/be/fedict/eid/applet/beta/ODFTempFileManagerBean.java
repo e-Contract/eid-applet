@@ -20,8 +20,11 @@ package be.fedict.eid.applet.beta;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.security.jacc.PolicyContext;
@@ -35,25 +38,66 @@ import org.apache.commons.logging.LogFactory;
 @Stateless
 public class ODFTempFileManagerBean implements ODFTempFileManager {
 
+	private static final String TMP_FILE_URLS_SESSION_ATTRIBUTE = ODFTempFileManagerBean.class
+			.getName()
+			+ ".tmpFileUrls";
+
 	private static final Log LOG = LogFactory
 			.getLog(ODFTempFileManagerBean.class);
+
+	private static class TmpSessionFile implements Serializable {
+
+		private static final long serialVersionUID = 1L;
+
+		private String sessionAttribute;
+
+		private URL tmpFileUrl;
+
+		public TmpSessionFile() {
+			super();
+		}
+
+		public TmpSessionFile(String sessionAttribute, URL tmpFileUrl) {
+			this.sessionAttribute = sessionAttribute;
+			this.tmpFileUrl = tmpFileUrl;
+		}
+	}
+
+	private List<TmpSessionFile> getTmpSessionFiles(HttpSession httpSession) {
+		List<TmpSessionFile> tmpFileUrls = (List<TmpSessionFile>) httpSession
+				.getAttribute(TMP_FILE_URLS_SESSION_ATTRIBUTE);
+		if (null == tmpFileUrls) {
+			tmpFileUrls = new LinkedList<TmpSessionFile>();
+			httpSession.setAttribute(TMP_FILE_URLS_SESSION_ATTRIBUTE,
+					tmpFileUrls);
+		}
+		return tmpFileUrls;
+	}
 
 	public void cleanup() {
 		LOG.debug("cleanup");
 		HttpSession httpSession = getHttpSession();
-		URL odfUrl = (URL) httpSession.getAttribute(ODF_URL_SESSION_ATTRIBUTE);
-		if (null == odfUrl) {
-			return;
+		List<TmpSessionFile> tmpSessionFiles = getTmpSessionFiles(httpSession);
+		for (TmpSessionFile tmpSessionFile : tmpSessionFiles) {
+			cleanup(tmpSessionFile, httpSession);
 		}
+	}
+
+	private void cleanup(TmpSessionFile tmpSessionFile, HttpSession httpSession) {
+		LOG.debug("removing session attribute: "
+				+ tmpSessionFile.sessionAttribute);
+		httpSession.removeAttribute(tmpSessionFile.sessionAttribute);
+
 		File odfFile;
 		try {
-			odfFile = new File(odfUrl.toURI());
+			odfFile = new File(tmpSessionFile.tmpFileUrl.toURI());
 		} catch (URISyntaxException e) {
 			throw new RuntimeException("URI error: " + e.getMessage(), e);
 		}
 		if (false == odfFile.exists()) {
 			LOG.warn("tmp ODF file does not exist: "
 					+ odfFile.getAbsolutePath());
+			return;
 		}
 		LOG.debug("deleting tmp file: " + odfFile.getAbsolutePath());
 		boolean result = odfFile.delete();
@@ -61,17 +105,55 @@ public class ODFTempFileManagerBean implements ODFTempFileManager {
 			LOG.warn("could not delete temp ODF file: "
 					+ odfFile.getAbsolutePath());
 		}
-		httpSession.removeAttribute(ODF_URL_SESSION_ATTRIBUTE);
 	}
 
-	public URL createTempFile() throws IOException {
-		LOG.debug("create temp file");
-		cleanup();
+	private void cleanup(String sessionAttribute) {
+		HttpSession httpSession = getHttpSession();
+		URL tmpFileUrl = (URL) httpSession.getAttribute(sessionAttribute);
+
+		LOG.debug("removing session attribute: " + sessionAttribute);
+		httpSession.removeAttribute(sessionAttribute);
+
+		if (null == tmpFileUrl) {
+			return;
+		}
+		File odfFile;
+		try {
+			odfFile = new File(tmpFileUrl.toURI());
+		} catch (URISyntaxException e) {
+			throw new RuntimeException("URI error: " + e.getMessage(), e);
+		}
+		if (false == odfFile.exists()) {
+			LOG.debug("tmp ODF file does not exist: "
+					+ odfFile.getAbsolutePath());
+			return;
+		}
+		LOG.debug("deleting tmp file: " + odfFile.getAbsolutePath());
+		boolean result = odfFile.delete();
+		if (false == result) {
+			LOG.debug("could not delete temp ODF file: "
+					+ odfFile.getAbsolutePath());
+		}
+	}
+
+	public URL createTempFile(String sessionAttribute) throws IOException {
+		LOG.debug("create temp file: " + sessionAttribute);
+		cleanup(sessionAttribute);
 		File tmpFile = File.createTempFile("eid-beta-", ".odf");
 		URL tmpFileUrl = tmpFile.toURI().toURL();
 		HttpSession httpSession = getHttpSession();
-		httpSession.setAttribute(ODF_URL_SESSION_ATTRIBUTE, tmpFileUrl);
+		httpSession.setAttribute(sessionAttribute, tmpFileUrl);
 		LOG.debug("tmp file: " + tmpFileUrl);
+
+		/*
+		 * Add to the list of tmp session files so we can have a cleanup when
+		 * the HTTP session is being destroyed.
+		 */
+		List<TmpSessionFile> tmpSessionFiles = getTmpSessionFiles(httpSession);
+		TmpSessionFile tmpSessionFile = new TmpSessionFile(sessionAttribute,
+				tmpFileUrl);
+		tmpSessionFiles.add(tmpSessionFile);
+
 		return tmpFileUrl;
 	}
 
@@ -88,13 +170,13 @@ public class ODFTempFileManagerBean implements ODFTempFileManager {
 		return httpSession;
 	}
 
-	public URL getTempFile() {
-		LOG.debug("get temp file");
+	public URL getTempFile(String sessionAttribute) {
+		LOG.debug("get temp file: " + sessionAttribute);
 		HttpSession httpSession = getHttpSession();
-		URL tmpFileUrl = (URL) httpSession
-				.getAttribute(ODF_URL_SESSION_ATTRIBUTE);
+		URL tmpFileUrl = (URL) httpSession.getAttribute(sessionAttribute);
 		if (null == tmpFileUrl) {
-			throw new RuntimeException("no temp file available");
+			throw new RuntimeException("no temp file available: "
+					+ sessionAttribute);
 		}
 		return tmpFileUrl;
 	}

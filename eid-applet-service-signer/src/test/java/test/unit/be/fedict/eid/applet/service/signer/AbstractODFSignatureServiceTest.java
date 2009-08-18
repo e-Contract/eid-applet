@@ -194,7 +194,7 @@ public class AbstractODFSignatureServiceTest {
 		assertNotNull(digestInfo);
 		LOG.debug("signature description: " + digestInfo.description);
 		LOG.debug("signature hash algo: " + digestInfo.digestAlgo);
-		assertEquals("ODF Signature", digestInfo.description);
+		assertEquals("ODF Document", digestInfo.description);
 		assertEquals("SHA-1", digestInfo.digestAlgo);
 		assertNotNull(digestInfo.digestValue);
 

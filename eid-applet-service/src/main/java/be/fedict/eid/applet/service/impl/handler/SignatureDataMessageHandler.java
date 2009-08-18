@@ -75,7 +75,8 @@ public class SignatureDataMessageHandler implements
 			throw new ServletException("certificate chain is empty");
 		}
 		X509Certificate signingCertificate = certificateChain.get(0);
-		LOG.debug("non-repudiation signing certificate: " + signingCertificate);
+		LOG.debug("non-repudiation signing certificate: "
+				+ signingCertificate.getSubjectX500Principal());
 		PublicKey signingPublicKey = signingCertificate.getPublicKey();
 
 		/*
