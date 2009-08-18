@@ -21,12 +21,13 @@ The source code is hosted at: http://code.google.com/p/eid-applet-php
 - PHP 5.2.9 does not serialize DateTime
 (that's a problem when going from one .PHP page to another...)
 - by default, session data is stored server side as (more or less) plain text files
-(msession should be used)
+(msession should be used, or session data encryption)
 - PHP 5.x does not support strong typing ("type hinting") for primitives types like int, string
 (so we need to add some ugly is_string() code to check parameters)
 - openssl_random_pseudo_bytes() requires PHP 5.3
 - DateTime::createFromFormat requires PHP 5.3
 
+http://www.hardened-php.net/suhosin/ patch is recommended
 
 === 3. Requirements
 
