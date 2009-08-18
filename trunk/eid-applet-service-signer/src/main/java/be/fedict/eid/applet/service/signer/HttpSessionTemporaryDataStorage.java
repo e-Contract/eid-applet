@@ -48,6 +48,7 @@ public class HttpSessionTemporaryDataStorage implements TemporaryDataStorage {
 			+ ".tempData";
 
 	public InputStream getTempInputStream() {
+		LOG.debug("get temp input stream");
 		HttpSession httpSession = getHttpSession();
 		ByteArrayOutputStream tempOutputStream = (ByteArrayOutputStream) httpSession
 				.getAttribute(TEMP_OUTPUT_STREAM_ATTRIBUTE);
@@ -62,14 +63,11 @@ public class HttpSessionTemporaryDataStorage implements TemporaryDataStorage {
 	}
 
 	public OutputStream getTempOutputStream() {
+		LOG.debug("get temp output stream");
 		HttpSession httpSession = getHttpSession();
-		ByteArrayOutputStream tempOutputStream = (ByteArrayOutputStream) httpSession
-				.getAttribute(TEMP_OUTPUT_STREAM_ATTRIBUTE);
-		if (null == tempOutputStream) {
-			tempOutputStream = new ByteArrayOutputStream();
-			httpSession.setAttribute(TEMP_OUTPUT_STREAM_ATTRIBUTE,
-					tempOutputStream);
-		}
+		ByteArrayOutputStream tempOutputStream = new ByteArrayOutputStream();
+		httpSession
+				.setAttribute(TEMP_OUTPUT_STREAM_ATTRIBUTE, tempOutputStream);
 		return tempOutputStream;
 	}
 
