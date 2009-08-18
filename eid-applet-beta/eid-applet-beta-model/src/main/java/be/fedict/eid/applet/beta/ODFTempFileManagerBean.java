@@ -74,9 +74,8 @@ public class ODFTempFileManagerBean implements ODFTempFileManager {
 		return tmpFileUrls;
 	}
 
-	public void cleanup() {
+	public void cleanup(HttpSession httpSession) {
 		LOG.debug("cleanup");
-		HttpSession httpSession = getHttpSession();
 		List<TmpSessionFile> tmpSessionFiles = getTmpSessionFiles(httpSession);
 		for (TmpSessionFile tmpSessionFile : tmpSessionFiles) {
 			cleanup(tmpSessionFile, httpSession);

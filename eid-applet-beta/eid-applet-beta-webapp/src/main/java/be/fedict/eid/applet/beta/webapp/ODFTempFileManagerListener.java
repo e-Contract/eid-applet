@@ -19,6 +19,7 @@
 package be.fedict.eid.applet.beta.webapp;
 
 import javax.ejb.EJB;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
@@ -48,6 +49,7 @@ public class ODFTempFileManagerListener implements HttpSessionListener {
 
 	public void sessionDestroyed(HttpSessionEvent event) {
 		LOG.debug("session destroyed");
-		this.odfTempFileManager.cleanup();
+		HttpSession httpSession = event.getSession();
+		this.odfTempFileManager.cleanup(httpSession);
 	}
 }
