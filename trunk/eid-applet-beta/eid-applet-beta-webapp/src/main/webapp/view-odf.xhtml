@@ -13,8 +13,9 @@
 		<h2>eID Applet Signature Test</h2>
 		<p>This page gives an overview of the uploaded ODF file.</p>
 		<h:panelGrid columns="2">
-			<h:outputText value="Filename:" />
-			<h:outputText value="#{odfFileName}" />
+			<h:outputText value="File (click to download):" />
+			<a
+				href="#{facesContext.externalContext.requestContextPath}/odf-download/#{odfFileName}">#{odfFileName}</a>
 
 			<h:outputText value="File size:" />
 			<h:outputText value="#{odfFileSize} bytes" />

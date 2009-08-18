@@ -18,14 +18,21 @@
 
 package be.fedict.eid.applet.beta;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.cert.X509Certificate;
+import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Stateless;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.ejb3.annotation.LocalBinding;
@@ -49,6 +56,8 @@ public class SignatureServiceBean extends AbstractODFSignatureService {
 	private static final Log LOG = LogFactory
 			.getLog(SignatureServiceBean.class);
 
+	private static final String TMP_SIGNED_ODF = "signedOdfUrl";
+
 	private final TemporaryDataStorage temporaryDataStorage;
 
 	@EJB
@@ -61,15 +70,54 @@ public class SignatureServiceBean extends AbstractODFSignatureService {
 
 	@Override
 	protected URL getOpenDocumentURL() {
-		return this.odfTempFileManager.getTempFile();
+		return this.odfTempFileManager
+				.getTempFile(ODFTempFileManager.ODF_URL_SESSION_ATTRIBUTE);
 	}
 
 	@Override
 	protected OutputStream getSignedOpenDocumentOutputStream() {
 		LOG.debug("get signed ODF output stream");
-		// TODO implement me
-		LOG.debug("TODO: implement me");
-		return new ByteArrayOutputStream();
+		try {
+			URL tmpSignedOdfUrl = this.odfTempFileManager
+					.createTempFile(TMP_SIGNED_ODF);
+			File tmpSignedOdfFile = new File(tmpSignedOdfUrl.toURI());
+			FileOutputStream outputStream = new FileOutputStream(
+					tmpSignedOdfFile);
+			return outputStream;
+		} catch (IOException e) {
+			throw new RuntimeException("IO error: " + e.getMessage(), e);
+		} catch (URISyntaxException e) {
+			throw new RuntimeException("URI error: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public void postSign(byte[] signatureValue,
+			List<X509Certificate> signingCertificateChain) {
+		super.postSign(signatureValue, signingCertificateChain);
+		LOG.debug("after super post sign");
+		URL tmpSignedOdfUrl = this.odfTempFileManager
+				.getTempFile(TMP_SIGNED_ODF);
+		LOG.debug("tmp signed ODF url: " + tmpSignedOdfUrl);
+		URL odfUrl = this.odfTempFileManager
+				.getTempFile(ODFTempFileManager.ODF_URL_SESSION_ATTRIBUTE);
+		File odfFile;
+		try {
+			odfFile = new File(odfUrl.toURI());
+		} catch (URISyntaxException e) {
+			throw new RuntimeException("URI error");
+		}
+		OutputStream outputStream;
+		try {
+			outputStream = new FileOutputStream(odfFile);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException("FileNotFoundException error");
+		}
+		try {
+			IOUtils.copy(tmpSignedOdfUrl.openStream(), outputStream);
+		} catch (IOException e) {
+			throw new RuntimeException("IOException error");
+		}
 	}
 
 	@Override

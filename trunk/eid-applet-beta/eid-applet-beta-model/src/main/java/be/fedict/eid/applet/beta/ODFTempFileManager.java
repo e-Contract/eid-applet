@@ -28,9 +28,9 @@ public interface ODFTempFileManager {
 
 	static final String ODF_URL_SESSION_ATTRIBUTE = "odfUrl";
 
-	URL createTempFile() throws IOException;
+	URL createTempFile(String sessionAttribute) throws IOException;
 
-	URL getTempFile();
-	
+	URL getTempFile(String sessionAttribute);
+
 	void cleanup();
 }

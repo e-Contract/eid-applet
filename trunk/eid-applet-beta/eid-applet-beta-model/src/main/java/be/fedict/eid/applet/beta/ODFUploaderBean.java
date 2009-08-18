@@ -92,7 +92,8 @@ public class ODFUploaderBean implements ODFUploader {
 		this.odfFileName = this.fileName;
 		this.odfFileSize = this.fileSize;
 		try {
-			URL tmpFileUrl = this.odfTempFileManager.createTempFile();
+			URL tmpFileUrl = this.odfTempFileManager
+					.createTempFile(ODFTempFileManager.ODF_URL_SESSION_ATTRIBUTE);
 			File tmpFile = new File(tmpFileUrl.toURI());
 			OutputStream outputStream = new FileOutputStream(tmpFile);
 			IOUtils.copy(this.uploadedFile, outputStream);

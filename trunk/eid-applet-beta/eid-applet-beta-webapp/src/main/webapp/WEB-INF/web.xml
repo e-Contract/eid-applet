@@ -155,6 +155,15 @@
 		<url-pattern>/identity.pdf</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>ODFDownloadServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.beta.webapp.ODFDownloadServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ODFDownloadServlet</servlet-name>
+		<url-pattern>/odf-download/*</url-pattern>
+	</servlet-mapping>
+
 	<!-- eID Applet Administrator -->
 	<servlet>
 		<servlet-name>AppletAdministratorServiceServlet</servlet-name>

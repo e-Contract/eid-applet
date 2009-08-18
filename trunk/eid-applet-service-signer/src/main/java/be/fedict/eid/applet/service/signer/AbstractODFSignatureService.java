@@ -111,7 +111,7 @@ abstract public class AbstractODFSignatureService extends
 
 	@Override
 	protected String getSignatureDescription() {
-		return "ODF Signature";
+		return "ODF Document";
 	}
 
 	@Override
