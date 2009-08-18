@@ -33,6 +33,11 @@
 							<artifactId>eid-applet-service-spi</artifactId>
 							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
+						<jarModule>
+							<groupId>be.fedict.eid-applet</groupId>
+							<artifactId>eid-applet-service-signer</artifactId>
+							<includeInApplicationXml>true</includeInApplicationXml>
+						</jarModule>
 						<ejbModule>
 							<groupId>be.fedict.eid-applet</groupId>
 							<artifactId>eid-applet-beta-model</artifactId>
@@ -64,6 +69,11 @@
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service-spi</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>be.fedict.eid-applet</groupId>
+			<artifactId>eid-applet-service-signer</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>

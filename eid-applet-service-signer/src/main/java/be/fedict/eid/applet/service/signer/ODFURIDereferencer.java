@@ -18,6 +18,7 @@
 
 package be.fedict.eid.applet.service.signer;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -48,10 +49,28 @@ public class ODFURIDereferencer implements URIDereferencer {
 
 	private final URL odfUrl;
 
+	private final byte[] odfData;
+
 	private final URIDereferencer baseUriDereferener;
 
 	public ODFURIDereferencer(URL odfUrl) {
+		this(odfUrl, null);
+	}
+
+	public ODFURIDereferencer(byte[] odfData) {
+		this(null, odfData);
+	}
+
+	private ODFURIDereferencer(URL odfUrl, byte[] odfData) {
+		if (null == odfUrl && null == odfData) {
+			throw new IllegalArgumentException("odfUrl and odfData are null");
+		}
+		if (null != odfUrl && null != odfData) {
+			throw new IllegalArgumentException(
+					"odfUrl and odfData are both not null");
+		}
 		this.odfUrl = odfUrl;
+		this.odfData = odfData;
 		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
 				.getInstance();
 		this.baseUriDereferener = xmlSignatureFactory.getURIDereferencer();
@@ -72,7 +91,8 @@ public class ODFURIDereferencer implements URIDereferencer {
 			InputStream dataInputStream = findDataInputStream(uri);
 			if (null == dataInputStream) {
 				LOG
-						.debug("cannot resolve, delegating to base DOM URI dereferener");
+						.debug("cannot resolve, delegating to base DOM URI dereferener: "
+								+ uri);
 				return this.baseUriDereferener.dereference(uriReference,
 						context);
 			}
@@ -83,7 +103,12 @@ public class ODFURIDereferencer implements URIDereferencer {
 	}
 
 	private InputStream findDataInputStream(String uri) throws IOException {
-		InputStream odfInputStream = this.odfUrl.openStream();
+		InputStream odfInputStream;
+		if (null != this.odfUrl) {
+			odfInputStream = this.odfUrl.openStream();
+		} else {
+			odfInputStream = new ByteArrayInputStream(this.odfData);
+		}
 		ZipInputStream odfZipInputStream = new ZipInputStream(odfInputStream);
 		ZipEntry zipEntry;
 		while (null != (zipEntry = odfZipInputStream.getNextEntry())) {

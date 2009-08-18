@@ -23,6 +23,18 @@
 	</navigation-rule>
 
 	<navigation-rule>
+		<from-view-id>/view-odf.xhtml</from-view-id>
+		<navigation-case>
+			<from-outcome>add</from-outcome>
+			<to-view-id>/sign-odf.xhtml</to-view-id>
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>back</from-outcome>
+			<to-view-id>/tests.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+
+	<navigation-rule>
 		<from-view-id>/feedback.xhtml</from-view-id>
 		<navigation-case>
 			<from-outcome>success</from-outcome>
@@ -43,7 +55,6 @@
 			<to-view-id>/admin/admin.xhtml</to-view-id>
 		</navigation-case>
 		<navigation-case>
-			<from-action>add</from-action>
 			<from-outcome>add</from-outcome>
 			<to-view-id>/admin/admin-add.xhtml</to-view-id>
 		</navigation-case>
