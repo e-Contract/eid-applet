@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import javax.ejb.Local;
+import javax.servlet.http.HttpSession;
 
 @Local
 public interface ODFTempFileManager {
@@ -32,5 +33,5 @@ public interface ODFTempFileManager {
 
 	URL getTempFile(String sessionAttribute);
 
-	void cleanup();
+	void cleanup(HttpSession httpSession);
 }
