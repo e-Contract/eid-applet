@@ -56,11 +56,6 @@ public class HttpSessionTemporaryDataStorageTest {
 		HttpSession mockHttpSession = EasyMock.createMock(HttpSession.class);
 		EasyMock.expect(mockHttpServletRequest.getSession()).andStubReturn(
 				mockHttpSession);
-		EasyMock
-				.expect(
-						mockHttpSession
-								.getAttribute(HttpSessionTemporaryDataStorage.TEMP_OUTPUT_STREAM_ATTRIBUTE))
-				.andReturn(null);
 		final Capture<OutputStream> tempOutputStreamCapture = new Capture<OutputStream>();
 		mockHttpSession
 				.setAttribute(
