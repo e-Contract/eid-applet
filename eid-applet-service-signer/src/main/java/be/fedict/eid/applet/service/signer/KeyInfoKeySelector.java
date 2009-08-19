@@ -54,6 +54,7 @@ public class KeyInfoKeySelector extends KeySelector implements
 			throws KeySelectorException {
 		LOG.debug("select key");
 		List<XMLStructure> keyInfoContent = keyInfo.getContent();
+		this.certificate = null;
 		for (XMLStructure keyInfoStructure : keyInfoContent) {
 			if (false == (keyInfoStructure instanceof X509Data)) {
 				continue;
@@ -64,8 +65,17 @@ public class KeyInfoKeySelector extends KeySelector implements
 				if (false == (x509DataObject instanceof X509Certificate)) {
 					continue;
 				}
-				this.certificate = (X509Certificate) x509DataObject;
-				// stop after first match
+				X509Certificate certificate = (X509Certificate) x509DataObject;
+				LOG.debug("certificate: "
+						+ certificate.getSubjectX500Principal());
+				if (null == this.certificate) {
+					/*
+					 * The first certificate is presumably the signer.
+					 */
+					this.certificate = certificate;
+				}
+			}
+			if (null != this.certificate) {
 				return this;
 			}
 		}

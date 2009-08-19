@@ -21,6 +21,7 @@ package be.fedict.eid.applet.service.signer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -82,6 +83,7 @@ public class ODFResourceResolverSpi extends ResourceResolverSpi {
 	}
 
 	private InputStream findDataInputStream(String uri) throws IOException {
+		uri = URLDecoder.decode(uri, "UTF-8");
 		InputStream odfInputStream = this.odfUrl.openStream();
 		ZipInputStream odfZipInputStream = new ZipInputStream(odfInputStream);
 		ZipEntry zipEntry;

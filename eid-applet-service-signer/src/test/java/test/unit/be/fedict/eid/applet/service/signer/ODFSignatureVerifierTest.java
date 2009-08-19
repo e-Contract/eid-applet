@@ -23,10 +23,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
@@ -133,5 +135,48 @@ public class ODFSignatureVerifierTest {
 		for (X509Certificate signer : result) {
 			LOG.debug("signer: " + signer.getSubjectX500Principal());
 		}
+	}
+
+	@Test
+	public void testNonODFFile() throws Exception {
+		// setup
+		File tmpFile = File.createTempFile("foo-bar-", ".txt");
+		tmpFile.deleteOnExit();
+		FileUtils.writeStringToFile(tmpFile, "hello world");
+		URL tmpFileUrl = tmpFile.toURI().toURL();
+
+		// operate
+		boolean result = ODFSignatureVerifier.hasOdfSignature(tmpFileUrl);
+
+		// verify
+		assertFalse(result);
+	}
+
+	@Test
+	public void testIsNotODF() throws Exception {
+		// setup
+		File tmpFile = File.createTempFile("foo-bar-", ".txt");
+		tmpFile.deleteOnExit();
+		FileUtils.writeStringToFile(tmpFile, "hello world");
+		URL tmpFileUrl = tmpFile.toURI().toURL();
+
+		// operate
+		boolean result = ODFSignatureVerifier.isODF(tmpFileUrl);
+
+		// verify
+		assertFalse(result);
+	}
+
+	@Test
+	public void testIsODF() throws Exception {
+		// setup
+		URL odfUrl = ODFSignatureVerifierTest.class
+				.getResource("/hello-world.odt");
+
+		// operate
+		boolean result = ODFSignatureVerifier.isODF(odfUrl);
+
+		// verify
+		assertTrue(result);
 	}
 }

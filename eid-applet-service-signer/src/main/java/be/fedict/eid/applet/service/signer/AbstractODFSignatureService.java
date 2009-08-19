@@ -20,6 +20,7 @@ package be.fedict.eid.applet.service.signer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.security.Key;
@@ -82,17 +83,43 @@ abstract public class AbstractODFSignatureService extends
 	@Override
 	protected List<ReferenceInfo> getReferences() {
 		List<ReferenceInfo> referenceInfos = new LinkedList<ReferenceInfo>();
-		referenceInfos.add(new ReferenceInfo("content.xml",
-				CanonicalizationMethod.INCLUSIVE));
-		referenceInfos.add(new ReferenceInfo("styles.xml",
-				CanonicalizationMethod.INCLUSIVE));
-		referenceInfos.add(new ReferenceInfo("meta.xml",
-				CanonicalizationMethod.INCLUSIVE));
-		referenceInfos.add(new ReferenceInfo("settings.xml",
-				CanonicalizationMethod.INCLUSIVE));
-		referenceInfos.add(new ReferenceInfo(
-				"Configurations2/accelerator/current.xml", null));
-		referenceInfos.add(new ReferenceInfo("Thumbnails/thumbnail.png"));
+		URL odfUrl = this.getOpenDocumentURL();
+		try {
+			InputStream odfInputStream = odfUrl.openStream();
+			ZipInputStream odfZipInputStream = new ZipInputStream(
+					odfInputStream);
+			ZipEntry zipEntry;
+			while (null != (zipEntry = odfZipInputStream.getNextEntry())) {
+				if (true == zipEntry.isDirectory()) {
+					continue;
+				}
+				if ("mimetype".equals(zipEntry.getName())) {
+					continue;
+				}
+				if ("META-INF/manifest.xml".equals(zipEntry.getName())) {
+					continue;
+				}
+				if ("META-INF/documentsignatures.xml"
+						.equals(zipEntry.getName())) {
+					continue;
+				}
+				String uri = zipEntry.getName().replaceAll(" ", "%20");
+				LOG.debug("uri: " + uri);
+				if (zipEntry.getName().endsWith(".xml")
+						&& zipEntry.getSize() > 0) {
+					/*
+					 * On non-empty XML files we apply a transformation.
+					 */
+					referenceInfos.add(new ReferenceInfo(uri,
+							CanonicalizationMethod.INCLUSIVE));
+				} else {
+					referenceInfos.add(new ReferenceInfo(uri, null));
+				}
+				LOG.debug("entry: " + zipEntry.getName());
+			}
+		} catch (IOException e) {
+			LOG.warn("IO error: " + e.getMessage(), e);
+		}
 		return referenceInfos;
 	}
 

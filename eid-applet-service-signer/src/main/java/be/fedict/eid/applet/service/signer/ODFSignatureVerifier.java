@@ -36,6 +36,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -60,6 +61,20 @@ public class ODFSignatureVerifier {
 		super();
 	}
 
+	/**
+	 * Checks whether the ODF document available via the given URL has been
+	 * signed.
+	 * 
+	 * @param odfUrl
+	 * @return
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws org.apache.xml.security.signature.XMLSignatureException
+	 * @throws XMLSecurityException
+	 * @throws MarshalException
+	 * @throws XMLSignatureException
+	 */
 	public static boolean hasOdfSignature(URL odfUrl) throws IOException,
 			ParserConfigurationException, SAXException,
 			org.apache.xml.security.signature.XMLSignatureException,
@@ -68,6 +83,18 @@ public class ODFSignatureVerifier {
 		return false == signers.isEmpty();
 	}
 
+	/**
+	 * Gives back a list of signers for the document available via the given
+	 * URL.
+	 * 
+	 * @param odfUrl
+	 * @return
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws MarshalException
+	 * @throws XMLSignatureException
+	 */
 	public static List<X509Certificate> getSigners(URL odfUrl)
 			throws IOException, ParserConfigurationException, SAXException,
 			MarshalException, XMLSignatureException {
@@ -144,5 +171,29 @@ public class ODFSignatureVerifier {
 				.newDocumentBuilder();
 		Document document = documentBuilder.parse(inputSource);
 		return document;
+	}
+
+	/**
+	 * Checks whether the document available on the given URL is an ODF document
+	 * or not.
+	 * 
+	 * @param url
+	 * @return
+	 * @throws IOException
+	 */
+	public static boolean isODF(URL url) throws IOException {
+		ZipInputStream zipInputStream = new ZipInputStream(url.openStream());
+		ZipEntry zipEntry;
+		while (null != (zipEntry = zipInputStream.getNextEntry())) {
+			if (false == "mimetype".equals(zipEntry.getName())) {
+				continue;
+			}
+			String mimetypeContent = IOUtils.toString(zipInputStream);
+			if (mimetypeContent
+					.startsWith("application/vnd.oasis.opendocument")) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

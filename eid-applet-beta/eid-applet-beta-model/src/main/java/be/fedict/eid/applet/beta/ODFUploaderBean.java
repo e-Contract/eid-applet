@@ -29,15 +29,20 @@ import java.net.URL;
 import javax.ejb.EJB;
 import javax.ejb.Remove;
 import javax.ejb.Stateful;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 
 import org.apache.commons.io.IOUtils;
 import org.jboss.ejb3.annotation.LocalBinding;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Destroy;
+import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Out;
 import org.jboss.seam.log.Log;
+
+import be.fedict.eid.applet.service.signer.ODFSignatureVerifier;
 
 @Stateful
 @Name("odfUploader")
@@ -63,6 +68,9 @@ public class ODFUploaderBean implements ODFUploader {
 	@SuppressWarnings("unused")
 	@Out(scope = ScopeType.SESSION, required = false)
 	private String odfFileName;
+
+	@In
+	private FacesContext facesContext;
 
 	@Remove
 	@Destroy
@@ -97,6 +105,11 @@ public class ODFUploaderBean implements ODFUploader {
 			File tmpFile = new File(tmpFileUrl.toURI());
 			OutputStream outputStream = new FileOutputStream(tmpFile);
 			IOUtils.copy(this.uploadedFile, outputStream);
+			if (false == ODFSignatureVerifier.isODF(tmpFileUrl)) {
+				this.facesContext.addMessage(null, new FacesMessage(
+						"not an ODF document"));
+				return null;
+			}
 		} catch (IOException e) {
 			throw new RuntimeException("IO error: " + e.getMessage(), e);
 		} catch (URISyntaxException e) {
