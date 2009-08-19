@@ -173,6 +173,11 @@ public class AbstractODFSignatureServiceTest {
 		sign("/hello-world.odt", 1);
 	}
 
+	@Test
+	public void testSignZipEntriesWithSpaces() throws Exception {
+		sign("/hello-world-spaces.odt", 1);
+	}
+
 	// @Test
 	public void testCoSign() throws Exception {
 		sign("/hello-world-signed.odt", 2);

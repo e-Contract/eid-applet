@@ -21,7 +21,9 @@ package be.fedict.eid.applet.service.signer;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -86,6 +88,11 @@ public class ODFURIDereferencer implements URIDereferencer {
 		}
 
 		String uri = uriReference.getURI();
+		try {
+			uri = URLDecoder.decode(uri, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			LOG.warn("could not URL decode the uri: " + uri);
+		}
 		LOG.debug("dereference: " + uri);
 		try {
 			InputStream dataInputStream = findDataInputStream(uri);
