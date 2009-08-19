@@ -37,7 +37,6 @@ import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.dom.DOMCryptoContext;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.XMLSignContext;
-import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
@@ -53,7 +52,7 @@ import org.apache.xml.security.utils.Constants;
 import org.jcp.xml.dsig.internal.dom.DOMKeyInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Signature Service implementation for OpenDocument format signatures. The
@@ -173,6 +172,9 @@ abstract public class AbstractODFSignatureService extends
 				.getOpenDocumentURL().openStream());
 		ZipEntry zipEntry;
 		while (null != (zipEntry = zipInputStream.getNextEntry())) {
+			if ("META-INF/documentsignatures.xml".equals(zipEntry.getName())) {
+				continue;
+			}
 			zipOutputStream.putNextEntry(zipEntry);
 			IOUtils.copy(zipInputStream, zipOutputStream);
 		}
@@ -201,7 +203,7 @@ abstract public class AbstractODFSignatureService extends
 	}
 
 	@Override
-	protected void postSign(Document signedDocument,
+	protected void postSign(Element signatureElement,
 			List<X509Certificate> signingCertificateChain) {
 		LOG.debug("postSign");
 		/*
@@ -220,12 +222,6 @@ abstract public class AbstractODFSignatureService extends
 		KeyInfo keyInfo = keyInfoFactory.newKeyInfo(Collections
 				.singletonList(x509Data));
 		DOMKeyInfo domKeyInfo = (DOMKeyInfo) keyInfo;
-		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(
-				XMLSignature.XMLNS, "Signature");
-		if (1 != signatureNodeList.getLength()) {
-			throw new RuntimeException("cannot handle multiple signatures yet");
-		}
-		Element signatureElement = (Element) signatureNodeList.item(0);
 		Key key = new Key() {
 			private static final long serialVersionUID = 1L;
 
@@ -241,7 +237,8 @@ abstract public class AbstractODFSignatureService extends
 				return null;
 			}
 		};
-		XMLSignContext xmlSignContext = new DOMSignContext(key, signedDocument);
+		XMLSignContext xmlSignContext = new DOMSignContext(key,
+				signatureElement);
 		DOMCryptoContext domCryptoContext = (DOMCryptoContext) xmlSignContext;
 		String dsPrefix = null;
 		// String dsPrefix = "ds";
@@ -254,13 +251,17 @@ abstract public class AbstractODFSignatureService extends
 
 	@Override
 	protected final Document getEnvelopingDocument()
-			throws ParserConfigurationException {
+			throws ParserConfigurationException, IOException, SAXException {
+		Document document = getODFSignatureDocument();
+		if (null != document) {
+			return document;
+		}
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
 				.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
 		DocumentBuilder documentBuilder = documentBuilderFactory
 				.newDocumentBuilder();
-		Document document = documentBuilder.newDocument();
+		document = documentBuilder.newDocument();
 		Element rootElement = document.createElementNS(
 				"urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0",
 				"dsig:document-signatures");
@@ -269,5 +270,22 @@ abstract public class AbstractODFSignatureService extends
 				"urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0");
 		document.appendChild(rootElement);
 		return document;
+	}
+
+	private Document getODFSignatureDocument() throws IOException,
+			ParserConfigurationException, SAXException {
+		URL odfUrl = this.getOpenDocumentURL();
+		ZipInputStream odfZipInputStream = new ZipInputStream(odfUrl
+				.openStream());
+		ZipEntry zipEntry;
+		while (null != (zipEntry = odfZipInputStream.getNextEntry())) {
+			if (false == "META-INF/documentsignatures.xml".equals(zipEntry
+					.getName())) {
+				continue;
+			}
+			Document document = loadDocument(odfZipInputStream);
+			return document;
+		}
+		return null;
 	}
 }

@@ -22,6 +22,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.security.jacc.PolicyContext;
 import javax.security.jacc.PolicyContextException;
@@ -46,6 +49,10 @@ public class HttpSessionTemporaryDataStorage implements TemporaryDataStorage {
 	public static final String TEMP_OUTPUT_STREAM_ATTRIBUTE = HttpSessionTemporaryDataStorage.class
 			.getName()
 			+ ".tempData";
+
+	public static final String TEMP_ATTRIBUTES_ATTRIBUTE = HttpSessionTemporaryDataStorage.class
+			.getName()
+			+ "/tempAttribs";
 
 	public InputStream getTempInputStream() {
 		LOG.debug("get temp input stream");
@@ -87,5 +94,27 @@ public class HttpSessionTemporaryDataStorage implements TemporaryDataStorage {
 
 		HttpSession httpSession = httpServletRequest.getSession();
 		return httpSession;
+	}
+
+	private Map<String, Serializable> getAttributes() {
+		HttpSession httpSession = getHttpSession();
+		Map<String, Serializable> attributes = (Map<String, Serializable>) httpSession
+				.getAttribute(TEMP_ATTRIBUTES_ATTRIBUTE);
+		if (null != attributes) {
+			return attributes;
+		}
+		attributes = new HashMap<String, Serializable>();
+		httpSession.setAttribute(TEMP_ATTRIBUTES_ATTRIBUTE, attributes);
+		return attributes;
+	}
+
+	public Serializable getAttribute(String attributeName) {
+		Map<String, Serializable> attributes = getAttributes();
+		return attributes.get(attributeName);
+	}
+
+	public void setAttribute(String attributeName, Serializable attributeValue) {
+		Map<String, Serializable> attributes = getAttributes();
+		attributes.put(attributeName, attributeValue);
 	}
 }

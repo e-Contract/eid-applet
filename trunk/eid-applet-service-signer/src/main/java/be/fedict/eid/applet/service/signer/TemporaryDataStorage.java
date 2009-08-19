@@ -20,6 +20,7 @@ package be.fedict.eid.applet.service.signer;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 
 /**
  * Interface for temporary data storage.
@@ -43,4 +44,20 @@ public interface TemporaryDataStorage {
 	 * @return
 	 */
 	InputStream getTempInputStream();
+
+	/**
+	 * Stores an attribute to the temporary data storage.
+	 * 
+	 * @param attributeName
+	 * @param attributeValue
+	 */
+	void setAttribute(String attributeName, Serializable attributeValue);
+
+	/**
+	 * Retrieves an attribute from the temporary data storage.
+	 * 
+	 * @param attributeName
+	 * @return
+	 */
+	Serializable getAttribute(String attributeName);
 }
