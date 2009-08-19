@@ -67,6 +67,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.utils.Base64;
+import org.apache.xml.security.utils.Constants;
+import org.apache.xpath.XPathAPI;
 import org.jcp.xml.dsig.internal.dom.DOMReference;
 import org.jcp.xml.dsig.internal.dom.DOMSignedInfo;
 import org.jcp.xml.dsig.internal.dom.DOMXMLSignature;
@@ -90,6 +92,8 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
 	private static final Log LOG = LogFactory
 			.getLog(AbstractXmlSignatureService.class);
+
+	private static final String SIGNATURE_ID_ATTRIBUTE = "signature-id";
 
 	/**
 	 * Gives back the signature digest algorithm. Allowed values are SHA-1,
@@ -118,9 +122,11 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 	 * override this method to provide a custom enveloping document.
 	 * 
 	 * @return
+	 * @throws SAXException
+	 * @throws IOException
 	 */
 	protected Document getEnvelopingDocument()
-			throws ParserConfigurationException {
+			throws ParserConfigurationException, IOException, SAXException {
 		return null;
 	}
 
@@ -225,10 +231,10 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 	 * Can be overridden by XML signature service implementation to further
 	 * process the signed XML document.
 	 * 
-	 * @param signedDocument
+	 * @param sinatureElement
 	 * @param signingCertificateChain
 	 */
-	protected void postSign(Document signedDocument,
+	protected void postSign(Element sinatureElement,
 			List<X509Certificate> signingCertificateChain) {
 		// empty
 	}
@@ -237,10 +243,20 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			List<X509Certificate> signingCertificateChain) {
 		LOG.debug("postSign");
 
+		/*
+		 * Retrieve the intermediate XML signature document from the temporary
+		 * data storage.
+		 */
 		TemporaryDataStorage temporaryDataStorage = getTemporaryDataStorage();
 		InputStream documentInputStream = temporaryDataStorage
 				.getTempInputStream();
+		String signatureId = (String) temporaryDataStorage
+				.getAttribute(SIGNATURE_ID_ATTRIBUTE);
+		LOG.debug("signature Id: " + signatureId);
 
+		/*
+		 * Load the signature DOM document.
+		 */
 		Document document;
 		try {
 			document = loadDocument(documentInputStream);
@@ -248,14 +264,39 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			throw new RuntimeException("DOM error: " + e.getMessage(), e);
 		}
 
-		// insert signature value
-		NodeList signatureValueNodeList = document.getElementsByTagNameNS(
-				javax.xml.crypto.dsig.XMLSignature.XMLNS, "SignatureValue");
+		/*
+		 * Locate the correct ds:Signature node.
+		 */
+		Element nsElement = document.createElement("ns");
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds",
+				Constants.SignatureSpecNS);
+		Element signatureElement;
+		try {
+			signatureElement = (Element) XPathAPI.selectSingleNode(document,
+					"//ds:Signature[@Id='" + signatureId + "']", nsElement);
+		} catch (TransformerException e) {
+			throw new RuntimeException("XPATH error: " + e.getMessage(), e);
+		}
+		if (null == signatureElement) {
+			throw new RuntimeException("ds:Signature not found for @Id: "
+					+ signatureId);
+		}
+
+		/*
+		 * Insert signature value into the ds:SignatureValue element
+		 */
+		NodeList signatureValueNodeList = signatureElement
+				.getElementsByTagNameNS(
+						javax.xml.crypto.dsig.XMLSignature.XMLNS,
+						"SignatureValue");
 		Element signatureValueElement = (Element) signatureValueNodeList
 				.item(0);
 		signatureValueElement.setTextContent(Base64.encode(signatureValue));
 
-		postSign(document, signingCertificateChain);
+		/*
+		 * Allow implementation classes to inject their own stuff.
+		 */
+		postSign(signatureElement, signingCertificateChain);
 
 		OutputStream signedDocumentOutputStream = getSignedDocumentOutputStream();
 		if (null == signedDocumentOutputStream) {
@@ -278,7 +319,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			NoSuchAlgorithmException, InvalidAlgorithmParameterException,
 			MarshalException, javax.xml.crypto.dsig.XMLSignatureException,
 			TransformerFactoryConfigurationError, TransformerException,
-			IOException {
+			IOException, SAXException {
 		/*
 		 * DOM Document construction.
 		 */
@@ -378,10 +419,14 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			domReference.digest(xmlSignContext);
 		}
 
+		/*
+		 * Store the intermediate XML signature document.
+		 */
 		TemporaryDataStorage temporaryDataStorage = getTemporaryDataStorage();
 		OutputStream tempDocumentOutputStream = temporaryDataStorage
 				.getTempOutputStream();
 		writeDocument(document, tempDocumentOutputStream);
+		temporaryDataStorage.setAttribute(SIGNATURE_ID_ATTRIBUTE, signatureId);
 
 		/*
 		 * Calculation of XML signature digest value.
@@ -510,7 +555,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		documentOutputStream.close();
 	}
 
-	private Document loadDocument(InputStream documentInputStream)
+	protected Document loadDocument(InputStream documentInputStream)
 			throws ParserConfigurationException, SAXException, IOException {
 		InputSource inputSource = new InputSource(documentInputStream);
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory

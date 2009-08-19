@@ -22,6 +22,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import be.fedict.eid.applet.service.signer.TemporaryDataStorage;
 
@@ -29,8 +32,11 @@ class TemporaryTestDataStorage implements TemporaryDataStorage {
 
 	private ByteArrayOutputStream outputStream;
 
+	private Map<String, Serializable> attributes;
+
 	public TemporaryTestDataStorage() {
 		this.outputStream = new ByteArrayOutputStream();
+		this.attributes = new HashMap<String, Serializable>();
 	}
 
 	public InputStream getTempInputStream() {
@@ -41,5 +47,13 @@ class TemporaryTestDataStorage implements TemporaryDataStorage {
 
 	public OutputStream getTempOutputStream() {
 		return this.outputStream;
+	}
+
+	public Serializable getAttribute(String attributeName) {
+		return this.attributes.get(attributeName);
+	}
+
+	public void setAttribute(String attributeName, Serializable attributeValue) {
+		this.attributes.put(attributeName, attributeValue);
 	}
 }
