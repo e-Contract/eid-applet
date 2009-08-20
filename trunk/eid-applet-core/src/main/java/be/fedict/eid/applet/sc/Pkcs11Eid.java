@@ -44,9 +44,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import be.fedict.eid.applet.Messages;
-import be.fedict.eid.applet.View;
-
 import sun.security.pkcs11.SunPKCS11;
 import sun.security.pkcs11.wrapper.CK_ATTRIBUTE;
 import sun.security.pkcs11.wrapper.CK_C_INITIALIZE_ARGS;
@@ -57,6 +54,8 @@ import sun.security.pkcs11.wrapper.CK_TOKEN_INFO;
 import sun.security.pkcs11.wrapper.PKCS11;
 import sun.security.pkcs11.wrapper.PKCS11Constants;
 import sun.security.pkcs11.wrapper.PKCS11Exception;
+import be.fedict.eid.applet.Messages;
+import be.fedict.eid.applet.View;
 
 /**
  * Class holding all PKCS#11 eID card access logic.
@@ -488,10 +487,22 @@ public class Pkcs11Eid {
 			attributes[1].type = PKCS11Constants.CKA_LABEL;
 			attributes[1].pValue = "Signature";
 			this.pkcs11.C_FindObjectsInit(session, attributes);
-			long[] keyHandles = this.pkcs11.C_FindObjects(session, 1);
-			long keyHandle = keyHandles[0];
-			this.view.addDetailMessage("key handle: " + keyHandle);
-			this.pkcs11.C_FindObjectsFinal(session);
+			long keyHandle;
+			try {
+				long[] keyHandles = this.pkcs11.C_FindObjects(session, 1);
+				if (0 == keyHandles.length) {
+					/*
+					 * In case of OpenSC PKCS#11.
+					 */
+					this.view
+							.addDetailMessage("no PKCS#11 key handle for label \"Signature\"");
+					throw new RuntimeException("cannot sign via PKCS#11");
+				}
+				keyHandle = keyHandles[0];
+				this.view.addDetailMessage("key handle: " + keyHandle);
+			} finally {
+				this.pkcs11.C_FindObjectsFinal(session);
+			}
 
 			CK_MECHANISM mechanism = new CK_MECHANISM();
 			mechanism.mechanism = PKCS11Constants.CKM_RSA_PKCS;
