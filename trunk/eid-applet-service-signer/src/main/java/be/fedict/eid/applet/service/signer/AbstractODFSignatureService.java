@@ -72,11 +72,8 @@ abstract public class AbstractODFSignatureService extends
 	private static final Log LOG = LogFactory
 			.getLog(AbstractODFSignatureService.class);
 
-	private final ODFSignedDocumentOutputStream signedDocumentOutputStream;
-
 	public AbstractODFSignatureService() {
 		super();
-		this.signedDocumentOutputStream = new ODFSignedDocumentOutputStream();
 	}
 
 	@Override
@@ -142,7 +139,13 @@ abstract public class AbstractODFSignatureService extends
 
 	@Override
 	protected final OutputStream getSignedDocumentOutputStream() {
-		return this.signedDocumentOutputStream;
+		LOG.debug("get signed document output stream");
+		/*
+		 * Create each time a new object; we want an empty output stream to
+		 * start with.
+		 */
+		OutputStream signedDocumentOutputStream = new ODFSignedDocumentOutputStream();
+		return signedDocumentOutputStream;
 	}
 
 	private class ODFSignedDocumentOutputStream extends ByteArrayOutputStream {
