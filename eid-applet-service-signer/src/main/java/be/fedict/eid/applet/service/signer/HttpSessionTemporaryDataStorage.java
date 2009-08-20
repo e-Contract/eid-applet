@@ -70,7 +70,7 @@ public class HttpSessionTemporaryDataStorage implements TemporaryDataStorage {
 	}
 
 	public OutputStream getTempOutputStream() {
-		LOG.debug("get temp output stream");
+		LOG.debug("get new temp output stream");
 		HttpSession httpSession = getHttpSession();
 		ByteArrayOutputStream tempOutputStream = new ByteArrayOutputStream();
 		httpSession

@@ -436,6 +436,11 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		domSignedInfo.canonicalize(xmlSignContext, dataStream);
 		byte[] octets = dataStream.toByteArray();
 
+		/*
+		 * TODO: we could be using DigestOutputStream here to optimize memory
+		 * usage.
+		 */
+
 		MessageDigest jcaMessageDigest = MessageDigest.getInstance(digestAlgo);
 		byte[] digestValue = jcaMessageDigest.digest(octets);
 		return digestValue;
