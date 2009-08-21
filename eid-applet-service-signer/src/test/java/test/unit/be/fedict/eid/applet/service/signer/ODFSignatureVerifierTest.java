@@ -33,7 +33,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
-import be.fedict.eid.applet.service.signer.ODFSignatureVerifier;
+import be.fedict.eid.applet.service.signer.odf.ODFSignatureVerifier;
 
 /**
  * Unit tests for ODF signature verifier.

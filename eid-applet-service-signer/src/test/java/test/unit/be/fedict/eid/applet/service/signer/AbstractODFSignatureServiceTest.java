@@ -63,11 +63,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import be.fedict.eid.applet.service.signer.AbstractODFSignatureService;
 import be.fedict.eid.applet.service.signer.KeyInfoKeySelector;
-import be.fedict.eid.applet.service.signer.ODFResourceResolverSpi;
-import be.fedict.eid.applet.service.signer.ODFURIDereferencer;
 import be.fedict.eid.applet.service.signer.TemporaryDataStorage;
+import be.fedict.eid.applet.service.signer.odf.AbstractODFSignatureService;
+import be.fedict.eid.applet.service.signer.odf.ODFResourceResolverSpi;
+import be.fedict.eid.applet.service.signer.odf.ODFURIDereferencer;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 
 public class AbstractODFSignatureServiceTest {

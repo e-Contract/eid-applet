@@ -16,7 +16,7 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.service.signer;
+package be.fedict.eid.applet.service.signer.odf;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +45,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import be.fedict.eid.applet.service.signer.KeyInfoKeySelector;
 
 /**
  * ODF Signature Verifier.

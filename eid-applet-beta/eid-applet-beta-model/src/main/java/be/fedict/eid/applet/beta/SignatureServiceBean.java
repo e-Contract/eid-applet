@@ -37,9 +37,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.ejb3.annotation.LocalBinding;
 
-import be.fedict.eid.applet.service.signer.AbstractODFSignatureService;
 import be.fedict.eid.applet.service.signer.HttpSessionTemporaryDataStorage;
 import be.fedict.eid.applet.service.signer.TemporaryDataStorage;
+import be.fedict.eid.applet.service.signer.odf.AbstractODFSignatureService;
 import be.fedict.eid.applet.service.spi.SignatureService;
 
 /**

@@ -16,7 +16,7 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.service.signer;
+package be.fedict.eid.applet.service.signer.odf;
 
 import java.io.IOException;
 import java.io.InputStream;

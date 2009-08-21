@@ -42,7 +42,7 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Out;
 import org.jboss.seam.log.Log;
 
-import be.fedict.eid.applet.service.signer.ODFSignatureVerifier;
+import be.fedict.eid.applet.service.signer.odf.ODFSignatureVerifier;
 
 @Stateful
 @Name("odfUploader")
