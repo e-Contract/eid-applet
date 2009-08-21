@@ -55,7 +55,6 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
-import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService.ReferenceInfo;
 
 /**
  * Signature Service implementation for OpenDocument format signatures. The
