@@ -12,6 +12,12 @@
 	<category name="test.unit">
 		<priority value="DEBUG" />
 	</category>
+	<category name="org.apache.xml.security">
+		<priority value="DEBUG" />
+	</category>
+	<category name="org.jcp.xml.dsig.internal">
+		<priority value="DEBUG" />
+	</category>
 	<root>
 		<appender-ref ref="CONSOLE" />
 	</root>
