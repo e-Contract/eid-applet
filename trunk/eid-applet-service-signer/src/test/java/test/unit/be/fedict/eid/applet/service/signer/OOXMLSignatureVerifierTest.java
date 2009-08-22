@@ -58,6 +58,7 @@ import org.xml.sax.SAXException;
 import be.fedict.eid.applet.service.signer.KeyInfoKeySelector;
 import be.fedict.eid.applet.service.signer.ooxml.OOXMLProvider;
 import be.fedict.eid.applet.service.signer.ooxml.OOXMLSignatureVerifier;
+import be.fedict.eid.applet.service.signer.ooxml.OOXMLURIDereferencer;
 
 public class OOXMLSignatureVerifierTest {
 
@@ -155,6 +156,12 @@ public class OOXMLSignatureVerifierTest {
 			KeyInfoKeySelector keySelector = new KeyInfoKeySelector();
 			DOMValidateContext domValidateContext = new DOMValidateContext(
 					keySelector, signatureNode);
+			domValidateContext.setProperty(
+					"org.jcp.xml.dsig.validateManifests", Boolean.TRUE);
+
+			OOXMLURIDereferencer dereferencer = new OOXMLURIDereferencer(url);
+			domValidateContext.setURIDereferencer(dereferencer);
+
 			XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
 					.getInstance();
 			XMLSignature xmlSignature = xmlSignatureFactory
