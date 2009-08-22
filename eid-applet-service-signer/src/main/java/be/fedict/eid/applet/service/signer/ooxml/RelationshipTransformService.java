@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2009 Frank Cornelis.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -18,6 +19,8 @@
 
 package be.fedict.eid.applet.service.signer.ooxml;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,9 +33,6 @@ import java.util.List;
 import javax.xml.crypto.Data;
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.OctetStreamData;
-import javax.xml.crypto.URIDereferencer;
-import javax.xml.crypto.URIReference;
-import javax.xml.crypto.URIReferenceException;
 import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
@@ -62,6 +62,16 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+/**
+ * JSR105 implementation of the RelationshipTransform transformation.
+ * 
+ * <p>
+ * Specs: http://openiso.org/Ecma/376/Part2/12.2.4#26
+ * </p>
+ * 
+ * @author fcorneli
+ * 
+ */
 public class RelationshipTransformService extends TransformService {
 
 	public static final String TRANSFORM_URI = "http://schemas.openxmlformats.org/package/2006/RelationshipTransform";
@@ -118,22 +128,6 @@ public class RelationshipTransformService extends TransformService {
 		}
 	}
 
-	static String toString(Node dom) throws TransformerException {
-		Source source = new DOMSource(dom);
-		StringWriter stringWriter = new StringWriter();
-		Result result = new StreamResult(stringWriter);
-		TransformerFactory transformerFactory = TransformerFactory
-				.newInstance();
-		Transformer transformer = transformerFactory.newTransformer();
-		/*
-		 * We have to omit the ?xml declaration if we want to embed the
-		 * document.
-		 */
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-		transformer.transform(source, result);
-		return stringWriter.getBuffer().toString();
-	}
-
 	@Override
 	public void marshalParams(XMLStructure parent, XMLCryptoContext context)
 			throws MarshalException {
@@ -167,52 +161,62 @@ public class RelationshipTransformService extends TransformService {
 		Element nsElement = relationshipsDocument.createElement("ns");
 		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
 				"http://schemas.openxmlformats.org/package/2006/relationships");
-		URIDereferencer uriDereferencer = context.getURIDereferencer();
-		for (String sourceId : this.sourceIds) {
-			LOG.debug("source Id: " + sourceId);
-			Node targetNode;
-			try {
-				targetNode = XPathAPI.selectSingleNode(relationshipsDocument,
-						"tns:Relationships/tns:Relationship[@Id='" + sourceId
-								+ "']/@Target", nsElement);
-			} catch (TransformerException e) {
-				LOG.error(e.getMessage(), e);
-				throw new TransformException(e.getMessage(), e);
+		Element relationshipsElement = relationshipsDocument
+				.getDocumentElement();
+		NodeList childNodes = relationshipsElement.getChildNodes();
+		for (int nodeIdx = 0; nodeIdx < childNodes.getLength(); nodeIdx++) {
+			Node childNode = childNodes.item(nodeIdx);
+			if (Node.ELEMENT_NODE != childNode.getNodeType()) {
+				LOG.debug("removing node");
+				relationshipsElement.removeChild(childNode);
+				nodeIdx--;
+				continue;
 			}
-			String target = targetNode.getTextContent();
-			LOG.debug("target: " + target);
-			Data referedData;
-			try {
-				referedData = uriDereferencer.dereference(
-						new SimpleURIReference(target), context);
-			} catch (URIReferenceException e) {
-				throw new TransformException(e.getMessage(), e);
+			Element childElement = (Element) childNode;
+			String idAttribute = childElement.getAttribute("Id");
+			LOG.debug("Relationship id attribute: " + idAttribute);
+			if (false == this.sourceIds.contains(idAttribute)) {
+				LOG.debug("removing element: " + idAttribute);
+				relationshipsElement.removeChild(childNode);
+				nodeIdx--;
 			}
-			LOG.debug("data java type: " + referedData.getClass().getName());
-			OctetStreamData referedOctetStreamData = (OctetStreamData) referedData;
-			InputStream referedInputStream = referedOctetStreamData
-					.getOctetStream();
-			// TODO: concat different sources
-			return new OctetStreamData(referedInputStream);
 		}
-		return null;
+		try {
+			return toOctetStreamData(relationshipsDocument);
+		} catch (TransformerException e) {
+			throw new TransformException(e.getMessage(), e);
+		}
 	}
 
-	private static class SimpleURIReference implements URIReference {
+	private String toString(Node dom) throws TransformerException {
+		Source source = new DOMSource(dom);
+		StringWriter stringWriter = new StringWriter();
+		Result result = new StreamResult(stringWriter);
+		TransformerFactory transformerFactory = TransformerFactory
+				.newInstance();
+		Transformer transformer = transformerFactory.newTransformer();
+		/*
+		 * We have to omit the ?xml declaration if we want to embed the
+		 * document.
+		 */
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+		transformer.transform(source, result);
+		return stringWriter.getBuffer().toString();
+	}
 
-		private final String uri;
-
-		public SimpleURIReference(String uri) {
-			this.uri = uri;
-		}
-
-		public String getType() {
-			return null;
-		}
-
-		public String getURI() {
-			return this.uri;
-		}
+	private OctetStreamData toOctetStreamData(Node node)
+			throws TransformerException {
+		Source source = new DOMSource(node);
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		Result result = new StreamResult(outputStream);
+		TransformerFactory transformerFactory = TransformerFactory
+				.newInstance();
+		Transformer transformer = transformerFactory.newTransformer();
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+		transformer.transform(source, result);
+		LOG.debug("result: " + new String(outputStream.toByteArray()));
+		return new OctetStreamData(new ByteArrayInputStream(outputStream
+				.toByteArray()));
 	}
 
 	private Document loadDocument(InputStream documentInputStream)

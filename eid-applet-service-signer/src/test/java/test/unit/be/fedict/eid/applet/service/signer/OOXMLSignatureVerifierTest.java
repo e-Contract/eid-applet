@@ -28,6 +28,7 @@ import java.net.URL;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -133,6 +134,10 @@ public class OOXMLSignatureVerifierTest {
 
 	@Test
 	public void testVerifySignature() throws Exception {
+
+		java.util.logging.Logger logger = java.util.logging.Logger
+				.getLogger("org.jcp.xml.dsig.internal.dom");
+		logger.log(Level.FINE, "test");
 
 		URL url = OOXMLSignatureVerifierTest.class
 				.getResource("/hello-world-signed.docx");
