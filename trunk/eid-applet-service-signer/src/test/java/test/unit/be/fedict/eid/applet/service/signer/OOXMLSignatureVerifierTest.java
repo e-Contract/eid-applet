@@ -20,12 +20,14 @@ package test.unit.be.fedict.eid.applet.service.signer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.security.Security;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -48,6 +50,7 @@ import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.openxml4j.opc.signature.PackageDigitalSignatureManager;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xpath.XPathAPI;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -65,6 +68,11 @@ public class OOXMLSignatureVerifierTest {
 
 	private static final Log LOG = LogFactory
 			.getLog(OOXMLSignatureVerifierTest.class);
+
+	@BeforeClass
+	public static void setUp() {
+		OOXMLProvider.install();
+	}
 
 	@Test
 	public void testIsOOXMLDocument() throws Exception {
@@ -133,6 +141,33 @@ public class OOXMLSignatureVerifierTest {
 	}
 
 	@Test
+	public void testGetSignerUnsigned() throws Exception {
+		// setup
+		URL url = OOXMLSignatureVerifierTest.class
+				.getResource("/hello-world-unsigned.docx");
+
+		// operate
+		X509Certificate result = OOXMLSignatureVerifier.getSigner(url);
+
+		// verify
+		assertNull(result);
+	}
+
+	@Test
+	public void testGetSigner() throws Exception {
+		// setup
+		URL url = OOXMLSignatureVerifierTest.class
+				.getResource("/hello-world-signed.docx");
+
+		// operate
+		X509Certificate result = OOXMLSignatureVerifier.getSigner(url);
+
+		// verify
+		assertNotNull(result);
+		LOG.debug("signer: " + result.getSubjectX500Principal());
+	}
+
+	@Test
 	public void testVerifySignature() throws Exception {
 
 		java.util.logging.Logger logger = java.util.logging.Logger
@@ -144,7 +179,7 @@ public class OOXMLSignatureVerifierTest {
 		String signatureResourceName = getSignatureResourceName(url);
 		LOG.debug("signature resource name: " + signatureResourceName);
 
-		Security.addProvider(new OOXMLProvider());
+		OOXMLProvider.install();
 
 		ZipInputStream zipInputStream = new ZipInputStream(url.openStream());
 		ZipEntry zipEntry;

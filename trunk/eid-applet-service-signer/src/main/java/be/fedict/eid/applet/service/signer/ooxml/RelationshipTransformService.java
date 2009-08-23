@@ -27,6 +27,7 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -69,7 +70,7 @@ import org.xml.sax.SAXException;
  * Specs: http://openiso.org/Ecma/376/Part2/12.2.4#26
  * </p>
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class RelationshipTransformService extends TransformService {
@@ -103,8 +104,7 @@ public class RelationshipTransformService extends TransformService {
 		try {
 			LOG.debug("parent: " + toString(parentNode));
 		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new InvalidAlgorithmParameterException();
 		}
 		Element nsElement = parentNode.getOwnerDocument().createElement("ns");
 		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds",
@@ -180,11 +180,40 @@ public class RelationshipTransformService extends TransformService {
 				relationshipsElement.removeChild(childNode);
 				nodeIdx--;
 			}
+			/*
+			 * See: ISO/IEC 29500-2:2008(E) - 13.2.4.24 Relationships Transform
+			 * Algorithm.
+			 */
+			if (null == childElement.getAttributeNode("TargetMode")) {
+				childElement.setAttribute("TargetMode", "Internal");
+			}
 		}
+		LOG.debug("# Relationship elements: "
+				+ relationshipsElement.getElementsByTagName("*").getLength());
+		sortRelationshipElements(relationshipsElement);
 		try {
 			return toOctetStreamData(relationshipsDocument);
 		} catch (TransformerException e) {
 			throw new TransformException(e.getMessage(), e);
+		}
+	}
+
+	private void sortRelationshipElements(Element relationshipsElement) {
+		List<Element> relationshipElements = new LinkedList<Element>();
+		NodeList relationshipNodes = relationshipsElement
+				.getElementsByTagName("*");
+		int nodeCount = relationshipNodes.getLength();
+		for (int nodeIdx = 0; nodeIdx < nodeCount; nodeIdx++) {
+			Node relationshipNode = relationshipNodes.item(0);
+			Element relationshipElement = (Element) relationshipNode;
+			LOG.debug("unsorted Id: " + relationshipElement.getAttribute("Id"));
+			relationshipElements.add(relationshipElement);
+			relationshipsElement.removeChild(relationshipNode);
+		}
+		Collections.sort(relationshipElements, new RelationshipComparator());
+		for (Element relationshipElement : relationshipElements) {
+			LOG.debug("sorted Id: " + relationshipElement.getAttribute("Id"));
+			relationshipsElement.appendChild(relationshipElement);
 		}
 	}
 

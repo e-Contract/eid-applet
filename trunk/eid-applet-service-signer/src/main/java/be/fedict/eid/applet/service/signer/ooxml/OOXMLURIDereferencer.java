@@ -40,7 +40,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * JSR105 URI dereferencer for Office Open XML documents.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class OOXMLURIDereferencer implements URIDereferencer {
