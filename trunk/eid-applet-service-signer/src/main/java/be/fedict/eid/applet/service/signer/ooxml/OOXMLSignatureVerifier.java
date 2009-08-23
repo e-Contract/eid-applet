@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.cert.X509Certificate;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -84,46 +86,46 @@ public class OOXMLSignatureVerifier {
 		return false;
 	}
 
-	public static X509Certificate getSigner(URL url) throws IOException,
+	public static List<X509Certificate> getSigners(URL url) throws IOException,
 			ParserConfigurationException, SAXException, TransformerException,
 			MarshalException, XMLSignatureException {
-		String signatureResourceName = getSignatureResourceName(url);
-		if (null == signatureResourceName) {
-			return null;
+		List<X509Certificate> signers = new LinkedList<X509Certificate>();
+		List<String> signatureResourceNames = getSignatureResourceNames(url);
+		for (String signatureResourceName : signatureResourceNames) {
+			Document signatureDocument = getSignatureDocument(url,
+					signatureResourceName);
+			if (null == signatureDocument) {
+				continue;
+			}
+
+			NodeList signatureNodeList = signatureDocument
+					.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
+			if (0 == signatureNodeList.getLength()) {
+				return null;
+			}
+			Node signatureNode = signatureNodeList.item(0);
+
+			KeyInfoKeySelector keySelector = new KeyInfoKeySelector();
+			DOMValidateContext domValidateContext = new DOMValidateContext(
+					keySelector, signatureNode);
+			domValidateContext.setProperty(
+					"org.jcp.xml.dsig.validateManifests", Boolean.TRUE);
+			OOXMLURIDereferencer dereferencer = new OOXMLURIDereferencer(url);
+			domValidateContext.setURIDereferencer(dereferencer);
+
+			XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
+					.getInstance();
+			XMLSignature xmlSignature = xmlSignatureFactory
+					.unmarshalXMLSignature(domValidateContext);
+			boolean validity = xmlSignature.validate(domValidateContext);
+
+			if (false == validity) {
+				continue;
+			}
+			X509Certificate signer = keySelector.getCertificate();
+			signers.add(signer);
 		}
-
-		Document signatureDocument = getSignatureDocument(url,
-				signatureResourceName);
-		if (null == signatureDocument) {
-			return null;
-		}
-
-		NodeList signatureNodeList = signatureDocument.getElementsByTagNameNS(
-				XMLSignature.XMLNS, "Signature");
-		if (0 == signatureNodeList.getLength()) {
-			return null;
-		}
-		Node signatureNode = signatureNodeList.item(0);
-
-		KeyInfoKeySelector keySelector = new KeyInfoKeySelector();
-		DOMValidateContext domValidateContext = new DOMValidateContext(
-				keySelector, signatureNode);
-		domValidateContext.setProperty("org.jcp.xml.dsig.validateManifests",
-				Boolean.TRUE);
-		OOXMLURIDereferencer dereferencer = new OOXMLURIDereferencer(url);
-		domValidateContext.setURIDereferencer(dereferencer);
-
-		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-				.getInstance();
-		XMLSignature xmlSignature = xmlSignatureFactory
-				.unmarshalXMLSignature(domValidateContext);
-		boolean validity = xmlSignature.validate(domValidateContext);
-
-		if (false == validity) {
-			return null;
-		}
-		X509Certificate signer = keySelector.getCertificate();
-		return signer;
+		return signers;
 	}
 
 	private static Document getSignatureDocument(URL url,
@@ -141,8 +143,10 @@ public class OOXMLSignatureVerifier {
 		return null;
 	}
 
-	private static String getSignatureResourceName(URL url) throws IOException,
-			ParserConfigurationException, SAXException, TransformerException {
+	private static List<String> getSignatureResourceNames(URL url)
+			throws IOException, ParserConfigurationException, SAXException,
+			TransformerException {
+		List<String> signatureResourceNames = new LinkedList<String>();
 		InputStream inputStream = url.openStream();
 		ZipInputStream zipInputStream = new ZipInputStream(inputStream);
 		ZipEntry zipEntry;
@@ -160,15 +164,15 @@ public class OOXMLSignatureVerifier {
 							contentTypesDocument,
 							"/tns:Types/tns:Override[@ContentType='application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml']/@PartName",
 							nsElement);
-			if (nodeList.getLength() == 0) {
-				return null;
+			for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
+				String partName = nodeList.item(nodeIdx).getTextContent();
+				LOG.debug("part name: " + partName);
+				partName = partName.substring(1); // remove '/'
+				signatureResourceNames.add(partName);
 			}
-			String partName = nodeList.item(0).getTextContent();
-			LOG.debug("part name: " + partName);
-			partName = partName.substring(1); // remove '/'
-			return partName;
+			break;
 		}
-		return null;
+		return signatureResourceNames;
 	}
 
 	private static Document loadDocument(InputStream documentInputStream)
