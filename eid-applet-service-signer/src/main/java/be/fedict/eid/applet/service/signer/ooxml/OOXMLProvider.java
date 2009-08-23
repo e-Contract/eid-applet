@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2009 Frank Cornelis.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -19,17 +20,35 @@
 package be.fedict.eid.applet.service.signer.ooxml;
 
 import java.security.Provider;
+import java.security.Security;
 
+/**
+ * Security Provider for Office OpenXML.
+ * 
+ * @author Frank Cornelis
+ * 
+ */
 public class OOXMLProvider extends Provider {
 
-	public OOXMLProvider() {
-		super("OOXMLProvider", 1.0, "OOXML Security Provider");
+	private static final long serialVersionUID = 1L;
+
+	public static final String NAME = "OOXMLProvider";
+
+	private OOXMLProvider() {
+		super(NAME, 1.0, "OOXML Security Provider");
 		put("TransformService." + RelationshipTransformService.TRANSFORM_URI,
 				RelationshipTransformService.class.getName());
 		put("TransformService." + RelationshipTransformService.TRANSFORM_URI
 				+ " MechanismType", "DOM");
 	}
 
-	private static final long serialVersionUID = 1L;
-
+	/**
+	 * Installs this security provider.
+	 */
+	public static void install() {
+		Provider provider = Security.getProvider(NAME);
+		if (null == provider) {
+			Security.addProvider(new OOXMLProvider());
+		}
+	}
 }
