@@ -21,7 +21,6 @@ package test.unit.be.fedict.eid.applet.service.signer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -147,10 +146,11 @@ public class OOXMLSignatureVerifierTest {
 				.getResource("/hello-world-unsigned.docx");
 
 		// operate
-		X509Certificate result = OOXMLSignatureVerifier.getSigner(url);
+		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
 
 		// verify
-		assertNull(result);
+		assertNotNull(result);
+		assertTrue(result.isEmpty());
 	}
 
 	@Test
@@ -160,11 +160,31 @@ public class OOXMLSignatureVerifierTest {
 				.getResource("/hello-world-signed.docx");
 
 		// operate
-		X509Certificate result = OOXMLSignatureVerifier.getSigner(url);
+		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
 
 		// verify
 		assertNotNull(result);
-		LOG.debug("signer: " + result.getSubjectX500Principal());
+		assertEquals(1, result.size());
+		X509Certificate signer = result.get(0);
+		LOG.debug("signer: " + signer.getSubjectX500Principal());
+	}
+
+	@Test
+	public void testGetSigners() throws Exception {
+		// setup
+		URL url = OOXMLSignatureVerifierTest.class
+				.getResource("/hello-world-signed-twice.docx");
+
+		// operate
+		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+
+		// verify
+		assertNotNull(result);
+		assertEquals(2, result.size());
+		X509Certificate signer1 = result.get(0);
+		X509Certificate signer2 = result.get(1);
+		LOG.debug("signer 1: " + signer1.getSubjectX500Principal());
+		LOG.debug("signer 2: " + signer2.getSubjectX500Principal());
 	}
 
 	@Test
