@@ -11,7 +11,7 @@
 <body>
 <h1>Identity Result Page</h1>
 <h2>Identity Information</h2>
-<img src="photo" />
+<img src="photo" alt="photo"/>
 <table>
 	<tr>
 		<th>Attribute</th>
@@ -182,6 +182,8 @@ Root CA Certificate:
 </pre>
 
 <p><a href="identity.pdf">Identity in PDF</a></p>
+<p><a href="identity.vcf">Identity in vCard 3.0 (.vcf)</a></p>
+<p><a href="identity.kmz">Identity in KML 2.2 (.kmz)</a></p>
 <a href="identify-all.jsp">Again</a>
 |
 <a href=".">Main Page</a>
