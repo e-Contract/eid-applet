@@ -37,7 +37,7 @@ import be.fedict.eid.applet.service.spi.AuthenticationService;
 /**
  * Authentication Service that manages the eID authentication test.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Stateless

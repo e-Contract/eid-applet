@@ -23,7 +23,7 @@ import java.util.GregorianCalendar;
 /**
  * Data convertor for eID identity validity dates.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class ValidityDateDataConvertor implements

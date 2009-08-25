@@ -21,7 +21,7 @@ package be.fedict.eid.applet.sc;
 /**
  * Interface for a generic task.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  * @param <T>
  */

@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Convertor for eID date of birth field.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class DateOfBirthDataConvertor implements

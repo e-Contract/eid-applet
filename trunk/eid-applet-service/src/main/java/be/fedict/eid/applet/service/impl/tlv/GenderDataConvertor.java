@@ -23,7 +23,7 @@ import be.fedict.eid.applet.service.Gender;
 /**
  * Data convertor for gender data type.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class GenderDataConvertor implements DataConvertor<Gender> {

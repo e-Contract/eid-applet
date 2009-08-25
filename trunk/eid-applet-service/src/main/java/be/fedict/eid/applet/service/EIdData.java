@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * Top-level eID data container.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class EIdData implements Serializable {

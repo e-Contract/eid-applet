@@ -45,7 +45,7 @@ import be.fedict.eid.applet.Messages.MESSAGE_ID;
 /**
  * Holds the implementation of some eID related dialogs.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class Dialogs {

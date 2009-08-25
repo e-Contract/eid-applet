@@ -99,7 +99,7 @@ import be.fedict.eid.applet.service.spi.AuthenticationService;
  * Integration tests for the eID Applet controller component and the eID Applet
  * Service.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class ControllerTest {

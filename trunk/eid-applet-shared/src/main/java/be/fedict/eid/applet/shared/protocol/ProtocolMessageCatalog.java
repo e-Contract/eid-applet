@@ -24,7 +24,7 @@ import java.util.List;
  * Interface for protocol message catalog. Defines all possible message of a
  * certain protocol.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public interface ProtocolMessageCatalog {

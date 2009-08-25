@@ -60,7 +60,7 @@ import be.fedict.eid.applet.View;
 /**
  * Class holding all PKCS#11 eID card access logic.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class Pkcs11Eid {

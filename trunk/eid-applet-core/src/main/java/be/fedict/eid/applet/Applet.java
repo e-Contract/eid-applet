@@ -62,7 +62,7 @@ import be.fedict.eid.applet.Messages.MESSAGE_ID;
  * The main class of the eID Applet. The {@link #init()} method is where it all
  * starts.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * @see Applet#init()
  */
 public class Applet extends JApplet {

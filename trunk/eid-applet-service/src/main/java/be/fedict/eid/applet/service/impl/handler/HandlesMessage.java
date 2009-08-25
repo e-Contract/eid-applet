@@ -29,7 +29,7 @@ import be.fedict.eid.applet.shared.AbstractProtocolMessage;
 /**
  * Annotation for message handlers.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * @see MessageHandler
  */
 @Retention(RetentionPolicy.RUNTIME)

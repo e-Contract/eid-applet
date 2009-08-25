@@ -22,7 +22,7 @@ package be.fedict.eid.applet.shared.protocol;
 /**
  * Interface for a semantic validator component.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  * @param <T>
  */

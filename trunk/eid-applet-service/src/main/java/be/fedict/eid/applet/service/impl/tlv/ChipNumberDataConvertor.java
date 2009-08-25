@@ -23,7 +23,7 @@ import org.apache.commons.codec.binary.Hex;
 /**
  * Convertor for the chip number field.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class ChipNumberDataConvertor implements DataConvertor<String> {

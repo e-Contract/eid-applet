@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Interface for authentication service components.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public interface AuthenticationService {

@@ -28,7 +28,7 @@ import be.fedict.eid.applet.shared.protocol.HttpTransmitter;
 /**
  * Implementation of a transport component using {@link HttpServletResponse}.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class HttpServletResponseHttpTransmitter implements HttpTransmitter {

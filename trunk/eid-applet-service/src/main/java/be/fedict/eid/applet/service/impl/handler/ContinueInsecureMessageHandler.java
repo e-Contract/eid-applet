@@ -46,7 +46,7 @@ import be.fedict.eid.applet.shared.SignRequestMessage;
 /**
  * Handler for continue insecure message.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @HandlesMessage(ContinueInsecureMessage.class)

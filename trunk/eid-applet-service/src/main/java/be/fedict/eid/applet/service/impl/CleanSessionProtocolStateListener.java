@@ -39,7 +39,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolStateListener;
  * that thinks that the citizen performed a successful identification.
  * </p>
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class CleanSessionProtocolStateListener implements ProtocolStateListener {

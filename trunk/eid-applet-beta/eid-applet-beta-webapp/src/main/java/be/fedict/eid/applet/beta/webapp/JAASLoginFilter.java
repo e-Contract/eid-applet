@@ -40,7 +40,7 @@ import org.jboss.security.auth.callback.UsernamePasswordHandler;
 /**
  * A JAAS login servlet filter using the JBoss Seam credentials.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class JAASLoginFilter implements Filter {

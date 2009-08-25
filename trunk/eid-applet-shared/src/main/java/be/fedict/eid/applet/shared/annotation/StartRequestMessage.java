@@ -29,7 +29,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 /**
  * Marks a message as being an entry point in the protocol state machine.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)

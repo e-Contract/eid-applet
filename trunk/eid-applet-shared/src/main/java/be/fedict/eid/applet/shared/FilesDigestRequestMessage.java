@@ -27,7 +27,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 /**
  * Files digest request message transfer object.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @StateTransition(ProtocolState.DIGEST)

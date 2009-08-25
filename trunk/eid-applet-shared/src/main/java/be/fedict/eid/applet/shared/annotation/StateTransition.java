@@ -29,7 +29,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 /**
  * Marks a protocol state transition for the outgoing message.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)

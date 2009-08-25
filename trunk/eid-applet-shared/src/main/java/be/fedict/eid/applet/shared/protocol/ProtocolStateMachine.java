@@ -29,7 +29,7 @@ import be.fedict.eid.applet.shared.annotation.StopResponseMessage;
 /**
  * Protocol State Machine.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class ProtocolStateMachine {

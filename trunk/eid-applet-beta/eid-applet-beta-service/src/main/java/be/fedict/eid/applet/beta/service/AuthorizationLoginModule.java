@@ -34,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * JAAS Login Module for assigning a principal JBoss Roles.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class AuthorizationLoginModule implements LoginModule {

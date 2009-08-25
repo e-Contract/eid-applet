@@ -27,7 +27,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 /**
  * Hello Message transfer object.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @ResponsesAllowed( { IdentificationRequestMessage.class,

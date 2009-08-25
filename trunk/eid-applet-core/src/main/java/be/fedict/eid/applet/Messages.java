@@ -24,7 +24,7 @@ import java.util.ResourceBundle;
 /**
  * Util class to manage the i18n messages used within the eID Applet UI.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class Messages {

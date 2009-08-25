@@ -23,7 +23,7 @@ import java.awt.Component;
 /**
  * Interface for view component.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public interface View {

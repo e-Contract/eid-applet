@@ -24,7 +24,7 @@ import be.fedict.eid.applet.View;
  * Task runner for smart card specific operations. Will run a given task using
  * some back-off strategy in case of failure.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class TaskRunner {

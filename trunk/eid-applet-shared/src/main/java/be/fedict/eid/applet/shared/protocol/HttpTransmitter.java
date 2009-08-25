@@ -21,7 +21,7 @@ package be.fedict.eid.applet.shared.protocol;
 /**
  * Interface for HTTP transmitter component.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public interface HttpTransmitter {

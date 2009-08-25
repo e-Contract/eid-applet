@@ -24,7 +24,7 @@ import be.fedict.eid.applet.shared.annotation.ProtocolVersion;
 /**
  * Abstract protocol message class.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public abstract class AbstractProtocolMessage {

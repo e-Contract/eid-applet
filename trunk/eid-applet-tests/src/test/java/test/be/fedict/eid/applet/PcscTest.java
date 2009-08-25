@@ -58,7 +58,7 @@ import be.fedict.eid.applet.sc.TaskRunner;
 /**
  * Integration tests for PC/SC eID component.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class PcscTest {

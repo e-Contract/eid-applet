@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  * Marks the field that will be used as message discriminator. Of course the
  * field should be final static.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)

@@ -23,7 +23,7 @@ package be.fedict.eid.applet.shared.protocol;
 /**
  * Interface for protocol state listeners.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public interface ProtocolStateListener {

@@ -29,7 +29,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 /**
  * Marks the required protocol state for the incoming message.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)

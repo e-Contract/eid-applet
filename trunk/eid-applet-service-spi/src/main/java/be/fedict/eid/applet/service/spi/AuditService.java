@@ -24,7 +24,7 @@ import java.security.cert.X509Certificate;
  * Interface for audit service components. Via such a component you can receive
  * eID Applet Service security related events.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public interface AuditService {

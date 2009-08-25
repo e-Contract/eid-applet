@@ -31,7 +31,7 @@ import be.fedict.eid.applet.service.AppletServiceServlet;
  * Interface for a message handler. A message handler has the same lifecycle as
  * the {@link AppletServiceServlet} dispatcher servlet.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  * @param <T>
  *            the message type.

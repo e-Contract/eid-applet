@@ -718,7 +718,7 @@ public class XmlSignatureServiceBeanTest {
 	 * This is a non-digesting message digest implementation. We assume we
 	 * already receive a digested value.
 	 * 
-	 * @author fcorneli
+	 * @author Frank Cornelis
 	 * 
 	 */
 	public static class MyTestMessageDigest extends MessageDigest {

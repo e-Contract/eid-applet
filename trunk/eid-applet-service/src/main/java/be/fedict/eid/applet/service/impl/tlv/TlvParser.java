@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
  * Tag-Length-Value parser. The TLV-format is used in the eID card for encoding
  * of the identity and address files.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class TlvParser {

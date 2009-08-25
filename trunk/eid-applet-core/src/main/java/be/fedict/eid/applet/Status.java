@@ -21,7 +21,7 @@ package be.fedict.eid.applet;
 /**
  * Status of info message.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public enum Status {

@@ -32,7 +32,7 @@ import be.fedict.eid.applet.shared.protocol.HttpReceiver;
  * Implementation of an {@link HttpReceiver} based on the
  * {@link HttpURLConnection}.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class HttpURLConnectionHttpReceiver implements HttpReceiver {

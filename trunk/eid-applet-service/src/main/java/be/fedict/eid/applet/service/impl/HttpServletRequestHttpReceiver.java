@@ -33,7 +33,7 @@ import be.fedict.eid.applet.shared.protocol.HttpReceiver;
 /**
  * HttpServletRequest based HTTP receiver.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class HttpServletRequestHttpReceiver implements HttpReceiver {

@@ -30,7 +30,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 /**
  * Implementation of a protocol context using the HTTP servlet session.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class HttpServletProtocolContext implements ProtocolContext {

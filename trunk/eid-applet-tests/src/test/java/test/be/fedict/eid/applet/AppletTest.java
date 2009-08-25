@@ -37,7 +37,7 @@ import com.thoughtworks.selenium.SeleniumLogLevels;
 /**
  * Integration tests for Applet.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class AppletTest {

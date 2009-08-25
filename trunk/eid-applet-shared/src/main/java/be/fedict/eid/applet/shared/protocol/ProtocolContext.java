@@ -23,7 +23,7 @@ package be.fedict.eid.applet.shared.protocol;
 /**
  * Interface for protocol context component.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public interface ProtocolContext {

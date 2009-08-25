@@ -21,7 +21,7 @@ package be.fedict.eid.applet.service.spi;
 /**
  * Insecure Client Environment Exception.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class InsecureClientEnvironmentException extends Exception {

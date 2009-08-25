@@ -23,7 +23,7 @@ import java.net.URL;
 /**
  * Interface for runtime component.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public interface Runtime {

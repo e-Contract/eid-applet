@@ -36,7 +36,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 /**
  * Identity Data Transfer Object.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @ValidateSemanticalIntegrity(IdentityDataMessageSemanticValidator.class)

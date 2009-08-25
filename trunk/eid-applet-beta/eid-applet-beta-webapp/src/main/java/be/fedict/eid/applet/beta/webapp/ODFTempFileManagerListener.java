@@ -32,7 +32,7 @@ import be.fedict.eid.applet.beta.ODFTempFileManager;
  * ODF temporary file manager listener. Triggers the clean up of the temporary
  * ODF files.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class ODFTempFileManagerListener implements HttpSessionListener {

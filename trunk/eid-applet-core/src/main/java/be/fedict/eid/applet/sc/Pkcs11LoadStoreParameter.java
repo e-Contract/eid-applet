@@ -30,7 +30,7 @@ import be.fedict.eid.applet.View;
 /**
  * Keystore load/store parameter implementation for the PKCS#11 keystore.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class Pkcs11LoadStoreParameter implements LoadStoreParameter {

@@ -55,7 +55,7 @@ import be.fedict.eid.applet.shared.IdentityDataMessage;
 /**
  * Message handler for the identity data message.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @HandlesMessage(IdentityDataMessage.class)

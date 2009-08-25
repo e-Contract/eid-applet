@@ -28,7 +28,7 @@ import be.fedict.eid.applet.shared.protocol.HttpTransmitter;
 /**
  * Implementation of an {@link HttpTransmitter} using {@link HttpURLConnection}.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class HttpURLConnectionHttpTransmitter implements HttpTransmitter {

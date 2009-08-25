@@ -40,7 +40,7 @@ import com.lowagie.text.DocumentException;
  * Can be used by web applications in case they want to print-out the identity
  * information of a citizen.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class PdfServlet extends HttpServlet {
