@@ -26,7 +26,7 @@ import be.fedict.eid.applet.service.impl.tlv.TlvField;
  * Holds all the fields within the eID address file. The nationality can be
  * found in the eID identity file.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * @see Identity
  * 
  */

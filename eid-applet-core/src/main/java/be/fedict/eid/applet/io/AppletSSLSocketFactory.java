@@ -48,7 +48,7 @@ import be.fedict.eid.applet.View;
  * protocol.
  * </p>
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class AppletSSLSocketFactory extends SSLSocketFactory implements

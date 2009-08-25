@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * Digest Information data transfer class.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class DigestInfo implements Serializable {

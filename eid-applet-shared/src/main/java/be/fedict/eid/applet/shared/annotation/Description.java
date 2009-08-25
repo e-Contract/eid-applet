@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 /**
  * Contains the human readable description of a field.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)

@@ -30,7 +30,7 @@ import javax.smartcardio.CardException;
 /**
  * Java 5 PC/SC eID component Service Provider Interface.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public interface PcscEidSpi {

@@ -47,7 +47,7 @@ import be.fedict.eid.applet.shared.annotation.ValidateSemanticalIntegrity;
  * inside AppletServiceServlet.
  * </p>
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class Unmarshaller {

@@ -44,7 +44,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 /**
  * Signature Data transfer object.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @ResponsesAllowed(FinishedMessage.class)

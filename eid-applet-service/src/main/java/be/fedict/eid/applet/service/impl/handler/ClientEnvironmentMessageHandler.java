@@ -49,7 +49,7 @@ import be.fedict.eid.applet.shared.SignRequestMessage;
 /**
  * Handler for client environment message.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @HandlesMessage(ClientEnvironmentMessage.class)

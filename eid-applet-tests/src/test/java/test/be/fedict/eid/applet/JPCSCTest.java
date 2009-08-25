@@ -41,7 +41,7 @@ import com.linuxnet.jpcsc.PCSC;
  * eID identity and address files.
  * </p>
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class JPCSCTest {

@@ -25,7 +25,7 @@ import be.fedict.eid.applet.shared.annotation.StopResponseMessage;
 /**
  * Administration transfer object.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @StopResponseMessage

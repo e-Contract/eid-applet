@@ -32,7 +32,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 /**
  * Client environment message transfer object.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @ProtocolStateAllowed(ProtocolState.ENV_CHECK)

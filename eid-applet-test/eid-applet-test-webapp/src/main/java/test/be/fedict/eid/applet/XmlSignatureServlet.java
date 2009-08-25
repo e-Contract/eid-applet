@@ -33,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Servlet to download an XML Signature from the HTTP session context.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class XmlSignatureServlet extends HttpServlet {

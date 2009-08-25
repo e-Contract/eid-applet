@@ -55,7 +55,7 @@ import be.fedict.eid.applet.shared.FinishedMessage;
 /**
  * Authentication data message protocol handler.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @HandlesMessage(AuthenticationDataMessage.class)

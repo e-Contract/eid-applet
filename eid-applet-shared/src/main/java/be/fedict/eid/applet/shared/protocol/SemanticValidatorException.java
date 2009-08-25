@@ -24,7 +24,7 @@ package be.fedict.eid.applet.shared.protocol;
  * 
  * @see SemanticValidator
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  */
 public class SemanticValidatorException extends Exception {
 	private static final long serialVersionUID = 1L;

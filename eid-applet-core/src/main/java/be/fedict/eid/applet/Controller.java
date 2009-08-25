@@ -84,7 +84,7 @@ import be.fedict.eid.applet.shared.protocol.Unmarshaller;
  * Controller component. Contains the eID logic. Interacts with {@link View} and
  * {@link Runtime} for outside world communication.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class Controller {

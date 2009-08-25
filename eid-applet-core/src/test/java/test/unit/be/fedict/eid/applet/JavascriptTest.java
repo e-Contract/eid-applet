@@ -33,7 +33,7 @@ import be.fedict.eid.applet.Applet;
 /**
  * Javascript security test. We don't allow Javascript to access our eID Applet.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class JavascriptTest {

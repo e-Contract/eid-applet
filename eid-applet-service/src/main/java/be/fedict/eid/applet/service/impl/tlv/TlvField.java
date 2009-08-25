@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 /**
  * Marks a field as being a TLV field.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)

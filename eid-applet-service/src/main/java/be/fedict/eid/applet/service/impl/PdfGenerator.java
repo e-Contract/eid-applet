@@ -42,7 +42,7 @@ import com.lowagie.text.pdf.PdfWriter;
 /**
  * PDF generator for eID identity data. The implementation is using iText.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * @see PdfServlet
  */
 public class PdfGenerator {

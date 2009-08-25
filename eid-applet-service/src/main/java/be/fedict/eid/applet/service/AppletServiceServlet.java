@@ -84,7 +84,7 @@ import be.fedict.eid.applet.shared.protocol.Unmarshaller;
  * available in the eID Applet developer's guide.
  * </p>
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  */
 public class AppletServiceServlet extends HttpServlet {
 

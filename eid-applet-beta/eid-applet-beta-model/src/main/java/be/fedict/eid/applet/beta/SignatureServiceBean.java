@@ -45,7 +45,7 @@ import be.fedict.eid.applet.service.spi.SignatureService;
 /**
  * Signature Service that manages the eID ODF signature test.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Stateless

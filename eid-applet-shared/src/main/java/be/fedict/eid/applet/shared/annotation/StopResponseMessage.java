@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 /**
  * Marks a message as being an exit point in the protocol state machine.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)

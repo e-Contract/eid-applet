@@ -26,7 +26,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolMessageCatalog;
 /**
  * eID Applet Protocol Message Catalog.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class AppletProtocolMessageCatalog implements ProtocolMessageCatalog {

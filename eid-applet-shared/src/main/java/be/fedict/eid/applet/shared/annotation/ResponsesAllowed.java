@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 /**
  * Marks which response messages are allowed for the annotated request message.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)

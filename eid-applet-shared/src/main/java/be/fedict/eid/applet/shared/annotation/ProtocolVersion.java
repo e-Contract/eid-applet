@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  * Marks the field that will be used as message protocol. Of course the field
  * should be final static and the same value over all the message classes.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)

@@ -24,7 +24,7 @@ import java.util.List;
  * Interface for security environment service components. Can be used by the eID
  * Applet Service to check the client environment security requirements.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public interface SecureClientEnvironmentService {

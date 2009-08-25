@@ -28,7 +28,7 @@ import javax.servlet.ServletException;
  * Classname referencing can be useful in environments where you don't have a
  * full-blown Java EE application container available.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  * @param <T>
  *            the service type.

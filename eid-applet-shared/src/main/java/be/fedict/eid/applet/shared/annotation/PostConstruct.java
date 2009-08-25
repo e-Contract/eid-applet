@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  * Post construct annotation. We cannot use the javax.annotation.PostConstruct
  * annotation since this one is not present in a Java 5 runtime.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)

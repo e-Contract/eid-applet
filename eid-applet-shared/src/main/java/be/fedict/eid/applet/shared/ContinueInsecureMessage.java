@@ -27,7 +27,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 /**
  * Continue Insecure Message transfer object.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @ProtocolStateAllowed(ProtocolState.INSECURE)

@@ -25,7 +25,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 /**
  * Local memory protocol context implementation.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class LocalAppletProtocolContext implements ProtocolContext {

@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Interface for signature service component.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public interface SignatureService {

@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Interface for HTTP receiver component.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public interface HttpReceiver {

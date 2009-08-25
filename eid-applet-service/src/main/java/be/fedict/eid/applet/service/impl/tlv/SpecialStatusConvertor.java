@@ -23,7 +23,7 @@ import be.fedict.eid.applet.service.SpecialStatus;
 /**
  * Data convertor for eID special status.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * @see SpecialStatus
  */
 public class SpecialStatusConvertor implements DataConvertor<SpecialStatus> {

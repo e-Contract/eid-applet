@@ -22,7 +22,7 @@ package be.fedict.eid.applet.service.impl.tlv;
 /**
  * Interface for a data convertor component.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  * @param <T>
  *            the type to which to convert to.

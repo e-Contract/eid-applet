@@ -29,7 +29,7 @@ import be.fedict.eid.applet.shared.protocol.SemanticValidator;
 /**
  * Marks that a class will be semantically validated.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)

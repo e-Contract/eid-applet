@@ -31,7 +31,7 @@ import be.fedict.eid.applet.shared.annotation.NotNull;
  * Transport component is responsible for governing the process of converting
  * Java objects into data streams using a HTTP transport component.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class Transport {

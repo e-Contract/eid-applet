@@ -32,7 +32,7 @@ import be.fedict.eid.applet.View;
 /**
  * Callback handler implementation for PKCS#11 keystore.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class Pkcs11CallbackHandler implements CallbackHandler {

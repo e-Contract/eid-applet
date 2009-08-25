@@ -43,7 +43,7 @@ import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
  * Servlet to display the citizen's photo that is stored in the HTTP session
  * after a successful eID identification operation via the eID Applet.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class PhotoServlet extends HttpServlet {

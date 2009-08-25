@@ -48,7 +48,7 @@ import be.fedict.eid.applet.shared.SignRequestMessage;
 /**
  * Message handler for hello message.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @HandlesMessage(HelloMessage.class)

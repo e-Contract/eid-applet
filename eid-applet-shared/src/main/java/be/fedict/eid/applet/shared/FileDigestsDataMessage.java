@@ -32,7 +32,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 /**
  * Files digests data message transfer object.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @ProtocolStateAllowed(ProtocolState.DIGEST)

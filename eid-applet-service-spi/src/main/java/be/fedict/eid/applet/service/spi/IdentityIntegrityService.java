@@ -26,7 +26,7 @@ import java.util.List;
  * Applet Service to run integrity validation on the identity data that comes
  * from the eID card.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public interface IdentityIntegrityService {

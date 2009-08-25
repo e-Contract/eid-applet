@@ -35,7 +35,7 @@ import be.fedict.eid.applet.service.impl.tlv.ValidityDateDataConvertor;
  * the TLV parser to parse the identity file as stored in the eID card to an
  * object of this class.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * @see Address
  * @see TlvField
  * @see ConvertData

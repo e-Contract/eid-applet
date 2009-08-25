@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 /**
  * Marks that a field will be transmitted as the HTTP body.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)

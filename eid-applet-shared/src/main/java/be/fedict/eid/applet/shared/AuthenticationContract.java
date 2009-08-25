@@ -45,7 +45,7 @@ import java.net.InetAddress;
  * intention via this formal authentication contract.
  * </p>
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class AuthenticationContract {

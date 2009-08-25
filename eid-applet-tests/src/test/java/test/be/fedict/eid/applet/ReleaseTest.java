@@ -55,7 +55,7 @@ import com.sun.org.apache.xpath.internal.XPathAPI;
  * We do our own release process since we're not really happy with the
  * maven-release-plugin.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class ReleaseTest {

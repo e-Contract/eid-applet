@@ -21,7 +21,7 @@ package be.fedict.eid.applet.shared.protocol;
 /**
  * Holds all the protocol states.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public enum ProtocolState {

@@ -43,7 +43,7 @@ import be.fedict.eid.applet.service.spi.AuthenticationService;
 /**
  * Authentication Services that manages administrator login.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Stateless

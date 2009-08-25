@@ -46,7 +46,7 @@ import be.fedict.eid.applet.shared.SignatureDataMessage;
 /**
  * Signature data message protocol handler.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @HandlesMessage(SignatureDataMessage.class)

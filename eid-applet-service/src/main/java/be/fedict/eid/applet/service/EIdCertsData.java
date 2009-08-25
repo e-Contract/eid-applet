@@ -24,7 +24,7 @@ import java.security.cert.X509Certificate;
 /**
  * Data structure to hold the eID X509 certificates.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class EIdCertsData implements Serializable {

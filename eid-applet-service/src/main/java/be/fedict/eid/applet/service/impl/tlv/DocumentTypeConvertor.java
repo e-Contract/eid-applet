@@ -23,7 +23,7 @@ import be.fedict.eid.applet.service.DocumentType;
 /**
  * Data Convertor for eID document type.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class DocumentTypeConvertor implements DataConvertor<DocumentType> {

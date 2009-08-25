@@ -41,7 +41,7 @@ import be.fedict.eid.applet.shared.SignRequestMessage;
 /**
  * Message handler for file digests data messages.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @HandlesMessage(FileDigestsDataMessage.class)

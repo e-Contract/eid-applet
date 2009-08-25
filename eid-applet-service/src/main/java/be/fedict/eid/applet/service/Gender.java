@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * Gender enumeration. For the moment we only have 2 values.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public enum Gender implements Serializable {

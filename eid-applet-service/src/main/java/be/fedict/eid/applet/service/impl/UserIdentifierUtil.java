@@ -35,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Utility class for user identifier construction.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class UserIdentifierUtil {

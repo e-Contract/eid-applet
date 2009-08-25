@@ -25,7 +25,7 @@ import java.util.Properties;
 /**
  * eID Applet Version class.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class Version {

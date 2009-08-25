@@ -52,7 +52,7 @@ import be.fedict.eid.applet.View;
  * 
  * This class required the Java 6 runtime to operate.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class PcscEid extends Observable implements PcscEidSpi {

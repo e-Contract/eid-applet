@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Authentication Challenge. Manages challenge freshness and randomness.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class AuthenticationChallenge implements Serializable {

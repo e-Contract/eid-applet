@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  * Marks that a field is required to be not <code>null</code>. Used for input
  * validation.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)

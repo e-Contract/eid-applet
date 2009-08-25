@@ -39,7 +39,7 @@ import be.fedict.eid.applet.service.spi.SignatureService;
 /**
  * Test for classname based service implementation.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class SignatureServiceImpl implements SignatureService {
