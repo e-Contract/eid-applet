@@ -32,7 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mortbay.jetty.testing.ServletTester;
 
-import be.fedict.eid.applet.service.PdfServlet;
+import be.fedict.eid.applet.service.KmlServlet;
 
 public class KmlServletTest {
 
@@ -45,7 +45,7 @@ public class KmlServletTest {
 	@Before
 	public void setUp() throws Exception {
 		this.servletTester = new ServletTester();
-		this.servletTester.addServlet(PdfServlet.class, "/");
+		this.servletTester.addServlet(KmlServlet.class, "/");
 
 		this.servletTester.start();
 		this.location = this.servletTester.createSocketConnector(true);
@@ -70,7 +70,7 @@ public class KmlServletTest {
 		assertEquals(HttpServletResponse.SC_OK, statusCode);
 		String resultContentType = getMethod.getResponseHeader("content-type")
 				.getValue();
-		assertEquals("application/pdf", resultContentType);
+		assertEquals("application/vnd.google-earth.kmz", resultContentType);
 		assertTrue(getMethod.getResponseBody().length > 0);
 	}
 }
