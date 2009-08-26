@@ -97,11 +97,14 @@ public class OOXMLURIDereferencer implements URIDereferencer {
 		String entryName;
 		if (uri.startsWith("/")) {
 			entryName = uri.substring(1); // remove '/'
-			entryName = entryName.substring(0, entryName.indexOf("?"));
-			LOG.debug("ZIP entry name: " + entryName);
 		} else {
 			entryName = uri.toString();
 		}
+		if (-1 != entryName.indexOf("?")) {
+			entryName = entryName.substring(0, entryName.indexOf("?"));
+		}
+		LOG.debug("ZIP entry name: " + entryName);
+
 		InputStream odfInputStream = this.ooxmlUrl.openStream();
 		ZipInputStream odfZipInputStream = new ZipInputStream(odfInputStream);
 		ZipEntry zipEntry;

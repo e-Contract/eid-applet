@@ -35,13 +35,16 @@ import java.util.UUID;
 
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.URIDereferencer;
+import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMCryptoContext;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.DigestMethod;
+import javax.xml.crypto.dsig.Manifest;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.SignatureMethod;
 import javax.xml.crypto.dsig.SignedInfo;
 import javax.xml.crypto.dsig.Transform;
+import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignContext;
 import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
@@ -94,6 +97,24 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			.getLog(AbstractXmlSignatureService.class);
 
 	private static final String SIGNATURE_ID_ATTRIBUTE = "signature-id";
+
+	private final List<SignatureAspect> signatureAspects;
+
+	/**
+	 * Main constructor.
+	 */
+	public AbstractXmlSignatureService() {
+		this.signatureAspects = new LinkedList<SignatureAspect>();
+	}
+
+	/**
+	 * Adds a signature aspect to this XML signature service.
+	 * 
+	 * @param signatureAspect
+	 */
+	protected void addSignatureAspect(SignatureAspect signatureAspect) {
+		this.signatureAspects.add(signatureAspect);
+	}
 
 	/**
 	 * Gives back the signature digest algorithm. Allowed values are SHA-1,
@@ -376,6 +397,16 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		addReferences(signatureFactory, references);
 
 		/*
+		 * Invoke the signature aspects.
+		 */
+		List<XMLObject> objects = new LinkedList<XMLObject>();
+		for (SignatureAspect signatureAspect : this.signatureAspects) {
+			LOG.debug("invoking signature aspect: "
+					+ signatureAspect.getClass().getSimpleName());
+			signatureAspect.preSign(signatureFactory, references, objects);
+		}
+
+		/*
 		 * ds:SignedInfo
 		 */
 		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(
@@ -388,11 +419,17 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 				canonicalizationMethod, signatureMethod, references);
 
 		/*
-		 * ds:Signature marshalling
+		 * JSR105 ds:Signature creation
 		 */
 		String signatureId = "xmldsig-" + UUID.randomUUID().toString();
+		String signatureValueId = signatureId + "-signature-value";
 		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory
-				.newXMLSignature(signedInfo, null, null, signatureId, null);
+				.newXMLSignature(signedInfo, null, objects, signatureId,
+						signatureValueId);
+
+		/*
+		 * ds:Signature Marshalling.
+		 */
 		DOMXMLSignature domXmlSignature = (DOMXMLSignature) xmlSignature;
 		Node documentNode = document.getDocumentElement();
 		if (null == documentNode) {
@@ -405,6 +442,30 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		// String dsPrefix = "ds";
 		domXmlSignature.marshal(documentNode, dsPrefix,
 				(DOMCryptoContext) xmlSignContext);
+
+		/*
+		 * Completion of undigested ds:References in the ds:Manifests.
+		 */
+		for (XMLObject object : objects) {
+			LOG.debug("object java type: " + object.getClass().getName());
+			List<XMLStructure> objectContentList = object.getContent();
+			for (XMLStructure objectContent : objectContentList) {
+				LOG.debug("object content java type: "
+						+ objectContent.getClass().getName());
+				if (false == objectContent instanceof Manifest) {
+					continue;
+				}
+				Manifest manifest = (Manifest) objectContent;
+				List<Reference> manifestReferences = manifest.getReferences();
+				for (Reference manifestReference : manifestReferences) {
+					if (null != manifestReference.getDigestValue()) {
+						continue;
+					}
+					DOMReference manifestDOMReference = (DOMReference) manifestReference;
+					manifestDOMReference.digest(xmlSignContext);
+				}
+			}
+		}
 
 		/*
 		 * Completion of undigested ds:References.
@@ -483,6 +544,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 						(TransformParameterSpec) null);
 				transforms.add(transform);
 			}
+			LOG.debug("adding ds:Reference " + referenceInfo.getUri());
 			Reference reference = xmlSignatureFactory.newReference(
 					referenceInfo.getUri(), digestMethod, transforms, null,
 					null);
