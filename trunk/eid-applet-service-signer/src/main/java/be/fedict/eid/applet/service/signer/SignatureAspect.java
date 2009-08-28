@@ -26,6 +26,8 @@ import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 
+import org.w3c.dom.Document;
+
 /**
  * JSR105 Signature Aspect interface.
  * 
@@ -40,12 +42,13 @@ public interface SignatureAspect {
 	 * signature aspects to an XML signature.
 	 * 
 	 * @param signatureFactory
+	 * @param document
 	 * @param references
 	 * @param objects
 	 * @throws InvalidAlgorithmParameterException
 	 * @throws NoSuchAlgorithmException
 	 */
-	void preSign(XMLSignatureFactory signatureFactory,
+	void preSign(XMLSignatureFactory signatureFactory, Document document,
 			List<Reference> references, List<XMLObject> objects)
 			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException;
 }

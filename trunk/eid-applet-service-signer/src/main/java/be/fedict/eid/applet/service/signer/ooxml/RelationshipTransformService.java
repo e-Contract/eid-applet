@@ -120,6 +120,9 @@ public class RelationshipTransformService extends TransformService {
 			LOG.error("transformer exception: " + e.getMessage(), e);
 			throw new InvalidAlgorithmParameterException();
 		}
+		if (0 == nodeList.getLength()) {
+			LOG.warn("no RelationshipReference/@SourceId parameters present");
+		}
 		for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
 			Node node = nodeList.item(nodeIdx);
 			String sourceId = node.getTextContent();
@@ -131,7 +134,11 @@ public class RelationshipTransformService extends TransformService {
 	@Override
 	public void marshalParams(XMLStructure parent, XMLCryptoContext context)
 			throws MarshalException {
-		LOG.debug("marshallParams");
+		LOG.debug("marshallParams(parent,context)");
+		DOMStructure domParent = (DOMStructure) parent;
+		Node parentNode = domParent.getNode();
+		LOG.debug("parent node name: " + parentNode.getNodeName());
+		// TODO?
 	}
 
 	public AlgorithmParameterSpec getParameterSpec() {

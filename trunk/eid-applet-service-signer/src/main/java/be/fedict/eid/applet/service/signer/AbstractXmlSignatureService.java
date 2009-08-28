@@ -93,11 +93,11 @@ import be.fedict.eid.applet.service.spi.SignatureService;
  */
 public abstract class AbstractXmlSignatureService implements SignatureService {
 
-	private static final Log LOG = LogFactory
-			.getLog(AbstractXmlSignatureService.class);
+	static final Log LOG = LogFactory.getLog(AbstractXmlSignatureService.class);
 
 	private static final String SIGNATURE_ID_ATTRIBUTE = "signature-id";
 
+	// TODO refactor everything using the signature aspect design pattern
 	private final List<SignatureAspect> signatureAspects;
 
 	/**
@@ -403,7 +403,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		for (SignatureAspect signatureAspect : this.signatureAspects) {
 			LOG.debug("invoking signature aspect: "
 					+ signatureAspect.getClass().getSimpleName());
-			signatureAspect.preSign(signatureFactory, references, objects);
+			signatureAspect.preSign(signatureFactory, document, references, objects);
 		}
 
 		/*
@@ -609,22 +609,54 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		throw new RuntimeException("unsupported sign algo: " + digestAlgo);
 	}
 
-	private void writeDocument(Document document,
+	protected void writeDocument(Document document,
 			OutputStream documentOutputStream)
+			throws TransformerConfigurationException,
+			TransformerFactoryConfigurationError, TransformerException,
+			IOException {
+		writeDocumentNoClosing(document, documentOutputStream);
+		documentOutputStream.close();
+	}
+
+	protected void writeDocumentNoClosing(Document document,
+			OutputStream documentOutputStream)
+			throws TransformerConfigurationException,
+			TransformerFactoryConfigurationError, TransformerException,
+			IOException {
+		writeDocumentNoClosing(document, documentOutputStream, true);
+	}
+
+	protected void writeDocumentNoClosing(Document document,
+			OutputStream documentOutputStream, boolean omitXmlDeclaration)
 			throws TransformerConfigurationException,
 			TransformerFactoryConfigurationError, TransformerException,
 			IOException {
 		Result result = new StreamResult(documentOutputStream);
 		Transformer xformer = TransformerFactory.newInstance().newTransformer();
-		xformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+		if (omitXmlDeclaration) {
+			xformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+		}
 		Source source = new DOMSource(document);
 		xformer.transform(source, result);
-		documentOutputStream.close();
 	}
 
 	protected Document loadDocument(InputStream documentInputStream)
 			throws ParserConfigurationException, SAXException, IOException {
 		InputSource inputSource = new InputSource(documentInputStream);
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
+				.newInstance();
+		documentBuilderFactory.setNamespaceAware(true);
+		DocumentBuilder documentBuilder = documentBuilderFactory
+				.newDocumentBuilder();
+		Document document = documentBuilder.parse(inputSource);
+		return document;
+	}
+
+	protected Document loadDocumentNoClose(InputStream documentInputStream)
+			throws ParserConfigurationException, SAXException, IOException {
+		NoCloseInputStream noCloseInputStream = new NoCloseInputStream(
+				documentInputStream);
+		InputSource inputSource = new InputSource(noCloseInputStream);
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
 				.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
