@@ -155,6 +155,8 @@ public class ODFSignatureVerifier {
 			LOG.debug("invalid signature");
 			return null;
 		}
+		// TODO: check what has been signed.
+
 		X509Certificate signer = keySelector.getCertificate();
 		if (null == signer) {
 			throw new IllegalStateException("signer X509 certificate is null");

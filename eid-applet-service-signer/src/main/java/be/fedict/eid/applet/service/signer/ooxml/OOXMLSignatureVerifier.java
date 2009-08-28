@@ -91,6 +91,9 @@ public class OOXMLSignatureVerifier {
 			MarshalException, XMLSignatureException {
 		List<X509Certificate> signers = new LinkedList<X509Certificate>();
 		List<String> signatureResourceNames = getSignatureResourceNames(url);
+		if (signatureResourceNames.isEmpty()) {
+			LOG.debug("no signature resources");
+		}
 		for (String signatureResourceName : signatureResourceNames) {
 			Document signatureDocument = getSignatureDocument(url,
 					signatureResourceName);
@@ -122,6 +125,8 @@ public class OOXMLSignatureVerifier {
 			if (false == validity) {
 				continue;
 			}
+			// TODO: check what has been signed.
+
 			X509Certificate signer = keySelector.getCertificate();
 			signers.add(signer);
 		}

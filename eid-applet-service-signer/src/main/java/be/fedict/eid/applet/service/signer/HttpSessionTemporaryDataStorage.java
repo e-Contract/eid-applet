@@ -96,6 +96,7 @@ public class HttpSessionTemporaryDataStorage implements TemporaryDataStorage {
 		return httpSession;
 	}
 
+	@SuppressWarnings("unchecked")
 	private Map<String, Serializable> getAttributes() {
 		HttpSession httpSession = getHttpSession();
 		Map<String, Serializable> attributes = (Map<String, Serializable>) httpSession

@@ -30,11 +30,14 @@ import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Manifest;
 import javax.xml.crypto.dsig.Reference;
+import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -46,6 +49,7 @@ import org.apache.xml.security.utils.Constants;
 import org.apache.xpath.XPathAPI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -75,8 +79,9 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 	}
 
 	public void preSign(XMLSignatureFactory signatureFactory,
-			List<Reference> references, List<XMLObject> objects)
-			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+			Document document, List<Reference> references,
+			List<XMLObject> objects) throws NoSuchAlgorithmException,
+			InvalidAlgorithmParameterException {
 		LOG.debug("pre sign");
 		List<Reference> manifestReferences = new LinkedList<Reference>();
 		addParts(
@@ -103,6 +108,13 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 				"application/vnd.openxmlformats-officedocument.wordprocessingml.webSettings+xml",
 				manifestReferences);
 
+		try {
+			addRelationshipsReferences(signatureFactory, document,
+					manifestReferences);
+		} catch (Exception e) {
+			throw new RuntimeException("error: " + e.getMessage(), e);
+		}
+
 		Manifest manifest = signatureFactory.newManifest(manifestReferences);
 		String objectId = "ooxml-manifest-object-"
 				+ UUID.randomUUID().toString();
@@ -114,6 +126,50 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 		Reference reference = signatureFactory.newReference("#" + objectId,
 				digestMethod);
 		references.add(reference);
+	}
+
+	private void addRelationshipsReferences(
+			XMLSignatureFactory signatureFactory, Document document,
+			List<Reference> manifestReferences) throws IOException,
+			ParserConfigurationException, SAXException, TransformerException,
+			NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+		Document _relsDotRels = loadDocument("_rels/.rels");
+		Element nsElement = _relsDotRels.createElement("ns");
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
+				"http://schemas.openxmlformats.org/package/2006/relationships");
+		Node idNode = XPathAPI
+				.selectSingleNode(
+						_relsDotRels,
+						"/tns:Relationships/tns:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument']/@Id",
+						nsElement);
+		String relId = idNode.getTextContent();
+		LOG.debug("Office document relationship Id: " + relId);
+		DigestMethod digestMethod = signatureFactory.newDigestMethod(
+				DigestMethod.SHA1, null);
+		List<Transform> transforms = new LinkedList<Transform>();
+		Element transformContentElement = document
+				.createElementNS(
+						"http://schemas.openxmlformats.org/package/2006/digital-signature",
+						"mdssi:RelationshipReference");
+		transformContentElement
+				.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:mdssi",
+						"http://schemas.openxmlformats.org/package/2006/digital-signature");
+		transformContentElement.setAttribute("SourceId", relId);
+		transforms
+				.add(signatureFactory
+						.newTransform(
+								"http://schemas.openxmlformats.org/package/2006/RelationshipTransform",
+								new DOMStructure(transformContentElement)));
+		transforms.add(signatureFactory.newTransform(
+				"http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
+				(TransformParameterSpec) null));
+		Reference reference = signatureFactory
+				.newReference(
+						"/_rels/.rels?ContentType=application/vnd.openxmlformats-package.relationships+xml",
+						digestMethod, transforms, null, null);
+
+		manifestReferences.add(reference);
+		// TODO
 	}
 
 	private void addParts(XMLSignatureFactory signatureFactory,
@@ -170,6 +226,22 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 			break;
 		}
 		return signatureResourceNames;
+	}
+
+	protected Document loadDocument(String zipEntryName) throws IOException,
+			ParserConfigurationException, SAXException {
+		URL ooxmlUrl = this.signatureService.getOfficeOpenXMLDocumentURL();
+		InputStream inputStream = ooxmlUrl.openStream();
+		ZipInputStream zipInputStream = new ZipInputStream(inputStream);
+		ZipEntry zipEntry;
+		while (null != (zipEntry = zipInputStream.getNextEntry())) {
+			if (false == zipEntryName.equals(zipEntry.getName())) {
+				continue;
+			}
+			Document document = loadDocument(zipInputStream);
+			return document;
+		}
+		throw new RuntimeException("ZIP entry not found: " + zipEntryName);
 	}
 
 	protected Document loadDocument(InputStream documentInputStream)

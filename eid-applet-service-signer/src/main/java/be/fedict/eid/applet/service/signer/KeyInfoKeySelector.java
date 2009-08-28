@@ -53,6 +53,9 @@ public class KeyInfoKeySelector extends KeySelector implements
 			AlgorithmMethod method, XMLCryptoContext context)
 			throws KeySelectorException {
 		LOG.debug("select key");
+		if (null == keyInfo) {
+			throw new KeySelectorException("no ds:KeyInfo present");
+		}
 		List<XMLStructure> keyInfoContent = keyInfo.getContent();
 		this.certificate = null;
 		for (XMLStructure keyInfoStructure : keyInfoContent) {
