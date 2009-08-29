@@ -30,7 +30,6 @@ import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Manifest;
 import javax.xml.crypto.dsig.Reference;
@@ -109,7 +108,9 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 				manifestReferences);
 
 		try {
-			addRelationshipsReferences(signatureFactory, document,
+			addRelationshipsReference(signatureFactory, document,
+					manifestReferences);
+			addDocumentRelationshipsReference(signatureFactory, document,
 					manifestReferences);
 		} catch (Exception e) {
 			throw new RuntimeException("error: " + e.getMessage(), e);
@@ -128,7 +129,40 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 		references.add(reference);
 	}
 
-	private void addRelationshipsReferences(
+	private void addDocumentRelationshipsReference(
+			XMLSignatureFactory signatureFactory, Document document,
+			List<Reference> manifestReferences) throws IOException,
+			ParserConfigurationException, SAXException, TransformerException,
+			NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+		Document _relsDotRels = loadDocument("word/_rels/document.xml.rels");
+		Element nsElement = _relsDotRels.createElement("ns");
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
+				"http://schemas.openxmlformats.org/package/2006/relationships");
+		NodeList idNodeList = XPathAPI.selectNodeList(_relsDotRels,
+				"/tns:Relationships/tns:Relationship/@Id", nsElement);
+
+		DigestMethod digestMethod = signatureFactory.newDigestMethod(
+				DigestMethod.SHA1, null);
+		List<Transform> transforms = new LinkedList<Transform>();
+		RelationshipTransformParameterSpec parameterSpec = new RelationshipTransformParameterSpec();
+		for (int nodeIdx = 0; nodeIdx < idNodeList.getLength(); nodeIdx++) {
+			String relId = idNodeList.item(nodeIdx).getTextContent();
+			parameterSpec.addRelationshipReference(relId);
+		}
+		transforms.add(signatureFactory.newTransform(
+				RelationshipTransformService.TRANSFORM_URI, parameterSpec));
+		transforms.add(signatureFactory.newTransform(
+				"http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
+				(TransformParameterSpec) null));
+		Reference reference = signatureFactory
+				.newReference(
+						"/word/_rels/document.xml.rels?ContentType=application/vnd.openxmlformats-package.relationships+xml",
+						digestMethod, transforms, null, null);
+
+		manifestReferences.add(reference);
+	}
+
+	private void addRelationshipsReference(
 			XMLSignatureFactory signatureFactory, Document document,
 			List<Reference> manifestReferences) throws IOException,
 			ParserConfigurationException, SAXException, TransformerException,
@@ -144,22 +178,14 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 						nsElement);
 		String relId = idNode.getTextContent();
 		LOG.debug("Office document relationship Id: " + relId);
+
 		DigestMethod digestMethod = signatureFactory.newDigestMethod(
 				DigestMethod.SHA1, null);
 		List<Transform> transforms = new LinkedList<Transform>();
-		Element transformContentElement = document
-				.createElementNS(
-						"http://schemas.openxmlformats.org/package/2006/digital-signature",
-						"mdssi:RelationshipReference");
-		transformContentElement
-				.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:mdssi",
-						"http://schemas.openxmlformats.org/package/2006/digital-signature");
-		transformContentElement.setAttribute("SourceId", relId);
-		transforms
-				.add(signatureFactory
-						.newTransform(
-								"http://schemas.openxmlformats.org/package/2006/RelationshipTransform",
-								new DOMStructure(transformContentElement)));
+		RelationshipTransformParameterSpec parameterSpec = new RelationshipTransformParameterSpec();
+		parameterSpec.addRelationshipReference(relId);
+		transforms.add(signatureFactory.newTransform(
+				RelationshipTransformService.TRANSFORM_URI, parameterSpec));
 		transforms.add(signatureFactory.newTransform(
 				"http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
 				(TransformParameterSpec) null));
@@ -169,7 +195,6 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 						digestMethod, transforms, null, null);
 
 		manifestReferences.add(reference);
-		// TODO
 	}
 
 	private void addParts(XMLSignatureFactory signatureFactory,

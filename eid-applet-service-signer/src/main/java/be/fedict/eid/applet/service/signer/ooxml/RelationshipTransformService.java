@@ -92,6 +92,13 @@ public class RelationshipTransformService extends TransformService {
 	public void init(TransformParameterSpec params)
 			throws InvalidAlgorithmParameterException {
 		LOG.debug("init(params)");
+		if (false == params instanceof RelationshipTransformParameterSpec) {
+			throw new InvalidAlgorithmParameterException();
+		}
+		RelationshipTransformParameterSpec relParams = (RelationshipTransformParameterSpec) params;
+		for (String sourceId : relParams.getSourceIds()) {
+			this.sourceIds.add(sourceId);
+		}
 	}
 
 	@Override
@@ -137,8 +144,19 @@ public class RelationshipTransformService extends TransformService {
 		LOG.debug("marshallParams(parent,context)");
 		DOMStructure domParent = (DOMStructure) parent;
 		Node parentNode = domParent.getNode();
-		LOG.debug("parent node name: " + parentNode.getNodeName());
-		// TODO?
+		Element parentElement = (Element) parentNode;
+		parentElement
+				.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:mdssi",
+						"http://schemas.openxmlformats.org/package/2006/digital-signature");
+		Document document = parentNode.getOwnerDocument();
+		for (String sourceId : this.sourceIds) {
+			Element relationshipReferenceElement = document
+					.createElementNS(
+							"http://schemas.openxmlformats.org/package/2006/digital-signature",
+							"mdssi:RelationshipReference");
+			relationshipReferenceElement.setAttribute("SourceId", sourceId);
+			parentElement.appendChild(relationshipReferenceElement);
+		}
 	}
 
 	public AlgorithmParameterSpec getParameterSpec() {
