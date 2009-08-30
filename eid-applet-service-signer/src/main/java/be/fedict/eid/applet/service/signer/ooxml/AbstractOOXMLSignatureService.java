@@ -273,12 +273,13 @@ public abstract class AbstractOOXMLSignatureService extends
 			ZipEntry newZipEntry = new ZipEntry(zipEntry.getName());
 			zipOutputStream.putNextEntry(newZipEntry);
 			if ("[Content_Types].xml".equals(zipEntry.getName())) {
-				/*
-				 * We need to add an Override element.
-				 */
 				Document contentTypesDocument = loadDocumentNoClose(zipInputStream);
 				Element typesElement = contentTypesDocument
 						.getDocumentElement();
+
+				/*
+				 * We need to add an Override element.
+				 */
 				Element overrideElement = contentTypesDocument
 						.createElementNS(
 								"http://schemas.openxmlformats.org/package/2006/content-types",
@@ -290,6 +291,19 @@ public abstract class AbstractOOXMLSignatureService extends
 								"application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml");
 				typesElement.appendChild(overrideElement);
 
+				/*
+				 * Add Default element for 'sigs' extension.
+				 */
+				Element defaultElement = contentTypesDocument
+						.createElementNS(
+								"http://schemas.openxmlformats.org/package/2006/content-types",
+								"Default");
+				defaultElement.setAttribute("Extension", "sigs");
+				defaultElement
+						.setAttribute("ContentType",
+								"application/vnd.openxmlformats-package.digital-signature-origin");
+				typesElement.appendChild(defaultElement);
+
 				NoCloseOutputStream outputStream = new NoCloseOutputStream(
 						zipOutputStream);
 				writeDocumentNoClosing(contentTypesDocument, outputStream,
@@ -297,30 +311,6 @@ public abstract class AbstractOOXMLSignatureService extends
 			} else if ("_xmlsignatures/_rels/origin.sigs.rels".equals(zipEntry
 					.getName())) {
 				throw new RuntimeException("implement me");
-			} else if ("_rels/.rels".equals(zipEntry.getName())) {
-				/*
-				 * Add a Relationship element for _xmlsignatures/origins.sigs
-				 */
-				Document relationshipsDocument = loadDocumentNoClose(zipInputStream);
-				Element relationshipElement = relationshipsDocument
-						.createElementNS(
-								"http://schemas.openxmlformats.org/package/2006/relationships",
-								"Relationship");
-				relationshipElement.setAttribute("Id", "rel-id-"
-						+ UUID.randomUUID().toString());
-				relationshipElement
-						.setAttribute(
-								"Type",
-								"http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin");
-				relationshipElement.setAttribute("Target",
-						"_xmlsignatures/origin.sigs");
-				relationshipsDocument.getDocumentElement().appendChild(
-						relationshipElement);
-
-				NoCloseOutputStream outputStream = new NoCloseOutputStream(
-						zipOutputStream);
-				writeDocumentNoClosing(relationshipsDocument, outputStream,
-						false);
 			} else {
 				IOUtils.copy(zipInputStream, zipOutputStream);
 			}
