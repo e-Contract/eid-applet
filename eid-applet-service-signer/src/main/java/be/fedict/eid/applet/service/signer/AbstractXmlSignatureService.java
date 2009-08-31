@@ -399,11 +399,13 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		/*
 		 * Invoke the signature aspects.
 		 */
+		String signatureId = "xmldsig-" + UUID.randomUUID().toString();
 		List<XMLObject> objects = new LinkedList<XMLObject>();
 		for (SignatureAspect signatureAspect : this.signatureAspects) {
 			LOG.debug("invoking signature aspect: "
 					+ signatureAspect.getClass().getSimpleName());
-			signatureAspect.preSign(signatureFactory, document, references, objects);
+			signatureAspect.preSign(signatureFactory, document, signatureId,
+					references, objects);
 		}
 
 		/*
@@ -421,7 +423,6 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		/*
 		 * JSR105 ds:Signature creation
 		 */
-		String signatureId = "xmldsig-" + UUID.randomUUID().toString();
 		String signatureValueId = signatureId + "-signature-value";
 		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory
 				.newXMLSignature(signedInfo, null, objects, signatureId,

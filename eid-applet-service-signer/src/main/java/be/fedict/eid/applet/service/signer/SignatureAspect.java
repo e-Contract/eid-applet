@@ -43,12 +43,14 @@ public interface SignatureAspect {
 	 * 
 	 * @param signatureFactory
 	 * @param document
+	 * @param signatureId
 	 * @param references
 	 * @param objects
 	 * @throws InvalidAlgorithmParameterException
 	 * @throws NoSuchAlgorithmException
 	 */
 	void preSign(XMLSignatureFactory signatureFactory, Document document,
-			List<Reference> references, List<XMLObject> objects)
-			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException;
+			String signatureId, List<Reference> references,
+			List<XMLObject> objects) throws NoSuchAlgorithmException,
+			InvalidAlgorithmParameterException;
 }
