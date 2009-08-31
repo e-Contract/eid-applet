@@ -23,16 +23,19 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Manifest;
 import javax.xml.crypto.dsig.Reference;
+import javax.xml.crypto.dsig.SignatureProperties;
+import javax.xml.crypto.dsig.SignatureProperty;
 import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
@@ -78,7 +81,7 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 	}
 
 	public void preSign(XMLSignatureFactory signatureFactory,
-			Document document, List<Reference> references,
+			Document document, String signatureId, List<Reference> references,
 			List<XMLObject> objects) throws NoSuchAlgorithmException,
 			InvalidAlgorithmParameterException {
 		LOG.debug("pre sign");
@@ -119,8 +122,173 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 		Manifest manifest = signatureFactory.newManifest(manifestReferences);
 		String objectId = "ooxml-manifest-object-"
 				+ UUID.randomUUID().toString();
-		objects.add(signatureFactory.newXMLObject(Collections
-				.singletonList(manifest), objectId, null, null));
+		List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
+		objectContent.add(manifest);
+
+		/*
+		 * SignatureTime
+		 */
+		Element signatureTimeElement = document
+				.createElementNS(
+						"http://schemas.openxmlformats.org/package/2006/digital-signature",
+						"mdssi:SignatureTime");
+		signatureTimeElement
+				.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:mdssi",
+						"http://schemas.openxmlformats.org/package/2006/digital-signature");
+		Element formatElement = document
+				.createElementNS(
+						"http://schemas.openxmlformats.org/package/2006/digital-signature",
+						"mdssi:Format");
+		formatElement.setTextContent("YYYY-MM-DDThh:mm:ssTZD");
+		signatureTimeElement.appendChild(formatElement);
+		Element valueElement = document
+				.createElementNS(
+						"http://schemas.openxmlformats.org/package/2006/digital-signature",
+						"mdssi:Value");
+		valueElement.setTextContent("2009-08-21T09:46:20Z");
+		signatureTimeElement.appendChild(valueElement);
+
+		List<XMLStructure> signatureTimeContent = new LinkedList<XMLStructure>();
+		signatureTimeContent.add(new DOMStructure(signatureTimeElement));
+		SignatureProperty signatureTimeSignatureProperty = signatureFactory
+				.newSignatureProperty(signatureTimeContent, "#" + signatureId,
+						null);
+		List<SignatureProperty> signaturePropertyContent = new LinkedList<SignatureProperty>();
+		signaturePropertyContent.add(signatureTimeSignatureProperty);
+		SignatureProperties signatureProperties = signatureFactory
+				.newSignatureProperties(signaturePropertyContent, null);
+		objectContent.add(signatureProperties);
+
+		objects.add(signatureFactory.newXMLObject(objectContent, objectId,
+				null, null));
+
+		DigestMethod digestMethod = signatureFactory.newDigestMethod(
+				DigestMethod.SHA1, null);
+		Reference reference = signatureFactory.newReference("#" + objectId,
+				digestMethod);
+		references.add(reference);
+
+		addSignatureInfo(signatureFactory, document, signatureId, references,
+				objects);
+	}
+
+	private void addSignatureInfo(XMLSignatureFactory signatureFactory,
+			Document document, String signatureId, List<Reference> references,
+			List<XMLObject> objects) throws NoSuchAlgorithmException,
+			InvalidAlgorithmParameterException {
+		List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
+
+		Element signatureInfoElement = document.createElementNS(
+				"http://schemas.microsoft.com/office/2006/digsig",
+				"SignatureInfoV1");
+		signatureInfoElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns",
+				"http://schemas.microsoft.com/office/2006/digsig");
+
+		signatureInfoElement.appendChild(document.createElementNS(
+				"http://schemas.microsoft.com/office/2006/digsig", "SetupID"));
+
+		signatureInfoElement.appendChild(document.createElementNS(
+				"http://schemas.microsoft.com/office/2006/digsig",
+				"SignatureText"));
+
+		signatureInfoElement.appendChild(document.createElementNS(
+				"http://schemas.microsoft.com/office/2006/digsig",
+				"SignatureImage"));
+
+		Element signatureCommentsElement = document.createElementNS(
+				"http://schemas.microsoft.com/office/2006/digsig",
+				"SignatureComments");
+		signatureCommentsElement.setTextContent("Test");
+		signatureInfoElement.appendChild(signatureCommentsElement);
+
+		Element windowsVersionElement = document.createElementNS(
+				"http://schemas.microsoft.com/office/2006/digsig",
+				"WindowsVersion");
+		windowsVersionElement.setTextContent("6.1");
+		signatureInfoElement.appendChild(windowsVersionElement);
+
+		Element officeVersionElement = document.createElementNS(
+				"http://schemas.microsoft.com/office/2006/digsig",
+				"OfficeVersion");
+		officeVersionElement.setTextContent("12.0");
+		signatureInfoElement.appendChild(officeVersionElement);
+
+		Element applicationVersionElement = document.createElementNS(
+				"http://schemas.microsoft.com/office/2006/digsig",
+				"ApplicationVersion");
+		applicationVersionElement.setTextContent("12.0");
+		signatureInfoElement.appendChild(applicationVersionElement);
+
+		Element monitorsElement = document.createElementNS(
+				"http://schemas.microsoft.com/office/2006/digsig", "Monitors");
+		monitorsElement.setTextContent("1");
+		signatureInfoElement.appendChild(monitorsElement);
+
+		Element horizontalResolutionElement = document.createElementNS(
+				"http://schemas.microsoft.com/office/2006/digsig",
+				"HorizontalResolution");
+		horizontalResolutionElement.setTextContent("1224");
+		signatureInfoElement.appendChild(horizontalResolutionElement);
+
+		Element verticalResolutionElement = document.createElementNS(
+				"http://schemas.microsoft.com/office/2006/digsig",
+				"VerticalResolution");
+		verticalResolutionElement.setTextContent("727");
+		signatureInfoElement.appendChild(verticalResolutionElement);
+
+		Element colorDepthElement = document
+				.createElementNS(
+						"http://schemas.microsoft.com/office/2006/digsig",
+						"ColorDepth");
+		colorDepthElement.setTextContent("32");
+		signatureInfoElement.appendChild(colorDepthElement);
+
+		Element signatureProviderIdElement = document.createElementNS(
+				"http://schemas.microsoft.com/office/2006/digsig",
+				"SignatureProviderId");
+		signatureProviderIdElement
+				.setTextContent("{00000000-0000-0000-0000-000000000000}");
+		signatureInfoElement.appendChild(signatureProviderIdElement);
+
+		signatureInfoElement.appendChild(document.createElementNS(
+				"http://schemas.microsoft.com/office/2006/digsig",
+				"SignatureProviderUrl"));
+
+		Element signatureProviderDetailsElement = document.createElementNS(
+				"http://schemas.microsoft.com/office/2006/digsig",
+				"SignatureProviderDetails");
+		signatureProviderDetailsElement.setTextContent("9");
+		signatureInfoElement.appendChild(signatureProviderDetailsElement);
+
+		Element manifestHashAlgorithmElement = document.createElementNS(
+				"http://schemas.microsoft.com/office/2006/digsig",
+				"ManifestHashAlgorithm");
+		manifestHashAlgorithmElement
+				.setTextContent("http://www.w3.org/2000/09/xmldsig#sha1");
+		signatureInfoElement.appendChild(manifestHashAlgorithmElement);
+
+		Element signatureTypeElement = document.createElementNS(
+				"http://schemas.microsoft.com/office/2006/digsig",
+				"SignatureType");
+		signatureTypeElement.setTextContent("1");
+		signatureInfoElement.appendChild(signatureTypeElement);
+
+		List<XMLStructure> signatureInfoContent = new LinkedList<XMLStructure>();
+		signatureInfoContent.add(new DOMStructure(signatureInfoElement));
+		SignatureProperty signatureInfoSignatureProperty = signatureFactory
+				.newSignatureProperty(signatureInfoContent, "#" + signatureId,
+						null);
+
+		List<SignatureProperty> signaturePropertyContent = new LinkedList<SignatureProperty>();
+		signaturePropertyContent.add(signatureInfoSignatureProperty);
+		SignatureProperties signatureProperties = signatureFactory
+				.newSignatureProperties(signaturePropertyContent, null);
+		objectContent.add(signatureProperties);
+
+		String objectId = "ooxml-signature-info-"
+				+ UUID.randomUUID().toString();
+		objects.add(signatureFactory.newXMLObject(objectContent, objectId,
+				null, null));
 
 		DigestMethod digestMethod = signatureFactory.newDigestMethod(
 				DigestMethod.SHA1, null);
