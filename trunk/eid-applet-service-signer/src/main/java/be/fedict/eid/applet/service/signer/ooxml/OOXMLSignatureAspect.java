@@ -97,8 +97,7 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 			List<XMLObject> objects) throws NoSuchAlgorithmException,
 			InvalidAlgorithmParameterException {
 		Manifest manifest = constructManifest(signatureFactory, document);
-		String objectId = "ooxml-manifest-object-"
-				+ UUID.randomUUID().toString();
+		String objectId = "idPackageObject"; // really has to be this value.
 		List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
 		objectContent.add(manifest);
 
@@ -186,7 +185,7 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 		signatureTimeContent.add(new DOMStructure(signatureTimeElement));
 		SignatureProperty signatureTimeSignatureProperty = signatureFactory
 				.newSignatureProperty(signatureTimeContent, "#" + signatureId,
-						null);
+						"idSignatureTime");
 		List<SignatureProperty> signaturePropertyContent = new LinkedList<SignatureProperty>();
 		signaturePropertyContent.add(signatureTimeSignatureProperty);
 		SignatureProperties signatureProperties = signatureFactory
@@ -300,7 +299,7 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 		signatureInfoContent.add(new DOMStructure(signatureInfoElement));
 		SignatureProperty signatureInfoSignatureProperty = signatureFactory
 				.newSignatureProperty(signatureInfoContent, "#" + signatureId,
-						"signature-info-" + UUID.randomUUID().toString());
+						"idOfficeV1Details");
 
 		List<SignatureProperty> signaturePropertyContent = new LinkedList<SignatureProperty>();
 		signaturePropertyContent.add(signatureInfoSignatureProperty);
@@ -308,8 +307,7 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 				.newSignatureProperties(signaturePropertyContent, null);
 		objectContent.add(signatureProperties);
 
-		String objectId = "ooxml-signature-info-"
-				+ UUID.randomUUID().toString();
+		String objectId = "idOfficeObject";
 		objects.add(signatureFactory.newXMLObject(objectContent, objectId,
 				null, null));
 
