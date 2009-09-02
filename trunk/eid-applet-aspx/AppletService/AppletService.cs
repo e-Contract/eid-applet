@@ -60,6 +60,7 @@ namespace Be.FedICT.EID.Applet.Service {
 			String messageType = httpRequest.Headers["X-AppletProtocol-Type"];
 			if ("HelloMessage".Equals(messageType)) {
 				httpResponse.AddHeader("X-AppletProtocol-IncludeAddress", "true");
+				httpResponse.AddHeader("X-AppletProtocol-IncludePhoto", "true");
 				sendCommand("IdentificationRequestMessage", httpResponse);
 				return;
 			} else if ("IdentityDataMessage".Equals(messageType)) {
@@ -139,6 +140,12 @@ namespace Be.FedICT.EID.Applet.Service {
 						break;
 					}
 				}
+				
+				int photoFileSize = int.Parse(httpRequest.Headers["X-AppletProtocol-PhotoFileSize"]);
+				byte[] photoFile = new byte[photoFileSize];
+				stream.Read(photoFile, 0, photoFileSize);
+				httpContext.Session.Add("Identity.Photo", photoFile);
+				
 				sendCommand("FinishedMessage", httpResponse);
 				return;
 			} else {
