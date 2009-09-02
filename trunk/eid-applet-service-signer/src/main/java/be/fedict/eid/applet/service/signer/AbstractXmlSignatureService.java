@@ -335,6 +335,11 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		}
 	}
 
+	protected String getCanonicalizationMethod() {
+		// CanonicalizationMethod.INCLUSIVE fails for OOo
+		return CanonicalizationMethod.EXCLUSIVE;
+	}
+
 	private byte[] getXmlSignatureDigestValue(String digestAlgo,
 			List<DigestInfo> digestInfos) throws ParserConfigurationException,
 			NoSuchAlgorithmException, InvalidAlgorithmParameterException,
@@ -413,9 +418,8 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		 */
 		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(
 				getSignatureMethod(digestAlgo), null);
-		// CanonicalizationMethod.INCLUSIVE fails for OOo
 		CanonicalizationMethod canonicalizationMethod = signatureFactory
-				.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE,
+				.newCanonicalizationMethod(getCanonicalizationMethod(),
 						(C14NMethodParameterSpec) null);
 		SignedInfo signedInfo = signatureFactory.newSignedInfo(
 				canonicalizationMethod, signatureMethod, references);

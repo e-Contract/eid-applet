@@ -26,6 +26,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.security.Signature;
 import java.security.cert.CertificateFactory;
@@ -44,6 +45,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.openssl.PEMWriter;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -325,22 +327,42 @@ public class PcscTest {
 			pcscEidSpi.waitForEidPresent();
 		}
 
-		byte[] authnCertFile = pcscEidSpi.readFile(PcscEid.AUTHN_CERT_FILE_ID);
-		byte[] signCertFile = pcscEidSpi.readFile(PcscEid.SIGN_CERT_FILE_ID);
+		byte[] authnCertData = pcscEidSpi.readFile(PcscEid.AUTHN_CERT_FILE_ID);
+		byte[] signCertData = pcscEidSpi.readFile(PcscEid.SIGN_CERT_FILE_ID);
+		byte[] citizenCaCertData = pcscEidSpi.readFile(PcscEid.CA_CERT_FILE_ID);
+		byte[] rootCaCertData = pcscEidSpi.readFile(PcscEid.ROOT_CERT_FILE_ID);
 
 		CertificateFactory certificateFactory = CertificateFactory
 				.getInstance("X.509");
 		X509Certificate authnCert = (X509Certificate) certificateFactory
-				.generateCertificate(new ByteArrayInputStream(authnCertFile));
+				.generateCertificate(new ByteArrayInputStream(authnCertData));
 		X509Certificate signCert = (X509Certificate) certificateFactory
-				.generateCertificate(new ByteArrayInputStream(signCertFile));
+				.generateCertificate(new ByteArrayInputStream(signCertData));
+		X509Certificate citizenCaCert = (X509Certificate) certificateFactory
+				.generateCertificate(new ByteArrayInputStream(citizenCaCertData));
+		X509Certificate rootCaCert = (X509Certificate) certificateFactory
+				.generateCertificate(new ByteArrayInputStream(rootCaCertData));
 
 		LOG.debug("authentication certificate: " + authnCert);
 		LOG.debug("signature certificate: " + signCert);
-		LOG.debug("authn cert size: " + authnCertFile.length);
-		LOG.debug("sign cert size: " + signCertFile.length);
+		LOG.debug("authn cert size: " + authnCertData.length);
+		LOG.debug("sign cert size: " + signCertData.length);
+
+		File rootCaFile = File.createTempFile("test-root-ca-", ".pem");
+		FileWriter rootCaFileWriter = new FileWriter(rootCaFile);
+		PEMWriter rootCaPemWriter = new PEMWriter(rootCaFileWriter);
+		rootCaPemWriter.writeObject(rootCaCert);
+		rootCaPemWriter.close();
+
+		File citizenCaFile = File.createTempFile("test-citizen-ca-", ".pem");
+		FileWriter citizenCaFileWriter = new FileWriter(citizenCaFile);
+		PEMWriter citizenCaPemWriter = new PEMWriter(citizenCaFileWriter);
+		citizenCaPemWriter.writeObject(citizenCaCert);
+		citizenCaPemWriter.close();
 
 		pcscEidSpi.close();
+		LOG.debug("root ca file: " + rootCaFile.getAbsolutePath());
+		LOG.debug("citizen CA file: " + citizenCaFile.getAbsolutePath());
 	}
 
 	@Test

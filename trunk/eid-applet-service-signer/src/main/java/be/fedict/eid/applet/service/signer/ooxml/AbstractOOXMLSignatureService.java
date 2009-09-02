@@ -36,6 +36,7 @@ import java.util.zip.ZipOutputStream;
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.dom.DOMCryptoContext;
+import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.XMLSignContext;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
@@ -95,6 +96,11 @@ public abstract class AbstractOOXMLSignatureService extends
 	protected final URIDereferencer getURIDereferencer() {
 		URL ooxmlUrl = getOfficeOpenXMLDocumentURL();
 		return new OOXMLURIDereferencer(ooxmlUrl);
+	}
+
+	@Override
+	protected String getCanonicalizationMethod() {
+		return CanonicalizationMethod.INCLUSIVE;
 	}
 
 	@Override
