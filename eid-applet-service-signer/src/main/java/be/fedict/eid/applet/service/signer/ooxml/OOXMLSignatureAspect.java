@@ -85,7 +85,49 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 			List<XMLObject> objects) throws NoSuchAlgorithmException,
 			InvalidAlgorithmParameterException {
 		LOG.debug("pre sign");
+		addManifestObject(signatureFactory, document, signatureId, references,
+				objects);
+
+		addSignatureInfo(signatureFactory, document, signatureId, references,
+				objects);
+	}
+
+	private void addManifestObject(XMLSignatureFactory signatureFactory,
+			Document document, String signatureId, List<Reference> references,
+			List<XMLObject> objects) throws NoSuchAlgorithmException,
+			InvalidAlgorithmParameterException {
+		Manifest manifest = constructManifest(signatureFactory, document);
+		String objectId = "ooxml-manifest-object-"
+				+ UUID.randomUUID().toString();
+		List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
+		objectContent.add(manifest);
+
+		addSignatureTime(signatureFactory, document, signatureId, objectContent);
+
+		objects.add(signatureFactory.newXMLObject(objectContent, objectId,
+				null, null));
+
+		DigestMethod digestMethod = signatureFactory.newDigestMethod(
+				DigestMethod.SHA1, null);
+		Reference reference = signatureFactory.newReference("#" + objectId,
+				digestMethod);
+		references.add(reference);
+	}
+
+	private Manifest constructManifest(XMLSignatureFactory signatureFactory,
+			Document document) throws NoSuchAlgorithmException,
+			InvalidAlgorithmParameterException {
 		List<Reference> manifestReferences = new LinkedList<Reference>();
+
+		try {
+			addRelationshipsReference(signatureFactory, document,
+					manifestReferences);
+			addDocumentRelationshipsReference(signatureFactory, document,
+					manifestReferences);
+		} catch (Exception e) {
+			throw new RuntimeException("error: " + e.getMessage(), e);
+		}
+
 		addParts(
 				signatureFactory,
 				"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml",
@@ -110,21 +152,13 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 				"application/vnd.openxmlformats-officedocument.wordprocessingml.webSettings+xml",
 				manifestReferences);
 
-		try {
-			addRelationshipsReference(signatureFactory, document,
-					manifestReferences);
-			addDocumentRelationshipsReference(signatureFactory, document,
-					manifestReferences);
-		} catch (Exception e) {
-			throw new RuntimeException("error: " + e.getMessage(), e);
-		}
-
 		Manifest manifest = signatureFactory.newManifest(manifestReferences);
-		String objectId = "ooxml-manifest-object-"
-				+ UUID.randomUUID().toString();
-		List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
-		objectContent.add(manifest);
+		return manifest;
+	}
 
+	private void addSignatureTime(XMLSignatureFactory signatureFactory,
+			Document document, String signatureId,
+			List<XMLStructure> objectContent) {
 		/*
 		 * SignatureTime
 		 */
@@ -156,20 +190,9 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 		List<SignatureProperty> signaturePropertyContent = new LinkedList<SignatureProperty>();
 		signaturePropertyContent.add(signatureTimeSignatureProperty);
 		SignatureProperties signatureProperties = signatureFactory
-				.newSignatureProperties(signaturePropertyContent, null);
+				.newSignatureProperties(signaturePropertyContent,
+						"id-signature-time-" + UUID.randomUUID().toString());
 		objectContent.add(signatureProperties);
-
-		objects.add(signatureFactory.newXMLObject(objectContent, objectId,
-				null, null));
-
-		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				DigestMethod.SHA1, null);
-		Reference reference = signatureFactory.newReference("#" + objectId,
-				digestMethod);
-		references.add(reference);
-
-		addSignatureInfo(signatureFactory, document, signatureId, references,
-				objects);
 	}
 
 	private void addSignatureInfo(XMLSignatureFactory signatureFactory,
@@ -277,7 +300,7 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 		signatureInfoContent.add(new DOMStructure(signatureInfoElement));
 		SignatureProperty signatureInfoSignatureProperty = signatureFactory
 				.newSignatureProperty(signatureInfoContent, "#" + signatureId,
-						null);
+						"signature-info-" + UUID.randomUUID().toString());
 
 		List<SignatureProperty> signaturePropertyContent = new LinkedList<SignatureProperty>();
 		signaturePropertyContent.add(signatureInfoSignatureProperty);

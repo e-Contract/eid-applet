@@ -59,20 +59,29 @@ namespace Be.FedICT.EID.Applet.Service {
 			}
 			String messageType = httpRequest.Headers["X-AppletProtocol-Type"];
 			if ("HelloMessage".Equals(messageType)) {
+				httpResponse.AddHeader("X-AppletProtocol-IncludeAddress", "true");
 				sendCommand("IdentificationRequestMessage", httpResponse);
 				return;
 			} else if ("IdentityDataMessage".Equals(messageType)) {
 				int identityFileSize = int.Parse(httpRequest.Headers["X-AppletProtocol-IdentityFileSize"]);
 				Stream stream = httpRequest.InputStream;
+				byte[] identityFile = new byte[identityFileSize];
+				stream.Read(identityFile, 0, identityFileSize);
 				Identity identity = new Identity();
 				Type identityType = typeof(Identity);
 				PropertyInfo[] properties = identityType.GetProperties();
-				while (stream.Position < stream.Length) {
-					int tag = stream.ReadByte();
-					int length = stream.ReadByte();
+				int idx = 0;
+				while (idx < identityFileSize) {
+					int tag = identityFile[idx++];
+					int length = identityFile[idx++];
 					byte[] buffer = new byte[length];
-					stream.Read(buffer, 0, length);
+					Array.Copy(identityFile, idx, buffer, 0, length);
+					idx += length;
 					switch(tag) {
+					case 6:
+						String nationalNumber = Encoding.UTF8.GetString(buffer);
+						httpContext.Session.Add("Identity.NationalNumber", nationalNumber);
+						break;
 					case 7:
 						String name = Encoding.UTF8.GetString(buffer);
 						httpContext.Session.Add("Identity.Name", name);
@@ -80,6 +89,14 @@ namespace Be.FedICT.EID.Applet.Service {
 					case 8:
 						String firstName = Encoding.UTF8.GetString(buffer);
 						httpContext.Session.Add("Identity.FirstName", firstName);
+						break;
+					case 12:
+						String dateOfBirth = Encoding.UTF8.GetString(buffer);
+						httpContext.Session.Add("Identity.DateOfBirth", dateOfBirth);
+						break;
+					case 13:
+						String gender = Encoding.UTF8.GetString(buffer);
+						httpContext.Session.Add("Identity.Gender", gender);
 						break;
 					}
 					foreach (PropertyInfo property in properties) {
@@ -95,6 +112,32 @@ namespace Be.FedICT.EID.Applet.Service {
 						}
 					}
 					httpContext.Session.Add("Identity", identity);
+				}
+				
+				int addressFileSize = int.Parse(httpRequest.Headers["X-AppletProtocol-AddressFileSize"]);
+				byte[] addressFile = new byte[addressFileSize];
+				stream.Read(addressFile, 0, addressFileSize);
+				idx = 0;
+				while (idx < addressFileSize - 1) {
+					int tag = addressFile[idx++];
+					int length = addressFile[idx++];
+					byte[] buffer = new byte[length];
+					Array.Copy(addressFile, idx, buffer, 0, length);
+					idx += length;
+					switch(tag) {
+					case 1:
+						String streetAndNumber = Encoding.UTF8.GetString(buffer);
+						httpContext.Session.Add("Address.StreetAndNumber", streetAndNumber);
+						break;
+					case 2:
+						String zip = Encoding.UTF8.GetString(buffer);
+						httpContext.Session.Add("Address.ZIP", zip);
+						break;
+					case 3:
+						String municipality = Encoding.UTF8.GetString(buffer);
+						httpContext.Session.Add("Address.Municipality", municipality);
+						break;
+					}
 				}
 				sendCommand("FinishedMessage", httpResponse);
 				return;
