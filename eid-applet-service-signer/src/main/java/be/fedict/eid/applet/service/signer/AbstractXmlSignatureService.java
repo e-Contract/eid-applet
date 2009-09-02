@@ -628,7 +628,8 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			throws TransformerConfigurationException,
 			TransformerFactoryConfigurationError, TransformerException,
 			IOException {
-		writeDocumentNoClosing(document, documentOutputStream, true);
+		// we need the XML processing initial line for OOXML
+		writeDocumentNoClosing(document, documentOutputStream, false);
 	}
 
 	protected void writeDocumentNoClosing(Document document,
