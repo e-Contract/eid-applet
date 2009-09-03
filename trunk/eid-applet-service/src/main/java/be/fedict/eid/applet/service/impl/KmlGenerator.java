@@ -71,7 +71,7 @@ public class KmlGenerator {
 
             Element elName = doc.createName(identity.firstName + " " + identity.name);
 
-            /* general description */
+            /* name */
             htmlDescription += identity.firstName + " ";
             if (null != identity.middleName) {
                 htmlDescription += identity.middleName + " ";
@@ -79,17 +79,33 @@ public class KmlGenerator {
             htmlDescription += identity.name;
             htmlDescription += "<br/>";
 
-            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-            String birthday = formatter.format(identity.dateOfBirth.getTime());
-            htmlDescription += "(°" + birthday +")";
+            /* nationality */
+            htmlDescription += identity.nationality;
             htmlDescription += "<br/>";
 
+            /* day of birth */
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            String birthday = formatter.format(identity.dateOfBirth.getTime());
+            htmlDescription += "(°" + birthday + ", " + identity.placeOfBirth + ")";
+            htmlDescription += "<br/>";
+
+            /* validity of the card */
+            Element elValid = null;
+
+            if (null != identity.cardValidityDateBegin) {
+                elValid = doc.createTimespan(identity.cardValidityDateBegin.getTime(),
+                                        identity.cardValidityDateEnd.getTime());
+            } else {
+                LOG.debug("card validity begin date is unknown");
+            }
+
+            /* citizen's address */
             Element elAddress = null;
 
             if (null != eIdData.getAddress()) {
                 Address address = eIdData.getAddress();
 
-                /* not needed, or it appears twice in GoogleEarth
+                /* not needed, or it will appear twice in GoogleEarth
                 htmlDescription += address.streetAndNumber + ", " +
                         address.zip + " " + address.municipality;
                 htmlDescription += "<br/>";
@@ -101,7 +117,7 @@ public class KmlGenerator {
             }
 
             Element elDescription = doc.createDescriptionNode(htmlDescription);
-            doc.addPlacemark(elName, elAddress, elDescription);
+            doc.addPlacemark(elName, elAddress, elDescription, elValid);
         }
         kml.addKmlFile(doc.getDocumentAsBytes());
         kml.close();
