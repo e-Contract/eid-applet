@@ -32,11 +32,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import be.fedict.eid.applet.beta.TempFileManager;
+import be.fedict.eid.applet.beta.OOXMLUploader;
 
-public class ODFDownloadServlet extends HttpServlet {
+public class OOXMLDownloadServlet extends HttpServlet {
 
-	private static final Log LOG = LogFactory.getLog(ODFDownloadServlet.class);
+	private static final Log LOG = LogFactory
+			.getLog(OOXMLDownloadServlet.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -45,15 +46,16 @@ public class ODFDownloadServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		LOG.debug("doGet");
 		HttpSession httpSession = request.getSession();
-		URL odfUrl = (URL) httpSession
-				.getAttribute(TempFileManager.ODF_URL_SESSION_ATTRIBUTE);
-		response.setContentType("application/vnd.oasis.opendocument.text");
+		URL ooxmlUrl = (URL) httpSession
+				.getAttribute(OOXMLUploader.OOXML_URL_SESSION_ATTRIBUTE);
+		response
+				.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
 		response.setHeader("Cache-Control",
 				"no-cache, no-store, must-revalidate, max-age=-1"); // http 1.1
 		response.setHeader("Pragma", "no-cache, no-store"); // http 1.0
 		response.setDateHeader("Expires", -1);
 		ServletOutputStream out = response.getOutputStream();
-		IOUtils.copy(odfUrl.openStream(), out);
+		IOUtils.copy(ooxmlUrl.openStream(), out);
 		out.close();
 	}
 }

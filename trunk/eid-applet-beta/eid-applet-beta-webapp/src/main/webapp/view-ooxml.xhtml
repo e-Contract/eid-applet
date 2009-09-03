@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:s="http://jboss.com/products/seam/taglib">
+<body>
+<ui:composition template="/WEB-INF/template.xhtml">
+	<ui:param name="activeMenu" value="test" />
+	<ui:define name="body">
+		<h2>eID Applet Signature Test</h2>
+		<p>This page gives an overview of the uploaded OOXML file.</p>
+		<h:panelGrid columns="2">
+			<h:outputText value="File (click to download):" />
+			<a
+				href="#{facesContext.externalContext.requestContextPath}/ooxml-download/#{ooxmlFileName}">#{ooxmlFileName}</a>
+		</h:panelGrid>
+		<h:form>
+			<rich:dataTable var="signer" value="#{ooxmlSigners}" rows="10"
+				rendered="#{!ooxmlSigners.isEmpty()}">
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="Signer" />
+					</f:facet>
+					<h:outputText value="#{signer.subjectX500Principal}" />
+				</rich:column>
+				<f:facet name="footer">
+					<rich:datascroller />
+				</f:facet>
+			</rich:dataTable>
+			<h:messages globalOnly="true" style="color: red;" />
+			<h:commandButton value="Add Signature" action="add" />
+			<h:commandButton value="Back" action="back" />
+		</h:form>
+	</ui:define>
+</ui:composition>
+</body>
+</html>

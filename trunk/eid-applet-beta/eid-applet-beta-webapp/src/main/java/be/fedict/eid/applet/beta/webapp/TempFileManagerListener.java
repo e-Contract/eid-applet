@@ -26,22 +26,22 @@ import javax.servlet.http.HttpSessionListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import be.fedict.eid.applet.beta.ODFTempFileManager;
+import be.fedict.eid.applet.beta.TempFileManager;
 
 /**
- * ODF temporary file manager listener. Triggers the clean up of the temporary
- * ODF files.
+ * Temporary file manager listener. Triggers the clean up of the temporary
+ * files.
  * 
  * @author Frank Cornelis
  * 
  */
-public class ODFTempFileManagerListener implements HttpSessionListener {
+public class TempFileManagerListener implements HttpSessionListener {
 
 	private static final Log LOG = LogFactory
-			.getLog(ODFTempFileManagerListener.class);
+			.getLog(TempFileManagerListener.class);
 
 	@EJB
-	private ODFTempFileManager odfTempFileManager;
+	private TempFileManager tempFileManager;
 
 	public void sessionCreated(HttpSessionEvent event) {
 		LOG.debug("session created");
@@ -50,6 +50,6 @@ public class ODFTempFileManagerListener implements HttpSessionListener {
 	public void sessionDestroyed(HttpSessionEvent event) {
 		LOG.debug("session destroyed");
 		HttpSession httpSession = event.getSession();
-		this.odfTempFileManager.cleanup(httpSession);
+		this.tempFileManager.cleanup(httpSession);
 	}
 }

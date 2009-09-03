@@ -42,12 +42,12 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Out;
 import org.jboss.seam.log.Log;
 
-import be.fedict.eid.applet.service.signer.odf.ODFSignatureVerifier;
+import be.fedict.eid.applet.service.signer.ooxml.OOXMLSignatureVerifier;
 
 @Stateful
-@Name("odfUploader")
-@LocalBinding(jndiBinding = "fedict/eid/applet/beta/ODFUploaderBean")
-public class ODFUploaderBean implements ODFUploader {
+@Name("ooxmlUploader")
+@LocalBinding(jndiBinding = "fedict/eid/applet/beta/OOXMLUploaderBean")
+public class OOXMLUploaderBean implements OOXMLUploader {
 
 	@Logger
 	private Log log;
@@ -56,18 +56,12 @@ public class ODFUploaderBean implements ODFUploader {
 
 	private InputStream uploadedFile;
 
-	private int fileSize;
-
 	@EJB
-	private TempFileManager odfTempFileManager;
+	private TempFileManager tempFileManager;
 
 	@SuppressWarnings("unused")
 	@Out(scope = ScopeType.SESSION, required = false)
-	private int odfFileSize;
-
-	@SuppressWarnings("unused")
-	@Out(scope = ScopeType.SESSION, required = false)
-	private String odfFileName;
+	private String ooxmlFileName;
 
 	@In
 	private FacesContext facesContext;
@@ -96,18 +90,16 @@ public class ODFUploaderBean implements ODFUploader {
 
 	public String upload() {
 		this.log.debug("upload: " + this.fileName);
-		this.log.debug("file size: " + this.fileSize);
-		this.odfFileName = this.fileName;
-		this.odfFileSize = this.fileSize;
+		this.ooxmlFileName = this.fileName;
 		try {
-			URL tmpFileUrl = this.odfTempFileManager
-					.createTempFile(TempFileManager.ODF_URL_SESSION_ATTRIBUTE);
+			URL tmpFileUrl = this.tempFileManager
+					.createTempFile(OOXML_URL_SESSION_ATTRIBUTE);
 			File tmpFile = new File(tmpFileUrl.toURI());
 			OutputStream outputStream = new FileOutputStream(tmpFile);
 			IOUtils.copy(this.uploadedFile, outputStream);
-			if (false == ODFSignatureVerifier.isODF(tmpFileUrl)) {
+			if (false == OOXMLSignatureVerifier.isOOXML(tmpFileUrl)) {
 				this.facesContext.addMessage(null, new FacesMessage(
-						"not an ODF document"));
+						"not an OOXML document"));
 				return null;
 			}
 		} catch (IOException e) {
@@ -116,13 +108,5 @@ public class ODFUploaderBean implements ODFUploader {
 			throw new RuntimeException("URI error: " + e.getMessage(), e);
 		}
 		return "success";
-	}
-
-	public int getFileSize() {
-		return this.fileSize;
-	}
-
-	public void setFileSize(int fileSize) {
-		this.fileSize = fileSize;
 	}
 }

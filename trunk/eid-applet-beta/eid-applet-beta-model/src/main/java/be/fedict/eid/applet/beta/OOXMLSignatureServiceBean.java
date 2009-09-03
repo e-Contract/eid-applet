@@ -39,47 +39,86 @@ import org.jboss.ejb3.annotation.LocalBinding;
 
 import be.fedict.eid.applet.service.signer.HttpSessionTemporaryDataStorage;
 import be.fedict.eid.applet.service.signer.TemporaryDataStorage;
-import be.fedict.eid.applet.service.signer.odf.AbstractODFSignatureService;
+import be.fedict.eid.applet.service.signer.ooxml.AbstractOOXMLSignatureService;
+import be.fedict.eid.applet.service.signer.ooxml.OOXMLProvider;
 import be.fedict.eid.applet.service.spi.SignatureService;
 
 /**
- * Signature Service that manages the eID ODF signature test.
+ * Signature Service that manages the eID OOXML signature test.
  * 
  * @author Frank Cornelis
  * 
  */
 @Stateless
 @Local(SignatureService.class)
-@LocalBinding(jndiBinding = "fedict/eid/applet/beta/SignatureServiceBean")
-public class SignatureServiceBean extends AbstractODFSignatureService {
+@LocalBinding(jndiBinding = "fedict/eid/applet/beta/OOXMLSignatureServiceBean")
+public class OOXMLSignatureServiceBean extends AbstractOOXMLSignatureService {
 
 	private static final Log LOG = LogFactory
-			.getLog(SignatureServiceBean.class);
+			.getLog(OOXMLSignatureServiceBean.class);
 
-	private static final String TMP_SIGNED_ODF = "signedOdfUrl";
+	private static final String TMP_SIGNED_OOXML = "signedOoxmlUrl";
 
 	private final TemporaryDataStorage temporaryDataStorage;
 
 	@EJB
-	private TempFileManager odfTempFileManager;
+	private TempFileManager tempFileManager;
 
-	public SignatureServiceBean() {
+	static {
+		OOXMLProvider.install();
+	}
+
+	public OOXMLSignatureServiceBean() {
 		LOG.debug("constructor");
 		this.temporaryDataStorage = new HttpSessionTemporaryDataStorage();
 	}
 
 	@Override
-	protected URL getOpenDocumentURL() {
-		return this.odfTempFileManager
-				.getTempFile(TempFileManager.ODF_URL_SESSION_ATTRIBUTE);
+	public void postSign(byte[] signatureValue,
+			List<X509Certificate> signingCertificateChain) {
+		super.postSign(signatureValue, signingCertificateChain);
+		LOG.debug("after super post sign");
+		URL tmpSignedOoxmlUrl = this.tempFileManager
+				.getTempFile(TMP_SIGNED_OOXML);
+		LOG.debug("tmp signed OOXML url: " + tmpSignedOoxmlUrl);
+		URL ooxmlUrl = this.tempFileManager
+				.getTempFile(OOXMLUploader.OOXML_URL_SESSION_ATTRIBUTE);
+		File ooxmlFile;
+		try {
+			ooxmlFile = new File(ooxmlUrl.toURI());
+		} catch (URISyntaxException e) {
+			throw new RuntimeException("URI error");
+		}
+		OutputStream outputStream;
+		try {
+			outputStream = new FileOutputStream(ooxmlFile);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException("FileNotFoundException error");
+		}
+		try {
+			IOUtils.copy(tmpSignedOoxmlUrl.openStream(), outputStream);
+		} catch (IOException e) {
+			throw new RuntimeException("IOException error");
+		}
 	}
 
 	@Override
-	protected OutputStream getSignedOpenDocumentOutputStream() {
-		LOG.debug("get signed ODF output stream");
+	protected TemporaryDataStorage getTemporaryDataStorage() {
+		return this.temporaryDataStorage;
+	}
+
+	@Override
+	protected URL getOfficeOpenXMLDocumentURL() {
+		return this.tempFileManager
+				.getTempFile(OOXMLUploader.OOXML_URL_SESSION_ATTRIBUTE);
+	}
+
+	@Override
+	protected OutputStream getSignedOfficeOpenXMLDocumentOutputStream() {
+		LOG.debug("get signed OOXML output stream");
 		try {
-			URL tmpSignedOdfUrl = this.odfTempFileManager
-					.createTempFile(TMP_SIGNED_ODF);
+			URL tmpSignedOdfUrl = this.tempFileManager
+					.createTempFile(TMP_SIGNED_OOXML);
 			File tmpSignedOdfFile = new File(tmpSignedOdfUrl.toURI());
 			FileOutputStream outputStream = new FileOutputStream(
 					tmpSignedOdfFile);
@@ -89,39 +128,5 @@ public class SignatureServiceBean extends AbstractODFSignatureService {
 		} catch (URISyntaxException e) {
 			throw new RuntimeException("URI error: " + e.getMessage(), e);
 		}
-	}
-
-	@Override
-	public void postSign(byte[] signatureValue,
-			List<X509Certificate> signingCertificateChain) {
-		super.postSign(signatureValue, signingCertificateChain);
-		LOG.debug("after super post sign");
-		URL tmpSignedOdfUrl = this.odfTempFileManager
-				.getTempFile(TMP_SIGNED_ODF);
-		LOG.debug("tmp signed ODF url: " + tmpSignedOdfUrl);
-		URL odfUrl = this.odfTempFileManager
-				.getTempFile(TempFileManager.ODF_URL_SESSION_ATTRIBUTE);
-		File odfFile;
-		try {
-			odfFile = new File(odfUrl.toURI());
-		} catch (URISyntaxException e) {
-			throw new RuntimeException("URI error");
-		}
-		OutputStream outputStream;
-		try {
-			outputStream = new FileOutputStream(odfFile);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("FileNotFoundException error");
-		}
-		try {
-			IOUtils.copy(tmpSignedOdfUrl.openStream(), outputStream);
-		} catch (IOException e) {
-			throw new RuntimeException("IOException error");
-		}
-	}
-
-	@Override
-	protected TemporaryDataStorage getTemporaryDataStorage() {
-		return this.temporaryDataStorage;
 	}
 }

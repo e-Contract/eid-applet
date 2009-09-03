@@ -36,14 +36,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 @Stateless
-public class ODFTempFileManagerBean implements ODFTempFileManager {
+public class TempFileManagerBean implements TempFileManager {
 
-	private static final String TMP_FILE_URLS_SESSION_ATTRIBUTE = ODFTempFileManagerBean.class
+	private static final String TMP_FILE_URLS_SESSION_ATTRIBUTE = TempFileManagerBean.class
 			.getName()
 			+ ".tmpFileUrls";
 
-	private static final Log LOG = LogFactory
-			.getLog(ODFTempFileManagerBean.class);
+	private static final Log LOG = LogFactory.getLog(TempFileManagerBean.class);
 
 	private static class TmpSessionFile implements Serializable {
 
@@ -87,22 +86,20 @@ public class ODFTempFileManagerBean implements ODFTempFileManager {
 				+ tmpSessionFile.sessionAttribute);
 		httpSession.removeAttribute(tmpSessionFile.sessionAttribute);
 
-		File odfFile;
+		File file;
 		try {
-			odfFile = new File(tmpSessionFile.tmpFileUrl.toURI());
+			file = new File(tmpSessionFile.tmpFileUrl.toURI());
 		} catch (URISyntaxException e) {
 			throw new RuntimeException("URI error: " + e.getMessage(), e);
 		}
-		if (false == odfFile.exists()) {
-			LOG.warn("tmp ODF file does not exist: "
-					+ odfFile.getAbsolutePath());
+		if (false == file.exists()) {
+			LOG.warn("tmp file does not exist: " + file.getAbsolutePath());
 			return;
 		}
-		LOG.debug("deleting tmp file: " + odfFile.getAbsolutePath());
-		boolean result = odfFile.delete();
+		LOG.debug("deleting tmp file: " + file.getAbsolutePath());
+		boolean result = file.delete();
 		if (false == result) {
-			LOG.warn("could not delete temp ODF file: "
-					+ odfFile.getAbsolutePath());
+			LOG.warn("could not delete temp file: " + file.getAbsolutePath());
 		}
 	}
 
@@ -116,29 +113,27 @@ public class ODFTempFileManagerBean implements ODFTempFileManager {
 		if (null == tmpFileUrl) {
 			return;
 		}
-		File odfFile;
+		File file;
 		try {
-			odfFile = new File(tmpFileUrl.toURI());
+			file = new File(tmpFileUrl.toURI());
 		} catch (URISyntaxException e) {
 			throw new RuntimeException("URI error: " + e.getMessage(), e);
 		}
-		if (false == odfFile.exists()) {
-			LOG.debug("tmp ODF file does not exist: "
-					+ odfFile.getAbsolutePath());
+		if (false == file.exists()) {
+			LOG.debug("tmp file does not exist: " + file.getAbsolutePath());
 			return;
 		}
-		LOG.debug("deleting tmp file: " + odfFile.getAbsolutePath());
-		boolean result = odfFile.delete();
+		LOG.debug("deleting tmp file: " + file.getAbsolutePath());
+		boolean result = file.delete();
 		if (false == result) {
-			LOG.debug("could not delete temp ODF file: "
-					+ odfFile.getAbsolutePath());
+			LOG.debug("could not delete temp file: " + file.getAbsolutePath());
 		}
 	}
 
 	public URL createTempFile(String sessionAttribute) throws IOException {
 		LOG.debug("create temp file: " + sessionAttribute);
 		cleanup(sessionAttribute);
-		File tmpFile = File.createTempFile("eid-beta-", ".odf");
+		File tmpFile = File.createTempFile("eid-beta-", ".tmp");
 		URL tmpFileUrl = tmpFile.toURI().toURL();
 		HttpSession httpSession = getHttpSession();
 		httpSession.setAttribute(sessionAttribute, tmpFileUrl);

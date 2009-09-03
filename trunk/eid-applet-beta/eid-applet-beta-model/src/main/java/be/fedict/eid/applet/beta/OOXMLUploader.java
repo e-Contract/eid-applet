@@ -18,20 +18,35 @@
 
 package be.fedict.eid.applet.beta;
 
-import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 
 import javax.ejb.Local;
-import javax.servlet.http.HttpSession;
+import javax.ejb.Remove;
 
 @Local
-public interface ODFTempFileManager {
+public interface OOXMLUploader {
 
-	static final String ODF_URL_SESSION_ATTRIBUTE = "odfUrl";
+	static final String OOXML_URL_SESSION_ATTRIBUTE = "ooxmlUrl";
+	
+	/*
+	 * Accessors.
+	 */
+	String getFileName();
 
-	URL createTempFile(String sessionAttribute) throws IOException;
+	void setFileName(String fileName);
 
-	URL getTempFile(String sessionAttribute);
+	InputStream getUploadedFile();
 
-	void cleanup(HttpSession httpSession);
+	void setUploadedFile(InputStream uploadedFile);
+
+	/*
+	 * Actions.
+	 */
+	String upload();
+
+	/*
+	 * Lifecycle.
+	 */
+	@Remove
+	void destroy();
 }
