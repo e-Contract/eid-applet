@@ -136,6 +136,12 @@ public class AbstractOOXMLSignatureServiceTest {
 	}
 
 	@Test
+	public void testSignTwiceHere() throws Exception {
+		File tmpFile = sign("/hello-world-unsigned.docx", 1);
+		sign(tmpFile.toURI().toURL(), 2);
+	}
+
+	@Test
 	public void testSignPowerpoint() throws Exception {
 		sign("/hello-world-unsigned.pptx");
 	}
@@ -149,11 +155,15 @@ public class AbstractOOXMLSignatureServiceTest {
 		sign(documentResourceName, 1);
 	}
 
-	private void sign(String documentResourceName, int signerCount)
+	private File sign(String documentResourceName, int signerCount)
 			throws Exception {
-		// setup
 		URL ooxmlUrl = AbstractOOXMLSignatureServiceTest.class
 				.getResource(documentResourceName);
+		return sign(ooxmlUrl, signerCount);
+	}
+
+	private File sign(URL ooxmlUrl, int signerCount) throws Exception {
+		// setup
 		assertNotNull(ooxmlUrl);
 
 		OOXMLTestSignatureService signatureService = new OOXMLTestSignatureService(
@@ -203,14 +213,15 @@ public class AbstractOOXMLSignatureServiceTest {
 				.getSignedOfficeOpenXMLDocumentData();
 		assertNotNull(signedOOXMLData);
 		LOG.debug("signed OOXML size: " + signedOOXMLData.length);
-		String extension = FilenameUtils.getExtension(documentResourceName);
+		String extension = FilenameUtils.getExtension(ooxmlUrl.getFile());
 		tmpFile = File.createTempFile("ooxml-signed-", "." + extension);
 		FileUtils.writeByteArrayToFile(tmpFile, signedOOXMLData);
 		LOG.debug("signed OOXML file: " + tmpFile.getAbsolutePath());
 		List<X509Certificate> signers = OOXMLSignatureVerifier
 				.getSigners(tmpFile.toURI().toURL());
 		assertEquals(signerCount, signers.size());
-		//assertEquals(certificate, signers.get(0));
+		// assertEquals(certificate, signers.get(0));
 		LOG.debug("signed OOXML file: " + tmpFile.getAbsolutePath());
+		return tmpFile;
 	}
 }

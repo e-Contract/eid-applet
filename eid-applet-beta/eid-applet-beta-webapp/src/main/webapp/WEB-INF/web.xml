@@ -125,6 +125,23 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>AppletOOXMLSignatureServiceServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+		<init-param>
+			<param-name>SignatureService</param-name>
+			<param-value>fedict/eid/applet/beta/OOXMLSignatureServiceBean</param-value>
+		</init-param>
+		<init-param>
+			<param-name>AuditService</param-name>
+			<param-value>fedict/eid/applet/beta/AuditServiceBean</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AppletOOXMLSignatureServiceServlet</servlet-name>
+		<url-pattern>/applet-sign-ooxml-service</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>AppletKioskServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
 		<init-param>
@@ -162,6 +179,15 @@
 	<servlet-mapping>
 		<servlet-name>ODFDownloadServlet</servlet-name>
 		<url-pattern>/odf-download/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>OOXMLDownloadServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.beta.webapp.OOXMLDownloadServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>OOXMLDownloadServlet</servlet-name>
+		<url-pattern>/ooxml-download/*</url-pattern>
 	</servlet-mapping>
 
 	<!-- eID Applet Administrator -->
@@ -215,7 +241,7 @@
 		<listener-class>be.fedict.eid.applet.beta.webapp.SessionContextListener</listener-class>
 	</listener>
 	<listener>
-		<listener-class>be.fedict.eid.applet.beta.webapp.ODFTempFileManagerListener</listener-class>
+		<listener-class>be.fedict.eid.applet.beta.webapp.TempFileManagerListener</listener-class>
 	</listener>
 	<session-config>
 		<!-- Increase for production environments -->

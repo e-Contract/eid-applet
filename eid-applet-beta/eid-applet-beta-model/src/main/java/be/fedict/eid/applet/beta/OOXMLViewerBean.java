@@ -35,22 +35,24 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Out;
 import org.jboss.seam.log.Log;
 
-import be.fedict.eid.applet.service.signer.odf.ODFSignatureVerifier;
+import be.fedict.eid.applet.service.signer.ooxml.OOXMLSignatureVerifier;
 
 @Stateful
-@Name("odfViewer")
-@LocalBinding(jndiBinding = "fedict/eid/applet/beta/ODFViewerBean")
-public class ODFViewerBean implements ODFViewer {
+@Name("ooxmlViewer")
+@LocalBinding(jndiBinding = "fedict/eid/applet/beta/OOXMLViewerBean")
+public class OOXMLViewerBean implements OOXMLViewer {
 
 	@Logger
 	private Log log;
 
+	public static final String OOXML_SIGNERS_COMPONENT_NAME = "ooxmlSigners";
+
 	@SuppressWarnings("unused")
-	@Out
+	@Out(OOXML_SIGNERS_COMPONENT_NAME)
 	private List<X509Certificate> signers;
 
-	@In(TempFileManager.ODF_URL_SESSION_ATTRIBUTE)
-	private URL odfFileUrl;
+	@In(OOXMLUploader.OOXML_URL_SESSION_ATTRIBUTE)
+	private URL ooxmlFileUrl;
 
 	@Remove
 	@Destroy
@@ -58,13 +60,13 @@ public class ODFViewerBean implements ODFViewer {
 		this.log.debug("destroy");
 	}
 
-	@Factory("signers")
+	@Factory(OOXML_SIGNERS_COMPONENT_NAME)
 	public void createSignersList() {
 		this.log.debug("create signers list");
 		try {
-			this.signers = ODFSignatureVerifier.getSigners(this.odfFileUrl);
+			this.signers = OOXMLSignatureVerifier.getSigners(this.ooxmlFileUrl);
 		} catch (Exception e) {
-			this.log.error("ODF signature verification error: "
+			this.log.error("OOXML signature verification error: "
 					+ e.getMessage());
 			this.signers = new LinkedList<X509Certificate>();
 		}
