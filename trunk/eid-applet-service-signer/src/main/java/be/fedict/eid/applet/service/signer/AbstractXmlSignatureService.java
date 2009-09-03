@@ -637,7 +637,9 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			throws TransformerConfigurationException,
 			TransformerFactoryConfigurationError, TransformerException,
 			IOException {
-		Result result = new StreamResult(documentOutputStream);
+		NoCloseOutputStream outputStream = new NoCloseOutputStream(
+				documentOutputStream);
+		Result result = new StreamResult(outputStream);
 		Transformer xformer = TransformerFactory.newInstance().newTransformer();
 		if (omitXmlDeclaration) {
 			xformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
