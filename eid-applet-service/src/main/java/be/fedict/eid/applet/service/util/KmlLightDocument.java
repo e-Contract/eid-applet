@@ -22,6 +22,9 @@ package be.fedict.eid.applet.service.util;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -51,7 +54,7 @@ public class KmlLightDocument {
     private Document docKml;
 
     /**
-     * Create a <kml:name>, to be used as a label
+     * Create a <name>, to be used as a label
      *
      * @param name name to be used
      * @return name element
@@ -65,9 +68,9 @@ public class KmlLightDocument {
     }
 
     /**
-     * Create a <kml:address>
+     * Create a <address>
      * Note: it's up to the processing application to convert the address
-     * to (GPS) coordinates
+     * to (GPS) coordinates.
      *
      * @param street street name and number
      * @param municipality muncipality / city
@@ -75,7 +78,9 @@ public class KmlLightDocument {
      * @return address element
      */
     public Element createAddress(String street, String municipality, String zip) {
-        String address = street + ", " + municipality + ", " + zip + ", " + ", Belgium";
+        /* Use google-style address, with empty "region" */
+        String address = street + ", " + municipality + ", " + zip +
+                ", " + ", Belgium";
 
         Element elAddress = docKml.createElement("address");
         Text txtAddress = docKml.createTextNode(address);
@@ -85,7 +90,7 @@ public class KmlLightDocument {
     }
 
     /**
-     * Create a <kml:description> element, the description can contain
+     * Create a <description> element, the description can contain
      * HTML markup
      *
      * @param description text to be used
@@ -99,27 +104,56 @@ public class KmlLightDocument {
         return elDescription;
     }
 
+    
     /**
-     * Create a <kml:placemark>
+     * Create a <timespan> element
+     * 
+     * @param begin
+     * @return
+     */
+    public Element createTimespan(Date begin, Date end) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        Element elTimespan = docKml.createElement("TimeSpan");
+        if (null != begin) {
+            Element elBegin = docKml.createElement("begin");
+            elBegin.setTextContent(dateFormat.format(begin));
+            elTimespan.appendChild(elBegin);
+        }
+        if (end != null) {
+            Element elEnd = docKml.createElement("end");
+            elEnd.setTextContent(dateFormat.format(end));
+            elTimespan.appendChild(elEnd);
+        }
+
+        return elTimespan;
+    }
+
+
+    /**
+     * Create a <Placemark>
      *
      * @param name the name (title)
      * @param address the address
      * @param description the short description
+     * @param timespan day of birth
      */
-    public void addPlacemark(Node name, Node address, Node description) {
+    public void addPlacemark(Node name, Node address, Node description, Node timespan) {
         Element elPlacemark = docKml.createElement("Placemark");
       //  elPlacemark.setAttribute("id", "1");
 
-        if (null != name) {
-            elPlacemark.appendChild(name);
-        }
+        elPlacemark.appendChild(name);
+
         if (null != address) {
             elPlacemark.appendChild(address);
         } else {
             LOG.debug("address is null");
         }
-        if (null != description) {
-            elPlacemark.appendChild(description);
+        
+        elPlacemark.appendChild(description);
+
+        if (null != timespan) {
+            elPlacemark.appendChild(timespan);
         }
         docKml.getDocumentElement().appendChild(elPlacemark);
     }
