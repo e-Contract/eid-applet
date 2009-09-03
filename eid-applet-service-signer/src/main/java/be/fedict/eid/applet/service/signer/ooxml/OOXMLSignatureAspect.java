@@ -49,6 +49,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xpath.XPathAPI;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -109,7 +113,8 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 		DigestMethod digestMethod = signatureFactory.newDigestMethod(
 				DigestMethod.SHA1, null);
 		Reference reference = signatureFactory.newReference("#" + objectId,
-				digestMethod);
+				digestMethod, null, "http://www.w3.org/2000/09/xmldsig#Object",
+				null);
 		references.add(reference);
 	}
 
@@ -127,6 +132,9 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 			throw new RuntimeException("error: " + e.getMessage(), e);
 		}
 
+		/*
+		 * Word
+		 */
 		addParts(
 				signatureFactory,
 				"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml",
@@ -149,6 +157,30 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 		addParts(
 				signatureFactory,
 				"application/vnd.openxmlformats-officedocument.wordprocessingml.webSettings+xml",
+				manifestReferences);
+
+		/*
+		 * Powerpoint
+		 */
+		addParts(
+				signatureFactory,
+				"application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml",
+				manifestReferences);
+		addParts(
+				signatureFactory,
+				"application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml",
+				manifestReferences);
+		addParts(
+				signatureFactory,
+				"application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml",
+				manifestReferences);
+		addParts(
+				signatureFactory,
+				"application/vnd.openxmlformats-officedocument.presentationml.slide+xml",
+				manifestReferences);
+		addParts(
+				signatureFactory,
+				"application/vnd.openxmlformats-officedocument.presentationml.tableStyles+xml",
 				manifestReferences);
 
 		Manifest manifest = signatureFactory.newManifest(manifestReferences);
@@ -178,7 +210,11 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 				.createElementNS(
 						"http://schemas.openxmlformats.org/package/2006/digital-signature",
 						"mdssi:Value");
-		valueElement.setTextContent("2009-08-21T09:46:20Z");
+		DateTime dateTime = new DateTime(DateTimeZone.UTC);
+		DateTimeFormatter fmt = ISODateTimeFormat.dateTimeNoMillis();
+		String now = fmt.print(dateTime);
+		LOG.debug("now: " + now);
+		valueElement.setTextContent(now);
 		signatureTimeElement.appendChild(valueElement);
 
 		List<XMLStructure> signatureTimeContent = new LinkedList<XMLStructure>();
@@ -206,94 +242,12 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 		signatureInfoElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns",
 				"http://schemas.microsoft.com/office/2006/digsig");
 
-		signatureInfoElement.appendChild(document.createElementNS(
-				"http://schemas.microsoft.com/office/2006/digsig", "SetupID"));
-
-		signatureInfoElement.appendChild(document.createElementNS(
-				"http://schemas.microsoft.com/office/2006/digsig",
-				"SignatureText"));
-
-		signatureInfoElement.appendChild(document.createElementNS(
-				"http://schemas.microsoft.com/office/2006/digsig",
-				"SignatureImage"));
-
-		Element signatureCommentsElement = document.createElementNS(
-				"http://schemas.microsoft.com/office/2006/digsig",
-				"SignatureComments");
-		signatureCommentsElement.setTextContent("Test");
-		signatureInfoElement.appendChild(signatureCommentsElement);
-
-		Element windowsVersionElement = document.createElementNS(
-				"http://schemas.microsoft.com/office/2006/digsig",
-				"WindowsVersion");
-		windowsVersionElement.setTextContent("6.1");
-		signatureInfoElement.appendChild(windowsVersionElement);
-
-		Element officeVersionElement = document.createElementNS(
-				"http://schemas.microsoft.com/office/2006/digsig",
-				"OfficeVersion");
-		officeVersionElement.setTextContent("12.0");
-		signatureInfoElement.appendChild(officeVersionElement);
-
-		Element applicationVersionElement = document.createElementNS(
-				"http://schemas.microsoft.com/office/2006/digsig",
-				"ApplicationVersion");
-		applicationVersionElement.setTextContent("12.0");
-		signatureInfoElement.appendChild(applicationVersionElement);
-
-		Element monitorsElement = document.createElementNS(
-				"http://schemas.microsoft.com/office/2006/digsig", "Monitors");
-		monitorsElement.setTextContent("1");
-		signatureInfoElement.appendChild(monitorsElement);
-
-		Element horizontalResolutionElement = document.createElementNS(
-				"http://schemas.microsoft.com/office/2006/digsig",
-				"HorizontalResolution");
-		horizontalResolutionElement.setTextContent("1224");
-		signatureInfoElement.appendChild(horizontalResolutionElement);
-
-		Element verticalResolutionElement = document.createElementNS(
-				"http://schemas.microsoft.com/office/2006/digsig",
-				"VerticalResolution");
-		verticalResolutionElement.setTextContent("727");
-		signatureInfoElement.appendChild(verticalResolutionElement);
-
-		Element colorDepthElement = document
-				.createElementNS(
-						"http://schemas.microsoft.com/office/2006/digsig",
-						"ColorDepth");
-		colorDepthElement.setTextContent("32");
-		signatureInfoElement.appendChild(colorDepthElement);
-
-		Element signatureProviderIdElement = document.createElementNS(
-				"http://schemas.microsoft.com/office/2006/digsig",
-				"SignatureProviderId");
-		signatureProviderIdElement
-				.setTextContent("{00000000-0000-0000-0000-000000000000}");
-		signatureInfoElement.appendChild(signatureProviderIdElement);
-
-		signatureInfoElement.appendChild(document.createElementNS(
-				"http://schemas.microsoft.com/office/2006/digsig",
-				"SignatureProviderUrl"));
-
-		Element signatureProviderDetailsElement = document.createElementNS(
-				"http://schemas.microsoft.com/office/2006/digsig",
-				"SignatureProviderDetails");
-		signatureProviderDetailsElement.setTextContent("9");
-		signatureInfoElement.appendChild(signatureProviderDetailsElement);
-
 		Element manifestHashAlgorithmElement = document.createElementNS(
 				"http://schemas.microsoft.com/office/2006/digsig",
 				"ManifestHashAlgorithm");
 		manifestHashAlgorithmElement
 				.setTextContent("http://www.w3.org/2000/09/xmldsig#sha1");
 		signatureInfoElement.appendChild(manifestHashAlgorithmElement);
-
-		Element signatureTypeElement = document.createElementNS(
-				"http://schemas.microsoft.com/office/2006/digsig",
-				"SignatureType");
-		signatureTypeElement.setTextContent("1");
-		signatureInfoElement.appendChild(signatureTypeElement);
 
 		List<XMLStructure> signatureInfoContent = new LinkedList<XMLStructure>();
 		signatureInfoContent.add(new DOMStructure(signatureInfoElement));
@@ -314,7 +268,8 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 		DigestMethod digestMethod = signatureFactory.newDigestMethod(
 				DigestMethod.SHA1, null);
 		Reference reference = signatureFactory.newReference("#" + objectId,
-				digestMethod);
+				digestMethod, null, "http://www.w3.org/2000/09/xmldsig#Object",
+				null);
 		references.add(reference);
 	}
 
@@ -323,7 +278,13 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 			List<Reference> manifestReferences) throws IOException,
 			ParserConfigurationException, SAXException, TransformerException,
 			NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-		Document _relsDotRels = loadDocument("word/_rels/document.xml.rels");
+		Document _relsDotRels = findDocument("word/_rels/document.xml.rels");
+		if (null == _relsDotRels) {
+			/*
+			 * document.xml.rels is only present in a Word document.
+			 */
+			return;
+		}
 		Element nsElement = _relsDotRels.createElement("ns");
 		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
 				"http://schemas.openxmlformats.org/package/2006/relationships");
@@ -444,6 +405,15 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 
 	protected Document loadDocument(String zipEntryName) throws IOException,
 			ParserConfigurationException, SAXException {
+		Document document = findDocument(zipEntryName);
+		if (null != document) {
+			return document;
+		}
+		throw new RuntimeException("ZIP entry not found: " + zipEntryName);
+	}
+
+	protected Document findDocument(String zipEntryName) throws IOException,
+			ParserConfigurationException, SAXException {
 		URL ooxmlUrl = this.signatureService.getOfficeOpenXMLDocumentURL();
 		InputStream inputStream = ooxmlUrl.openStream();
 		ZipInputStream zipInputStream = new ZipInputStream(inputStream);
@@ -455,7 +425,7 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 			Document document = loadDocument(zipInputStream);
 			return document;
 		}
-		throw new RuntimeException("ZIP entry not found: " + zipEntryName);
+		return null;
 	}
 
 	protected Document loadDocument(InputStream documentInputStream)

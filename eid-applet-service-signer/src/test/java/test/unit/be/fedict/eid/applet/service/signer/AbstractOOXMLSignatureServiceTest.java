@@ -33,6 +33,7 @@ import java.util.List;
 import javax.crypto.Cipher;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
@@ -126,9 +127,18 @@ public class AbstractOOXMLSignatureServiceTest {
 
 	@Test
 	public void testPostSign() throws Exception {
+		sign("/hello-world-unsigned.docx");
+	}
+
+	@Test
+	public void testSignPowerpoint() throws Exception {
+		sign("/hello-world-unsigned.pptx");
+	}
+
+	private void sign(String documentResourceName) throws Exception {
 		// setup
 		URL ooxmlUrl = AbstractOOXMLSignatureServiceTest.class
-				.getResource("/hello-world-unsigned.docx");
+				.getResource(documentResourceName);
 		assertNotNull(ooxmlUrl);
 
 		OOXMLTestSignatureService signatureService = new OOXMLTestSignatureService(
@@ -178,7 +188,8 @@ public class AbstractOOXMLSignatureServiceTest {
 				.getSignedOfficeOpenXMLDocumentData();
 		assertNotNull(signedOOXMLData);
 		LOG.debug("signed OOXML size: " + signedOOXMLData.length);
-		tmpFile = File.createTempFile("ooxml-signed-", ".docx");
+		String extension = FilenameUtils.getExtension(documentResourceName);
+		tmpFile = File.createTempFile("ooxml-signed-", "." + extension);
 		FileUtils.writeByteArrayToFile(tmpFile, signedOOXMLData);
 		LOG.debug("signed OOXML file: " + tmpFile.getAbsolutePath());
 		List<X509Certificate> signers = OOXMLSignatureVerifier
