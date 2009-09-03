@@ -60,6 +60,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import be.fedict.eid.applet.service.signer.NoCloseInputStream;
 import be.fedict.eid.applet.service.signer.SignatureAspect;
 
 /**
@@ -124,9 +125,7 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 		List<Reference> manifestReferences = new LinkedList<Reference>();
 
 		try {
-			addRelationshipsReference(signatureFactory, document,
-					manifestReferences);
-			addDocumentRelationshipsReference(signatureFactory, document,
+			addRelationshipsReferences(signatureFactory, document,
 					manifestReferences);
 		} catch (Exception e) {
 			throw new RuntimeException("error: " + e.getMessage(), e);
@@ -273,75 +272,84 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 		references.add(reference);
 	}
 
-	private void addDocumentRelationshipsReference(
+	private void addRelationshipsReferences(
 			XMLSignatureFactory signatureFactory, Document document,
 			List<Reference> manifestReferences) throws IOException,
 			ParserConfigurationException, SAXException, TransformerException,
 			NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-		Document _relsDotRels = findDocument("word/_rels/document.xml.rels");
-		if (null == _relsDotRels) {
-			/*
-			 * document.xml.rels is only present in a Word document.
-			 */
-			return;
+		URL ooxmlUrl = this.signatureService.getOfficeOpenXMLDocumentURL();
+		InputStream inputStream = ooxmlUrl.openStream();
+		ZipInputStream zipInputStream = new ZipInputStream(inputStream);
+		ZipEntry zipEntry;
+		while (null != (zipEntry = zipInputStream.getNextEntry())) {
+			if (false == zipEntry.getName().endsWith(".rels")) {
+				continue;
+			}
+			Document relsDocument = loadDocumentNoClose(zipInputStream);
+			addRelationshipsReference(signatureFactory, document, zipEntry
+					.getName(), relsDocument, manifestReferences);
 		}
-		Element nsElement = _relsDotRels.createElement("ns");
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
-				"http://schemas.openxmlformats.org/package/2006/relationships");
-		NodeList idNodeList = XPathAPI.selectNodeList(_relsDotRels,
-				"/tns:Relationships/tns:Relationship/@Id", nsElement);
-
-		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				DigestMethod.SHA1, null);
-		List<Transform> transforms = new LinkedList<Transform>();
-		RelationshipTransformParameterSpec parameterSpec = new RelationshipTransformParameterSpec();
-		for (int nodeIdx = 0; nodeIdx < idNodeList.getLength(); nodeIdx++) {
-			String relId = idNodeList.item(nodeIdx).getTextContent();
-			parameterSpec.addRelationshipReference(relId);
-		}
-		transforms.add(signatureFactory.newTransform(
-				RelationshipTransformService.TRANSFORM_URI, parameterSpec));
-		transforms.add(signatureFactory.newTransform(
-				"http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
-				(TransformParameterSpec) null));
-		Reference reference = signatureFactory
-				.newReference(
-						"/word/_rels/document.xml.rels?ContentType=application/vnd.openxmlformats-package.relationships+xml",
-						digestMethod, transforms, null, null);
-
-		manifestReferences.add(reference);
 	}
 
 	private void addRelationshipsReference(
 			XMLSignatureFactory signatureFactory, Document document,
-			List<Reference> manifestReferences) throws IOException,
-			ParserConfigurationException, SAXException, TransformerException,
-			NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-		Document _relsDotRels = loadDocument("_rels/.rels");
-		Element nsElement = _relsDotRels.createElement("ns");
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
-				"http://schemas.openxmlformats.org/package/2006/relationships");
-		Node idNode = XPathAPI
-				.selectSingleNode(
-						_relsDotRels,
-						"/tns:Relationships/tns:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument']/@Id",
-						nsElement);
-		String relId = idNode.getTextContent();
-		LOG.debug("Office document relationship Id: " + relId);
-
-		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				DigestMethod.SHA1, null);
-		List<Transform> transforms = new LinkedList<Transform>();
+			String zipEntryName, Document relsDocument,
+			List<Reference> manifestReferences)
+			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+		LOG.debug("relationships: " + zipEntryName);
 		RelationshipTransformParameterSpec parameterSpec = new RelationshipTransformParameterSpec();
-		parameterSpec.addRelationshipReference(relId);
+		NodeList nodeList = relsDocument.getDocumentElement().getChildNodes();
+		for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
+			Node node = nodeList.item(nodeIdx);
+			if (node.getNodeType() != Node.ELEMENT_NODE) {
+				continue;
+			}
+			Element element = (Element) node;
+			String relationshipType = element.getAttribute("Type");
+			/*
+			 * We skip some relationship types.
+			 */
+			if ("http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties"
+					.equals(relationshipType)) {
+				continue;
+			}
+			if ("http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties"
+					.equals(relationshipType)) {
+				continue;
+			}
+			if ("http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin"
+					.equals(relationshipType)) {
+				continue;
+			}
+			if ("http://schemas.openxmlformats.org/package/2006/relationships/metadata/thumbnail"
+					.equals(relationshipType)) {
+				continue;
+			}
+			if ("http://schemas.openxmlformats.org/officeDocument/2006/relationships/presProps"
+					.equals(relationshipType)) {
+				continue;
+			}
+			if ("http://schemas.openxmlformats.org/officeDocument/2006/relationships/viewProps"
+					.equals(relationshipType)) {
+				continue;
+			}
+			String relationshipId = element.getAttribute("Id");
+			parameterSpec.addRelationshipReference(relationshipId);
+		}
+
+		List<Transform> transforms = new LinkedList<Transform>();
 		transforms.add(signatureFactory.newTransform(
 				RelationshipTransformService.TRANSFORM_URI, parameterSpec));
 		transforms.add(signatureFactory.newTransform(
 				"http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
 				(TransformParameterSpec) null));
+		DigestMethod digestMethod = signatureFactory.newDigestMethod(
+				DigestMethod.SHA1, null);
 		Reference reference = signatureFactory
 				.newReference(
-						"/_rels/.rels?ContentType=application/vnd.openxmlformats-package.relationships+xml",
+						"/"
+								+ zipEntryName
+								+ "?ContentType=application/vnd.openxmlformats-package.relationships+xml",
 						digestMethod, transforms, null, null);
 
 		manifestReferences.add(reference);
@@ -428,7 +436,21 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 		return null;
 	}
 
-	protected Document loadDocument(InputStream documentInputStream)
+	private Document loadDocumentNoClose(InputStream documentInputStream)
+			throws ParserConfigurationException, SAXException, IOException {
+		NoCloseInputStream noCloseInputStream = new NoCloseInputStream(
+				documentInputStream);
+		InputSource inputSource = new InputSource(noCloseInputStream);
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
+				.newInstance();
+		documentBuilderFactory.setNamespaceAware(true);
+		DocumentBuilder documentBuilder = documentBuilderFactory
+				.newDocumentBuilder();
+		Document document = documentBuilder.parse(inputSource);
+		return document;
+	}
+
+	private Document loadDocument(InputStream documentInputStream)
 			throws ParserConfigurationException, SAXException, IOException {
 		InputSource inputSource = new InputSource(documentInputStream);
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
