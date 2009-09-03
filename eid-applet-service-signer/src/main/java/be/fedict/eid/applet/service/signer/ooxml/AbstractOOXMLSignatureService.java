@@ -64,7 +64,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
-import be.fedict.eid.applet.service.signer.NoCloseOutputStream;
 
 /**
  * Signature Service implementation for Office OpenXML document format XML
@@ -310,10 +309,28 @@ public abstract class AbstractOOXMLSignatureService extends
 								"application/vnd.openxmlformats-package.digital-signature-origin");
 				typesElement.appendChild(defaultElement);
 
-				NoCloseOutputStream outputStream = new NoCloseOutputStream(
-						zipOutputStream);
-				writeDocumentNoClosing(contentTypesDocument, outputStream,
+				writeDocumentNoClosing(contentTypesDocument, zipOutputStream,
 						false);
+			} else if ("_rels/.rels".equals(zipEntry.getName())) {
+				Document relsDocument = loadDocumentNoClose(zipInputStream);
+
+				Element relationshipElement = relsDocument
+						.createElementNS(
+								"http://schemas.openxmlformats.org/package/2006/relationships",
+								"Relationship");
+				relationshipElement.setAttribute("Id", "rel-id-"
+						+ UUID.randomUUID().toString());
+				relationshipElement
+						.setAttribute(
+								"Type",
+								"http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin");
+				relationshipElement.setAttribute("Target",
+						"_xmlsignatures/origin.sigs");
+
+				relsDocument.getDocumentElement().appendChild(
+						relationshipElement);
+
+				writeDocumentNoClosing(relsDocument, zipOutputStream, false);
 			} else if ("_xmlsignatures/_rels/origin.sigs.rels".equals(zipEntry
 					.getName())) {
 				throw new RuntimeException("implement me");
