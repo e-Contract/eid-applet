@@ -9,12 +9,12 @@
 	<ui:param name="activeMenu" value="test" />
 	<ui:define name="body">
 		<h2>eID Applet Tests</h2>
-		<p>Via this page you can test for correct functionality of the eID
-		Applet within your web browser.</p>
+		<p>Via this page you can test the eID Applet within your web
+		browser.</p>
 		<rich:panel>
 			<f:facet name="header">eID Applet Identification</f:facet>
-			This test will execute an eID identification via the eID Applet.
-			A simple eID readout will take place.
+			This test will perform an eID identification using the eID Applet.
+			A simple eID data readout will take place.
 			<p><a
 				href="#{facesContext.externalContext.requestContextPath}/identification.seam">Click
 			here to run the eID Applet Identification test.</a></p>
@@ -22,8 +22,8 @@
 		<rich:spacer height="10" />
 		<rich:panel>
 			<f:facet name="header">eID Applet Authentication</f:facet>
-			This test will execute an eID authentication via the eID Applet.
-			This test requires you to enter your PIN code.
+			This test will perform an eID authentication using the eID Applet.
+			This test requires you to enter your eID PIN code.
 			<p><a
 				href="#{facesContext.externalContext.requestContextPath}/authentication.seam">Click
 			here to run the eID Applet Authentication test.</a></p>
@@ -31,8 +31,8 @@
 		<rich:spacer height="10" />
 		<rich:panel>
 			<f:facet name="header">eID Applet Authentication - Kiosk Mode</f:facet>
-			This test will execute an eID authentication via the eID Applet.
-			This test requires you to enter your PIN code.
+			This test will perform an eID authentication using the eID Applet.
+			This test requires you to enter your eID PIN code.
 			The eID Applet kiosk mode features detection of eID card removal.
 			<p><a
 				href="#{facesContext.externalContext.requestContextPath}/authentication-kiosk.seam">Click
@@ -41,8 +41,9 @@
 		<rich:spacer height="10" />
 		<rich:panel>
 			<f:facet name="header">eID Applet ODF Signature</f:facet>
-			This test will execute an eID Signature creation via the eID Applet.
-			The demonstrated signature format is ODF.
+			This test will execute an eID Signature creation using the eID Applet.
+			This test requires you to enter your eID PIN code.
+			The demonstrated signature format is the Open Document Format (ODF).
 			The ODF signature format is also supported by 
 			<a href="http://www.openoffice.org/" target="_blank">OpenOffice.org</a> version 3.1.
 			<p><a
@@ -52,7 +53,8 @@
 		<rich:panel>
 			<f:facet name="header">eID Applet OOXML Signature</f:facet>
 			This test will perform an eID Signature creation via the eID Applet.
-			The demonstrated signature format is OOXML.
+			This test requires you to enter your eID PIN code.
+			The demonstrated signature format is Office OpenXML (OOXML).
 			The OOXML signature format is also supported by 
 			<a href="http://office.microsoft.com/" target="_blank">Office
 			2007</a>.
