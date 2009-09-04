@@ -173,6 +173,24 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>KmlServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.KmlServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>KmlServlet</servlet-name>
+		<url-pattern>/identity.kmz</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>VcardServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.VcardServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>VcardServlet</servlet-name>
+		<url-pattern>/identity.vcf</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>ODFDownloadServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.beta.webapp.ODFDownloadServlet</servlet-class>
 	</servlet>
@@ -180,7 +198,7 @@
 		<servlet-name>ODFDownloadServlet</servlet-name>
 		<url-pattern>/odf-download/*</url-pattern>
 	</servlet-mapping>
-	
+
 	<servlet>
 		<servlet-name>OOXMLDownloadServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.beta.webapp.OOXMLDownloadServlet</servlet-class>
