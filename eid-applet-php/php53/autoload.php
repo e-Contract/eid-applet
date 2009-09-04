@@ -24,7 +24,7 @@ function __autoload($className) {
 
     $beidPart = DIRECTORY_SEPARATOR.'beid'.DIRECTORY_SEPARATOR;
     $inSub = strpos($base, $beidPart);
-    if ($insub > 0) {
+    if ($inSub > 0) {
         $base = substr($base, 0, $inSub);
     }
     

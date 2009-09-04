@@ -33,7 +33,7 @@
                 <td><?php echo $identity->getAddress()->getMunicipality(); ?></td>
             </tr>
             <tr><th></th>
-                <td><img src="<?php echo $photoFile;?>"/></td></tr>
+                <td><img src="<?php echo $photoFile;?>" alt="photo"/></td></tr>
         </table>
     </body>
 </html>

@@ -12,18 +12,20 @@
             var attributes = {
                 code :'be.fedict.eid.applet.Applet.class',
                 archive :'eid-applet.jar',
-                width :400, height :300 };
+                width :600,
+                height :300 };
 
             var parameters = {
                 TargetPage :'CheckClientResult.php',
                 AppletService : 'CheckClientService.php',
                 BackgroundColor : '#ffffff',
+                Language: 'en',
                 NavigatorUserAgent : navigator.userAgent,
                 NavigatorAppName : navigator.appName,
                 NavigatorAppVersion : navigator.appVersion
             };
 
-            var version = '1.6';
+            var version = '1.5';
             deployJava.runApplet(attributes, parameters, version);
      </script>
     </body>
