@@ -78,7 +78,7 @@ abstract public class AbstractODFSignatureService extends
 
 	public AbstractODFSignatureService() {
 		super();
-		//addSignatureAspect(new OpenOfficeSignatureAspect());
+		addSignatureAspect(new OpenOfficeSignatureAspect());
 	}
 
 	@Override
@@ -287,9 +287,9 @@ abstract public class AbstractODFSignatureService extends
 		document = documentBuilder.newDocument();
 		Element rootElement = document.createElementNS(
 				"urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0",
-				"dsig:document-signatures");
+				"document-signatures");
 		// next is required for correct validation in Java, but fails in OOo
-		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:dsig",
+		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns",
 				"urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0");
 		document.appendChild(rootElement);
 		return document;
