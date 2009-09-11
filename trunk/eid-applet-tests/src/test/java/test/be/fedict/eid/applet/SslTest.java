@@ -419,4 +419,18 @@ public class SslTest {
 		String response = getMethod.getResponseBodyAsString();
 		LOG.debug("response: " + response);
 	}
+
+	@Test
+	public void testGeneratePkcs11KeyStore() throws Exception {
+		KeyPair keyPair = generateKeyPair();
+		DateTime notBefore = new DateTime().minusMonths(1);
+		DateTime notAfter = notBefore.plusYears(1);
+		X509Certificate certificate = generateSelfSignedCertificate(keyPair,
+				"CN=Test", notBefore, notAfter);
+
+		File p12File = File.createTempFile("test-", ".p12");
+		persistKey(p12File, keyPair.getPrivate(), certificate, "secret"
+				.toCharArray(), "secret".toCharArray());
+		LOG.debug("p12 file: " + p12File.getAbsolutePath());
+	}
 }

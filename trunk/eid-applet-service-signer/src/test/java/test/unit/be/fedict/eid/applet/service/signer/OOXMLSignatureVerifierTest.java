@@ -154,6 +154,20 @@ public class OOXMLSignatureVerifierTest {
 	}
 
 	@Test
+	public void testGetSignerOffice2010Unsigned() throws Exception {
+		// setup
+		URL url = OOXMLSignatureVerifierTest.class
+				.getResource("/hello-world-office-2010-technical-preview-unsigned.docx");
+
+		// operate
+		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+
+		// verify
+		assertNotNull(result);
+		assertTrue(result.isEmpty());
+	}
+
+	@Test
 	public void testGetSignerUnsignedPowerpoint() throws Exception {
 		// setup
 		URL url = OOXMLSignatureVerifierTest.class
@@ -186,6 +200,22 @@ public class OOXMLSignatureVerifierTest {
 		// setup
 		URL url = OOXMLSignatureVerifierTest.class
 				.getResource("/hello-world-signed.docx");
+
+		// operate
+		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+
+		// verify
+		assertNotNull(result);
+		assertEquals(1, result.size());
+		X509Certificate signer = result.get(0);
+		LOG.debug("signer: " + signer.getSubjectX500Principal());
+	}
+
+	@Test
+	public void testOffice2010TechnicalPreview() throws Exception {
+		// setup
+		URL url = OOXMLSignatureVerifierTest.class
+				.getResource("/hello-world-office-2010-technical-preview.docx");
 
 		// operate
 		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);

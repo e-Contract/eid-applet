@@ -18,7 +18,9 @@
 
 package be.fedict.eid.applet.beta.webapp;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.servlet.ServletException;
@@ -50,10 +52,24 @@ public class OOXMLDownloadServlet extends HttpServlet {
 				.getAttribute(OOXMLUploader.OOXML_URL_SESSION_ATTRIBUTE);
 		response
 				.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+
 		response.setHeader("Cache-Control",
 				"no-cache, no-store, must-revalidate, max-age=-1"); // http 1.1
-		response.setHeader("Pragma", "no-cache, no-store"); // http 1.0
+		if (false == request.getScheme().equals("https")) {
+			// else the download fails in IE
+			response.setHeader("Pragma", "no-cache"); // http 1.0
+		} else {
+			response.setHeader("Pragma", "public");
+		}
 		response.setDateHeader("Expires", -1);
+		response.setHeader("Content-disposition", "attachment");
+		try {
+			File ooxmlFile = new File(ooxmlUrl.toURI());
+			response.setContentLength((int) ooxmlFile.length());
+		} catch (URISyntaxException e) {
+			LOG.error("uri " + e.getMessage(), e);
+		}
+
 		ServletOutputStream out = response.getOutputStream();
 		IOUtils.copy(ooxmlUrl.openStream(), out);
 		out.close();
