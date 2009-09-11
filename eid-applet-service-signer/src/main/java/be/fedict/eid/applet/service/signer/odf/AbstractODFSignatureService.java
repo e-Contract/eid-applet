@@ -52,6 +52,8 @@ import org.apache.xml.security.utils.Constants;
 import org.jcp.xml.dsig.internal.dom.DOMKeyInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
@@ -76,6 +78,7 @@ abstract public class AbstractODFSignatureService extends
 
 	public AbstractODFSignatureService() {
 		super();
+		//addSignatureAspect(new OpenOfficeSignatureAspect());
 	}
 
 	@Override
@@ -210,7 +213,19 @@ abstract public class AbstractODFSignatureService extends
 	@Override
 	protected void postSign(Element signatureElement,
 			List<X509Certificate> signingCertificateChain) {
+		// TODO: refactor as signature aspect
 		LOG.debug("postSign");
+		/*
+		 * Make sure we insert right after the ds:SignatureValue element.
+		 */
+		Node nextSibling;
+		NodeList objectNodeList = signatureElement.getElementsByTagNameNS(
+				"http://www.w3.org/2000/09/xmldsig#", "Object");
+		if (0 == objectNodeList.getLength()) {
+			nextSibling = null;
+		} else {
+			nextSibling = objectNodeList.item(0);
+		}
 		/*
 		 * Add a ds:KeyInfo entry.
 		 */
@@ -220,9 +235,11 @@ abstract public class AbstractODFSignatureService extends
 		x509DataObjects.add(keyInfoFactory.newX509IssuerSerial(
 				signingCertificate.getIssuerX500Principal().toString(),
 				signingCertificate.getSerialNumber()));
-		for (X509Certificate certificate : signingCertificateChain) {
-			x509DataObjects.add(certificate);
-		}
+		/*
+		 * XXX: for the moment we only add the signing certificate because of a
+		 * bug in OpenOffice 3.1.
+		 */
+		x509DataObjects.add(signingCertificate);
 		X509Data x509Data = keyInfoFactory.newX509Data(x509DataObjects);
 		KeyInfo keyInfo = keyInfoFactory.newKeyInfo(Collections
 				.singletonList(x509Data));
@@ -248,7 +265,8 @@ abstract public class AbstractODFSignatureService extends
 		String dsPrefix = null;
 		// String dsPrefix = "ds";
 		try {
-			domKeyInfo.marshal(signatureElement, dsPrefix, domCryptoContext);
+			domKeyInfo.marshal(signatureElement, nextSibling, dsPrefix,
+					domCryptoContext);
 		} catch (MarshalException e) {
 			throw new RuntimeException("marshall error: " + e.getMessage(), e);
 		}

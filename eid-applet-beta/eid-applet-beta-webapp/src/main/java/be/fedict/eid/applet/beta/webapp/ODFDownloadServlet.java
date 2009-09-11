@@ -18,7 +18,9 @@
 
 package be.fedict.eid.applet.beta.webapp;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.servlet.ServletException;
@@ -48,10 +50,24 @@ public class ODFDownloadServlet extends HttpServlet {
 		URL odfUrl = (URL) httpSession
 				.getAttribute(TempFileManager.ODF_URL_SESSION_ATTRIBUTE);
 		response.setContentType("application/vnd.oasis.opendocument.text");
+
 		response.setHeader("Cache-Control",
 				"no-cache, no-store, must-revalidate, max-age=-1"); // http 1.1
-		response.setHeader("Pragma", "no-cache, no-store"); // http 1.0
+		if (false == request.getScheme().equals("https")) {
+			// else the download fails in IE
+			response.setHeader("Pragma", "no-cache"); // http 1.0
+		} else {
+			response.setHeader("Pragma", "public");
+		}
 		response.setDateHeader("Expires", -1);
+		response.setHeader("Content-disposition", "attachment");
+		try {
+			File odfFile = new File(odfUrl.toURI());
+			response.setContentLength((int) odfFile.length());
+		} catch (URISyntaxException e) {
+			LOG.error("uri " + e.getMessage(), e);
+		}
+
 		ServletOutputStream out = response.getOutputStream();
 		IOUtils.copy(odfUrl.openStream(), out);
 		out.close();

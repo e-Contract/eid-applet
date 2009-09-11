@@ -131,6 +131,11 @@ public class AbstractOOXMLSignatureServiceTest {
 	}
 
 	@Test
+	public void testSignOffice2010() throws Exception {
+		sign("/hello-world-office-2010-technical-preview-unsigned.docx");
+	}
+
+	@Test
 	public void testSignTwice() throws Exception {
 		sign("/hello-world-signed.docx", 2);
 	}
@@ -138,7 +143,7 @@ public class AbstractOOXMLSignatureServiceTest {
 	@Test
 	public void testSignTwiceHere() throws Exception {
 		File tmpFile = sign("/hello-world-unsigned.docx", 1);
-		sign(tmpFile.toURI().toURL(), 2);
+		sign(tmpFile.toURI().toURL(), "CN=Test2", 2);
 	}
 
 	@Test
@@ -163,6 +168,11 @@ public class AbstractOOXMLSignatureServiceTest {
 	}
 
 	private File sign(URL ooxmlUrl, int signerCount) throws Exception {
+		return sign(ooxmlUrl, "CN=Test", signerCount);
+	}
+
+	private File sign(URL ooxmlUrl, String signerDn, int signerCount)
+			throws Exception {
 		// setup
 		assertNotNull(ooxmlUrl);
 
@@ -200,7 +210,7 @@ public class AbstractOOXMLSignatureServiceTest {
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
 		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
+				.getPublic(), signerDn, notBefore, notAfter, null, keyPair
 				.getPrivate(), true, 0, null, null, new KeyUsage(
 				KeyUsage.nonRepudiation));
 
