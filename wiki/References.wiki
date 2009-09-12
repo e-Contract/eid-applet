@@ -58,6 +58,12 @@
   * [http://www.privacycommission.be/nl/static/pdf/wetgeving/kb_persoonlijke_levenssfeer.pdf Koninklijk Besluit van 13 februari 2001 ter uitvoering van de Wet van 8 december 1992 tot bescherming van de persoonlijke levensfeer ten opzichte van de verwerking van persoonsgegevens]
 
 
+== Signatures ==
+
+  * [http://msdn.microsoft.com/en-us/library/cc313071.aspx [MS-OFFCRYPTO]: Office Document Cryptography Structure Specification]
+
+
+
 == Other Projects ==
 
   * [http://developer.novell.com/wiki/index.php/EID-belgium SUSE Linux eID toolkit]
