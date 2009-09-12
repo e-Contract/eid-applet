@@ -55,6 +55,7 @@
   * [http://www.ksz.fgov.be/nl/Legislation/doc/20010709-cert.htm Wet van 9 juli 2001 houdende vaststelling van bepaalde regels in verband met het juridisch kader voor elektronische handtekeningen en certificatiediensten]
   * [http://www.privacycommission.be/nl/legislation/national/ Nationale wetgeving Privacycommissie]
   * [http://www.privacycommission.be/nl/static/pdf/wetgeving/wet_privacy_08_12_1992.pdf Wet van 8 december 1992 voor de bescherming van de persoonlijke levenssfeer ten opzichte van de verwerking van persoonsgegevens (Privacywet)]
+  * [http://www.privacycommission.be/nl/static/pdf/wetgeving/kb_persoonlijke_levenssfeer.pdf Koninklijk Besluit van 13 februari 2001 ter uitvoering van de Wet van 8 december 1992 tot bescherming van de persoonlijke levensfeer ten opzichte van de verwerking van persoonsgegevens]
 
 
 == Other Projects ==
