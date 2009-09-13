@@ -60,7 +60,8 @@
 
 == Signatures ==
 
-  * [http://msdn.microsoft.com/en-us/library/cc313071.aspx [MS-OFFCRYPTO]: Office Document Cryptography Structure Specification]
+  * [http://msdn.microsoft.com/en-us/library/cc313071.aspx MS-OFFCRYPTO: Office Document Cryptography Structure Specification]
+  * [http://wiki.services.openoffice.org/wiki/Security/Digital_Signatures OpenOffice Digital Signatures]
 
 
 
