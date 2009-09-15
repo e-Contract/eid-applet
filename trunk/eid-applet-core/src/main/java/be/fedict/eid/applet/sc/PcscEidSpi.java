@@ -110,9 +110,10 @@ public interface PcscEidSpi {
 	 * @throws NoSuchAlgorithmException
 	 * @throws CardException
 	 * @throws IOException
+	 * @throws InterruptedException 
 	 */
 	byte[] signAuthn(byte[] toBeSigned) throws NoSuchAlgorithmException,
-			CardException, IOException;
+			CardException, IOException, InterruptedException;
 
 	/**
 	 * Creates a non-repudiation signature starting from a hashed value of the
@@ -124,9 +125,10 @@ public interface PcscEidSpi {
 	 * @throws NoSuchAlgorithmException
 	 * @throws CardException
 	 * @throws IOException
+	 * @throws InterruptedException 
 	 */
 	byte[] sign(byte[] digestValue, String digestAlgo)
-			throws NoSuchAlgorithmException, CardException, IOException;
+			throws NoSuchAlgorithmException, CardException, IOException, InterruptedException;
 
 	List<X509Certificate> getAuthnCertificateChain() throws CardException,
 			IOException, CertificateException;

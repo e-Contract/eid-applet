@@ -258,7 +258,7 @@ public class AbstractXmlSignatureServiceTest {
 		assertTrue(validity);
 	}
 
-	private static class UriTestDereferencer implements URIDereferencer {
+	public static class UriTestDereferencer implements URIDereferencer {
 
 		private final Map<String, byte[]> resources;
 
@@ -467,7 +467,7 @@ public class AbstractXmlSignatureServiceTest {
 		DOMValidateContext domValidateContext = new DOMValidateContext(
 				KeySelector.singletonKeySelector(keyPair.getPublic()),
 				signatureNode);
-		URIDereferencer dereferencer = new URITestDereferencer();
+		URIDereferencer dereferencer = new URITest2Dereferencer();
 		domValidateContext.setURIDereferencer(dereferencer);
 		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
 				.getInstance();
@@ -565,7 +565,7 @@ public class AbstractXmlSignatureServiceTest {
 		DOMValidateContext domValidateContext = new DOMValidateContext(
 				KeySelector.singletonKeySelector(keyPair.getPublic()),
 				signatureNode);
-		URIDereferencer dereferencer = new URITestDereferencer();
+		URIDereferencer dereferencer = new URITest2Dereferencer();
 		domValidateContext.setURIDereferencer(dereferencer);
 		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
 				.getInstance();
@@ -575,10 +575,10 @@ public class AbstractXmlSignatureServiceTest {
 		assertTrue(validity);
 	}
 
-	private static class URITestDereferencer implements URIDereferencer {
+	private static class URITest2Dereferencer implements URIDereferencer {
 
 		private static final Log LOG = LogFactory
-				.getLog(URITestDereferencer.class);
+				.getLog(URITest2Dereferencer.class);
 
 		public Data dereference(URIReference uriReference,
 				XMLCryptoContext context) throws URIReferenceException {
