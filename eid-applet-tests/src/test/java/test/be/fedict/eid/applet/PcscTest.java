@@ -56,6 +56,16 @@ import be.fedict.eid.applet.sc.PcscEid;
 import be.fedict.eid.applet.sc.PcscEidSpi;
 import be.fedict.eid.applet.sc.Task;
 import be.fedict.eid.applet.sc.TaskRunner;
+import be.fedict.trust.CachedCrlRepository;
+import be.fedict.trust.CrlTrustLinker;
+import be.fedict.trust.FallbackTrustLinker;
+import be.fedict.trust.MemoryCertificateRepository;
+import be.fedict.trust.NetworkConfig;
+import be.fedict.trust.OcspTrustLinker;
+import be.fedict.trust.OnlineCrlRepository;
+import be.fedict.trust.OnlineOcspRepository;
+import be.fedict.trust.PublicKeyTrustLinker;
+import be.fedict.trust.TrustValidator;
 
 /**
  * Integration tests for PC/SC eID component.
@@ -110,10 +120,15 @@ public class PcscTest {
 			pcscEidSpi.waitForEidPresent();
 		}
 		byte[] challenge = "hello world".getBytes();
-		byte[] signatureValue = pcscEidSpi.signAuthn(challenge);
-		List<X509Certificate> authnCertChain = pcscEidSpi
-				.getAuthnCertificateChain();
-		pcscEidSpi.close();
+		byte[] signatureValue;
+		List<X509Certificate> authnCertChain;
+		try {
+			signatureValue = pcscEidSpi.signAuthn(challenge);
+			authnCertChain = pcscEidSpi.getAuthnCertificateChain();
+			pcscEidSpi.logoff();
+		} finally {
+			pcscEidSpi.close();
+		}
 
 		Signature signature = Signature.getInstance("SHA1withRSA");
 		signature.initVerify(authnCertChain.get(0).getPublicKey());
@@ -552,5 +567,49 @@ public class PcscTest {
 	public void testListReaders() throws Exception {
 		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
 		LOG.debug("reader list: " + pcscEid.getReaderList());
+	}
+
+	@Test
+	public void testPKIValidation() throws Exception {
+		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEid.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEid.waitForEidPresent();
+		}
+
+		try {
+			List<X509Certificate> certChain = pcscEid.getSignCertificateChain();
+
+			MemoryCertificateRepository certificateRepository = new MemoryCertificateRepository();
+			certificateRepository.addTrustPoint(certChain
+					.get(certChain.size() - 1));
+
+			TrustValidator trustValidator = new TrustValidator(
+					certificateRepository);
+			trustValidator.addTrustLinker(new PublicKeyTrustLinker());
+
+			NetworkConfig networkConfig = new NetworkConfig(
+					"proxy.yourict.net", 8080);
+
+			OnlineOcspRepository ocspRepository = new OnlineOcspRepository(
+					networkConfig);
+
+			OnlineCrlRepository crlRepository = new OnlineCrlRepository(
+					networkConfig);
+			CachedCrlRepository cachedCrlRepository = new CachedCrlRepository(
+					crlRepository);
+
+			FallbackTrustLinker fallbackTrustLinker = new FallbackTrustLinker();
+			fallbackTrustLinker.addTrustLinker(new OcspTrustLinker(
+					ocspRepository));
+			fallbackTrustLinker.addTrustLinker(new CrlTrustLinker(
+					cachedCrlRepository));
+
+			trustValidator.addTrustLinker(fallbackTrustLinker);
+
+			trustValidator.isTrusted(certChain);
+		} finally {
+			pcscEid.close();
+		}
 	}
 }

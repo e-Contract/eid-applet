@@ -435,13 +435,23 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		return authnCertificateChain;
 	}
 
+	public static final byte FEATURE_VERIFY_PIN_START_TAG = 0x01;
+	public static final byte FEATURE_VERIFY_PIN_FINISH_TAG = 0x02;
+	public static final byte FEATURE_GET_KEY_PRESSED_TAG = 0x05;
 	public static final byte FEATURE_VERIFY_PIN_DIRECT_TAG = 0x06;
 
 	private Integer getFeature(byte featureTag) {
-		this.view.addDetailMessage("CCID GET_FEATURES...");
+		this.view.addDetailMessage("CCID GET_FEATURE IOCTL...");
+		int ioctl;
+		String osName = System.getProperty("os.name");
+		if (osName.startsWith("Windows")) {
+			ioctl = (0x31 << 16 | (3400) << 2);
+		} else {
+			ioctl = 0x42000D48;
+		}
 		byte[] features;
 		try {
-			features = card.transmitControlCommand(0x42000D48, new byte[0]);
+			features = card.transmitControlCommand(ioctl, new byte[0]);
 		} catch (CardException e) {
 			this.view.addDetailMessage("GET_FEATURES IOCTL error: "
 					+ e.getMessage());
@@ -476,8 +486,9 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	}
 
 	private byte[] sign(byte[] digestValue, String digestAlgo, byte keyId)
-			throws CardException, IOException {
+			throws CardException, IOException, InterruptedException {
 		Integer directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
+		Integer verifyPinStartFeature = getFeature(FEATURE_VERIFY_PIN_START_TAG);
 
 		// select the key
 		this.view.addDetailMessage("selecting key...");
@@ -542,11 +553,13 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 		int retriesLeft = -1;
 		do {
-			if (null == directPinVerifyFeature) {
-				responseApdu = verifyPin(retriesLeft);
-			} else {
+			if (null != directPinVerifyFeature) {
 				responseApdu = verifyPinDirect(retriesLeft,
 						directPinVerifyFeature);
+			} else if (null != verifyPinStartFeature) {
+				responseApdu = verifyPin(retriesLeft, verifyPinStartFeature);
+			} else {
+				responseApdu = verifyPin(retriesLeft);
 			}
 			if (0x9000 != responseApdu.getSW()) {
 				this.view.addDetailMessage("VERIFY_PIN error");
@@ -573,6 +586,53 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 		byte[] signatureValue = responseApdu.getData();
 		return signatureValue;
+	}
+
+	private ResponseAPDU verifyPin(int retriesLeft,
+			Integer verifyPinStartFeature) throws IOException, CardException,
+			InterruptedException {
+		this.view.addDetailMessage("CCID verify PIN start/end sequence...");
+		byte[] verifyCommandData = createPINVerificationDataStructure(PIN_SIZE,
+				0x20);
+		this.dialogs.showPINPadFrame(retriesLeft);
+		try {
+			byte[] verifyPinStartResult = card.transmitControlCommand(
+					verifyPinStartFeature, verifyCommandData);
+
+			// wait for key pressed
+			loop: while (true) {
+				int getKeyPressedFeature = getFeature(FEATURE_GET_KEY_PRESSED_TAG);
+				byte[] getKeyPressedResult = card.transmitControlCommand(
+						getKeyPressedFeature, new byte[0]);
+				byte key = getKeyPressedResult[0];
+				switch (key) {
+				case 0x00:
+					// this.view.addDetailMessage("waiting for CCID...");
+					Thread.sleep(200);
+					break;
+				case 0x0d:
+					this.view.addDetailMessage("user confirmed");
+					break loop;
+				case 0x1b:
+					this.view.addDetailMessage("user canceled");
+					// XXX: need to send the PIN finish ioctl?
+					throw new SecurityException("canceled by user");
+				case 0x40:
+					this.view.addDetailMessage("PIN abort");
+					break loop;
+				default:
+					this.view.addDetailMessage("CCID get key pressed result: "
+							+ key);
+				}
+			}
+		} finally {
+			this.dialogs.disposePINPadFrame();
+		}
+		int verifyPinFinishIoctl = getFeature(FEATURE_VERIFY_PIN_FINISH_TAG);
+		byte[] verifyPinFinishResult = card.transmitControlCommand(
+				verifyPinFinishIoctl, new byte[0]);
+		ResponseAPDU responseApdu = new ResponseAPDU(verifyPinFinishResult);
+		return responseApdu;
 	}
 
 	private ResponseAPDU verifyPinDirect(int retriesLeft,
@@ -727,7 +787,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	}
 
 	public byte[] signAuthn(byte[] toBeSigned) throws NoSuchAlgorithmException,
-			CardException, IOException {
+			CardException, IOException, InterruptedException {
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
 		byte[] digest = messageDigest.digest(toBeSigned);
 		byte keyId = (byte) 0x82; // authentication key
@@ -891,7 +951,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	}
 
 	public byte[] sign(byte[] digestValue, String digestAlgo)
-			throws NoSuchAlgorithmException, CardException, IOException {
+			throws NoSuchAlgorithmException, CardException, IOException,
+			InterruptedException {
 		byte keyId = (byte) 0x83; // non-repudiation key
 		byte[] signatureValue = sign(digestValue, digestAlgo, keyId);
 		return signatureValue;
