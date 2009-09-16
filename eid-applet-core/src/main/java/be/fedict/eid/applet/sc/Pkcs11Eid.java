@@ -230,6 +230,25 @@ public class Pkcs11Eid {
 			if (pkcs11File.exists()) {
 				return pkcs11File.getAbsolutePath();
 			}
+			/*
+			 * Windows 7 when installing the 32-bit eID MW on a 64-bit platform.
+			 */
+			pkcs11File = new File("C:\\Windows\\SysWOW64\\beidpkcs11.dll");
+			if (pkcs11File.exists()) {
+				return pkcs11File.getAbsolutePath();
+			}
+			/*
+			 * And finally we try out some generic solution.
+			 */
+			String javaLibraryPath = System.getProperty("java.library.path");
+			String pathSeparator = System.getProperty("path.separator");
+			String[] libraryDirectories = javaLibraryPath.split(pathSeparator);
+			for (String libraryDirectory : libraryDirectories) {
+				pkcs11File = new File(libraryDirectory + "\\beidpkcs11.dll");
+				if (pkcs11File.exists()) {
+					return pkcs11File.getAbsolutePath();
+				}
+			}
 		}
 		throw new PKCS11NotFoundException();
 	}
