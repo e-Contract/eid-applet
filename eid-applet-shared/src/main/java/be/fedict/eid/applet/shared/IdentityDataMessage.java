@@ -20,7 +20,6 @@ package be.fedict.eid.applet.shared;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
 import be.fedict.eid.applet.shared.annotation.Description;
 import be.fedict.eid.applet.shared.annotation.HttpBody;
@@ -154,63 +153,62 @@ public class IdentityDataMessage extends AbstractProtocolMessage {
 		this.body = baos.toByteArray();
 	}
 
+	private byte[] copy(byte[] source, int idx, int count) {
+		byte[] result = new byte[count];
+		System.arraycopy(source, idx, result, 0, count);
+		return result;
+	}
+
 	@PostConstruct
 	public void postConstruct() {
 		int idx = 0;
-		this.idFile = Arrays.copyOfRange(this.body, 0, this.identityFileSize);
+		this.idFile = copy(this.body, 0, this.identityFileSize);
 		idx += this.identityFileSize;
 
 		if (null != this.addressFileSize) {
-			this.addressFile = Arrays.copyOfRange(this.body, idx, idx
-					+ this.addressFileSize);
+			this.addressFile = copy(this.body, idx, this.addressFileSize);
 			idx += this.addressFileSize;
 		}
 
 		if (null != this.photoFileSize) {
-			this.photoFile = Arrays.copyOfRange(this.body, idx, idx
-					+ this.photoFileSize);
+			this.photoFile = copy(this.body, idx, this.photoFileSize);
 			idx += this.photoFileSize;
 		}
 
 		if (null != this.identitySignatureFileSize) {
-			this.identitySignatureFile = Arrays.copyOfRange(this.body, idx, idx
-					+ this.identitySignatureFileSize);
+			this.identitySignatureFile = copy(this.body, idx,
+					this.identitySignatureFileSize);
 			idx += this.identitySignatureFileSize;
 		}
 
 		if (null != this.addressSignatureFileSize) {
-			this.addressSignatureFile = Arrays.copyOfRange(this.body, idx, idx
-					+ this.addressSignatureFileSize);
+			this.addressSignatureFile = copy(this.body, idx,
+					this.addressSignatureFileSize);
 			idx += this.addressSignatureFileSize;
 		}
 
 		if (null != this.authnCertFileSize) {
-			this.authnCertFile = Arrays.copyOfRange(this.body, idx, idx
-					+ this.authnCertFileSize);
+			this.authnCertFile = copy(this.body, idx, this.authnCertFileSize);
 			idx += this.authnCertFileSize;
 		}
 
 		if (null != this.signCertFileSize) {
-			this.signCertFile = Arrays.copyOfRange(this.body, idx, idx
-					+ this.signCertFileSize);
+			this.signCertFile = copy(this.body, idx, this.signCertFileSize);
 			idx += this.signCertFileSize;
 		}
 
 		if (null != this.caCertFileSize) {
-			this.caCertFile = Arrays.copyOfRange(this.body, idx, idx
-					+ this.caCertFileSize);
+			this.caCertFile = copy(this.body, idx, this.caCertFileSize);
 			idx += this.caCertFileSize;
 		}
 
 		if (null != this.rrnCertFileSize) {
-			this.rrnCertFile = Arrays.copyOfRange(this.body, idx, idx
-					+ this.rrnCertFileSize);
+			this.rrnCertFile = copy(this.body, idx, this.rrnCertFileSize);
 			idx += this.rrnCertFileSize;
 		}
 
 		if (null != this.rootCertFileSize) {
-			this.rootCertFile = Arrays.copyOfRange(this.body, idx, idx
-					+ this.rootCertFileSize);
+			this.rootCertFile = copy(this.body, idx, this.rootCertFileSize);
 			idx += this.rootCertFileSize;
 		}
 	}

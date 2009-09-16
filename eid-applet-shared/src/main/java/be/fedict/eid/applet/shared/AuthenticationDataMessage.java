@@ -26,7 +26,6 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -107,35 +106,38 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 		this.body = baos.toByteArray();
 	}
 
+	private byte[] copy(byte[] source, int idx, int count) {
+		byte[] result = new byte[count];
+		System.arraycopy(source, idx, result, 0, count);
+		return result;
+	}
+
 	@PostConstruct
 	public void postConstruct() {
 		int idx = 0;
 		if (0 == this.saltValueSize) {
 			throw new RuntimeException("salt bytes required");
 		}
-		this.saltValue = Arrays.copyOfRange(this.body, idx, idx
-				+ this.saltValueSize);
+		this.saltValue = copy(this.body, idx, this.saltValueSize);
 		idx += this.saltValueSize;
 
 		if (null != this.sessionIdSize) {
-			this.sessionId = Arrays.copyOfRange(this.body, idx, idx
-					+ this.sessionIdSize);
+			this.sessionId = copy(this.body, idx, this.sessionIdSize);
 			idx += this.sessionIdSize;
 		}
 
 		if (this.signatureValueSize != 128) {
 			throw new RuntimeException("signature value size invalid");
 		}
-		this.signatureValue = Arrays.copyOfRange(this.body, idx, idx
-				+ this.signatureValueSize);
+		this.signatureValue = copy(this.body, idx, this.signatureValueSize);
 		idx += this.signatureValueSize;
 
 		try {
 			CertificateFactory certificateFactory = CertificateFactory
 					.getInstance("X.509");
 			Collection<? extends Certificate> certificates = certificateFactory
-					.generateCertificates(new ByteArrayInputStream(Arrays
-							.copyOfRange(this.body, idx, this.body.length)));
+					.generateCertificates(new ByteArrayInputStream(copy(
+							this.body, idx, this.body.length - idx)));
 			this.certificateChain = new LinkedList<X509Certificate>();
 			for (Certificate certificate : certificates) {
 				this.certificateChain.add((X509Certificate) certificate);

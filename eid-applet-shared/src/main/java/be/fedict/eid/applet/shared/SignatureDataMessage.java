@@ -26,7 +26,6 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,20 +79,25 @@ public class SignatureDataMessage extends AbstractProtocolMessage {
 		this.body = baos.toByteArray();
 	}
 
+	private byte[] copy(byte[] source, int idx, int count) {
+		byte[] result = new byte[count];
+		System.arraycopy(source, idx, result, 0, count);
+		return result;
+	}
+
 	@PostConstruct
 	public void postConstruct() {
 		if (this.signatureValueSize != 128) {
 			throw new RuntimeException("signature value size invalid");
 		}
-		this.signatureValue = Arrays.copyOfRange(this.body, 0,
-				this.signatureValueSize);
+		this.signatureValue = copy(this.body, 0, this.signatureValueSize);
 		try {
 			CertificateFactory certificateFactory = CertificateFactory
 					.getInstance("X.509");
 			Collection<? extends Certificate> certificates = certificateFactory
-					.generateCertificates(new ByteArrayInputStream(Arrays
-							.copyOfRange(this.body, this.signatureValueSize,
-									this.body.length)));
+					.generateCertificates(new ByteArrayInputStream(copy(
+							this.body, this.signatureValueSize,
+							this.body.length - this.signatureValueSize)));
 			this.certificateChain = new LinkedList<X509Certificate>();
 			for (Certificate certificate : certificates) {
 				this.certificateChain.add((X509Certificate) certificate);
