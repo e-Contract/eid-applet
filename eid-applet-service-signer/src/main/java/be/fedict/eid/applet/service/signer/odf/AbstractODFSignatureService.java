@@ -107,7 +107,8 @@ abstract public class AbstractODFSignatureService extends
 				String uri = zipEntry.getName().replaceAll(" ", "%20");
 				LOG.debug("uri: " + uri);
 				if (zipEntry.getName().endsWith(".xml")
-						&& zipEntry.getSize() > 0) {
+						&& !isEmpty(odfZipInputStream)) {
+					LOG.debug("non-empty entry: " + zipEntry.getName());
 					/*
 					 * On non-empty XML files we apply a transformation.
 					 */
@@ -122,6 +123,10 @@ abstract public class AbstractODFSignatureService extends
 			LOG.warn("IO error: " + e.getMessage(), e);
 		}
 		return referenceInfos;
+	}
+
+	private boolean isEmpty(InputStream inputStream) throws IOException {
+		return 0 == inputStream.skip(1);
 	}
 
 	/**
@@ -288,7 +293,6 @@ abstract public class AbstractODFSignatureService extends
 		Element rootElement = document.createElementNS(
 				"urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0",
 				"document-signatures");
-		// next is required for correct validation in Java, but fails in OOo
 		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns",
 				"urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0");
 		document.appendChild(rootElement);
