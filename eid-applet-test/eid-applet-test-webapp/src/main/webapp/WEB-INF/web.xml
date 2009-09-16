@@ -346,25 +346,33 @@
 		<servlet-name>PdfServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.PdfServlet</servlet-class>
 	</servlet>
-        <servlet>
+	<servlet>
 		<servlet-name>KmlServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.KmlServlet</servlet-class>
 	</servlet>
-        <servlet>
+	<servlet>
 		<servlet-name>VcardServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.VcardServlet</servlet-class>
 	</servlet>
-        <servlet-mapping>
+	<servlet>
+		<servlet-name>JSONServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.JSONServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
 		<servlet-name>PdfServlet</servlet-name>
 		<url-pattern>/identity.pdf</url-pattern>
 	</servlet-mapping>
-        <servlet-mapping>
+	<servlet-mapping>
 		<servlet-name>KmlServlet</servlet-name>
 		<url-pattern>/identity.kmz</url-pattern>
 	</servlet-mapping>
-        <servlet-mapping>
+	<servlet-mapping>
 		<servlet-name>VcardServlet</servlet-name>
 		<url-pattern>/identity.vcf</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>JSONServlet</servlet-name>
+		<url-pattern>/identity.js</url-pattern>
 	</servlet-mapping>
 	<filter>
 		<filter-name>LogFilter</filter-name>
