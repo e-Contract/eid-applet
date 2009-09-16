@@ -275,7 +275,9 @@ public class IdentityDataMessageHandler implements
 				break;
 			}
 		}
-		return Arrays.copyOf(addressFile, idx);
+		byte[] result = new byte[idx];
+		System.arraycopy(addressFile, 0, result, 0, idx);
+		return result;
 	}
 
 	private void verifySignature(byte[] signatureData, PublicKey publicKey,
