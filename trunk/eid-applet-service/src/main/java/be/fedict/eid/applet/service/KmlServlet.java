@@ -35,11 +35,11 @@ import be.fedict.eid.applet.service.impl.KmlGenerator;
 import be.fedict.eid.applet.service.util.KmlLight;
 
 /**
- * Servlet that outputs the eID identity data from the HTTP session to a 
- * zipped KML (.kmz)
- * Can be used by virtual globes like Google Earth, KDE Marble...
+ * Servlet that outputs the eID identity data from the HTTP session to a zipped
+ * KML (.kmz) Can be used by virtual globes like Google Earth, KDE Marble...
+ * 
  * @see http://www.opengeospatial.org/standards/kml/
- *
+ * 
  * @author Bart Hanssens
  * 
  */
@@ -67,16 +67,23 @@ public class KmlServlet extends HttpServlet {
 
 		byte[] document;
 		try {
-                    document = this.kmlGenerator.generateKml(eIdData);
+			document = this.kmlGenerator.generateKml(eIdData);
 		} catch (IOException e) {
 			throw new ServletException(
-				"KML generator error: " + e.getMessage(), e);
+					"KML generator error: " + e.getMessage(), e);
 		}
 
-		response.setHeader("Expires", "0");
 		response.setHeader("Cache-Control",
-				"must-revalidate, post-check=0, pre-check=0");
-		response.setHeader("Pragma", "public");
+				"no-cache, no-store, must-revalidate, max-age=-1"); // http 1.1
+		if (false == request.getScheme().equals("https")) {
+			// else the download fails in IE
+			response.setHeader("Pragma", "no-cache"); // http 1.0
+		} else {
+			response.setHeader("Pragma", "public");
+		}
+		response.setDateHeader("Expires", -1);
+		response.setHeader("Content-disposition", "attachment");
+		response.setContentLength(document.length);
 
 		response.setContentType(KmlLight.MIME_TYPE);
 		response.setContentLength(document.length);
