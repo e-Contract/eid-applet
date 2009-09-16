@@ -19,7 +19,6 @@
 package be.fedict.eid.applet.service.impl.tlv;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,6 +58,12 @@ public class TlvParser {
 					+ tlvClass.getName(), e);
 		}
 		return t;
+	}
+
+	private static byte[] copy(byte[] source, int idx, int count) {
+		byte[] result = new byte[count];
+		System.arraycopy(source, idx, result, 0, count);
+		return result;
 	}
 
 	private static <T> T parseThrowing(byte[] file, Class<T> tlvClass)
@@ -101,7 +106,7 @@ public class TlvParser {
 				Class<?> tlvType = tlvField.getType();
 				ConvertData convertDataAnnotation = tlvField
 						.getAnnotation(ConvertData.class);
-				byte[] tlvValue = Arrays.copyOfRange(file, idx, idx + length);
+				byte[] tlvValue = copy(file, idx, length);
 				Object fieldValue;
 				if (null != convertDataAnnotation) {
 					Class<? extends DataConvertor<?>> dataConvertorClass = convertDataAnnotation
