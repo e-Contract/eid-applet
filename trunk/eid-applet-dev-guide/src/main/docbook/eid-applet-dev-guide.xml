@@ -561,6 +561,34 @@
 				<programlisting role="XML"><![CDATA[<a href="identity.kmz" target="_blank">View in Google Earth</a>]]></programlisting>
 			</section>
 			<section>
+				<title>JSON</title>
+				<para>The eID Applet SDK comes with a servlet to support eID
+					identity data retrieval inside your web application via JSON. The
+					JSON servlet is configured as follows:</para>
+				<programlisting role="XML"><![CDATA[<servlet>
+	<servlet-name>JSONServlet</servlet-name>
+	<servlet-class>be.fedict.eid.applet.service.JSONServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+	<servlet-name>JSONServlet</servlet-name>
+	<url-pattern>/identity.js</url-pattern>
+</servlet-mapping>]]></programlisting>
+				<para>The retrieved JSON data object has the following structure:</para>
+				<programlisting><![CDATA[{
+	identity: {
+		name: "SPECIMEN",
+		firstName: "Alice Geldigekaart",
+		dateOfBirth: "Fri Jan 01 00:00:00 CET 1971",
+		gender: "FEMALE"
+	},
+	address: {
+		streetAndNumber: "Meirplaats 1 bus 1",
+		municipality: "Antwerpen",
+		zip: "2000"
+	}
+}]]></programlisting>
+			</section>
+			<section>
 				<title>Identity Data Integrity</title>
 				<para>During an eID identification operation the eID Applet
 					Service
