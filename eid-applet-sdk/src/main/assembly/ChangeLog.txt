@@ -1,3 +1,17 @@
+1.0.0-beta-4 - 18 September 2009
+	* various improvements to the PHP eID Applet Service
+	* fix for PC/SC library loading under Linux
+	* improved OpenSC PKCS#11 error handling
+	* CCID secure pinpad reader support (direct & start/finish)
+	* TLV parser fix for large fields
+	* ODF signature service fixes (valid in OpenOffice.org 3.1)
+	* OOXML signature service implementation (Office 2007)
+	* eID identity export to KML 2.2 (Google Earth) and vCard 3.0
+	* improved the ASP.NET eID Applet Service implementation (photo)
+	* updated the eID Applet developer's guide
+	* eID identity export in JSON format
+	* French translation updates
+
 1.0.0-beta-3 - 24 July 2009
 	* initial eID Applet Service Signer implementation (XML + ODF)
 	* non-reversible citizen identifiers (NRCID) support
