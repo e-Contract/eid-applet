@@ -80,6 +80,10 @@
 			<param-name>AuditService</param-name>
 			<param-value>fedict/eid/applet/beta/AuditServiceBean</param-value>
 		</init-param>
+		<init-param>
+			<param-name>SkipNationalNumberCheck</param-name>
+			<param-value>true</param-value>
+		</init-param>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>AppletIdentificationServiceServlet</servlet-name>

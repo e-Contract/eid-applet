@@ -90,6 +90,9 @@ public class IdentityDataMessageHandlerTest {
 		EasyMock
 				.expect(mockServletConfig.getInitParameter("AuditServiceClass"))
 				.andStubReturn(null);
+		EasyMock.expect(
+				mockServletConfig.getInitParameter("SkipNationalNumberCheck"))
+				.andStubReturn(null);
 
 		mockHttpSession.setAttribute(EasyMock.eq("eid.identity"), EasyMock
 				.isA(Identity.class));
@@ -154,6 +157,9 @@ public class IdentityDataMessageHandlerTest {
 				.andStubReturn(null);
 		EasyMock
 				.expect(mockServletConfig.getInitParameter("AuditServiceClass"))
+				.andStubReturn(null);
+		EasyMock.expect(
+				mockServletConfig.getInitParameter("SkipNationalNumberCheck"))
 				.andStubReturn(null);
 
 		EasyMock.expect(mockHttpSession.getAttribute("eid.identifier"))
@@ -228,6 +234,9 @@ public class IdentityDataMessageHandlerTest {
 		EasyMock
 				.expect(mockServletConfig.getInitParameter("AuditServiceClass"))
 				.andStubReturn(AuditTestService.class.getName());
+		EasyMock.expect(
+				mockServletConfig.getInitParameter("SkipNationalNumberCheck"))
+				.andStubReturn(null);
 
 		EasyMock.expect(mockServletRequest.getRemoteAddr()).andStubReturn(
 				"remote-address");
@@ -300,6 +309,9 @@ public class IdentityDataMessageHandlerTest {
 		EasyMock
 				.expect(mockServletConfig.getInitParameter("AuditServiceClass"))
 				.andStubReturn(AuditTestService.class.getName());
+		EasyMock.expect(
+				mockServletConfig.getInitParameter("SkipNationalNumberCheck"))
+				.andStubReturn(null);
 
 		EasyMock.expect(mockServletRequest.getRemoteAddr()).andStubReturn(
 				"remote-address");

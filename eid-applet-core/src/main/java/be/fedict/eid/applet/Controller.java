@@ -34,6 +34,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
@@ -941,6 +942,7 @@ public class Controller {
 		addDetailMessage("OS arch: " + System.getProperty("os.arch"));
 		addDetailMessage("Web application URL: "
 				+ this.runtime.getDocumentBase());
+		addDetailMessage("Current time: " + new Date());
 		// TODO when using SunPKCS11 we only accept the Sun JRE
 		// TODO can we assume there is only Sun JRE? OpenJDK variants...
 	}
