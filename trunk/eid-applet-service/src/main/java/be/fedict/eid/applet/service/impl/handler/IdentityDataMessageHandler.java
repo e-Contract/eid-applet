@@ -83,11 +83,15 @@ public class IdentityDataMessageHandler implements
 
 	public static final String ROOT_CERT_SESSION_ATTRIBTUE = "eid.certs.root";
 
+	public static final String SKIP_NATIONAL_NUMBER_CHECK_INIT_PARAM_NAME = "SkipNationalNumberCheck";
+
 	private boolean includePhoto;
 
 	private boolean includeAddress;
 
 	private boolean includeCertificates;
+
+	private boolean skipNationalNumberCheck;
 
 	private ServiceLocator<IdentityIntegrityService> identityIntegrityServiceLocator;
 
@@ -184,11 +188,13 @@ public class IdentityDataMessageHandler implements
 			PublicKey rrnPublicKey = rrnCertificate.getPublicKey();
 			verifySignature(message.identitySignatureFile, rrnPublicKey,
 					request, message.idFile);
-			String authnUserId = (String) session
-					.getAttribute(AuthenticationDataMessageHandler.AUTHENTICATED_USER_IDENTIFIER_SESSION_ATTRIBUTE);
-			if (null != authnUserId) {
-				if (false == authnUserId.equals(identity.nationalNumber)) {
-					throw new ServletException("national number mismatch");
+			if (false == this.skipNationalNumberCheck) {
+				String authnUserId = (String) session
+						.getAttribute(AuthenticationDataMessageHandler.AUTHENTICATED_USER_IDENTIFIER_SESSION_ATTRIBUTE);
+				if (null != authnUserId) {
+					if (false == authnUserId.equals(identity.nationalNumber)) {
+						throw new ServletException("national number mismatch");
+					}
 				}
 			}
 			if (this.includeAddress) {
@@ -354,6 +360,13 @@ public class IdentityDataMessageHandler implements
 		if (null != includeCertificates) {
 			this.includeCertificates = Boolean
 					.parseBoolean(includeCertificates);
+		}
+
+		String skipNationalNumberCheck = config
+				.getInitParameter(SKIP_NATIONAL_NUMBER_CHECK_INIT_PARAM_NAME);
+		if (null != skipNationalNumberCheck) {
+			this.skipNationalNumberCheck = Boolean
+					.parseBoolean(skipNationalNumberCheck);
 		}
 
 		this.identityIntegrityServiceLocator = new ServiceLocator<IdentityIntegrityService>(

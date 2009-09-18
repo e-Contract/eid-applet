@@ -573,7 +573,8 @@
 	<servlet-name>JSONServlet</servlet-name>
 	<url-pattern>/identity.js</url-pattern>
 </servlet-mapping>]]></programlisting>
-				<para>The retrieved JSON data object has the following structure:</para>
+				<para>The retrieved JSON data object has the following structure:
+				</para>
 				<programlisting><![CDATA[{
 	identity: {
 		name: "SPECIMEN",
@@ -682,6 +683,13 @@
 					verification. This makes for
 					a bullet-proof eID identification that cannot be forged.
 				</para>
+				<para>For some applications that need eID identification of citizen
+					B after eID authentication of citizen A, you might want to disable
+					this feature. Do so via:</para>
+				<programlisting role="XML"><![CDATA[<init-param>
+	<param-name>SkipNationalNumberCheck</param-name>
+	<param-value>true</param-value>
+</init-param>]]></programlisting>
 			</section>
 		</section>
 		<section>

@@ -28,6 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.Security;
 import java.security.Signature;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -45,8 +46,10 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMWriter;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import be.fedict.eid.applet.Messages;
@@ -103,6 +106,11 @@ public class PcscTest {
 		@Override
 		public void progressIndication(int max, int current) {
 		}
+	}
+
+	@BeforeClass
+	public static void beforeClass() {
+		Security.addProvider(new BouncyCastleProvider());
 	}
 
 	private Messages messages;
