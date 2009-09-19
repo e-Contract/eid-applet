@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>be.fedict.eid-applet</groupId>
 		<artifactId>eid-applet-test</artifactId>
-		<version>1.0.0-beta-4</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet Test Model</name>
 	<description>EJB3 Model for Test eID Applet Web App.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-test-model</artifactId>
-	<version>1.0.0-beta-4</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>ejb</packaging>
 	<build>
 		<plugins>
@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service-spi</artifactId>
-			<version>1.0.0-beta-4</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
