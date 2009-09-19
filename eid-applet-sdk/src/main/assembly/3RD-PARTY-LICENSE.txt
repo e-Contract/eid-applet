@@ -8,6 +8,7 @@ The third party software included as a part in this product:
 * Bouncycastle Library: BSD type license. See section 2 below.
 * iText: MPL or LGPL license. This project requires the LGPL license.
 * Apache XML Security: Apache License Version 2.0
+* Joda-Time: Apache License Version 2.0
 
 Use of any of this software is governed by the terms of the license below.
 

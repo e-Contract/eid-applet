@@ -1,17 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0-beta-4</version>
 	</parent>
 	<name>FedICT eID Applet Package</name>
 	<description>Packaging of the eID applet.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-package</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0-beta-4</version>
 	<packaging>jar</packaging>
 	<build>
 		<plugins>
@@ -121,12 +119,15 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-jar-plugin</artifactId>
-						<version>2.3-MJAR-112</version>
-						<!-- http://jira.codehaus.org/browse/MJAR-112 -->
-						<!--
-							XXX: overriding plugin version does not work for multi-module
-							build
-						-->
+						<configuration>
+							<archive>
+								<addMavenDescriptor>false</addMavenDescriptor>
+							</archive>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jarsigner-plugin</artifactId>
 						<executions>
 							<execution>
 								<goals>
@@ -135,15 +136,13 @@
 							</execution>
 						</executions>
 						<configuration>
-							<archive>
-								<addMavenDescriptor>false</addMavenDescriptor>
-							</archive>
 							<keystore>NONE</keystore>
-							<type>PKCS11</type>
+							<storetype>PKCS11</storetype>
 							<providerClass>sun.security.pkcs11.SunPKCS11</providerClass>
 							<providerArg>src/main/jar/etoken.config</providerArg>
 							<storepass>FedICT1234</storepass>
 							<alias>NEW</alias>
+							<verbose>true</verbose>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -154,7 +153,7 @@
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-core</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-beta-4</version>
 		</dependency>
 	</dependencies>
 </project>
