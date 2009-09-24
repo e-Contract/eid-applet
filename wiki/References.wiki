@@ -76,3 +76,4 @@
   * [http://www.osor.eu/communities/eid OSOR eID Community]
   * [http://code.google.com/p/jtrust/ jTrust - Java library for PKI validation]
   * [http://rcardon.free.fr/websign/ WebSign Project]
+  * [http://j4sign.sourceforge.net/ j4sign]
