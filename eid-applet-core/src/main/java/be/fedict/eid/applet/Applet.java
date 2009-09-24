@@ -151,7 +151,7 @@ public class Applet extends JApplet {
 			try {
 				URL targetUrl = new URL(documentBase, targetPageParam);
 				addDetailMessage("Navigating to: " + targetUrl);
-				appletContext.showDocument(targetUrl);
+				appletContext.showDocument(targetUrl, "_self");
 			} catch (MalformedURLException e) {
 				addDetailMessage("URL error: " + e.getMessage());
 			}
