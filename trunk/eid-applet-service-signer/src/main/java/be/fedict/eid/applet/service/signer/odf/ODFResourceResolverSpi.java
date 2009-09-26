@@ -15,21 +15,21 @@
  * License along with this software; if not, see 
  * http://www.gnu.org/licenses/.
  */
-
 package be.fedict.eid.applet.service.signer.odf;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.utils.resolver.ResourceResolverException;
 import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
+
 import org.w3c.dom.Attr;
 
 /**
@@ -40,58 +40,55 @@ import org.w3c.dom.Attr;
  * 
  */
 public class ODFResourceResolverSpi extends ResourceResolverSpi {
+    private static final Log LOG = LogFactory.getLog(ODFResourceResolverSpi.class);
+    private final URL odfUrl;
 
-	private static final Log LOG = LogFactory
-			.getLog(ODFResourceResolverSpi.class);
+    public ODFResourceResolverSpi(URL odfUrl) {
+        this.odfUrl = odfUrl;
+    }
 
-	private final URL odfUrl;
+    @Override
+    public boolean engineCanResolve(Attr uri, String baseUri) {
+        String uriValue = uri.getValue();
+        LOG.debug("engineCanResolve " + uriValue);
+        InputStream dataInputStream;
+        try {
+            dataInputStream = findDataInputStream(uriValue);
+        } catch (IOException e) {
+            LOG.warn("IO error: " + e.getMessage(), e);
+            return false;
+        }
+        if (null != dataInputStream) {
+            return true;
+        }
+        return false;
+    }
 
-	public ODFResourceResolverSpi(URL odfUrl) {
-		this.odfUrl = odfUrl;
-	}
+    @Override
+    public XMLSignatureInput engineResolve(Attr uri, String baseUri)
+            throws ResourceResolverException {
+        String uriValue = uri.getValue();
+        LOG.debug("engineResolve " + uriValue);
+        InputStream dataInputStream;
+        try {
+            dataInputStream = findDataInputStream(uriValue);
+            return new XMLSignatureInput(dataInputStream);
+        } catch (IOException e) {
+            LOG.warn("IO error: " + e.getMessage(), e);
+        }
+        return null;
+    }
 
-	@Override
-	public boolean engineCanResolve(Attr uri, String baseUri) {
-		String uriValue = uri.getValue();
-		LOG.debug("engineCanResolve " + uriValue);
-		InputStream dataInputStream;
-		try {
-			dataInputStream = findDataInputStream(uriValue);
-		} catch (IOException e) {
-			LOG.warn("IO error: " + e.getMessage(), e);
-			return false;
-		}
-		if (null != dataInputStream) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public XMLSignatureInput engineResolve(Attr uri, String baseUri)
-			throws ResourceResolverException {
-		String uriValue = uri.getValue();
-		LOG.debug("engineResolve " + uriValue);
-		InputStream dataInputStream;
-		try {
-			dataInputStream = findDataInputStream(uriValue);
-			return new XMLSignatureInput(dataInputStream);
-		} catch (IOException e) {
-			LOG.warn("IO error: " + e.getMessage(), e);
-		}
-		return null;
-	}
-
-	private InputStream findDataInputStream(String uri) throws IOException {
-		uri = URLDecoder.decode(uri, "UTF-8");
-		InputStream odfInputStream = this.odfUrl.openStream();
-		ZipInputStream odfZipInputStream = new ZipInputStream(odfInputStream);
-		ZipEntry zipEntry;
-		while (null != (zipEntry = odfZipInputStream.getNextEntry())) {
-			if (zipEntry.getName().equals(uri)) {
-				return odfZipInputStream;
-			}
-		}
-		return null;
-	}
+    /**
+     * Find a given file / zip entry in the ODF package
+     *
+     * @param uri
+     * @return inputstream of the file
+     * @throws IOException
+     */
+    private InputStream findDataInputStream(String uri) throws IOException {
+        uri = URLDecoder.decode(uri, "UTF-8");
+        InputStream odfInputStream = this.odfUrl.openStream();
+        return ODFUtil.findDataInputStream(odfInputStream, uri);
+    }
 }
