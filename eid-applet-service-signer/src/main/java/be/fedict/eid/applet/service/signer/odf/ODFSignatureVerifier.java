@@ -15,13 +15,15 @@
  * License along with this software; if not, see 
  * http://www.gnu.org/licenses/.
  */
-
 package be.fedict.eid.applet.service.signer.odf;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.net.URL;
+
 import java.security.cert.X509Certificate;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -33,16 +35,17 @@ import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -52,152 +55,149 @@ import be.fedict.eid.applet.service.signer.KeyInfoKeySelector;
  * ODF Signature Verifier.
  * 
  * @author fcorneli
- * 
  */
 public class ODFSignatureVerifier {
 
-	private static final Log LOG = LogFactory
-			.getLog(ODFSignatureVerifier.class);
+    private static final Log LOG = LogFactory.getLog(ODFSignatureVerifier.class);
 
-	private ODFSignatureVerifier() {
-		super();
-	}
+    private ODFSignatureVerifier() {
+        super();
+    }
 
-	/**
-	 * Checks whether the ODF document available via the given URL has been
-	 * signed.
-	 * 
-	 * @param odfUrl
-	 * @return
-	 * @throws IOException
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws org.apache.xml.security.signature.XMLSignatureException
-	 * @throws XMLSecurityException
-	 * @throws MarshalException
-	 * @throws XMLSignatureException
-	 */
-	public static boolean hasOdfSignature(URL odfUrl) throws IOException,
-			ParserConfigurationException, SAXException,
-			org.apache.xml.security.signature.XMLSignatureException,
-			XMLSecurityException, MarshalException, XMLSignatureException {
-		List<X509Certificate> signers = getSigners(odfUrl);
-		return false == signers.isEmpty();
-	}
+    /**
+     * Checks whether the ODF document available via the given URL has been
+     * signed.
+     *
+     * @param odfUrl
+     * @return
+     * @throws IOException
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws org.apache.xml.security.signature.XMLSignatureException
+     * @throws XMLSecurityException
+     * @throws MarshalException
+     * @throws XMLSignatureException
+     */
+    public static boolean hasOdfSignature(URL odfUrl) throws IOException,
+            ParserConfigurationException, SAXException,
+            org.apache.xml.security.signature.XMLSignatureException,
+            XMLSecurityException, MarshalException, XMLSignatureException {
+        List<X509Certificate> signers = getSigners(odfUrl);
+        return false == signers.isEmpty();
+    }
 
-	/**
-	 * Gives back a list of signers for the document available via the given
-	 * URL.
-	 * 
-	 * @param odfUrl
-	 * @return
-	 * @throws IOException
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws MarshalException
-	 * @throws XMLSignatureException
-	 */
-	public static List<X509Certificate> getSigners(URL odfUrl)
-			throws IOException, ParserConfigurationException, SAXException,
-			MarshalException, XMLSignatureException {
-		List<X509Certificate> signers = new LinkedList<X509Certificate>();
-		if (null == odfUrl) {
-			throw new IllegalArgumentException("odfUrl is null");
-		}
-		ZipInputStream odfZipInputStream = new ZipInputStream(odfUrl
-				.openStream());
-		ZipEntry zipEntry;
-		while (null != (zipEntry = odfZipInputStream.getNextEntry())) {
-			LOG.debug(zipEntry.getName());
-			if (true == "META-INF/documentsignatures.xml".equals(zipEntry
-					.getName())) {
-				Document documentSignatures = loadDocument(odfZipInputStream);
-				NodeList signatureNodeList = documentSignatures
-						.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
-				for (int idx = 0; idx < signatureNodeList.getLength(); idx++) {
-					Node signatureNode = signatureNodeList.item(idx);
-					X509Certificate signer = getVerifiedSignatureSigner(odfUrl,
-							signatureNode);
-					if (null == signer) {
-						LOG.debug("JSR105 says invalid signature");
-						continue;
-					}
-					signers.add(signer);
-				}
-				return signers;
-			}
-		}
-		LOG.debug("no documentsignatures.xml entry present");
-		return signers;
-	}
+    /**
+     * return list of signers for the document available via the given
+     * URL.
+     *
+     * @param odfUrl
+     * @return list of X509 certificates
+     * @throws IOException
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws MarshalException
+     * @throws XMLSignatureException
+     */
+    public static List<X509Certificate> getSigners(URL odfUrl)
+            throws IOException, ParserConfigurationException, SAXException,
+            MarshalException, XMLSignatureException {
+        List<X509Certificate> signers = new LinkedList<X509Certificate>();
+        if (null == odfUrl) {
+            throw new IllegalArgumentException("odfUrl is null");
+        }
+        ZipInputStream odfZipInputStream = new ZipInputStream(odfUrl.openStream());
+        ZipEntry zipEntry;
 
-	private static X509Certificate getVerifiedSignatureSigner(URL odfUrl,
-			Node signatureNode) throws MarshalException, XMLSignatureException {
-		if (null == odfUrl) {
-			throw new IllegalArgumentException("odfUrl is null");
-		}
-		KeyInfoKeySelector keySelector = new KeyInfoKeySelector();
-		DOMValidateContext domValidateContext = new DOMValidateContext(
-				keySelector, signatureNode);
-		ODFURIDereferencer dereferencer = new ODFURIDereferencer(odfUrl);
-		domValidateContext.setURIDereferencer(dereferencer);
-		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-				.getInstance();
-		LOG.debug("java version: " + System.getProperty("java.version"));
-		/*
-		 * Requires Java 6u10 because of a bug. See also:
-		 * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6696582
-		 */
-		XMLSignature xmlSignature = xmlSignatureFactory
-				.unmarshalXMLSignature(domValidateContext);
-		boolean validity = xmlSignature.validate(domValidateContext);
-		if (false == validity) {
-			LOG.debug("invalid signature");
-			return null;
-		}
-		// TODO: check what has been signed.
+        while (null != (zipEntry = odfZipInputStream.getNextEntry())) {
+            LOG.debug(zipEntry.getName());
+            if (ODFUtil.isSignatureFile(zipEntry)) {
+                Document documentSignatures = loadDocument(odfZipInputStream);
+                NodeList signatureNodeList = documentSignatures.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 
-		X509Certificate signer = keySelector.getCertificate();
-		if (null == signer) {
-			throw new IllegalStateException("signer X509 certificate is null");
-		}
-		LOG.debug("signer: " + signer.getSubjectX500Principal());
-		return signer;
-	}
+                for (int idx = 0; idx < signatureNodeList.getLength(); idx++) {
+                    Node signatureNode = signatureNodeList.item(idx);
+                    X509Certificate signer = getVerifiedSignatureSigner(odfUrl,
+                            signatureNode);
+                    if (null == signer) {
+                        LOG.debug("JSR105 says invalid signature");
+                    } else {
+                        signers.add(signer);
+                    }
+                }
+                return signers;
+            }
+        }
+        LOG.debug("no documentsignatures.xml entry present");
+        return signers;
+    }
 
-	private static Document loadDocument(InputStream documentInputStream)
-			throws ParserConfigurationException, SAXException, IOException {
-		InputSource inputSource = new InputSource(documentInputStream);
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
-		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
-		Document document = documentBuilder.parse(inputSource);
-		return document;
-	}
+    private static X509Certificate getVerifiedSignatureSigner(URL odfUrl,
+            Node signatureNode) throws MarshalException, XMLSignatureException {
+        if (null == odfUrl) {
+            throw new IllegalArgumentException("odfUrl is null");
+        }
+        KeyInfoKeySelector keySelector = new KeyInfoKeySelector();
+        DOMValidateContext domValidateContext = new DOMValidateContext(
+                keySelector, signatureNode);
+        ODFURIDereferencer dereferencer = new ODFURIDereferencer(odfUrl);
+        domValidateContext.setURIDereferencer(dereferencer);
 
-	/**
-	 * Checks whether the document available on the given URL is an ODF document
-	 * or not.
-	 * 
-	 * @param url
-	 * @return
-	 * @throws IOException
-	 */
-	public static boolean isODF(URL url) throws IOException {
-		ZipInputStream zipInputStream = new ZipInputStream(url.openStream());
-		ZipEntry zipEntry;
-		while (null != (zipEntry = zipInputStream.getNextEntry())) {
-			if (false == "mimetype".equals(zipEntry.getName())) {
-				continue;
-			}
-			String mimetypeContent = IOUtils.toString(zipInputStream);
-			if (mimetypeContent
-					.startsWith("application/vnd.oasis.opendocument")) {
-				return true;
-			}
-		}
-		return false;
-	}
+        XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
+        LOG.debug("java version: " + System.getProperty("java.version"));
+        /*
+         * Requires Java 6u10 because of a bug. See also:
+         * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6696582
+         */
+        XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
+        boolean validity = xmlSignature.validate(domValidateContext);
+        if (false == validity) {
+            LOG.debug("invalid signature");
+            return null;
+        }
+        // TODO: check what has been signed.
+
+        X509Certificate signer = keySelector.getCertificate();
+        if (null == signer) {
+            throw new IllegalStateException("signer X509 certificate is null");
+        }
+        LOG.debug("signer: " + signer.getSubjectX500Principal());
+        return signer;
+    }
+
+    /**
+     * Load an XML file from ODF package as a DOM Document
+     *
+     * @param documentInputStream
+     * @return
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    private static Document loadDocument(InputStream documentInputStream)
+            throws ParserConfigurationException, SAXException, IOException {
+        InputSource inputSource = new InputSource(documentInputStream);
+        DocumentBuilder documentBuilder = ODFUtil.getNewDocumentBuilder();
+        Document document = documentBuilder.parse(inputSource);
+        return document;
+    }
+
+    /**
+     * Checks whether the document available on the given URL is an ODF document
+     * or not.
+     *
+     * @param url
+     * @return
+     * @throws IOException
+     */
+    public static boolean isODF(URL url) throws IOException {
+        ZipInputStream zipInputStream = new ZipInputStream(url.openStream());
+        ZipEntry zipEntry;
+        while (null != (zipEntry = zipInputStream.getNextEntry())) {
+            if ("mimetype".equals(zipEntry.getName())) {
+                String mimetypeContent = IOUtils.toString(zipInputStream);
+                return mimetypeContent.startsWith("application/vnd.oasis.opendocument");
+            }
+        }
+        return false;
+    }
 }
