@@ -12,7 +12,7 @@
 			<year>2008-2009</year>
 			<holder>FedICT</holder>
 		</copyright>
-		<releaseinfo>draft 16 Sept 2009</releaseinfo>
+		<releaseinfo>draft 28 Sept 2009</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -1289,6 +1289,60 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 </init-param>]]></programlisting>
 			</section>
 		</section>
+	</section>
+	<section>
+		<title>eID Applet Web Application Deployment</title>
+		<para>You can deploy your eID Applet enabled web application over a
+			lot of different network topologies, depending on the setup of your
+			infrastructure. The easiest configuration is a setup where you
+			terminate the SSL on the Application Server itself. Another option is
+			to use an AJP proxy. An example of how to configure the Apache HTTPD
+			AJP proxy is given below:</para>
+		<programlisting><![CDATA[LoadModule proxy_ajp_module modules/mod_proxy_ajp.so
+ProxyPass /eid-applet-test/ ajp://localhost:8009/eid-applet-test/
+ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlisting>
+		<para>This AJP proxy can then terminate the SSL without the
+			Application Service noticing this.</para>
+		<para>Some configuration use non-AJP aware reverse proxies. An example
+			on how to configure the Apache HTTPD as a reverse proxy is given
+			below:
+		</para>
+		<programlisting><![CDATA[ProxyRequests Off
+
+<Proxy *>
+        Order deny,allow
+        Allow from all
+</Proxy>
+
+<Location /eid-applet-test/>
+        ProxyPass http://localhost:8080/eid-applet-test/
+        ProxyPassReverse http://localhost:8080/eid-applet-test/
+</Location>]]></programlisting>
+		<para>
+			Because the Application Server no longer receives the SSL
+			information
+			as provided by the AJP protocol, the eID Applet Service
+			can no longer
+			detect whether it's using a secure connection or not.
+			The eID Applet
+			Service can be configured to skip the secure connection check using
+			the following
+			<code>init-param</code>
+			on the
+			<code>AppletServiceServlet</code>
+			:
+		</para>
+		<programlisting role="XML"><![CDATA[<init-param>
+	<param-name>SkipSecureConnectionCheck</param-name>
+	<param-value>true</param-value>
+</init-param>]]></programlisting>
+		<para>
+			Further it is important to have a servlet container session cookie
+			without the
+			<code>HttpOnly</code>
+			flag set. Else the eID Applet Service will push the eID identity
+			credentials in the wrong Application Server HTTP session.
+		</para>
 	</section>
 	<section>
 		<title>eID Applet Protocol</title>

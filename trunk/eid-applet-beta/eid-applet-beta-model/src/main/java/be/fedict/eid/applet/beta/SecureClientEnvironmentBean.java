@@ -56,7 +56,7 @@ public class SecureClientEnvironmentBean implements
 			String javaVendor, String osName, String osArch, String osVersion,
 			String userAgent, String navigatorAppName,
 			String navigatorAppVersion, String navigatorUserAgent,
-			String remoteAddress, int sslKeySize, String sslCipherSuite,
+			String remoteAddress, Integer sslKeySize, String sslCipherSuite,
 			List<String> readerList) throws InsecureClientEnvironmentException {
 		String clientEnviromentResult = "java version: " + javaVersion + "\n"
 				+ "java vendor: " + javaVendor + "\n" + "OS name: " + osName

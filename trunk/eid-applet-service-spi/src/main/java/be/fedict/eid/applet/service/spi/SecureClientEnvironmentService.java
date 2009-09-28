@@ -54,11 +54,13 @@ public interface SecureClientEnvironmentService {
 	 * @param remoteAddress
 	 *            the address of the client machine.
 	 * @param sslKeySize
-	 *            the key size of the SSL session used between server and
-	 *            client.
+	 *            the optional key size of the SSL session used between server
+	 *            and client. Can be <code>null</code> in case the SSL is
+	 *            terminated early.
 	 * @param sslCipherSuite
-	 *            the cipher suite of the SSL session used between server and
-	 *            client.
+	 *            the optional cipher suite of the SSL session used between
+	 *            server and client. Can be <code>null</code> in case the SSL is
+	 *            terminated early.
 	 * @param readerList
 	 *            the list of smart card readers present on the client machine.
 	 * @throws InsecureClientEnvironmentException
@@ -67,7 +69,7 @@ public interface SecureClientEnvironmentService {
 	void checkSecureClientEnvironment(String javaVersion, String javaVendor,
 			String osName, String osArch, String osVersion, String userAgent,
 			String navigatorAppName, String navigatorAppVersion,
-			String navigatorUserAgent, String remoteAddress, int sslKeySize,
-			String sslCipherSuite, List<String> readerList)
+			String navigatorUserAgent, String remoteAddress,
+			Integer sslKeySize, String sslCipherSuite, List<String> readerList)
 			throws InsecureClientEnvironmentException;
 }

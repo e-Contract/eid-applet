@@ -40,13 +40,21 @@ public class HttpServletRequestHttpReceiver implements HttpReceiver {
 
 	private final HttpServletRequest httpServletRequest;
 
+	private final boolean skipSecureConnectionCheck;
+
 	/**
 	 * Main constructor.
 	 * 
 	 * @param httpServletRequest
+	 * @param skipSecureConnectionCheck
+	 *            set to <code>true</code> to skip the check on a secure SSL
+	 *            connection.
 	 */
-	public HttpServletRequestHttpReceiver(HttpServletRequest httpServletRequest) {
+	public HttpServletRequestHttpReceiver(
+			HttpServletRequest httpServletRequest,
+			boolean skipSecureConnectionCheck) {
 		this.httpServletRequest = httpServletRequest;
+		this.skipSecureConnectionCheck = skipSecureConnectionCheck;
 	}
 
 	public byte[] getBody() {
@@ -77,6 +85,9 @@ public class HttpServletRequestHttpReceiver implements HttpReceiver {
 	}
 
 	public boolean isSecure() {
+		if (true == this.skipSecureConnectionCheck) {
+			return true;
+		}
 		if (false == this.httpServletRequest.isSecure()) {
 			return false;
 		}
