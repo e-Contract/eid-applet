@@ -105,6 +105,10 @@ public class AppletServiceServlet extends HttpServlet {
 
 	private Unmarshaller unmarshaller;
 
+	private static final String SKIP_SECURE_CONNECTION_CHECK_INIT_PARAM = "SkipSecureConnectionCheck";
+
+	private boolean skipSecureConnectionCheck;
+
 	public AppletServiceServlet() {
 		super();
 		LOG.debug("constructor");
@@ -143,6 +147,15 @@ public class AppletServiceServlet extends HttpServlet {
 		}
 
 		this.unmarshaller = new Unmarshaller(new AppletProtocolMessageCatalog());
+
+		String skipSecureConnectionCheck = config
+				.getInitParameter(SKIP_SECURE_CONNECTION_CHECK_INIT_PARAM);
+		if (null != skipSecureConnectionCheck) {
+			this.skipSecureConnectionCheck = Boolean
+					.parseBoolean(skipSecureConnectionCheck);
+			LOG.debug("skipping secure connection check: "
+					+ this.skipSecureConnectionCheck);
+		}
 	}
 
 	@Override
@@ -152,10 +165,11 @@ public class AppletServiceServlet extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		out.println("<html>");
-		out.println("<head><title>AppletService</title></head>");
+		out.println("<head><title>eID Applet Service</title></head>");
 		out.println("<body>");
+		out.println("<h1>eID Applet Service</h1>");
 		out
-				.println("<p>The applet service should not be accessed directly.</p>");
+				.println("<p>The eID Applet Service should not be accessed directly.</p>");
 		out.println("</body></html>");
 		out.close();
 	}
@@ -180,7 +194,7 @@ public class AppletServiceServlet extends HttpServlet {
 		 * Incoming message unmarshaller.
 		 */
 		HttpServletRequestHttpReceiver httpReceiver = new HttpServletRequestHttpReceiver(
-				request);
+				request, this.skipSecureConnectionCheck);
 		Object transferObject;
 		try {
 			transferObject = this.unmarshaller.receive(httpReceiver);

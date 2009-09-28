@@ -41,7 +41,7 @@ public class InsecureClientEnvironmentWarningServiceImpl implements
 			String javaVendor, String osName, String osArch, String osVersion,
 			String userAgent, String navigatorAppName,
 			String navigatorAppVersion, String navigatorUserAgent,
-			String remoteAddress, int sslKeySize, String sslCipherSuite,
+			String remoteAddress, Integer sslKeySize, String sslCipherSuite,
 			List<String> readerList) throws InsecureClientEnvironmentException {
 		LOG.debug("insecure warning");
 

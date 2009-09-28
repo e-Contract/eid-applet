@@ -101,7 +101,7 @@ public class ClientEnvironmentMessageHandler implements
 					"no secure client env service configured");
 		}
 		String remoteAddress = request.getRemoteAddr();
-		int sslKeySize = (Integer) request
+		Integer sslKeySize = (Integer) request
 				.getAttribute("javax.servlet.request.key_size");
 		String userAgent = httpHeaders.get("user-agent");
 		String sslCipherSuite = (String) request

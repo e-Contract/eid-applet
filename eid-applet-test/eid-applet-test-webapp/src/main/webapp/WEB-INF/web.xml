@@ -185,6 +185,10 @@
 			<param-name>IdentityIntegrityService</param-name>
 			<param-value>test/eid/applet/model/IdentityIntegrityServiceBean</param-value>
 		</init-param>
+		<init-param>
+			<param-name>SkipSecureConnectionCheck</param-name>
+			<param-value>true</param-value>
+		</init-param>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>AppletAllServiceServlet</servlet-name>
