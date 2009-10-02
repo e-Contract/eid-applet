@@ -67,11 +67,9 @@ import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
  *
  * The signatures created with this class are accepted as valid signature within
  * OpenOffice.org 3.x. They probably don't get accepted by older OOo versions.
- * 
- * <p>
- * See also <a href="http://www.openoffice.org/">OpenOffice.org</a>.
- * </p>
- * 
+ *
+ * @see http://wiki.services.openoffice.org/wiki/Security/Digital_Signatures
+ *
  * @author fcorneli
  * 
  */
@@ -90,24 +88,21 @@ abstract public class AbstractODFSignatureService extends AbstractXmlSignatureSe
         URL odfUrl = this.getOpenDocumentURL();
         try {
             InputStream odfInputStream = odfUrl.openStream();
-            ZipInputStream odfZipInputStream = new ZipInputStream(
-                    odfInputStream);
+            ZipInputStream odfZipInputStream = new ZipInputStream(odfInputStream);
             ZipEntry zipEntry;
 
             while (null != (zipEntry = odfZipInputStream.getNextEntry())) {
-                if (isToBeSigned(zipEntry)) {
+                if (ODFUtil.isToBeSigned(zipEntry)) {
                     String name = zipEntry.getName();
                     /* Whitespaces are illegal in URIs
                      *
-                     * Note that OOo seems to have a bug, seems like the
+                     * Note that OOo 3.0/3.1 seems to have a bug, seems like the
                      * OOo signature verification doesn't convert it back to
                      * whitespace, to be investigated
                      */
                     String uri = name.replaceAll(" ", "%20");
-                    LOG.debug("uri: " + uri);
 
                     if (name.endsWith(".xml") && !isEmpty(odfZipInputStream)) {
-                        LOG.debug("non-empty entry: " + name);
                         /* apply transformation on non-empty XML files only */
                         referenceInfos.add(new ReferenceInfo(uri,
                                 CanonicalizationMethod.INCLUSIVE));
@@ -118,7 +113,9 @@ abstract public class AbstractODFSignatureService extends AbstractXmlSignatureSe
                 }
             }
         } catch (IOException e) {
-            LOG.warn("IO error: " + e.getMessage(), e);
+            LOG.error("IO error: " + e.getMessage(), e);
+        } catch (Exception e) {
+           LOG.error("Error: " + e.getMessage(), e);
         }
         return referenceInfos;
     }
@@ -134,26 +131,6 @@ abstract public class AbstractODFSignatureService extends AbstractXmlSignatureSe
     private boolean isEmpty(InputStream inputStream) throws IOException {
         return 0 == inputStream.skip(1);
     }
-
-
-    /* Check if a file / zip entry is to be signed
-     *
-     * @param zipEntry
-     * @return true if zip entry is to be signed
-     */
-    private static boolean isToBeSigned(ZipEntry zipEntry) {
-        String name = zipEntry.getName();
-
-        /* OOo 3.0/3.1 bug: don't sign mimetype stream nor the manifest */
-        if (zipEntry.isDirectory() ||
-                name.equals("mimetype") ||
-                name.equals("META-INF/manifest.xml") ||
-                name.equals("META-INF/documentsignatures.xml")) {
-            return false;
-        }
-        return true;
-    }
-
 
     /**
      * Returns the URL of the ODF to be signed.
@@ -205,12 +182,11 @@ abstract public class AbstractODFSignatureService extends AbstractXmlSignatureSe
         /*
          * Copy the original ODF content to the signed ODF package.
          */
-        ZipOutputStream zipOutputStream = new ZipOutputStream(
-                signedOdfOutputStream);
+        ZipOutputStream zipOutputStream = new ZipOutputStream(signedOdfOutputStream);
         ZipInputStream zipInputStream = new ZipInputStream(this.getOpenDocumentURL().openStream());
         ZipEntry zipEntry;
         while (null != (zipEntry = zipInputStream.getNextEntry())) {
-            if (! ODFUtil.isSignatureFile(zipEntry)) {
+            if (! zipEntry.getName().equals(ODFUtil.SIGNATURE_FILE)) {
                 zipOutputStream.putNextEntry(zipEntry);
                 IOUtils.copy(zipInputStream, zipOutputStream);
             }
@@ -219,7 +195,7 @@ abstract public class AbstractODFSignatureService extends AbstractXmlSignatureSe
         /*
          * Add the ODF XML signature file to the signed ODF package.
          */
-        zipEntry = new ZipEntry("META-INF/documentsignatures.xml");
+        zipEntry = new ZipEntry(ODFUtil.SIGNATURE_FILE);
         zipOutputStream.putNextEntry(zipEntry);
         IOUtils.write(signatureData, zipOutputStream);
         zipOutputStream.close();
@@ -272,8 +248,8 @@ abstract public class AbstractODFSignatureService extends AbstractXmlSignatureSe
         X509Data x509Data = keyInfoFactory.newX509Data(x509DataObjects);
         KeyInfo keyInfo = keyInfoFactory.newKeyInfo(Collections.singletonList(x509Data));
         DOMKeyInfo domKeyInfo = (DOMKeyInfo) keyInfo;
-        Key key = new Key() {
 
+        Key key = new Key() {
             private static final long serialVersionUID = 1L;
 
             public String getAlgorithm() {
@@ -288,6 +264,7 @@ abstract public class AbstractODFSignatureService extends AbstractXmlSignatureSe
                 return null;
             }
         };
+
         XMLSignContext xmlSignContext = new DOMSignContext(key,
                 signatureElement);
         DOMCryptoContext domCryptoContext = (DOMCryptoContext) xmlSignContext;
@@ -309,24 +286,30 @@ abstract public class AbstractODFSignatureService extends AbstractXmlSignatureSe
             return document;
         }
         document = ODFUtil.getNewDocument();
-        Element rootElement = document.createElementNS(
-                "urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0",
-                "document-signatures");
-        rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns",
-                "urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0");
+        Element rootElement = document.createElementNS(ODFUtil.SIGNATURE_NS,
+                ODFUtil.SIGNATURE_ELEMENT);
+        rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns", 
+                ODFUtil.SIGNATURE_NS);
         document.appendChild(rootElement);
         return document;
     }
 
+    /**
+     * Get the XML signature file from the ODF package
+     *
+     * @return
+     * @throws IOException
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     */
     private Document getODFSignatureDocument() throws IOException,
             ParserConfigurationException, SAXException {
         URL odfUrl = this.getOpenDocumentURL();
-        ZipInputStream odfZipInputStream = new ZipInputStream(odfUrl.openStream());
-        ZipEntry zipEntry;
-        while (null != (zipEntry = odfZipInputStream.getNextEntry())) {
-            if (ODFUtil.isSignatureFile(zipEntry)) {
-                return loadDocument(odfZipInputStream);
-            }
+
+        InputStream inputStream = ODFUtil.findDataInputStream(odfUrl.openStream(),
+                ODFUtil.SIGNATURE_FILE);
+        if (null != inputStream) {
+            return ODFUtil.loadDocument(inputStream);
         }
         return null;
     }
