@@ -34,19 +34,19 @@ import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
-import javax.xml.parsers.DocumentBuilder;
+
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.apache.xml.security.exceptions.XMLSecurityException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import be.fedict.eid.applet.service.signer.KeyInfoKeySelector;
@@ -109,9 +109,8 @@ public class ODFSignatureVerifier {
         ZipEntry zipEntry;
 
         while (null != (zipEntry = odfZipInputStream.getNextEntry())) {
-            LOG.debug(zipEntry.getName());
-            if (ODFUtil.isSignatureFile(zipEntry)) {
-                Document documentSignatures = loadDocument(odfZipInputStream);
+          if (ODFUtil.isSignatureFile(zipEntry)) {
+                Document documentSignatures = ODFUtil.loadDocument(odfZipInputStream);
                 NodeList signatureNodeList = documentSignatures.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 
                 for (int idx = 0; idx < signatureNodeList.getLength(); idx++) {
@@ -127,7 +126,7 @@ public class ODFSignatureVerifier {
                 return signers;
             }
         }
-        LOG.debug("no documentsignatures.xml entry present");
+        LOG.debug("no signature file present");
         return signers;
     }
 
@@ -165,23 +164,6 @@ public class ODFSignatureVerifier {
     }
 
     /**
-     * Load an XML file from ODF package as a DOM Document
-     *
-     * @param documentInputStream
-     * @return
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws IOException
-     */
-    private static Document loadDocument(InputStream documentInputStream)
-            throws ParserConfigurationException, SAXException, IOException {
-        InputSource inputSource = new InputSource(documentInputStream);
-        DocumentBuilder documentBuilder = ODFUtil.getNewDocumentBuilder();
-        Document document = documentBuilder.parse(inputSource);
-        return document;
-    }
-
-    /**
      * Checks whether the document available on the given URL is an ODF document
      * or not.
      *
@@ -190,14 +172,17 @@ public class ODFSignatureVerifier {
      * @throws IOException
      */
     public static boolean isODF(URL url) throws IOException {
-        ZipInputStream zipInputStream = new ZipInputStream(url.openStream());
-        ZipEntry zipEntry;
-        while (null != (zipEntry = zipInputStream.getNextEntry())) {
-            if ("mimetype".equals(zipEntry.getName())) {
-                String mimetypeContent = IOUtils.toString(zipInputStream);
-                return mimetypeContent.startsWith("application/vnd.oasis.opendocument");
-            }
+        InputStream resStream =
+                ODFUtil.findDataInputStream(url.openStream(), ODFUtil.MIMETYPE_FILE);
+        if (null == resStream) {
+            /*
+             * Some ODF implementations do not include a mimetype file
+             * TODO: try harder to check if a file is ODF or not
+             */
+            LOG.debug("mimetype stream not found in ODF package");
+            return false;
         }
-        return false;
+        String mimetypeContent = IOUtils.toString(resStream);
+        return mimetypeContent.startsWith(ODFUtil.MIMETYPE_START);
     }
 }
