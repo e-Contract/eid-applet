@@ -20,7 +20,6 @@ package be.fedict.eid.applet.service.signer.odf;
 
 import java.util.Iterator;
 
-import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 
 /**
@@ -53,6 +52,6 @@ public class ODFNamespaceContext implements NamespaceContext {
         if ("xlink".equals(prefix)) {
             return "http://www.w3.org/1999/xlink";
         }
-        return XMLConstants.NULL_NS_URI;
+        return "";
     }
 }
