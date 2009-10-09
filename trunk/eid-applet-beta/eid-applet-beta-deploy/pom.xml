@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict.eid-applet</groupId>
@@ -48,12 +50,6 @@
 						<jarModule>
 							<groupId>org.jboss.el</groupId>
 							<artifactId>jboss-el</artifactId>
-							<includeInApplicationXml>true</includeInApplicationXml>
-							<bundleDir>lib</bundleDir>
-						</jarModule>
-						<jarModule>
-							<groupId>com.sun.facelets</groupId>
-							<artifactId>jsf-facelets</artifactId>
 							<includeInApplicationXml>true</includeInApplicationXml>
 							<bundleDir>lib</bundleDir>
 						</jarModule>
@@ -151,11 +147,6 @@
 			<groupId>org.jboss.seam</groupId>
 			<artifactId>jboss-seam</artifactId>
 			<type>ejb</type>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.facelets</groupId>
-			<artifactId>jsf-facelets</artifactId>
-			<version>1.1.15.B1</version>
 		</dependency>
 	</dependencies>
 </project>

@@ -69,7 +69,7 @@ public class HttpSessionTemporaryDataStorage implements TemporaryDataStorage {
 
 	public static final String TEMP_ATTRIBUTES_ATTRIBUTE = HttpSessionTemporaryDataStorage.class
 			.getName()
-			+ "/tempAttribs";
+			+ ".tempAttribs";
 
 	public InputStream getTempInputStream() {
 		LOG.debug("get temp input stream");

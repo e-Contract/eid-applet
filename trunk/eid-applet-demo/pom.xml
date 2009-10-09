@@ -83,5 +83,11 @@
 			<version>1.0.0-SNAPSHOT</version>
 			<type>ear</type>
 		</dependency>
+		<dependency>
+			<groupId>be.fedict.eid-dss</groupId>
+			<artifactId>eid-dss-deploy</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<type>ear</type>
+		</dependency>
 	</dependencies>
 </project>
