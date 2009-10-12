@@ -33,6 +33,7 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.LinkedList;
@@ -73,6 +74,8 @@ import be.fedict.eid.applet.shared.IdentificationRequestMessage;
 import be.fedict.eid.applet.shared.IdentityDataMessage;
 import be.fedict.eid.applet.shared.InsecureClientMessage;
 import be.fedict.eid.applet.shared.KioskMessage;
+import be.fedict.eid.applet.shared.SignCertificatesDataMessage;
+import be.fedict.eid.applet.shared.SignCertificatesRequestMessage;
 import be.fedict.eid.applet.shared.SignRequestMessage;
 import be.fedict.eid.applet.shared.SignatureDataMessage;
 import be.fedict.eid.applet.shared.annotation.ResponsesAllowed;
@@ -302,6 +305,10 @@ public class Controller {
 				FilesDigestRequestMessage filesDigestRequestMessage = (FilesDigestRequestMessage) resultMessage;
 				resultMessage = performFilesDigestOperation(filesDigestRequestMessage.digestAlgo);
 			}
+			if (resultMessage instanceof SignCertificatesRequestMessage) {
+				SignCertificatesDataMessage signCertificatesDataMessage = performSignCertificatesOperation();
+				resultMessage = sendMessage(signCertificatesDataMessage);
+			}
 			if (resultMessage instanceof SignRequestMessage) {
 				SignRequestMessage signRequestMessage = (SignRequestMessage) resultMessage;
 				performEidSignOperation(signRequestMessage);
@@ -401,6 +408,49 @@ public class Controller {
 				.getMessage(MESSAGE_ID.DONE));
 		this.runtime.gotoTargetPage();
 		return null;
+	}
+
+	private SignCertificatesDataMessage performSignCertificatesOperation()
+			throws Exception {
+		setStatusMessage(Status.NORMAL, this.messages
+				.getMessage(MESSAGE_ID.DETECTING_CARD));
+		try {
+			if (false == this.pkcs11Eid.isEidPresent()) {
+				setStatusMessage(Status.NORMAL, this.messages
+						.getMessage(MESSAGE_ID.INSERT_CARD_QUESTION));
+				this.pkcs11Eid.waitForEidPresent();
+			}
+		} catch (PKCS11NotFoundException e) {
+			addDetailMessage("eID Middleware PKCS#11 library not found.");
+			if (null != this.pcscEidSpi) {
+				addDetailMessage("fallback to PC/SC signing...");
+				return performPcscSignCertificatesOperation();
+			}
+			throw new PKCS11NotFoundException();
+		}
+		setStatusMessage(Status.NORMAL, this.messages
+				.getMessage(MESSAGE_ID.READING_IDENTITY));
+		PrivateKeyEntry privateKeyEntry = this.pkcs11Eid
+				.getPrivateKeyEntry("Signature");
+		X509Certificate[] certificateChain = (X509Certificate[]) privateKeyEntry
+				.getCertificateChain();
+		this.pkcs11Eid.close();
+		SignCertificatesDataMessage signCertificatesDataMessage = new SignCertificatesDataMessage(
+				certificateChain);
+		return signCertificatesDataMessage;
+	}
+
+	private SignCertificatesDataMessage performPcscSignCertificatesOperation()
+			throws Exception {
+		waitForEIdCard();
+		setStatusMessage(Status.NORMAL, this.messages
+				.getMessage(MESSAGE_ID.READING_IDENTITY));
+		List<X509Certificate> certificateChain = this.pcscEidSpi
+				.getSignCertificateChain();
+		this.pcscEidSpi.close();
+		SignCertificatesDataMessage signCertificatesDataMessage = new SignCertificatesDataMessage(
+				certificateChain);
+		return signCertificatesDataMessage;
 	}
 
 	private void kioskMode() throws IllegalArgumentException,

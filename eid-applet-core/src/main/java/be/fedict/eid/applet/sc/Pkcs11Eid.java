@@ -389,7 +389,7 @@ public class Pkcs11Eid {
 
 	private SunPKCS11 pkcs11Provider;
 
-	public PrivateKeyEntry getPrivateKeyEntry() throws IOException,
+	public PrivateKeyEntry getPrivateKeyEntry(String alias) throws IOException,
 			KeyStoreException, NoSuchAlgorithmException, CertificateException,
 			UnrecoverableEntryException {
 		// setup configuration file
@@ -418,10 +418,9 @@ public class Pkcs11Eid {
 			 * Apparently the first eID cards have some issue with the PKCS#15
 			 * structure causing problems in the PKCS#11 object listing.
 			 */
-			String alias = aliases.nextElement();
-			this.view.addDetailMessage("key alias: " + alias);
+			String currentAlias = aliases.nextElement();
+			this.view.addDetailMessage("key alias: " + currentAlias);
 		}
-		String alias = "Authentication";
 		PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore.getEntry(
 				alias, null);
 		if (null == privateKeyEntry) {
@@ -431,6 +430,13 @@ public class Pkcs11Eid {
 			throw new RuntimeException(
 					"private key entry for alias not found: " + alias);
 		}
+		return privateKeyEntry;
+	}
+
+	public PrivateKeyEntry getPrivateKeyEntry() throws IOException,
+			KeyStoreException, NoSuchAlgorithmException, CertificateException,
+			UnrecoverableEntryException {
+		PrivateKeyEntry privateKeyEntry = getPrivateKeyEntry("Authentication");
 		return privateKeyEntry;
 	}
 

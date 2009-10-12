@@ -47,6 +47,7 @@ import be.fedict.eid.applet.service.impl.handler.HandlesMessage;
 import be.fedict.eid.applet.service.impl.handler.HelloMessageHandler;
 import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
 import be.fedict.eid.applet.service.impl.handler.MessageHandler;
+import be.fedict.eid.applet.service.impl.handler.SignCertificatesDataMessageHandler;
 import be.fedict.eid.applet.service.impl.handler.SignatureDataMessageHandler;
 import be.fedict.eid.applet.shared.AbstractProtocolMessage;
 import be.fedict.eid.applet.shared.AppletProtocolMessageCatalog;
@@ -99,7 +100,8 @@ public class AppletServiceServlet extends HttpServlet {
 			AuthenticationDataMessageHandler.class,
 			SignatureDataMessageHandler.class,
 			FileDigestsDataMessageHandler.class,
-			ContinueInsecureMessageHandler.class };
+			ContinueInsecureMessageHandler.class,
+			SignCertificatesDataMessageHandler.class };
 
 	private Map<Class<?>, MessageHandler<?>> messageHandlers;
 
@@ -126,7 +128,8 @@ public class AppletServiceServlet extends HttpServlet {
 					.getAnnotation(HandlesMessage.class);
 			if (null == handlesMessageAnnotation) {
 				throw new ServletException(
-						"missing meta-data on message handler");
+						"missing meta-data on message handler: "
+								+ messageHandlerClass.getName());
 			}
 			Class<? extends AbstractProtocolMessage> protocolMessageClass = handlesMessageAnnotation
 					.value();
