@@ -16,14 +16,27 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.shared.protocol;
+package be.fedict.eid.applet.shared;
+
+import be.fedict.eid.applet.shared.annotation.HttpHeader;
+import be.fedict.eid.applet.shared.annotation.MessageDiscriminator;
+import be.fedict.eid.applet.shared.annotation.StateTransition;
+import be.fedict.eid.applet.shared.protocol.ProtocolState;
 
 /**
- * Holds all the protocol states.
+ * Sign certificates request message transfer object.
  * 
  * @author Frank Cornelis
  * 
  */
-public enum ProtocolState {
-	INIT, IDENTIFY, ENV_CHECK, AUTHENTICATE, SIGN, DIGEST, INSECURE, SIGN_CERTS
+@StateTransition(ProtocolState.SIGN_CERTS)
+public class SignCertificatesRequestMessage extends AbstractProtocolMessage {
+	@HttpHeader(TYPE_HTTP_HEADER)
+	@MessageDiscriminator
+	public static final String TYPE = SignCertificatesRequestMessage.class
+			.getSimpleName();
+
+	public SignCertificatesRequestMessage() {
+		super();
+	}
 }

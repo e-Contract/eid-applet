@@ -269,6 +269,10 @@
 			<param-name>SignatureServiceClass</param-name>
 			<param-value>test.be.fedict.eid.applet.SignatureServiceImpl</param-value>
 		</init-param>
+		<init-param>
+			<param-name>IncludeCertificates</param-name>
+			<param-value>true</param-value>
+		</init-param>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>AppletSignServiceServlet</servlet-name>

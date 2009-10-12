@@ -43,6 +43,7 @@ import be.fedict.eid.applet.shared.FilesDigestRequestMessage;
 import be.fedict.eid.applet.shared.HelloMessage;
 import be.fedict.eid.applet.shared.IdentificationRequestMessage;
 import be.fedict.eid.applet.shared.KioskMessage;
+import be.fedict.eid.applet.shared.SignCertificatesRequestMessage;
 import be.fedict.eid.applet.shared.SignRequestMessage;
 
 /**
@@ -149,6 +150,11 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 				FilesDigestRequestMessage filesDigestRequestMessage = new FilesDigestRequestMessage();
 				filesDigestRequestMessage.digestAlgo = filesDigestAlgo;
 				return filesDigestRequestMessage;
+			}
+			if (true == this.includeCertificates) {
+				LOG.debug("include signing certificate chain during pre-sign");
+				SignCertificatesRequestMessage signCertificatesRequestMessage = new SignCertificatesRequestMessage();
+				return signCertificatesRequestMessage;
 			}
 
 			DigestInfo digestInfo;
