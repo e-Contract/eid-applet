@@ -22,14 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import javax.xml.crypto.URIDereferencer;
-import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.IOUtils;
@@ -62,60 +59,9 @@ abstract public class AbstractODFSignatureService extends
 
 	public AbstractODFSignatureService() {
 		super();
+		addSignatureFacet(new ODFSignatureFacet(this));
 		addSignatureFacet(new OpenOfficeSignatureFacet());
 		addSignatureFacet(new KeyInfoSignatureFacet(false, true, false));
-	}
-
-	@Override
-	protected List<ReferenceInfo> getReferences() {
-		List<ReferenceInfo> referenceInfos = new LinkedList<ReferenceInfo>();
-		URL odfUrl = this.getOpenDocumentURL();
-		try {
-			InputStream odfInputStream = odfUrl.openStream();
-			ZipInputStream odfZipInputStream = new ZipInputStream(
-					odfInputStream);
-			ZipEntry zipEntry;
-
-			while (null != (zipEntry = odfZipInputStream.getNextEntry())) {
-				if (ODFUtil.isToBeSigned(zipEntry)) {
-					String name = zipEntry.getName();
-					/*
-					 * Whitespaces are illegal in URIs
-					 * 
-					 * Note that OOo 3.0/3.1 seems to have a bug, seems like the
-					 * OOo signature verification doesn't convert it back to
-					 * whitespace, to be investigated
-					 */
-					String uri = name.replaceAll(" ", "%20");
-
-					if (name.endsWith(".xml") && !isEmpty(odfZipInputStream)) {
-						/* apply transformation on non-empty XML files only */
-						referenceInfos.add(new ReferenceInfo(uri,
-								CanonicalizationMethod.INCLUSIVE));
-					} else {
-						referenceInfos.add(new ReferenceInfo(uri, null));
-					}
-					LOG.debug("entry: " + name);
-				}
-			}
-		} catch (IOException e) {
-			LOG.error("IO error: " + e.getMessage(), e);
-		} catch (Exception e) {
-			LOG.error("Error: " + e.getMessage(), e);
-		}
-		return referenceInfos;
-	}
-
-	/**
-	 * Unfortunately zipEntry.getSize() often returns -1/size unknown, so this
-	 * is a quick hack to see if the file is empty or not
-	 * 
-	 * @param inputStream
-	 * @return
-	 * @throws IOException
-	 */
-	private boolean isEmpty(InputStream inputStream) throws IOException {
-		return 0 == inputStream.skip(1);
 	}
 
 	/**
