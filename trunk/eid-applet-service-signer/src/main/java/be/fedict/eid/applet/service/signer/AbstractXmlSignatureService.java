@@ -60,14 +60,11 @@ import javax.xml.crypto.dsig.Manifest;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.SignatureMethod;
 import javax.xml.crypto.dsig.SignedInfo;
-import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignContext;
-import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
-import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -114,7 +111,6 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
 	private static final String SIGNATURE_ID_ATTRIBUTE = "signature-id";
 
-	// TODO refactor everything using the signature aspect design pattern
 	private final List<SignatureFacet> signatureFacets;
 
 	/**
@@ -145,16 +141,6 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 	}
 
 	/**
-	 * Gives back a list of service digest infos. Override this method to
-	 * provide digest infos of files located in the service itself.
-	 * 
-	 * @return
-	 */
-	protected List<DigestInfo> getServiceDigestInfos() {
-		return new LinkedList<DigestInfo>();
-	}
-
-	/**
 	 * Gives back the enveloping document. Return <code>null</code> in case
 	 * ds:Signature should be the top-level element. Implementations can
 	 * override this method to provide a custom enveloping document.
@@ -166,49 +152,6 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 	protected Document getEnvelopingDocument()
 			throws ParserConfigurationException, IOException, SAXException {
 		return null;
-	}
-
-	/**
-	 * Gives back a list of reference URIs that need to be signed. These URIs
-	 * can refer to elements inside the enveloping document or to external
-	 * resources. Override this method to feed in other ds:Reference URIs.
-	 * 
-	 * @return
-	 */
-	protected List<String> getReferenceUris() {
-		return new LinkedList<String>();
-	}
-
-	public static class ReferenceInfo {
-		private final String uri;
-		private final String transform;
-
-		public ReferenceInfo(String uri, String transform) {
-			this.uri = uri;
-			this.transform = transform;
-		}
-
-		public ReferenceInfo(String uri) {
-			this(uri, null);
-		}
-
-		public String getUri() {
-			return this.uri;
-		}
-
-		public String getTransform() {
-			return this.transform;
-		}
-	}
-
-	/**
-	 * Gives back a list of references that need to be signed. Implementation
-	 * can override this method.
-	 * 
-	 * @return
-	 */
-	protected List<ReferenceInfo> getReferences() {
-		return new LinkedList<ReferenceInfo>();
 	}
 
 	/**
@@ -398,15 +341,10 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 				"DOM", new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
 
 		/*
-		 * ds:Reference
+		 * Add ds:References that come from signing client local files.
 		 */
 		List<Reference> references = new LinkedList<Reference>();
 		addDigestInfosAsReferences(digestInfos, signatureFactory, references);
-		List<DigestInfo> serviceDigestInfos = getServiceDigestInfos();
-		addDigestInfosAsReferences(serviceDigestInfos, signatureFactory,
-				references);
-		addReferenceIds(signatureFactory, xmlSignContext, references);
-		addReferences(signatureFactory, references);
 
 		/*
 		 * Invoke the signature facets.
@@ -517,51 +455,6 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		MessageDigest jcaMessageDigest = MessageDigest.getInstance(digestAlgo);
 		byte[] digestValue = jcaMessageDigest.digest(octets);
 		return digestValue;
-	}
-
-	private void addReferenceIds(XMLSignatureFactory signatureFactory,
-			XMLSignContext xmlSignContext, List<Reference> references)
-			throws NoSuchAlgorithmException,
-			InvalidAlgorithmParameterException, XMLSignatureException {
-		List<String> referenceUris = getReferenceUris();
-		if (null == referenceUris) {
-			return;
-		}
-		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				DigestMethod.SHA1, null);
-		for (String referenceUri : referenceUris) {
-			Reference reference = signatureFactory.newReference(referenceUri,
-					digestMethod);
-			references.add(reference);
-		}
-	}
-
-	private void addReferences(XMLSignatureFactory xmlSignatureFactory,
-			List<Reference> references) throws NoSuchAlgorithmException,
-			InvalidAlgorithmParameterException {
-		List<ReferenceInfo> referenceInfos = getReferences();
-		if (null == referenceInfos) {
-			return;
-		}
-		if (referenceInfos.isEmpty()) {
-			return;
-		}
-		DigestMethod digestMethod = xmlSignatureFactory.newDigestMethod(
-				DigestMethod.SHA1, null);
-		for (ReferenceInfo referenceInfo : referenceInfos) {
-			List<Transform> transforms = new LinkedList<Transform>();
-			if (null != referenceInfo.getTransform()) {
-				Transform transform = xmlSignatureFactory.newTransform(
-						referenceInfo.getTransform(),
-						(TransformParameterSpec) null);
-				transforms.add(transform);
-			}
-			LOG.debug("adding ds:Reference " + referenceInfo.getUri());
-			Reference reference = xmlSignatureFactory.newReference(
-					referenceInfo.getUri(), digestMethod, transforms, null,
-					null);
-			references.add(reference);
-		}
 	}
 
 	private void addDigestInfosAsReferences(List<DigestInfo> digestInfos,

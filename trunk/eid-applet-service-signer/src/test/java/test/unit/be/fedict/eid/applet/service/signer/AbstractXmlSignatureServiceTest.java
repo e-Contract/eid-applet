@@ -33,8 +33,6 @@ import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import javax.crypto.Cipher;
@@ -76,6 +74,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
+import be.fedict.eid.applet.service.signer.SignatureFacet;
 import be.fedict.eid.applet.service.signer.TemporaryDataStorage;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 
@@ -89,8 +88,6 @@ public class AbstractXmlSignatureServiceTest {
 
 		private Document envelopingDocument;
 
-		private List<String> referenceUris;
-
 		private TemporaryTestDataStorage temporaryDataStorage;
 
 		private String signatureDescription;
@@ -100,10 +97,16 @@ public class AbstractXmlSignatureServiceTest {
 		private URIDereferencer uriDereferencer;
 
 		public XmlSignatureTestService() {
+			this(null);
+		}
+
+		public XmlSignatureTestService(SignatureFacet signatureFacet) {
 			super();
-			this.referenceUris = new LinkedList<String>();
 			this.temporaryDataStorage = new TemporaryTestDataStorage();
 			this.signedDocumentOutputStream = new ByteArrayOutputStream();
+			if (null != signatureFacet) {
+				addSignatureFacet(signatureFacet);
+			}
 		}
 
 		public byte[] getSignedDocumentData() {
@@ -126,15 +129,6 @@ public class AbstractXmlSignatureServiceTest {
 
 		public void setSignatureDescription(String signatureDescription) {
 			this.signatureDescription = signatureDescription;
-		}
-
-		@Override
-		protected List<String> getReferenceUris() {
-			return this.referenceUris;
-		}
-
-		public void addReferenceUri(String referenceUri) {
-			this.referenceUris.add(referenceUri);
 		}
 
 		@Override
@@ -179,9 +173,11 @@ public class AbstractXmlSignatureServiceTest {
 		dataElement.setTextContent("data to be signed");
 		rootElement.appendChild(dataElement);
 
-		XmlSignatureTestService testedInstance = new XmlSignatureTestService();
+		SignatureTestFacet signatureFacet = new SignatureTestFacet();
+		signatureFacet.addReferenceUri("#id-1234");
+		XmlSignatureTestService testedInstance = new XmlSignatureTestService(
+				signatureFacet);
 		testedInstance.setEnvelopingDocument(document);
-		testedInstance.addReferenceUri("#id-1234");
 		testedInstance.setSignatureDescription("test-signature-description");
 
 		// operate
@@ -291,9 +287,11 @@ public class AbstractXmlSignatureServiceTest {
 				.newDocumentBuilder();
 		Document document = documentBuilder.newDocument();
 
-		XmlSignatureTestService testedInstance = new XmlSignatureTestService();
+		SignatureTestFacet signatureFacet = new SignatureTestFacet();
+		signatureFacet.addReferenceUri("external-uri");
+		XmlSignatureTestService testedInstance = new XmlSignatureTestService(
+				signatureFacet);
 		testedInstance.setEnvelopingDocument(document);
-		testedInstance.addReferenceUri("external-uri");
 		testedInstance.setSignatureDescription("test-signature-description");
 		UriTestDereferencer uriDereferencer = new UriTestDereferencer();
 		uriDereferencer.addResource("external-uri", "hello world".getBytes());
