@@ -20,6 +20,7 @@ package be.fedict.eid.applet.service.signer.odf;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -43,18 +44,18 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import be.fedict.eid.applet.service.signer.SignatureAspect;
+import be.fedict.eid.applet.service.signer.SignatureFacet;
 
 /**
- * OpenOffice.org signature aspect.
+ * OpenOffice.org signature facet.
  * 
  * @author fcorneli
  * 
  */
-public class OpenOfficeSignatureAspect implements SignatureAspect {
+public class OpenOfficeSignatureFacet implements SignatureFacet {
 
 	private static final Log LOG = LogFactory
-			.getLog(OpenOfficeSignatureAspect.class);
+			.getLog(OpenOfficeSignatureFacet.class);
 
 	public void preSign(XMLSignatureFactory signatureFactory,
 			Document document, String signatureId, List<Reference> references,
@@ -95,5 +96,10 @@ public class OpenOfficeSignatureAspect implements SignatureAspect {
 		Reference reference = signatureFactory.newReference("#"
 				+ signaturePropertyId, digestMethod);
 		references.add(reference);
+	}
+
+	public void postSign(Element signatureElement,
+			List<X509Certificate> signingCertificateChain) {
+		// empty
 	}
 }

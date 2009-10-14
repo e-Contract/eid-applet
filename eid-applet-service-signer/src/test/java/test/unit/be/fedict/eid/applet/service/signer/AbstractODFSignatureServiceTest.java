@@ -50,14 +50,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.Init;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.keys.KeyInfo;
-import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -66,7 +63,6 @@ import org.xml.sax.SAXException;
 import be.fedict.eid.applet.service.signer.KeyInfoKeySelector;
 import be.fedict.eid.applet.service.signer.TemporaryDataStorage;
 import be.fedict.eid.applet.service.signer.odf.AbstractODFSignatureService;
-import be.fedict.eid.applet.service.signer.odf.ODFResourceResolverSpi;
 import be.fedict.eid.applet.service.signer.odf.ODFURIDereferencer;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 
@@ -114,10 +110,6 @@ public class AbstractODFSignatureServiceTest {
 				assertEquals(signatureCount, signatureNodeList.getLength());
 				for (int idx = 0; idx < signatureNodeList.getLength(); idx++) {
 					Node signatureNode = signatureNodeList.item(idx);
-					if (false == verifySignatureApache(odfUrl, signatureNode)) {
-						LOG.debug("apache says invalid signature");
-						return false;
-					}
 					if (false == verifySignature(odfUrl, signatureNode)) {
 						LOG.debug("JSR105 says invalid signature");
 						return false;
@@ -231,21 +223,6 @@ public class AbstractODFSignatureServiceTest {
 		LOG.debug("signed ODF file: " + tmpFile.getAbsolutePath());
 		assertTrue(hasOdfSignature(tmpFile.toURI().toURL(), signatureCount));
 		LOG.debug("signed ODF file: " + tmpFile.getAbsolutePath());
-	}
-
-	private boolean verifySignatureApache(URL odfUrl, Node signatureNode)
-			throws org.apache.xml.security.signature.XMLSignatureException,
-			XMLSecurityException {
-		org.apache.xml.security.signature.XMLSignature xmlSignature = new org.apache.xml.security.signature.XMLSignature(
-				(Element) signatureNode, null);
-		ResourceResolverSpi resourceResolver = new ODFResourceResolverSpi(
-				odfUrl);
-		xmlSignature.addResourceResolver(resourceResolver);
-		KeyInfo keyInfo = xmlSignature.getKeyInfo();
-		X509Certificate certificate = keyInfo.getX509Certificate();
-		LOG.debug("cert subject: " + certificate.getSubjectX500Principal());
-		boolean validity = xmlSignature.checkSignatureValue(certificate);
-		return validity;
 	}
 
 	/**
