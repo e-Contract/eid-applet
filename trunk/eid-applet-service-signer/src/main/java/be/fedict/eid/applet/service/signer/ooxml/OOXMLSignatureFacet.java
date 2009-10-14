@@ -40,6 +40,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -78,18 +79,18 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import be.fedict.eid.applet.service.signer.NoCloseInputStream;
-import be.fedict.eid.applet.service.signer.SignatureAspect;
+import be.fedict.eid.applet.service.signer.SignatureFacet;
 
 /**
- * Office OpenXML Signature Aspect implementation.
+ * Office OpenXML Signature Facet implementation.
  * 
  * @author fcorneli
  * 
  */
-public class OOXMLSignatureAspect implements SignatureAspect {
+public class OOXMLSignatureFacet implements SignatureFacet {
 
 	private static final Log LOG = LogFactory
-			.getLog(OOXMLSignatureAspect.class);
+			.getLog(OOXMLSignatureFacet.class);
 
 	private final AbstractOOXMLSignatureService signatureService;
 
@@ -98,7 +99,7 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 	 * 
 	 * @param ooxmlUrl
 	 */
-	public OOXMLSignatureAspect(AbstractOOXMLSignatureService signatureService) {
+	public OOXMLSignatureFacet(AbstractOOXMLSignatureService signatureService) {
 		this.signatureService = signatureService;
 	}
 
@@ -477,5 +478,10 @@ public class OOXMLSignatureAspect implements SignatureAspect {
 				.newDocumentBuilder();
 		Document document = documentBuilder.parse(inputSource);
 		return document;
+	}
+
+	public void postSign(Element signatureElement,
+			List<X509Certificate> signingCertificateChain) {
+		// empty
 	}
 }

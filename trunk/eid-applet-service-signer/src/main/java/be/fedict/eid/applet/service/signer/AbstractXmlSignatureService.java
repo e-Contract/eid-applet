@@ -115,22 +115,22 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 	private static final String SIGNATURE_ID_ATTRIBUTE = "signature-id";
 
 	// TODO refactor everything using the signature aspect design pattern
-	private final List<SignatureAspect> signatureAspects;
+	private final List<SignatureFacet> signatureFacets;
 
 	/**
 	 * Main constructor.
 	 */
 	public AbstractXmlSignatureService() {
-		this.signatureAspects = new LinkedList<SignatureAspect>();
+		this.signatureFacets = new LinkedList<SignatureFacet>();
 	}
 
 	/**
-	 * Adds a signature aspect to this XML signature service.
+	 * Adds a signature facet to this XML signature service.
 	 * 
-	 * @param signatureAspect
+	 * @param signatureFacet
 	 */
-	protected void addSignatureAspect(SignatureAspect signatureAspect) {
-		this.signatureAspects.add(signatureAspect);
+	protected void addSignatureFacet(SignatureFacet signatureFacet) {
+		this.signatureFacets.add(signatureFacet);
 	}
 
 	/**
@@ -223,13 +223,13 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
 	/**
 	 * Gives back the human-readable description of what the citizen will be
-	 * signing. The default value is "XML Signature". Override this method to
+	 * signing. The default value is "XML Document". Override this method to
 	 * provide the citizen with another description.
 	 * 
 	 * @return
 	 */
 	protected String getSignatureDescription() {
-		return "XML Signature";
+		return "XML Document";
 	}
 
 	/**
@@ -263,18 +263,6 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
 		String description = getSignatureDescription();
 		return new DigestInfo(digestValue, digestAlgo, description);
-	}
-
-	/**
-	 * Can be overridden by XML signature service implementation to further
-	 * process the signed XML document.
-	 * 
-	 * @param sinatureElement
-	 * @param signingCertificateChain
-	 */
-	protected void postSign(Element sinatureElement,
-			List<X509Certificate> signingCertificateChain) {
-		// empty
 	}
 
 	public void postSign(byte[] signatureValue,
@@ -332,9 +320,11 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		signatureValueElement.setTextContent(Base64.encode(signatureValue));
 
 		/*
-		 * Allow implementation classes to inject their own stuff.
+		 * Allow signature facets to inject their own stuff.
 		 */
-		postSign(signatureElement, signingCertificateChain);
+		for (SignatureFacet signatureFacet : this.signatureFacets) {
+			signatureFacet.postSign(signatureElement, signingCertificateChain);
+		}
 
 		OutputStream signedDocumentOutputStream = getSignedDocumentOutputStream();
 		if (null == signedDocumentOutputStream) {
@@ -419,14 +409,14 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		addReferences(signatureFactory, references);
 
 		/*
-		 * Invoke the signature aspects.
+		 * Invoke the signature facets.
 		 */
 		String signatureId = "xmldsig-" + UUID.randomUUID().toString();
 		List<XMLObject> objects = new LinkedList<XMLObject>();
-		for (SignatureAspect signatureAspect : this.signatureAspects) {
-			LOG.debug("invoking signature aspect: "
-					+ signatureAspect.getClass().getSimpleName());
-			signatureAspect.preSign(signatureFactory, document, signatureId,
+		for (SignatureFacet signatureFacet : this.signatureFacets) {
+			LOG.debug("invoking signature facet: "
+					+ signatureFacet.getClass().getSimpleName());
+			signatureFacet.preSign(signatureFactory, document, signatureId,
 					references, objects);
 		}
 
