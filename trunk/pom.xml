@@ -343,6 +343,11 @@
 				<artifactId>jtidy</artifactId>
 				<version>4aug2000r7-dev</version>
 			</dependency>
+			<dependency>
+				<groupId>commons-digester</groupId>
+				<artifactId>commons-digester</artifactId>
+				<version>1.8.1</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<build>
@@ -477,14 +482,23 @@
 		<pluginRepository>
 			<id>java.net</id>
 			<url>http://download.java.net/maven/2/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</pluginRepository>
 		<pluginRepository>
 			<id>jboss.org</id>
 			<url>http://repository.jboss.org/maven2/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</pluginRepository>
 		<pluginRepository>
 			<id>codehaus</id>
 			<url>http://repository.codehaus.org/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</pluginRepository>
 		<pluginRepository>
 			<id>codehaus-snapshots</id>
@@ -495,6 +509,9 @@
 		<repository>
 			<id>java.net</id>
 			<url>http://download.java.net/maven/2/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>jboss.org</id>
@@ -503,6 +520,9 @@
 			<releases>
 				<enabled>true</enabled>
 			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>openqa</id>
@@ -511,6 +531,9 @@
 			<releases>
 				<enabled>true</enabled>
 			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>openqa-snapshots</id>
@@ -527,6 +550,9 @@
 			<releases>
 				<enabled>true</enabled>
 			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>Codehaus SVN Repository</id>
@@ -536,11 +562,17 @@
 			<id>maven-java.net</id>
 			<url>https://maven-repository.dev.java.net/repository/</url>
 			<layout>legacy</layout>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>maven1-java.net</id>
 			<url>http://download.java.net/maven/1/</url>
 			<layout>legacy</layout>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
 </project>
