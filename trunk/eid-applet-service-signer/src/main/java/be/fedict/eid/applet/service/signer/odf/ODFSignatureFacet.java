@@ -44,6 +44,12 @@ import org.w3c.dom.Element;
 
 import be.fedict.eid.applet.service.signer.SignatureFacet;
 
+/**
+ * Signature Facet implementation to create ODF signatures.
+ * 
+ * @author fcorneli
+ * 
+ */
 public class ODFSignatureFacet implements SignatureFacet {
 
 	private static final Log LOG = LogFactory.getLog(ODFSignatureFacet.class);
@@ -60,9 +66,10 @@ public class ODFSignatureFacet implements SignatureFacet {
 	}
 
 	public void preSign(XMLSignatureFactory signatureFactory,
-			Document document, String signatureId, List<Reference> references,
-			List<XMLObject> objects) throws NoSuchAlgorithmException,
-			InvalidAlgorithmParameterException {
+			Document document, String signatureId,
+			List<X509Certificate> signingCertificateChain,
+			List<Reference> references, List<XMLObject> objects)
+			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		try {
 			URL odfUrl = this.signatureService.getOpenDocumentURL();
 			InputStream odfInputStream = odfUrl.openStream();

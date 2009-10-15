@@ -1,5 +1,5 @@
 /*
- * eID Applet Project.
+ * eID Digital Signature Service Project.
  * Copyright (C) 2009 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -16,7 +16,7 @@
  * http://www.gnu.org/licenses/.
  */
 
-package test.unit.be.fedict.eid.applet.service.signer;
+package be.fedict.eid.applet.service.signer;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
@@ -24,23 +24,24 @@ import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Reference;
+import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import be.fedict.eid.applet.service.signer.SignatureFacet;
-
-public class SignatureTestFacet implements SignatureFacet {
-
-	private final List<String> uris;
-
-	public SignatureTestFacet() {
-		this.uris = new LinkedList<String>();
-	}
+/**
+ * Signature Facet implementation to create enveloped signatures.
+ * 
+ * @author Frank Cornelis
+ * 
+ */
+public class EnvelopedSignatureFacet implements SignatureFacet {
 
 	public void postSign(Element signatureElement,
 			List<X509Certificate> signingCertificateChain) {
@@ -54,14 +55,20 @@ public class SignatureTestFacet implements SignatureFacet {
 			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		DigestMethod digestMethod = signatureFactory.newDigestMethod(
 				DigestMethod.SHA1, null);
-		for (String uri : this.uris) {
-			Reference reference = signatureFactory.newReference(uri,
-					digestMethod);
-			references.add(reference);
-		}
-	}
 
-	public void addReferenceUri(String uri) {
-		this.uris.add(uri);
+		List<Transform> transforms = new LinkedList<Transform>();
+		Transform envelopedTransform = signatureFactory
+				.newTransform(CanonicalizationMethod.ENVELOPED,
+						(TransformParameterSpec) null);
+		transforms.add(envelopedTransform);
+		Transform exclusiveTransform = signatureFactory
+				.newTransform(CanonicalizationMethod.EXCLUSIVE,
+						(TransformParameterSpec) null);
+		transforms.add(exclusiveTransform);
+
+		Reference reference = signatureFactory.newReference("", digestMethod,
+				transforms, null, null);
+
+		references.add(reference);
 	}
 }

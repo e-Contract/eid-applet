@@ -198,7 +198,8 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
 		byte[] digestValue;
 		try {
-			digestValue = getXmlSignatureDigestValue(digestAlgo, digestInfos);
+			digestValue = getXmlSignatureDigestValue(digestAlgo, digestInfos,
+					signingCertificateChain);
 		} catch (Exception e) {
 			throw new RuntimeException(
 					"XML signature error: " + e.getMessage(), e);
@@ -291,9 +292,11 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 	}
 
 	private byte[] getXmlSignatureDigestValue(String digestAlgo,
-			List<DigestInfo> digestInfos) throws ParserConfigurationException,
-			NoSuchAlgorithmException, InvalidAlgorithmParameterException,
-			MarshalException, javax.xml.crypto.dsig.XMLSignatureException,
+			List<DigestInfo> digestInfos,
+			List<X509Certificate> signingCertificateChain)
+			throws ParserConfigurationException, NoSuchAlgorithmException,
+			InvalidAlgorithmParameterException, MarshalException,
+			javax.xml.crypto.dsig.XMLSignatureException,
 			TransformerFactoryConfigurationError, TransformerException,
 			IOException, SAXException {
 		/*
@@ -355,7 +358,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			LOG.debug("invoking signature facet: "
 					+ signatureFacet.getClass().getSimpleName());
 			signatureFacet.preSign(signatureFactory, document, signatureId,
-					references, objects);
+					signingCertificateChain, references, objects);
 		}
 
 		/*

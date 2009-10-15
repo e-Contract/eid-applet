@@ -85,12 +85,11 @@ import be.fedict.eid.applet.service.signer.SignatureFacet;
  * Office OpenXML Signature Facet implementation.
  * 
  * @author fcorneli
- * 
+ * @see http://msdn.microsoft.com/en-us/library/cc313071.aspx
  */
 public class OOXMLSignatureFacet implements SignatureFacet {
 
-	private static final Log LOG = LogFactory
-			.getLog(OOXMLSignatureFacet.class);
+	private static final Log LOG = LogFactory.getLog(OOXMLSignatureFacet.class);
 
 	private final AbstractOOXMLSignatureService signatureService;
 
@@ -104,9 +103,10 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 	}
 
 	public void preSign(XMLSignatureFactory signatureFactory,
-			Document document, String signatureId, List<Reference> references,
-			List<XMLObject> objects) throws NoSuchAlgorithmException,
-			InvalidAlgorithmParameterException {
+			Document document, String signatureId,
+			List<X509Certificate> signingCertificateChain,
+			List<Reference> references, List<XMLObject> objects)
+			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		LOG.debug("pre sign");
 		addManifestObject(signatureFactory, document, signatureId, references,
 				objects);
