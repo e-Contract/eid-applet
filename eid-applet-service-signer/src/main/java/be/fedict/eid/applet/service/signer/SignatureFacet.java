@@ -63,15 +63,17 @@ public interface SignatureFacet {
 	 * @param signatureFactory
 	 * @param document
 	 * @param signatureId
+	 * @param signingCertificateChain
+	 *            the optional signing certificate chain
 	 * @param references
 	 * @param objects
 	 * @throws InvalidAlgorithmParameterException
 	 * @throws NoSuchAlgorithmException
 	 */
 	void preSign(XMLSignatureFactory signatureFactory, Document document,
-			String signatureId, List<Reference> references,
-			List<XMLObject> objects) throws NoSuchAlgorithmException,
-			InvalidAlgorithmParameterException;
+			String signatureId, List<X509Certificate> signingCertificateChain,
+			List<Reference> references, List<XMLObject> objects)
+			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException;
 
 	/**
 	 * This method is being invoked by the XML signature service engine during

@@ -1,0 +1,2 @@
+SYSTEM "http://uri.etsi.org/01903/v1.3.2/XAdES.xsd" "XAdES.xsd"
+SYSTEM "http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd" "xmldsig-core-schema.xsd"
