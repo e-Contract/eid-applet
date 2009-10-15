@@ -81,5 +81,13 @@ As of NetBeans version 6.7 this free IDE from Sun has native Maven 2 support.
 
 === 7. License
 
+The source code of the eID Applet Project is licensed under GNU LGPL v3.0.
+Part of the source code (OOXML signature code) is dual-licensed under both 
+the GNU LGPL v3.0 and the Apache License v2.0. Only the files with a header
+containing both the GNU LGPL v3.0 and Apache License v2.0 license texts are
+dual-licensed. The dual-licensing was offered in response to a request from
+the Apache POI open source project. All other source code files remain under
+control of the GNU LGPL v3.0 license unless otherwise decided in the future
+by _ALL_ eID Applet Project copyright holders.
 The license conditions can be found in the file: LICENSE.txt
 
