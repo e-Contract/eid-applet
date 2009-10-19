@@ -83,7 +83,7 @@
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<scope>test</scope>
-				<version>4.6</version>
+				<version>4.7</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-logging</groupId>
@@ -109,17 +109,22 @@
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
-				<version>1.3</version>
+				<version>1.4</version>
 			</dependency>
 			<dependency>
-				<groupId>bouncycastle</groupId>
+				<groupId>org.bouncycastle</groupId>
 				<artifactId>bcprov-jdk16</artifactId>
-				<version>140</version>
+				<version>1.44</version>
 			</dependency>
 			<dependency>
-				<groupId>bouncycastle</groupId>
+				<groupId>org.bouncycastle</groupId>
 				<artifactId>bcmail-jdk16</artifactId>
-				<version>140</version>
+				<version>1.44</version>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bctsp-jdk16</artifactId>
+				<version>1.44</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openqa.selenium.client-drivers</groupId>
@@ -141,19 +146,19 @@
 			<dependency>
 				<groupId>org.easymock</groupId>
 				<artifactId>easymock</artifactId>
-				<version>2.5.1</version>
+				<version>2.5.2</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.mortbay.jetty</groupId>
 				<artifactId>jetty</artifactId>
-				<version>6.1.19</version>
+				<version>6.1.21</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.mortbay.jetty</groupId>
 				<artifactId>jetty-servlet-tester</artifactId>
-				<version>6.1.19</version>
+				<version>6.1.21</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -230,12 +235,12 @@
 			<dependency>
 				<groupId>org.richfaces.framework</groupId>
 				<artifactId>richfaces-impl</artifactId>
-				<version>3.3.1.GA</version>
+				<version>3.3.2.SR1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.richfaces.ui</groupId>
 				<artifactId>richfaces-ui</artifactId>
-				<version>3.3.1.GA</version>
+				<version>3.3.2.SR1</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.persistence</groupId>
@@ -280,7 +285,7 @@
 			<dependency>
 				<groupId>com.lowagie</groupId>
 				<artifactId>itext</artifactId>
-				<version>2.1.5</version>
+				<version>2.1.7</version>
 			</dependency>
 			<dependency>
 				<groupId>com.caucho</groupId>
@@ -331,7 +336,7 @@
 			<dependency>
 				<groupId>com.h2database</groupId>
 				<artifactId>h2</artifactId>
-				<version>1.1.117</version>
+				<version>1.2.121</version>
 			</dependency>
 			<dependency>
 				<groupId>net.sf.json-lib</groupId>
@@ -397,12 +402,12 @@
 				<plugin>
 					<groupId>org.jboss.maven.plugins</groupId>
 					<artifactId>maven-jdocbook-plugin</artifactId>
-					<version>2.1.2</version>
+					<version>2.2.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>jboss-maven-plugin</artifactId>
-					<version>1.3.1</version>
+					<version>1.3.2</version>
 				</plugin>
 				<!--
 					XXX: Maven 2.0.10 does not allow us to override plugin versions in
@@ -419,7 +424,7 @@
 					<version>2.5</version>
 					<configuration>
 						<links>
-							<link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
+							<link>http://java.sun.com/javase/6/docs/api/</link>
 							<link>http://java.sun.com/javaee/5/docs/api/</link>
 						</links>
 					</configuration>
@@ -478,7 +483,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jarsigner-plugin</artifactId>
-					<version>1.1</version>
+					<version>1.2</version>
 				</plugin>
 				<plugin>
 					<groupId>org.jvnet.jaxb2.maven2</groupId>

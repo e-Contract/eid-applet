@@ -119,7 +119,8 @@ public class CMSTest {
 		generator.addSigner(keyPair.getPrivate(), certificate,
 				CMSSignedDataGenerator.DIGEST_SHA1);
 		CMSProcessable content = new CMSProcessableByteArray(toBeSigned);
-		CMSSignedData signedData = generator.generate(content, false, null);
+		CMSSignedData signedData = generator.generate(content, false,
+				(String) null);
 
 		byte[] cmsSignature = signedData.getEncoded();
 		LOG.debug("CMS signature: "
@@ -162,7 +163,8 @@ public class CMSTest {
 		generator.addSigner(keyPair.getPrivate(), certificate,
 				CMSSignedDataGenerator.DIGEST_SHA1);
 		CMSProcessable content = new CMSProcessableByteArray(toBeSigned);
-		CMSSignedData signedData = generator.generate(content, true, null);
+		CMSSignedData signedData = generator.generate(content, true,
+				(String) null);
 
 		byte[] cmsSignature = signedData.getEncoded();
 		LOG.debug("CMS signature: "
@@ -217,7 +219,8 @@ public class CMSTest {
 				new CollectionCertStoreParameters(certList));
 		generator.addCertificatesAndCRLs(certStore);
 		CMSProcessable content = new CMSProcessableByteArray(toBeSigned);
-		CMSSignedData signedData = generator.generate(content, false, null);
+		CMSSignedData signedData = generator.generate(content, false,
+				(String) null);
 
 		byte[] cmsSignature = signedData.getEncoded();
 		LOG.debug("CMS signature: "
