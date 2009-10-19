@@ -59,16 +59,16 @@ import be.fedict.eid.applet.sc.PcscEid;
 import be.fedict.eid.applet.sc.PcscEidSpi;
 import be.fedict.eid.applet.sc.Task;
 import be.fedict.eid.applet.sc.TaskRunner;
-import be.fedict.trust.CachedCrlRepository;
-import be.fedict.trust.CrlTrustLinker;
 import be.fedict.trust.FallbackTrustLinker;
 import be.fedict.trust.MemoryCertificateRepository;
 import be.fedict.trust.NetworkConfig;
-import be.fedict.trust.OcspTrustLinker;
-import be.fedict.trust.OnlineCrlRepository;
-import be.fedict.trust.OnlineOcspRepository;
 import be.fedict.trust.PublicKeyTrustLinker;
 import be.fedict.trust.TrustValidator;
+import be.fedict.trust.crl.CachedCrlRepository;
+import be.fedict.trust.crl.CrlTrustLinker;
+import be.fedict.trust.crl.OnlineCrlRepository;
+import be.fedict.trust.ocsp.OcspTrustLinker;
+import be.fedict.trust.ocsp.OnlineOcspRepository;
 
 /**
  * Integration tests for PC/SC eID component.
