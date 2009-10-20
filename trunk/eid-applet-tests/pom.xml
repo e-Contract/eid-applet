@@ -147,7 +147,6 @@
 		<dependency>
 			<groupId>be.fedict</groupId>
 			<artifactId>jtrust</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

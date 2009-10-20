@@ -39,6 +39,7 @@ import org.xml.sax.SAXException;
 
 import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
 import be.fedict.eid.applet.service.signer.KeyInfoSignatureFacet;
+import be.fedict.eid.applet.service.signer.XAdESSignatureFacet;
 
 /**
  * Signature Service implementation for OpenDocument format signatures.
@@ -61,6 +62,7 @@ abstract public class AbstractODFSignatureService extends
 		super();
 		addSignatureFacet(new ODFSignatureFacet(this));
 		addSignatureFacet(new OpenOfficeSignatureFacet());
+		addSignatureFacet(new XAdESSignatureFacet());
 		addSignatureFacet(new KeyInfoSignatureFacet(false, true, false));
 	}
 
