@@ -184,8 +184,17 @@ public class AbstractODFSignatureServiceTest {
 		ODFTestSignatureService odfSignatureService = new ODFTestSignatureService();
 		odfSignatureService.setOdfUrl(odfUrl);
 
+		KeyPair keyPair = PkiTestUtils.generateKeyPair();
+		DateTime notBefore = new DateTime();
+		DateTime notAfter = notBefore.plusYears(1);
+		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
+				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
+				.getPrivate(), true, 0, null, null, new KeyUsage(
+				KeyUsage.nonRepudiation));
+
 		// operate
-		DigestInfo digestInfo = odfSignatureService.preSign(null, null);
+		DigestInfo digestInfo = odfSignatureService.preSign(null, Collections
+				.singletonList(certificate));
 
 		// verify
 		assertNotNull(digestInfo);
@@ -195,19 +204,11 @@ public class AbstractODFSignatureServiceTest {
 		assertEquals("SHA-1", digestInfo.digestAlgo);
 		assertNotNull(digestInfo.digestValue);
 
-		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
 		byte[] digestInfoValue = ArrayUtils.addAll(
 				PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
 		byte[] signatureValue = cipher.doFinal(digestInfoValue);
-
-		DateTime notBefore = new DateTime();
-		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
-				.getPrivate(), true, 0, null, null, new KeyUsage(
-				KeyUsage.nonRepudiation));
 
 		/*
 		 * Operate: postSign
