@@ -16,7 +16,7 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.service.signer;
+package be.fedict.eid.applet.service.signer.facets;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
@@ -34,6 +34,8 @@ import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import be.fedict.eid.applet.service.signer.SignatureFacet;
 
 /**
  * Signature Facet implementation to create enveloped signatures.

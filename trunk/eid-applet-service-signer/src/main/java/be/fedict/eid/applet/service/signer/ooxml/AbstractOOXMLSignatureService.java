@@ -65,7 +65,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
-import be.fedict.eid.applet.service.signer.KeyInfoSignatureFacet;
+import be.fedict.eid.applet.service.signer.facets.KeyInfoSignatureFacet;
 
 /**
  * Signature Service implementation for Office OpenXML document format XML

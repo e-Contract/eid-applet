@@ -53,11 +53,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
-import be.fedict.eid.applet.service.signer.EnvelopedSignatureFacet;
-import be.fedict.eid.applet.service.signer.KeyInfoSignatureFacet;
 import be.fedict.eid.applet.service.signer.SignatureFacet;
 import be.fedict.eid.applet.service.signer.TemporaryDataStorage;
-import be.fedict.eid.applet.service.signer.XAdESSignatureFacet;
+import be.fedict.eid.applet.service.signer.facets.EnvelopedSignatureFacet;
+import be.fedict.eid.applet.service.signer.facets.KeyInfoSignatureFacet;
+import be.fedict.eid.applet.service.signer.facets.XAdESSignatureFacet;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 
 public class XAdESSignatureFacetTest {
