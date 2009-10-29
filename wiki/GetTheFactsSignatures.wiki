@@ -1,0 +1,43 @@
+#summary Get The Facts on Signatures
+
+= Get The Facts on Signatures =
+
+This document will guide you through the various options you have for integrating electronic signatures within your business processes. We first give an executive summary via the following table.
+
+|| *Aspect* || *PDF signatures* || *XML signatures* ||
+|| Open Standard || yes || yes ||
+|| Data Format || PDF || whatever you want it to be ||
+|| Easy of implementation || limited choice: iText or via Adobe Lifecycle products || lightweight via various open source solutions ||
+|| Accessibility || almost forced using Adobe products to extract data || you can define your own XML schema according to your business needs ||
+|| Validation || Adobe specific as people will want valid signatures in Acrobat Reader || under your own control ||
+|| Service Directive readiness || PAdES is premature || XAdES is a proven standard that has been implemented in various open source projects ||
+|| Long-Term Accessibility || your PDFs just might survive the Adobe products || no matter how the IT landscape changes, there will always be some notepad ||
+|| Long-Term Signature Validity || PAdES is premature, so is PAdES-A || XAdES-A has proven implementations (ETSI XAdES plugtests) ||
+|| Risk for Vendor lock-in || high. What if Adobe decides to charge for the Reader? || low. XML parsers are all over the place ||
+|| Preservation of Visualization || PDF/A is cool. But what if the Reader is buggy? || via XSLT to HTML will always work ||
+|| Visualization of Signatures || PDF has this feature. Is human interpretation this important? || the business application should handle this aspect ||
+
+
+== Open Standard ==
+
+Everything is an open standard these days, so this argument becomes irrelevant somehow.
+
+== Data Format ==
+
+== Easy of implementation ==
+
+== Accessibility ==
+
+== Validation ==
+
+== Service Directive readiness ==
+
+== Long-Term Accessibility ==
+
+== Long-Term Signature Validity ==
+
+== Risk for Vendor lock-in ==
+
+== Preservation of Visualization ==
+
+== Visualization of Signatures ==
