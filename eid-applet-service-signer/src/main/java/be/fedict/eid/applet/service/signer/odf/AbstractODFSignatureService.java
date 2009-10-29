@@ -38,8 +38,8 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
-import be.fedict.eid.applet.service.signer.KeyInfoSignatureFacet;
-import be.fedict.eid.applet.service.signer.XAdESSignatureFacet;
+import be.fedict.eid.applet.service.signer.facets.KeyInfoSignatureFacet;
+import be.fedict.eid.applet.service.signer.facets.XAdESSignatureFacet;
 
 /**
  * Signature Service implementation for OpenDocument format signatures.

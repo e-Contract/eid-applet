@@ -33,7 +33,7 @@
  * limitations under the License.
  */
 
-package be.fedict.eid.applet.service.signer;
+package be.fedict.eid.applet.service.signer.facets;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
@@ -62,6 +62,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import be.fedict.eid.applet.service.signer.SignatureFacet;
 
 /**
  * Signature Facet implementation that adds ds:KeyInfo to the XML signature.

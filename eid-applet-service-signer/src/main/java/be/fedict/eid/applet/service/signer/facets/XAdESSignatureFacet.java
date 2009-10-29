@@ -16,7 +16,7 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.service.signer;
+package be.fedict.eid.applet.service.signer.facets;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.MessageDigest;
@@ -26,6 +26,7 @@ import java.security.cert.X509Certificate;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -57,6 +58,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import be.fedict.eid.applet.service.signer.SignatureFacet;
 
 /**
  * XAdES Signature Facet. Implements XAdES v1.4.1 which is compatible with XAdES
@@ -134,6 +136,7 @@ public class XAdESSignatureFacet implements SignatureFacet {
 
 		// SigningTime
 		GregorianCalendar signingTime = new GregorianCalendar();
+		signingTime.setTimeZone(TimeZone.getTimeZone("Z"));
 		signedSignatureProperties.setSigningTime(this.datatypeFactory
 				.newXMLGregorianCalendar(signingTime));
 
