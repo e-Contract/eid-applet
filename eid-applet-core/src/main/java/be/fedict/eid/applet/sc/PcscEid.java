@@ -189,6 +189,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		}
 	}
 
+	private static final int BLOCK_SIZE = 0xff;
+
 	private byte[] readBinary() throws CardException, IOException {
 		int offset = 0;
 		this.view.addDetailMessage("read binary");
@@ -196,9 +198,17 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		byte[] data;
 		do {
 			CommandAPDU readBinaryApdu = new CommandAPDU(0x00, 0xB0,
-					offset >> 8, offset & 0xFF, 0xFF);
+					offset >> 8, offset & 0xFF, BLOCK_SIZE);
 			ResponseAPDU responseApdu = transmit(readBinaryApdu);
-			if (0x9000 != responseApdu.getSW()) {
+			int sw = responseApdu.getSW();
+			if (0x6B00 == sw) {
+				/*
+				 * Wrong parameters (offset outside the EF) End of file reached.
+				 * Can happen in case the file size is a multiple of 0xff bytes.
+				 */
+				break;
+			}
+			if (0x9000 != sw) {
 				throw new IOException("APDU response error: "
 						+ responseApdu.getSW());
 			}
@@ -219,7 +229,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			data = responseApdu.getData();
 			baos.write(data);
 			offset += data.length;
-		} while (0xFF == data.length);
+		} while (BLOCK_SIZE == data.length);
 		return baos.toByteArray();
 	}
 

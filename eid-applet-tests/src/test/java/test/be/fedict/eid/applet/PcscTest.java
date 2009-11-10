@@ -192,12 +192,15 @@ public class PcscTest {
 			pcscEidSpi.waitForEidPresent();
 		}
 
+		long t0 = System.currentTimeMillis();
 		byte[] photo = pcscEidSpi.readFile(PcscEid.PHOTO_FILE_ID);
+		long t1 = System.currentTimeMillis();
 		LOG.debug("image size: " + photo.length);
 		BufferedImage image = ImageIO.read(new ByteArrayInputStream(photo));
 		assertNotNull(image);
 		LOG.debug("width: " + image.getWidth());
 		LOG.debug("height: " + image.getHeight());
+		LOG.debug("dt: " + (t1 - t0) + " ms");
 
 		pcscEidSpi.close();
 	}
