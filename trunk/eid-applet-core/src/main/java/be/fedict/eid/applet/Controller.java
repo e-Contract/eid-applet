@@ -19,9 +19,12 @@
 package be.fedict.eid.applet;
 
 import java.awt.Component;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -185,6 +188,7 @@ public class Controller {
 				msg = Integer.toString(responseCode);
 			}
 			this.view.addDetailMessage("HTTP response code: " + msg);
+			printHttpResponseContent(connection);
 			throw new IOException(
 					"error sending message to service. HTTP status code: "
 							+ msg);
@@ -206,6 +210,23 @@ public class Controller {
 		this.protocolStateMachine.checkResponseMessage(responseObject);
 
 		return responseObject;
+	}
+
+	private void printHttpResponseContent(HttpURLConnection connection) {
+		InputStream errorStream = connection.getErrorStream();
+		if (null == errorStream) {
+			return;
+		}
+		BufferedReader reader = new BufferedReader(new InputStreamReader(
+				errorStream));
+		String line;
+		try {
+			while (null != (line = reader.readLine())) {
+				this.view.addDetailMessage(line);
+			}
+		} catch (IOException e) {
+			this.view.addDetailMessage("I/O error: " + e.getMessage());
+		}
 	}
 
 	private boolean isOfClass(Object object, Class<?>[] classes) {
