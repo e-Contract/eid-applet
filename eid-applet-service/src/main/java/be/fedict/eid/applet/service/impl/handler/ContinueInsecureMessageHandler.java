@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2009 Frank Cornelis.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -78,6 +79,8 @@ public class ContinueInsecureMessageHandler implements
 
 	private boolean logoff;
 
+	private boolean preLogoff;
+
 	private boolean includeCertificates;
 
 	private boolean sessionIdChannelBinding;
@@ -130,7 +133,8 @@ public class ContinueInsecureMessageHandler implements
 					.generateChallenge(session);
 			AuthenticationRequestMessage authenticationRequestMessage = new AuthenticationRequestMessage(
 					challenge, this.includeHostname, this.includeInetAddress,
-					this.logoff, this.removeCard, this.sessionIdChannelBinding,
+					this.logoff, this.preLogoff, this.removeCard,
+					this.sessionIdChannelBinding,
 					this.serverCertificateChannelBinding);
 			return authenticationRequestMessage;
 		} else {
@@ -209,6 +213,12 @@ public class ContinueInsecureMessageHandler implements
 				.getInitParameter(HelloMessageHandler.LOGOFF_INIT_PARAM_NAME);
 		if (null != logoff) {
 			this.logoff = Boolean.parseBoolean(logoff);
+		}
+
+		String preLogoff = config
+				.getInitParameter(HelloMessageHandler.PRE_LOGOFF_INIT_PARAM_NAME);
+		if (null != preLogoff) {
+			this.preLogoff = Boolean.parseBoolean(preLogoff);
 		}
 
 		String sessionIdChannelBinding = config

@@ -51,6 +51,9 @@ public class AuthenticationRequestMessage extends AbstractProtocolMessage {
 	@HttpHeader(HTTP_HEADER_PREFIX + "Logoff")
 	public boolean logoff;
 
+	@HttpHeader(HTTP_HEADER_PREFIX + "PreLogoff")
+	public boolean preLogoff;
+
 	@HttpHeader(HTTP_HEADER_PREFIX + "SessionIdChannelBinding")
 	public boolean sessionIdChannelBinding;
 
@@ -68,13 +71,14 @@ public class AuthenticationRequestMessage extends AbstractProtocolMessage {
 
 	public AuthenticationRequestMessage(byte[] challenge,
 			boolean includeHostname, boolean includeInetAddress,
-			boolean logoff, boolean removeCard,
+			boolean logoff, boolean preLogoff, boolean removeCard,
 			boolean sessionIdChannelBinding,
 			boolean serverCertificateChannelBinding) {
 		this.challenge = challenge;
 		this.includeHostname = includeHostname;
 		this.includeInetAddress = includeInetAddress;
 		this.logoff = logoff;
+		this.preLogoff = preLogoff;
 		this.removeCard = removeCard;
 		this.sessionIdChannelBinding = sessionIdChannelBinding;
 		this.serverCertificateChannelBinding = serverCertificateChannelBinding;

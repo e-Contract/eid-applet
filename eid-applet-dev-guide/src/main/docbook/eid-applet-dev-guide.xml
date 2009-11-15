@@ -944,6 +944,29 @@
 						identifier if appropriate.</para>
 				</warning>
 			</section>
+			<section>
+				<title>Explicit PIN entry</title>
+				<para>
+					The eID card offers caching of the PIN authorization when
+					creating
+					an authentication signature.
+					Some applications might require
+					a PIN
+					entry upon each authentication request.
+					This can be achieved
+					by
+					performing an eID card logoff right before the creation of the
+					authentication signature. Activate this feature via the following
+					<code>init-param</code>
+					on the
+					<code>AppletServiceServlet</code>
+					:
+				</para>
+				<programlisting role="XML"><![CDATA[<init-param>
+	<param-name>PreLogoff</param-name>
+	<param-value>true</param-value>
+</init-param>]]></programlisting>
+			</section>
 		</section>
 		<section>
 			<title>eID Signatures</title>
