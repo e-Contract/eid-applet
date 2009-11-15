@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2009 Frank Cornelis.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -826,6 +827,7 @@ public class Controller {
 		boolean includeHostname = authnRequest.includeHostname;
 		boolean includeInetAddress = authnRequest.includeInetAddress;
 		boolean logoff = authnRequest.logoff;
+		boolean preLogoff = authnRequest.preLogoff;
 		boolean sessionIdChannelBinding = authnRequest.sessionIdChannelBinding;
 		boolean serverCertificateChannelBinding = authnRequest.serverCertificateChannelBinding;
 		if (challenge.length < 20) {
@@ -836,6 +838,7 @@ public class Controller {
 		addDetailMessage("include inet address: " + includeInetAddress);
 		addDetailMessage("remove card after authn: " + removeCard);
 		addDetailMessage("logoff: " + logoff);
+		addDetailMessage("pre-logoff: " + preLogoff);
 		addDetailMessage("TLS session Id channel binding: "
 				+ sessionIdChannelBinding);
 		addDetailMessage("server certificate channel binding: "
@@ -900,7 +903,7 @@ public class Controller {
 			if (null != this.pcscEidSpi) {
 				addDetailMessage("fallback to PC/SC interface for authentication...");
 				performEidPcscAuthnOperation(salt, sessionId, toBeSigned,
-						logoff, removeCard);
+						logoff, preLogoff, removeCard);
 				return;
 			}
 			throw new PKCS11NotFoundException();
@@ -928,6 +931,19 @@ public class Controller {
 			}
 		} else {
 			logoffReaderName = null;
+		}
+
+		if (preLogoff) {
+			if (null != this.pcscEidSpi) {
+				this.view.addDetailMessage("performing a pre-logoff");
+				String readerName = logoffReaderName;
+				if (null == readerName) {
+					readerName = this.pkcs11Eid.getSlotDescription();
+				}
+				this.pcscEidSpi.logoff(readerName);
+			} else {
+				this.view.addDetailMessage("cannot perform a pre-logoff");
+			}
 		}
 
 		byte[] signatureValue;
@@ -960,8 +976,8 @@ public class Controller {
 	}
 
 	private void performEidPcscAuthnOperation(byte[] salt, byte[] sessionId,
-			byte[] toBeSigned, boolean logoff, boolean removeCard)
-			throws Exception {
+			byte[] toBeSigned, boolean logoff, boolean preLogoff,
+			boolean removeCard) throws Exception {
 		waitForEIdCard();
 
 		setStatusMessage(Status.NORMAL, this.messages
@@ -969,6 +985,14 @@ public class Controller {
 		byte[] signatureValue;
 		List<X509Certificate> authnCertChain;
 		try {
+			if (preLogoff) {
+				/*
+				 * Use the PreLogoff feature to make sure that the user has to
+				 * enter his PIN code on each authentication request.
+				 */
+				this.view.addDetailMessage("performing a pre-logoff");
+				this.pcscEidSpi.logoff();
+			}
 			signatureValue = this.pcscEidSpi.signAuthn(toBeSigned);
 
 			this.maxProgress = 0;

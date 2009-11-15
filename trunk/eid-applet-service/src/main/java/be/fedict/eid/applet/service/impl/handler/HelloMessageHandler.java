@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2009 Frank Cornelis.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -81,6 +82,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	public static final String LOGOFF_INIT_PARAM_NAME = "Logoff";
 
+	public static final String PRE_LOGOFF_INIT_PARAM_NAME = "PreLogoff";
+
 	public static final String KIOSK_INIT_PARAM_NAME = "Kiosk";
 
 	public static final String SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME = "SessionIdChannelBinding";
@@ -102,6 +105,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 	private boolean unblockPin;
 
 	private boolean logoff;
+
+	private boolean preLogoff;
 
 	private boolean includeCertificates;
 
@@ -180,7 +185,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 					.generateChallenge(session);
 			AuthenticationRequestMessage authenticationRequestMessage = new AuthenticationRequestMessage(
 					challenge, this.includeHostname, this.includeInetAddress,
-					this.logoff, this.removeCard, this.sessionIdChannelBinding,
+					this.logoff, this.preLogoff, this.removeCard,
+					this.sessionIdChannelBinding,
 					this.serverCertificateChannelBinding);
 			return authenticationRequestMessage;
 		}
@@ -253,6 +259,11 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 		String logoff = config.getInitParameter(LOGOFF_INIT_PARAM_NAME);
 		if (null != logoff) {
 			this.logoff = Boolean.parseBoolean(logoff);
+		}
+
+		String preLogoff = config.getInitParameter(PRE_LOGOFF_INIT_PARAM_NAME);
+		if (null != preLogoff) {
+			this.preLogoff = Boolean.parseBoolean(preLogoff);
 		}
 
 		String kiosk = config.getInitParameter(KIOSK_INIT_PARAM_NAME);

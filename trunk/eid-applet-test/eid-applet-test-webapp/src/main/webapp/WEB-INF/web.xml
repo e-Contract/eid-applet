@@ -2,6 +2,10 @@
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
 	version="2.4">
+
+	<display-name>eID Applet Test Web Application</display-name>
+	<description>This web application tests different eID Applet Service servlet configurations.</description>
+
 	<servlet>
 		<servlet-name>AppletServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -10,6 +14,7 @@
 		<servlet-name>AppletServiceServlet</servlet-name>
 		<url-pattern>/applet-service</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletServiceChangePinServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -26,6 +31,7 @@
 		<servlet-name>AppletServiceChangePinServlet</servlet-name>
 		<url-pattern>/applet-service-change-pin</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletServiceChangePinSecureClientServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -42,6 +48,7 @@
 		<servlet-name>AppletServiceChangePinSecureClientServlet</servlet-name>
 		<url-pattern>/applet-service-change-pin-secure-client</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletServiceChangePinRemoveCardServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -62,6 +69,7 @@
 		<servlet-name>AppletServiceChangePinRemoveCardServlet</servlet-name>
 		<url-pattern>/applet-service-change-pin-remove-card</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletServiceUnblockPinServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -74,6 +82,7 @@
 		<servlet-name>AppletServiceUnblockPinServlet</servlet-name>
 		<url-pattern>/applet-service-unblock-pin</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletRemoveCardServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -86,6 +95,7 @@
 		<servlet-name>AppletRemoveCardServiceServlet</servlet-name>
 		<url-pattern>/applet-service-remove-card</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletPhotoServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -102,6 +112,7 @@
 		<servlet-name>AppletPhotoServiceServlet</servlet-name>
 		<url-pattern>/applet-service-photo</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletAddressServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -114,6 +125,7 @@
 		<servlet-name>AppletAddressServiceServlet</servlet-name>
 		<url-pattern>/applet-service-address</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletSecureClientServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -126,6 +138,7 @@
 		<servlet-name>AppletSecureClientServiceServlet</servlet-name>
 		<url-pattern>/applet-service-secure-client</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletInSecureClientServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -138,6 +151,7 @@
 		<servlet-name>AppletInSecureClientServiceServlet</servlet-name>
 		<url-pattern>/applet-service-insecure-client</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletInSecureWarnClientServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -150,6 +164,7 @@
 		<servlet-name>AppletInSecureWarnClientServiceServlet</servlet-name>
 		<url-pattern>/applet-service-insecure-warn-client</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletIntegrityServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -162,6 +177,7 @@
 		<servlet-name>AppletIntegrityServiceServlet</servlet-name>
 		<url-pattern>/applet-service-integrity</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletAllServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -194,6 +210,7 @@
 		<servlet-name>AppletAllServiceServlet</servlet-name>
 		<url-pattern>/applet-service-all</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletAuthnServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -206,6 +223,7 @@
 		<servlet-name>AppletAuthnServiceServlet</servlet-name>
 		<url-pattern>/applet-service-authn</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletAuthnRemoveCardServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -222,6 +240,7 @@
 		<servlet-name>AppletAuthnRemoveCardServiceServlet</servlet-name>
 		<url-pattern>/applet-service-authn-remove-card</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletAuthnLogoffCardServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -233,11 +252,16 @@
 			<param-name>Logoff</param-name>
 			<param-value>true</param-value>
 		</init-param>
+		<init-param>
+			<param-name>PreLogoff</param-name>
+			<param-value>true</param-value>
+		</init-param>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>AppletAuthnLogoffCardServiceServlet</servlet-name>
 		<url-pattern>/applet-service-authn-logoff-card</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletAuthnSecureClientServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -262,6 +286,7 @@
 		<servlet-name>AppletAuthnSecureClientServiceServlet</servlet-name>
 		<url-pattern>/applet-service-authn-secure-client</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletSignServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -278,6 +303,7 @@
 		<servlet-name>AppletSignServiceServlet</servlet-name>
 		<url-pattern>/applet-service-sign</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletSignFilesServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -290,6 +316,7 @@
 		<servlet-name>AppletSignFilesServiceServlet</servlet-name>
 		<url-pattern>/applet-service-sign-files</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletSignXmlFilesServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -302,6 +329,7 @@
 		<servlet-name>AppletSignXmlFilesServiceServlet</servlet-name>
 		<url-pattern>/applet-service-sign-xml-files</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>XmlSignatureServlet</servlet-name>
 		<servlet-class>test.be.fedict.eid.applet.XmlSignatureServlet</servlet-class>
@@ -310,6 +338,7 @@
 		<servlet-name>XmlSignatureServlet</servlet-name>
 		<url-pattern>/signature.xml</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletSignFilesAllServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -330,6 +359,7 @@
 		<servlet-name>AppletSignFilesAllServiceServlet</servlet-name>
 		<url-pattern>/applet-service-sign-files-all</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>AppletKioskServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
@@ -342,6 +372,7 @@
 		<servlet-name>AppletKioskServiceServlet</servlet-name>
 		<url-pattern>/applet-kiosk-service</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>PhotoServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.PhotoServlet</servlet-class>
@@ -350,38 +381,43 @@
 		<servlet-name>PhotoServlet</servlet-name>
 		<url-pattern>/photo</url-pattern>
 	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>PdfServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.PdfServlet</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>KmlServlet</servlet-name>
-		<servlet-class>be.fedict.eid.applet.service.KmlServlet</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>VcardServlet</servlet-name>
-		<servlet-class>be.fedict.eid.applet.service.VcardServlet</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>JSONServlet</servlet-name>
-		<servlet-class>be.fedict.eid.applet.service.JSONServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>PdfServlet</servlet-name>
 		<url-pattern>/identity.pdf</url-pattern>
 	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>KmlServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.KmlServlet</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>KmlServlet</servlet-name>
 		<url-pattern>/identity.kmz</url-pattern>
 	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>VcardServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.VcardServlet</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>VcardServlet</servlet-name>
 		<url-pattern>/identity.vcf</url-pattern>
 	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>JSONServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.JSONServlet</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>JSONServlet</servlet-name>
 		<url-pattern>/identity.js</url-pattern>
 	</servlet-mapping>
+
 	<filter>
 		<filter-name>LogFilter</filter-name>
 		<filter-class>test.be.fedict.eid.applet.LogFilter</filter-class>
@@ -390,4 +426,5 @@
 		<filter-name>LogFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+
 </web-app>
