@@ -364,6 +364,17 @@
 					directory of your web application.
 				</para>
 			</note>
+			<tip>
+				<title>eID Applet Service availability</title>
+				<para>
+					One can always check for eID Applet Service availability by
+					manually
+					browsing to the location of the eID Applet Service servlet
+					as configured in your
+					<code>web.xml</code>
+					Java EE web deployment descriptor.
+				</para>
+			</tip>
 			<para>
 				After a successful identification took place, the
 				<code>AppletServiceServlet</code>
