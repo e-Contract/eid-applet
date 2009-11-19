@@ -369,7 +369,7 @@ public class Controller {
 					.getMessage(MESSAGE_ID.SECURITY_ERROR));
 			addDetailMessage("error: " + e.getMessage());
 			return null;
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			addDetailMessage("error: " + e.getMessage());
 			addDetailMessage("error type: " + e.getClass().getName());
 			StackTraceElement[] stackTrace = e.getStackTrace();
