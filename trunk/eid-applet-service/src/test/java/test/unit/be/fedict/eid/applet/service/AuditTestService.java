@@ -106,4 +106,8 @@ public class AuditTestService implements AuditService {
 	public static String getAuditSigningUserId() {
 		return AuditTestService.auditSigningUserId;
 	}
+
+	public void identified(String userId) {
+		// empty
+	}
 }

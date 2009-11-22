@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2009 Frank Cornelis.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -269,6 +270,12 @@ public class IdentityDataMessageHandler implements
 			session.setAttribute(SIGN_CERT_SESSION_ATTRIBUTE, signCert);
 			session.setAttribute(CA_CERT_SESSION_ATTRIBUTE, caCert);
 			session.setAttribute(ROOT_CERT_SESSION_ATTRIBTUE, rootCert);
+		}
+
+		AuditService auditService = this.auditServiceLocator.locateService();
+		if (null != auditService) {
+			String userId = identity.nationalNumber;
+			auditService.identified(userId);
 		}
 
 		return new FinishedMessage();

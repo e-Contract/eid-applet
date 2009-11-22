@@ -70,4 +70,8 @@ public class AuditServiceBean implements AuditService {
 	public void signed(String userId) {
 		logTestResult("Signature", "Successful");
 	}
+
+	public void identified(String userId) {
+		logTestResult("Identification", "Successful");
+	}
 }
