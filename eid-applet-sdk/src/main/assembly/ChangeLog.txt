@@ -1,3 +1,13 @@
+1.0.0-rc-1 - 22 November 2009
+	* SkipSecureConnectionCheck
+	* dual-licensing of the OOXML signature code under LGPL and AL
+	* signature facets cleanup
+	* XAdES support on ODF signature service
+	* PreLogoff
+	* Audit Service identified method
+	* XAdES SigningTime in Zulu
+	* fix read binary when file size mod 0xff
+
 1.0.0-beta-4 - 18 September 2009
 	* various improvements to the PHP eID Applet Service
 	* fix for PC/SC library loading under Linux

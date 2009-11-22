@@ -12,7 +12,7 @@
 			<year>2008-2009</year>
 			<holder>FedICT</holder>
 		</copyright>
-		<releaseinfo>draft 28 Sept 2009</releaseinfo>
+		<releaseinfo>draft 22 Nov 2009</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -1509,6 +1509,11 @@ ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlis
 						<entry>18 Sep 2009</entry>
 						<entry>Frank Cornelis</entry>
 						<entry>1.0.0-beta-4</entry>
+					</row>
+					<row>
+						<entry>22 Nov 2009</entry>
+						<entry>Frank Cornelis</entry>
+						<entry>1.0.0-rc-1</entry>
 					</row>
 				</tbody>
 			</tgroup>
