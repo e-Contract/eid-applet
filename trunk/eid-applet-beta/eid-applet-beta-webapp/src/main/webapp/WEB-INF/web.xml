@@ -102,6 +102,10 @@
 			<param-value>fedict/eid/applet/beta/AuditServiceBean</param-value>
 		</init-param>
 		<init-param>
+			<param-name>SecureClientEnvironmentService</param-name>
+			<param-value>fedict/eid/applet/beta/SecureClientEnvironmentBean</param-value>
+		</init-param>
+		<init-param>
 			<param-name>Logoff</param-name>
 			<param-value>true</param-value>
 		</init-param>
@@ -123,6 +127,10 @@
 			<param-value>fedict/eid/applet/beta/AuditServiceBean</param-value>
 		</init-param>
 		<init-param>
+			<param-name>SecureClientEnvironmentService</param-name>
+			<param-value>fedict/eid/applet/beta/SecureClientEnvironmentBean</param-value>
+		</init-param>
+		<init-param>
 			<param-name>IncludeCertificates</param-name>
 			<param-value>true</param-value>
 		</init-param>
@@ -142,6 +150,10 @@
 		<init-param>
 			<param-name>AuditService</param-name>
 			<param-value>fedict/eid/applet/beta/AuditServiceBean</param-value>
+		</init-param>
+		<init-param>
+			<param-name>SecureClientEnvironmentService</param-name>
+			<param-value>fedict/eid/applet/beta/SecureClientEnvironmentBean</param-value>
 		</init-param>
 	</servlet>
 	<servlet-mapping>

@@ -21,7 +21,10 @@
 	var parameters = {
 		TargetPage :'authentication-results.seam',
 		AppletService :'applet-authentication-service',
-		Language :'en'
+		Language :'en',
+		NavigatorUserAgent : navigator.userAgent,
+		NavigatorAppName : navigator.appName,
+		NavigatorAppVersion : navigator.appVersion
 	};
 	var version = '1.5';
 	deployJava.runApplet(attributes, parameters, version);

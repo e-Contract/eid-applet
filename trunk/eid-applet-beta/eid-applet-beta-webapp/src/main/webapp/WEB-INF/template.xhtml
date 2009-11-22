@@ -44,13 +44,11 @@
 			<c:choose>
 				<c:when test="#{activeMenu == 'test'}">
 					<li class="selected"><a
-						href="#{facesContext.externalContext.requestContextPath}/tests.seam">eID
-					Applet Tests</a></li>
+						href="#{facesContext.externalContext.requestContextPath}/tests.seam">Tests</a></li>
 				</c:when>
 				<c:otherwise>
 					<li><a
-						href="#{facesContext.externalContext.requestContextPath}/tests.seam">eID
-					Applet Tests</a></li>
+						href="#{facesContext.externalContext.requestContextPath}/tests.seam">Tests</a></li>
 				</c:otherwise>
 			</c:choose>
 
@@ -64,7 +62,18 @@
 						href="#{facesContext.externalContext.requestContextPath}/feedback.seam">Feedback</a></li>
 				</c:otherwise>
 			</c:choose>
-			
+
+			<c:choose>
+				<c:when test="#{activeMenu == 'results'}">
+					<li class="selected"><a
+						href="#{facesContext.externalContext.requestContextPath}/results.seam">Results</a></li>
+				</c:when>
+				<c:otherwise>
+					<li><a
+						href="#{facesContext.externalContext.requestContextPath}/results.seam">Results</a></li>
+				</c:otherwise>
+			</c:choose>
+
 			<c:choose>
 				<c:when test="#{activeMenu == 'devel'}">
 					<li class="selected"><a
@@ -79,11 +88,11 @@
 			<c:choose>
 				<c:when test="#{activeMenu == 'admin'}">
 					<li class="selected"><a
-						href="#{facesContext.externalContext.requestContextPath}/admin/admin.seam">Administrator</a></li>
+						href="#{facesContext.externalContext.requestContextPath}/admin/admin.seam">Admin</a></li>
 				</c:when>
 				<c:otherwise>
 					<li><a
-						href="#{facesContext.externalContext.requestContextPath}/admin/admin.seam">Administrator</a></li>
+						href="#{facesContext.externalContext.requestContextPath}/admin/admin.seam">Admin</a></li>
 				</c:otherwise>
 			</c:choose>
 

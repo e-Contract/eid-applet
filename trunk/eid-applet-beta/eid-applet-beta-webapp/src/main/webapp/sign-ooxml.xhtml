@@ -21,7 +21,10 @@
 	var parameters = {
 		TargetPage :'view-ooxml.seam',
 		AppletService :'applet-sign-ooxml-service',
-		Language :'en'
+		Language :'en',
+		NavigatorUserAgent : navigator.userAgent,
+		NavigatorAppName : navigator.appName,
+		NavigatorAppVersion : navigator.appVersion
 	};
 	var version = '1.5';
 	deployJava.runApplet(attributes, parameters, version);
