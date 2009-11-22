@@ -1,0 +1,100 @@
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: small;
+}
+
+h1 {
+	color: gray;
+}
+
+h2 {
+	color: #FF9000;
+	font-size: large;
+	font-family: Arial;
+}
+
+h3 {
+	color: #FF9000;
+	font-size: medium;
+	font-family: Arial;
+	font-style: italic;
+}
+
+#fed {
+	font-size: 25px;
+	font-weight: bold;
+	float: left;
+	color: black;
+}
+
+#ictegov {
+	font-size: 25px;
+	font-weight: bold;
+	float: left;
+	background-color: #d9d9d9;
+	color: #FF9000;
+	margin-right: 30px;
+}
+
+#ict {
+	float: left;
+}
+
+#egov {
+	float: left;
+	background-color: #d9d9d9;
+	color: gray;
+	padding-left: 5px;
+	padding-right: 10px;
+	padding-bottom: 17px;
+	font-size: 10px;
+	padding-right: 10px;
+}
+
+#header {
+	width: 700px;
+	margin: 0 auto;
+}
+
+#menu {
+	width: 700px;
+	height: 44px;
+	background-color: #e0e0e0;
+	margin: 0 auto;
+}
+
+#menu ul {
+	padding: 13px 0 0 20px;
+	list-style: none;
+}
+
+#menu li {
+	float: left;
+}
+
+#menu a {
+	display: block;
+	margin-right: 3px;
+	margin-left: 3px;
+	padding: 5px 20px 7px 20px;
+	text-decoration: none;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	color: #000000;
+}
+
+#menu a:hover {
+	background: #FF9000;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.selected {
+	background: #FF9000;
+}
+
+#content {
+	width: 700px;
+	margin: 0 auto;
+	color: #303030;
+}

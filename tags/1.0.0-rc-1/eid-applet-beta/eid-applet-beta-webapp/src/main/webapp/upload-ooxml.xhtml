@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:s="http://jboss.com/products/seam/taglib">
+<body>
+<ui:composition template="/WEB-INF/template.xhtml">
+	<ui:param name="activeMenu" value="test" />
+	<ui:define name="body">
+		<h2>eID Applet Signature Test</h2>
+		<p>Via this page you can test the eID Applet Signature
+		functionality. This test will demo the creation and verification of
+		OOXML signatures. OOXML signatures are also supported by <a
+			href="http://office.microsoft.com/" target="_blank">Office 2007</a>.
+		</p>
+		<h:form enctype="multipart/form-data">
+			<h:panelGrid columns="2">
+				<s:fileUpload data="#{ooxmlUploader.uploadedFile}"
+					fileName="#{ooxmlUploader.fileName}" size="60" required="true" />
+			</h:panelGrid>
+			<h:commandButton action="#{ooxmlUploader.upload}" value="Upload" />
+			<h:messages globalOnly="true" style="color: red;" />
+		</h:form>
+	</ui:define>
+</ui:composition>
+</body>
+</html>
