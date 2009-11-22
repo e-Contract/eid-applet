@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2009 Frank Cornelis.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -37,6 +38,15 @@ public interface AuditService {
 	 *            the unique identifier of the authenticated user.
 	 */
 	void authenticated(String userId);
+
+	/**
+	 * Called by the eID Applet Service in case a citizen has been successfully
+	 * identified using the eID Applet.
+	 * 
+	 * @param userId
+	 *            the unique identifier of the identified user.
+	 */
+	void identified(String userId);
 
 	/**
 	 * Called by the eID Applet Service in case the eID Applet responded with an
