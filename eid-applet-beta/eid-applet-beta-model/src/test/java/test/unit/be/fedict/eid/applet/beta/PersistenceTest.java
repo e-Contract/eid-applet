@@ -39,6 +39,7 @@ import org.junit.Test;
 
 import be.fedict.eid.applet.beta.FeedbackEntity;
 import be.fedict.eid.applet.beta.SessionContextEntity;
+import be.fedict.eid.applet.beta.TestReportEntity;
 import be.fedict.eid.applet.beta.TestResultEntity;
 
 public class PersistenceTest {
@@ -61,6 +62,7 @@ public class PersistenceTest {
 		configuration.addAnnotatedClass(SessionContextEntity.class);
 		configuration.addAnnotatedClass(FeedbackEntity.class);
 		configuration.addAnnotatedClass(TestResultEntity.class);
+		configuration.addAnnotatedClass(TestReportEntity.class);
 		EntityManagerFactory entityManagerFactory = configuration
 				.buildEntityManagerFactory();
 
@@ -179,5 +181,23 @@ public class PersistenceTest {
 
 		// verify
 		assertEquals(2, testResults.size());
+	}
+
+	@Test
+	public void testTestReportQuery() throws Exception {
+		// setup
+		TestReportEntity testReportEntity = new TestReportEntity("javaVersion",
+				"javaVendor", "osName", "osArch", "osVersion", "userAgent",
+				"navigatorAppName", "navigatorAppVersion", "navigatorUserAgent");
+		this.entityManager.persist(testReportEntity);
+		LOG.debug("id: " + testReportEntity.getId());
+
+		// operate
+		Query query = this.entityManager
+				.createNamedQuery(TestReportEntity.QUERY_TEST_REPORT);
+		List<TestReportEntity> resultList = query.getResultList();
+
+		// verify
+		assertEquals(1, resultList.size());
 	}
 }

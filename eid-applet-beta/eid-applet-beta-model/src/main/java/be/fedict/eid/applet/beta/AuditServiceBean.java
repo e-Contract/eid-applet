@@ -42,36 +42,43 @@ public class AuditServiceBean implements AuditService {
 	private EntityManager entityManager;
 
 	public void authenticated(String userId) {
-		logTestResult("Authentication", "Successful");
+		logTestResult(TestReportType.AUTHENTICATION,
+				TestReportResult.SUCCESSFUL);
 	}
 
-	private void logTestResult(String test, String result) {
+	private void logTestResult(TestReportType test, TestReportResult result) {
 		SessionContextEntity sessionContext = this.sessionContextManager
 				.getSessionContext();
-		TestResultEntity testResultEntity = new TestResultEntity(test, result,
-				sessionContext);
+		TestResultEntity testResultEntity = new TestResultEntity(test.name(),
+				result.name(), sessionContext);
 		this.entityManager.persist(testResultEntity);
+
+		TestReportFactory testReportFactory = new TestReportFactory(
+				this.entityManager);
+		testReportFactory.finalizeTestReport(test, result);
+
 	}
 
 	public void authenticationError(String remoteAddress,
 			X509Certificate clientCertificate) {
-		logTestResult("Authentication", "Error");
+		logTestResult(TestReportType.AUTHENTICATION, TestReportResult.FAILED);
 	}
 
 	public void identityIntegrityError(String remoteAddress) {
-		logTestResult("Identification", "Error");
+		logTestResult(TestReportType.IDENTIFICATION, TestReportResult.FAILED);
 	}
 
 	public void signatureError(String remoteAddress,
 			X509Certificate clientCertificate) {
-		logTestResult("Signature", "Error");
+		logTestResult(TestReportType.SIGNATURE, TestReportResult.FAILED);
 	}
 
 	public void signed(String userId) {
-		logTestResult("Signature", "Successful");
+		logTestResult(TestReportType.SIGNATURE, TestReportResult.SUCCESSFUL);
 	}
 
 	public void identified(String userId) {
-		logTestResult("Identification", "Successful");
+		logTestResult(TestReportType.IDENTIFICATION,
+				TestReportResult.SUCCESSFUL);
 	}
 }

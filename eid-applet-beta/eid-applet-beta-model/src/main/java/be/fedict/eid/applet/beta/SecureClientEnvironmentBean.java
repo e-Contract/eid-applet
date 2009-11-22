@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2009 Frank Cornelis.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -100,5 +101,11 @@ public class SecureClientEnvironmentBean implements
 		httpSession.setAttribute("clientNavigatorAppName", navigatorAppName);
 		httpSession.setAttribute("clientNavigatorAppVersion",
 				navigatorAppVersion);
+
+		TestReportFactory testReportFactory = new TestReportFactory(
+				this.entityManager);
+		testReportFactory.startTestReport(javaVersion, javaVendor, osName,
+				osArch, osVersion, userAgent, navigatorAppName,
+				navigatorAppVersion, navigatorUserAgent);
 	}
 }
