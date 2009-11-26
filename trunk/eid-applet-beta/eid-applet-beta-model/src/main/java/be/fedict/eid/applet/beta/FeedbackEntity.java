@@ -32,6 +32,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.validator.Email;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
@@ -65,6 +66,7 @@ public class FeedbackEntity implements Serializable {
 	}
 
 	@Column(nullable = false)
+	@Email
 	public String getEmail() {
 		return this.email;
 	}

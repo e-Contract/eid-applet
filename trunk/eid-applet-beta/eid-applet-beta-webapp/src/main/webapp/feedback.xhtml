@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:t="http://myfaces.apache.org/tomahawk">
+	xmlns:s="http://jboss.com/products/seam/taglib">
 <body>
 <ui:composition template="/WEB-INF/template.xhtml">
 	<ui:param name="activeMenu" value="feedback" />
@@ -15,7 +15,7 @@
 				<h:outputText value="Email" />
 				<h:inputText id="email" size="30" required="true"
 					value="#{feedbackEntry.email}">
-					<t:validateEmail message="Invalid email." />
+					<s:validate />
 				</h:inputText>
 				<h:message for="email" style="color: red;" />
 
