@@ -33,6 +33,7 @@ import javax.persistence.Query;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.ejb.Ejb3Configuration;
+import org.hibernate.validator.InvalidStateException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -142,7 +143,7 @@ public class PersistenceTest {
 				SessionContextEntity.class, contextId);
 
 		FeedbackEntity feedbackEntity = new FeedbackEntity();
-		feedbackEntity.setEmail("email");
+		feedbackEntity.setEmail("valid@email.be");
 		feedbackEntity.setSubject("subject");
 		feedbackEntity.setMessage("message");
 		feedbackEntity.setCreated(Calendar.getInstance());
@@ -157,6 +158,35 @@ public class PersistenceTest {
 		feedbackEntity = this.entityManager.find(FeedbackEntity.class,
 				feedbackId);
 		assertNotNull(feedbackEntity.getSessionContext());
+	}
+
+	@Test
+	public void testFeedbackEntityHibernateValidator() throws Exception {
+		SessionContextEntity sessionContextEntity = new SessionContextEntity(
+				"http-session-id", "user-agent");
+		this.entityManager.persist(sessionContextEntity);
+		int contextId = sessionContextEntity.getContextId();
+
+		this.entityManager.getTransaction().commit();
+		this.entityManager.getTransaction().begin();
+
+		sessionContextEntity = this.entityManager.find(
+				SessionContextEntity.class, contextId);
+
+		FeedbackEntity feedbackEntity = new FeedbackEntity();
+		feedbackEntity.setEmail("invalid-email-address");
+		feedbackEntity.setSubject("subject");
+		feedbackEntity.setMessage("message");
+		feedbackEntity.setCreated(Calendar.getInstance());
+		feedbackEntity.setSessionContext(sessionContextEntity);
+
+		try {
+			this.entityManager.persist(feedbackEntity);
+			fail();
+		} catch (InvalidStateException e) {
+			// expected
+			this.entityManager.getTransaction().rollback();
+		}
 	}
 
 	@SuppressWarnings("unchecked")
