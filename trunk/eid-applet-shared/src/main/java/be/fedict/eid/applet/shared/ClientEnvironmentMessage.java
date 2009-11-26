@@ -39,7 +39,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 @ResponsesAllowed( { IdentificationRequestMessage.class,
 		InsecureClientMessage.class, AuthenticationRequestMessage.class,
 		AdministrationMessage.class, SignRequestMessage.class,
-		FilesDigestRequestMessage.class })
+		FilesDigestRequestMessage.class, SignCertificatesRequestMessage.class })
 public class ClientEnvironmentMessage extends AbstractProtocolMessage {
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator

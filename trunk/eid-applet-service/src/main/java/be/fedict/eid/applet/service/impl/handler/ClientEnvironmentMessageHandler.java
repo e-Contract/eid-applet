@@ -45,6 +45,7 @@ import be.fedict.eid.applet.shared.ClientEnvironmentMessage;
 import be.fedict.eid.applet.shared.FilesDigestRequestMessage;
 import be.fedict.eid.applet.shared.IdentificationRequestMessage;
 import be.fedict.eid.applet.shared.InsecureClientMessage;
+import be.fedict.eid.applet.shared.SignCertificatesRequestMessage;
 import be.fedict.eid.applet.shared.SignRequestMessage;
 
 /**
@@ -135,6 +136,11 @@ public class ClientEnvironmentMessageHandler implements
 				FilesDigestRequestMessage filesDigestRequestMessage = new FilesDigestRequestMessage();
 				filesDigestRequestMessage.digestAlgo = filesDigestAlgo;
 				return filesDigestRequestMessage;
+			}
+			if (true == this.includeCertificates) {
+				LOG.debug("include signing certificate chain during pre-sign");
+				SignCertificatesRequestMessage signCertificatesRequestMessage = new SignCertificatesRequestMessage();
+				return signCertificatesRequestMessage;
 			}
 
 			DigestInfo digestInfo;

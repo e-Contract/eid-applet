@@ -45,6 +45,14 @@ public class MessagesTest {
 	}
 
 	@Test
+	public void testFrenchMessages() throws Exception {
+		Locale locale = Locale.FRENCH;
+		Messages messages = new Messages(locale);
+		String message = messages.getMessage(Messages.MESSAGE_ID.GENERIC_ERROR);
+		LOG.debug("message: " + message);
+	}
+
+	@Test
 	public void allStringsAvailable() throws Exception {
 		allStringsAvailable("");
 		allStringsAvailable("nl");
