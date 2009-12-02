@@ -988,7 +988,9 @@ public class PcscEid extends Observable implements PcscEidSpi {
 					+ readerName);
 			List<String> readerList = getReaderList();
 			this.view.addDetailMessage("reader list: " + readerList);
-			throw new RuntimeException("card reader not found: " + readerName);
+			//throw new RuntimeException("card reader not found: " + readerName);
+			// we won't fail in this case...
+			return;
 		}
 		Card card = cardTerminal.connect("T=0");
 		try {
