@@ -12,7 +12,7 @@
 			<year>2008-2009</year>
 			<holder>FedICT</holder>
 		</copyright>
-		<releaseinfo>draft 22 Nov 2009</releaseinfo>
+		<releaseinfo>draft 2 Dec 2009</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -104,9 +104,9 @@
 			<para>
 				The Fedora operating system comes by default with the IcedTea JRE
 				which is based on the OpenJDK. If the Firefox browser uses this JRE
-				the eID Applet refuses to run. Please download the official Sun Java
-				6 JRE and enable it in the Firefox browser. The Firefox plugins can
-				be configured via symbolic links under:
+				the eID Applet still has some difficulties to run. Please download
+				the official Sun Java 6 JRE and enable it in the Firefox browser.
+				The Firefox plugins can be configured via symbolic links under:
 				<prompt>/usr/lib/mozilla/plugins</prompt>
 				. Remove the IcedTea JRE link via:
 				<prompt>rm /usr/lib/mozilla/plugins/libjavaplugin.so</prompt>
@@ -117,6 +117,14 @@
 				. Check the installed plugins in Firefox by navigating to:
 				<prompt>about:plugins</prompt>
 				.
+			</para>
+		</note>
+		<note>
+			<title>Linux Ubuntu 9.10</title>
+			<para>
+				Under Linux Ubuntu you can install the Sun JRE 1.6 via the following
+				command:
+				<prompt>sudo apt-get install sun-java6-jdk</prompt>
 			</para>
 		</note>
 	</section>
@@ -249,6 +257,15 @@
 							can
 							use this parameter to set a Javascript callback. The callback
 							function will be invoked on an eID card removal event.</entry>
+					</row>
+					<row>
+						<entry>
+							<code>MessageCallback</code>
+						</entry>
+						<entry>optional</entry>
+						<entry>Via this parameter a web developer can configure a
+							Javascript callback. This callback function will be invoked
+							everytime the eID Applet displays an info message.</entry>
 					</row>
 				</tbody>
 			</tgroup>
@@ -769,7 +786,10 @@
 					Because the eID Applet is using the
 					<code>SunPKCS11</code>
 					security provider we need the Sun JRE as browser applet runtime for
-					eID authentication (and eID signature) via the eID Applet.
+					eID authentication (and eID signature) via the eID Applet. These
+					days the OpenJDK JRE also comes with an (almost working)
+					<code>SunPKCS11</code>
+					security provider.
 				</para>
 			</note>
 			<note>
@@ -1178,6 +1198,15 @@
 				might imagine a use case where the callback method invokes a
 				server-side component via AJAX.
 			</para>
+			<tip>
+				<title>mayscript</title>
+				<para>
+					Don't forget the
+					<code>mayscript:'true'</code>
+					attribute, else the eID Applet will not be able to invoke
+					Javascripts inside the browser window.
+				</para>
+			</tip>
 		</section>
 		<section>
 			<title>Generic eID Applet Service settings</title>
@@ -1321,6 +1350,57 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 	<param-name>AuditService</param-name>
 	<param-value>your/location/in/jndi/AuditServiceBean</param-value>
 </init-param>]]></programlisting>
+			</section>
+			<section>
+				<title>Alternative UI</title>
+				<para>The eID Applet offers its own user interface for interactive
+					handling of eID card events. As some web application technologies
+					(like Flex) like to construct their own user interface we created a
+					Javascript based callback mechanism so that these web technologies
+					can visualize the info messages themselves.</para>
+				<para>The web developer can install the info message callback inside
+					a web page as
+					follows:</para>
+				<programlisting role="XML"><![CDATA[<script src="https://www.java.com/js/deployJava.js"></script>
+<script>
+	var attributes = {
+		code :'be.fedict.eid.applet.Applet.class',
+		archive :'eid-applet.jar',
+		width :1,
+		height :1,
+		mayscript :'true'
+	};
+	var parameters = {
+		AppletService :'applet-service',
+		MessageCallback :'messageCallback'
+	};
+	var version = '1.6';
+	deployJava.runApplet(attributes, parameters, version);
+</script>
+<script>
+	function messageCallback(message) {
+		document.getElementById('appletMessage').innerHTML = '<b>' + message + '</b>';
+	}
+</script>
+<div id="appletMessage">Message placeholder</div>]]></programlisting>
+				<para>
+					As you can see the web developer can install a Javascript
+					callback
+					function by setting the
+					<code>MessageCallback</code>
+					eID Applet parameter. In our example we simply display the incoming
+					message via some dynamic HTML. Of course more complex
+					visualizations are possible here.
+				</para>
+				<tip>
+					<title>mayscript</title>
+					<para>
+						Don't forget the
+						<code>mayscript:'true'</code>
+						attribute, else the eID Applet will not be able to invoke
+						Javascripts inside the browser window.
+					</para>
+				</tip>
 			</section>
 		</section>
 	</section>

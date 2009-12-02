@@ -77,6 +77,8 @@ public class Applet extends JApplet {
 
 	public static final String LANGUAGE_PARAM = "Language";
 
+	public static final String MESSAGE_CALLBACK_PARAM = "MessageCallback";
+
 	private JLabel statusLabel;
 
 	private JTextArea detailMessages;
@@ -102,8 +104,44 @@ public class Applet extends JApplet {
 									.getDocument().getLength());
 				}
 			});
+			Applet.this.invokeMessageCallback(statusMessage);
 		} catch (Exception e) {
 			// tja
+		}
+	}
+
+	protected void invokeMessageCallback(String statusMessage) {
+		if (null == this.messageCallbackParam) {
+			return;
+		}
+		ClassLoader classLoader = Applet.class.getClassLoader();
+		Class<?> jsObjectClass;
+		try {
+			jsObjectClass = classLoader
+					.loadClass("netscape.javascript.JSObject");
+		} catch (ClassNotFoundException e) {
+			this.detailMessages.append("JSObject class not found" + "\n");
+			this.detailMessages.setCaretPosition(Applet.this.detailMessages
+					.getDocument().getLength());
+			return;
+		}
+		try {
+			Method getWindowMethod = jsObjectClass.getMethod("getWindow",
+					new Class<?>[] { java.applet.Applet.class });
+			Object jsObject = getWindowMethod.invoke(null, this);
+			Method callMethod = jsObjectClass.getMethod("call", new Class<?>[] {
+					String.class, Class.forName("[Ljava.lang.Object;") });
+			addDetailMessage("invoking Javascript message callback: "
+					+ this.messageCallbackParam);
+			callMethod.invoke(jsObject, this.messageCallbackParam,
+					new Object[] { statusMessage });
+		} catch (Exception e) {
+			this.detailMessages
+					.append("error locating: JSObject.getWindow().call: "
+							+ e.getMessage() + "\n");
+			this.detailMessages.setCaretPosition(Applet.this.detailMessages
+					.getDocument().getLength());
+			return;
 		}
 	}
 
@@ -201,9 +239,13 @@ public class Applet extends JApplet {
 
 	private Messages messages;
 
+	private String messageCallbackParam;
+
 	private void initUI() {
 		loadMessages();
 		initStyle();
+
+		this.messageCallbackParam = super.getParameter(MESSAGE_CALLBACK_PARAM);
 
 		Container contentPane = this.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
