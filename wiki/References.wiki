@@ -61,6 +61,7 @@
 == Signatures ==
 
   * [http://msdn.microsoft.com/en-us/library/cc313071.aspx MS-OFFCRYPTO: Office Document Cryptography Structure Specification]
+  * [http://blogs.technet.com/office2010/archive/2009/12/08/digital-signitures-in-office-2010.aspx Digital Signatures in Office 2010]
   * [http://wiki.services.openoffice.org/wiki/Security/Digital_Signatures OpenOffice Digital Signatures]
 
 
