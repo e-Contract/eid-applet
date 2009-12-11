@@ -4,13 +4,13 @@
 	"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <article lang="en">
 	<articleinfo>
-		<title>FedICT eID Applet Developer's Guide</title>
+		<title>Fedict eID Applet Developer's Guide</title>
 		<subtitle>Integrating the eID Applet within your web
 			applications.
 		</subtitle>
 		<copyright>
 			<year>2008-2009</year>
-			<holder>FedICT</holder>
+			<holder>Fedict</holder>
 		</copyright>
 		<releaseinfo>draft 7 Dec 2009</releaseinfo>
 		<authorgroup>
@@ -31,7 +31,7 @@
 	<section>
 		<title>Introduction</title>
 		<para>
-			The FedICT eID Applet is a browser component that exposes the
+			The Fedict eID Applet is a browser component that exposes the
 			functionality of an eID card to your web applications. In
 			<xref linkend="eid-applet-screenshot" />
 			you find a screen shot of the eID Applet.
@@ -171,9 +171,9 @@
 			has to be signed and trusted by the citizen. The eID
 			Applet that ships
 			with an officially released eID Applet SDK has been
-			signed by FedICT.
+			signed by Fedict.
 			In case of a security breach with the eID Applet,
-			FedICT can revoke
+			Fedict can revoke
 			the corresponding code signing certificate to
 			guarantee maximal safety
 			of the citizen.</para>
