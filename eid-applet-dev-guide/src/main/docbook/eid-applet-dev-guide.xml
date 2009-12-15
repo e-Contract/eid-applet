@@ -12,7 +12,7 @@
 			<year>2008-2009</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>draft 7 Dec 2009</releaseinfo>
+		<releaseinfo>draft 15 Dec 2009</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -736,6 +736,34 @@
 				<programlisting role="XML"><![CDATA[<init-param>
 	<param-name>SkipNationalNumberCheck</param-name>
 	<param-value>true</param-value>
+</init-param>]]></programlisting>
+			</section>
+			<section>
+				<title>Privacy Service</title>
+				<para>
+					The application can define an identity data usage description
+					by
+					means of a privacy service component.
+					To enable this functionality
+					as part of an eID identification
+					operation, you need to implement
+					the
+					<code>PrivacyService</code>
+					interface. This service provider interface (SPI) can be found in
+					the
+					<code>eid-applet-service-spi</code>
+					artifact. The corresponding service component (EJB3) session bean
+					should be registered somewhere in JNDI. The JNDI location of this
+					service component needs to be communicated to the eID Applet
+					Service via the following
+					<code>init-param</code>
+					on the
+					<code>AppletServiceServlet</code>
+					:
+				</para>
+				<programlisting role="XML"><![CDATA[<init-param>
+	<param-name>PrivacyService</param-name>
+	<param-value>your/location/in/jndi/PrivacyServiceBean</param-value>
 </init-param>]]></programlisting>
 			</section>
 		</section>
