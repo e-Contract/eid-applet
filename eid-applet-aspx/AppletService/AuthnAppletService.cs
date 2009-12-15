@@ -29,6 +29,10 @@ namespace Be.FedICT.EID.Applet.Service {
 	
 	public class AuthnAppletService : IHttpHandler, IRequiresSessionState {
 		
+		public const string IDENTIFIER_SESSION_KEY = "Identifier";
+		
+		public const string CHALLENGE_SESSION_KEY = "Challenge";
+		
 		public AuthnAppletService() {	
 		}
 		
@@ -51,7 +55,7 @@ namespace Be.FedICT.EID.Applet.Service {
 			}
 			String messageType = httpRequest.Headers["X-AppletProtocol-Type"];
 			if ("HelloMessage".Equals(messageType)) {
-				httpContext.Session.Remove("Identifier");
+				httpContext.Session.Remove(IDENTIFIER_SESSION_KEY);
 				
 				sendCommand("AuthenticationRequestMessage", httpResponse);
 				Random random = new Random();
@@ -59,7 +63,7 @@ namespace Be.FedICT.EID.Applet.Service {
 				random.NextBytes(challenge);
 				httpResponse.BinaryWrite(challenge);
 				
-				httpContext.Session.Add("Challenge", challenge);
+				httpContext.Session.Add(CHALLENGE_SESSION_KEY, challenge);
 				return;
 			}
 			if ("AuthenticationDataMessage".Equals(messageType)) {
@@ -91,8 +95,9 @@ namespace Be.FedICT.EID.Applet.Service {
 				byte[] legalNotice = utf8Encoding.GetBytes("Declaration of authentication intension.\n"
 					+ "The following data should be interpreted as an authentication challenge.\n");
 				memoryStream.Write(legalNotice, 0, legalNotice.Length);
-				byte[] challenge = (byte[]) httpContext.Session["challenge"];
+				byte[] challenge = (byte[]) httpContext.Session[CHALLENGE_SESSION_KEY];
 				memoryStream.Write(challenge, 0, challenge.Length);
+				httpContext.Session.Remove(CHALLENGE_SESSION_KEY);
 				memoryStream.Seek(0, SeekOrigin.Begin);
 				byte[] toBeSignedData = new byte[memoryStream.Length];
 				memoryStream.Read(toBeSignedData, 0, toBeSignedData.Length);
@@ -125,7 +130,7 @@ namespace Be.FedICT.EID.Applet.Service {
 				int commaIdx = subjectName.Name.IndexOf(",");
 				int prefixSize = "OID.2.5.4.5=".Length;
 				string identifier = subjectName.Name.Substring(prefixSize, commaIdx - prefixSize);
-				httpContext.Session.Add("Identifier", identifier);
+				httpContext.Session.Add(IDENTIFIER_SESSION_KEY, identifier);
 				sendCommand("FinishedMessage", httpResponse);
 				return;
 			}

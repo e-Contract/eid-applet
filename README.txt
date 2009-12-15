@@ -33,7 +33,7 @@ We provide a JBoss AS 5.0.x package artifact named:
 	eid-applet-jboss-as
 
 Missing dependencies can be added to your local Maven repository via:
-        mvn install:install-file -Dfile=Download/jboss-5.0.1.GA-jdk6.zip \
+        mvn install:install-file -Dfile=Downloads/jboss-5.0.1.GA-jdk6.zip \
 	-DgroupId=org.jboss -DartifactId=jboss-as-distribution \
 	-Dversion=5.0.1.GA -Dpackaging=zip -DgeneratePom=true -Dclassifier=jdk6
 

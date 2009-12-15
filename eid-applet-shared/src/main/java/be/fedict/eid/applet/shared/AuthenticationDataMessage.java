@@ -65,6 +65,15 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	@HttpHeader(HTTP_HEADER_PREFIX + "SessionIdSize")
 	public Integer sessionIdSize;
 
+	@HttpHeader(HTTP_HEADER_PREFIX + "AuthnCertFileSize")
+	public Integer authnCertFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "CaCertFileSize")
+	public Integer caCertFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "RootCaCertFileSize")
+	public Integer rootCertFileSize;
+
 	@HttpBody
 	@NotNull
 	@Description("Contains concatenation of salt value, optional session id, signature value, and authn cert chain.")
@@ -104,6 +113,21 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 			baos.write(cert.getEncoded());
 		}
 		this.body = baos.toByteArray();
+		X509Certificate authnCert = authnCertChain.get(0);
+		X509Certificate citCaCert = authnCertChain.get(1);
+		X509Certificate rootCaCert = authnCertChain.get(2);
+		this.authnCertFileSize = getCertificateSize(authnCert);
+		this.caCertFileSize = getCertificateSize(citCaCert);
+		this.rootCertFileSize = getCertificateSize(rootCaCert);
+	}
+
+	private int getCertificateSize(X509Certificate certificate) {
+		try {
+			return certificate.getEncoded().length;
+		} catch (CertificateEncodingException e) {
+			throw new RuntimeException("certificate encoding error: "
+					+ e.getMessage(), e);
+		}
 	}
 
 	private byte[] copy(byte[] source, int idx, int count) {
