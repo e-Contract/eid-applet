@@ -58,6 +58,15 @@ public class SignatureDataMessage extends AbstractProtocolMessage {
 	@NotNull
 	public Integer signatureValueSize;
 
+	@HttpHeader(HTTP_HEADER_PREFIX + "SignCertFileSize")
+	public Integer signCertFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "CaCertFileSize")
+	public Integer caCertFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "RootCaCertFileSize")
+	public Integer rootCertFileSize;
+
 	@HttpBody
 	@NotNull
 	@Description("Contains concatenation of signature value and sign cert chain.")
@@ -77,6 +86,21 @@ public class SignatureDataMessage extends AbstractProtocolMessage {
 			baos.write(cert.getEncoded());
 		}
 		this.body = baos.toByteArray();
+		X509Certificate signCert = signCertChain.get(0);
+		X509Certificate citCaCert = signCertChain.get(1);
+		X509Certificate rootCaCert = signCertChain.get(2);
+		this.signCertFileSize = getCertificateSize(signCert);
+		this.caCertFileSize = getCertificateSize(citCaCert);
+		this.rootCertFileSize = getCertificateSize(rootCaCert);
+	}
+
+	private int getCertificateSize(X509Certificate certificate) {
+		try {
+			return certificate.getEncoded().length;
+		} catch (CertificateEncodingException e) {
+			throw new RuntimeException("certificate encoding error: "
+					+ e.getMessage(), e);
+		}
 	}
 
 	private byte[] copy(byte[] source, int idx, int count) {

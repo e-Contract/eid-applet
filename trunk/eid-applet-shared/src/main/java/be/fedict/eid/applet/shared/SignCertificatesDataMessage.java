@@ -55,6 +55,15 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 	public static final String TYPE = SignCertificatesDataMessage.class
 			.getSimpleName();
 
+	@HttpHeader(HTTP_HEADER_PREFIX + "SignCertFileSize")
+	public Integer signCertFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "CaCertFileSize")
+	public Integer caCertFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "RootCaCertFileSize")
+	public Integer rootCertFileSize;
+
 	@HttpBody
 	@NotNull
 	@Description("The non-repudiation certificate chain.")
@@ -79,6 +88,12 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 			}
 		}
 		this.body = baos.toByteArray();
+		X509Certificate signCert = certificateChain[0];
+		X509Certificate citCaCert = certificateChain[1];
+		X509Certificate rootCaCert = certificateChain[2];
+		this.signCertFileSize = getCertificateSize(signCert);
+		this.caCertFileSize = getCertificateSize(citCaCert);
+		this.rootCertFileSize = getCertificateSize(rootCaCert);
 	}
 
 	public SignCertificatesDataMessage(List<X509Certificate> certificateChain)
@@ -93,6 +108,21 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 			}
 		}
 		this.body = baos.toByteArray();
+		X509Certificate signCert = certificateChain.get(0);
+		X509Certificate citCaCert = certificateChain.get(1);
+		X509Certificate rootCaCert = certificateChain.get(2);
+		this.signCertFileSize = getCertificateSize(signCert);
+		this.caCertFileSize = getCertificateSize(citCaCert);
+		this.rootCertFileSize = getCertificateSize(rootCaCert);
+	}
+
+	private int getCertificateSize(X509Certificate certificate) {
+		try {
+			return certificate.getEncoded().length;
+		} catch (CertificateEncodingException e) {
+			throw new RuntimeException("certificate encoding error: "
+					+ e.getMessage(), e);
+		}
 	}
 
 	@PostConstruct
