@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2009 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -16,26 +16,22 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet;
-
-import java.awt.Component;
+package be.fedict.eid.applet.service.spi;
 
 /**
- * Interface for view component.
+ * Service Provider Interface for the privacy service.
  * 
  * @author Frank Cornelis
  * 
  */
-public interface View {
+public interface PrivacyService {
 
-	void addDetailMessage(String detailMessage);
-
-	void setStatusMessage(Status status, String statusMessage);
-
-	boolean privacyQuestion(boolean includeAddress, boolean includePhoto,
-			String identityDataUsage);
-
-	Component getParentComponent();
-
-	void progressIndication(int max, int current);
+	/**
+	 * Gives back the usage description on the retrieved identity data.
+	 * 
+	 * @param language
+	 *            the optional language indication.
+	 * @return the usage description.
+	 */
+	String getIdentityDataUsage(String language);
 }

@@ -40,4 +40,15 @@ public class HelloMessage extends AbstractProtocolMessage {
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator
 	public static final String TYPE = HelloMessage.class.getSimpleName();
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "Language")
+	public String language;
+
+	public HelloMessage() {
+		super();
+	}
+
+	public HelloMessage(String language) {
+		this.language = language;
+	}
 }

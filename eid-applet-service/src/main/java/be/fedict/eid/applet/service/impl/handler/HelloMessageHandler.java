@@ -35,6 +35,7 @@ import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
+import be.fedict.eid.applet.service.spi.PrivacyService;
 import be.fedict.eid.applet.service.spi.SecureClientEnvironmentService;
 import be.fedict.eid.applet.service.spi.SignatureService;
 import be.fedict.eid.applet.shared.AdministrationMessage;
@@ -69,6 +70,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 	public static final String IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME = "IdentityIntegrityService";
 
 	public static final String SIGNATURE_SERVICE_INIT_PARAM_NAME = "SignatureService";
+
+	public static final String PRIVACY_SERVICE_INIT_PARAM_NAME = "PrivacyService";
 
 	public static final String REMOVE_CARD_INIT_PARAM_NAME = "RemoveCard";
 
@@ -124,11 +127,14 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	private ServiceLocator<SignatureService> signatureServiceLocator;
 
+	private ServiceLocator<PrivacyService> privacyServiceLocator;
+
 	public Object handleMessage(HelloMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
 			HttpSession session) throws ServletException {
 		LOG.debug("hello message received");
 
+		storeClientLanguage(message.language, session);
 		SecureClientEnvironmentService secureClientEnvService = this.secureClientEnvServiceLocator
 				.locateService();
 		if (null != secureClientEnvService) {
@@ -194,10 +200,33 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 		IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
 				.locateService();
 		boolean includeIntegrityData = null != identityIntegrityService;
+		PrivacyService privacyService = this.privacyServiceLocator
+				.locateService();
+		String identityDataUsage;
+		if (null != privacyService) {
+			identityDataUsage = privacyService
+					.getIdentityDataUsage(message.language);
+		} else {
+			identityDataUsage = null;
+		}
 		IdentificationRequestMessage responseMessage = new IdentificationRequestMessage(
 				this.includeAddress, this.includePhoto, includeIntegrityData,
-				this.includeCertificates, this.removeCard);
+				this.includeCertificates, this.removeCard, identityDataUsage);
 		return responseMessage;
+	}
+
+	private static final String CLIENT_LANGUAGE_SESSION_ATTRIBUTE = HelloMessageHandler.class
+			.getName()
+			+ ".clientLanguage";
+
+	private void storeClientLanguage(String language, HttpSession httpSession) {
+		httpSession.setAttribute(CLIENT_LANGUAGE_SESSION_ATTRIBUTE, language);
+	}
+
+	public static String getClientLanguage(HttpSession httpSession) {
+		String clientLanguage = (String) httpSession
+				.getAttribute(CLIENT_LANGUAGE_SESSION_ATTRIBUTE);
+		return clientLanguage;
 	}
 
 	public void init(ServletConfig config) throws ServletException {
@@ -220,6 +249,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 				config);
 		this.signatureServiceLocator = new ServiceLocator<SignatureService>(
 				SIGNATURE_SERVICE_INIT_PARAM_NAME, config);
+		this.privacyServiceLocator = new ServiceLocator<PrivacyService>(
+				PRIVACY_SERVICE_INIT_PARAM_NAME, config);
 
 		String removeCard = config
 				.getInitParameter(REMOVE_CARD_INIT_PARAM_NAME);

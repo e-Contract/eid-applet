@@ -52,15 +52,18 @@ public class IdentificationRequestMessage extends AbstractProtocolMessage {
 	 * @param includeIntegrityData
 	 * @param includeCertificates
 	 * @param removeCard
+	 * @param identityDataUsage
 	 */
 	public IdentificationRequestMessage(boolean includeAddress,
 			boolean includePhoto, boolean includeIntegrityData,
-			boolean includeCertificates, boolean removeCard) {
+			boolean includeCertificates, boolean removeCard,
+			String identityDataUsage) {
 		this.includeAddress = includeAddress;
 		this.includePhoto = includePhoto;
 		this.includeIntegrityData = includeIntegrityData;
 		this.includeCertificates = includeCertificates;
 		this.removeCard = removeCard;
+		this.identityDataUsage = identityDataUsage;
 	}
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "IncludeAddress")
@@ -77,4 +80,7 @@ public class IdentificationRequestMessage extends AbstractProtocolMessage {
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "IncludeCertificates")
 	public boolean includeCertificates;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "IdentityDataUsage")
+	public String identityDataUsage;
 }
