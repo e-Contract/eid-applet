@@ -327,7 +327,7 @@ public class ControllerTest {
 
 		@Override
 		public boolean privacyQuestion(boolean includeAddress,
-				boolean includePhoto) {
+				boolean includePhoto, String identityDataUsage) {
 			LOG.debug("privacyQuestion()");
 			return true;
 		}
