@@ -1,3 +1,15 @@
+1.0.0-rc-2 - 15 December 2009
+	* fix to IncludeCertificates after CheckClientEnvironment
+	* fix to no longer use Tomahawk for email input validation
+	* javascript MessageCallback feature
+	* fix to remove Maven descriptor from the eID Applet JAR
+	* fix to not to stop on a failing logoff
+	* documented the JBoss Seam conversation preservation issue
+	* fix since FedICT should be pronounced as Fedict according to marketing
+	* include certificates sizes in eID Applet protocol messages
+	* identity data usage via a privacy service
+	* documentation on PrivacyService SPI
+
 1.0.0-rc-1 - 22 November 2009
 	* SkipSecureConnectionCheck
 	* dual-licensing of the OOXML signature code under LGPL and AL
