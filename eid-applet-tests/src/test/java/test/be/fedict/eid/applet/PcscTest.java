@@ -94,7 +94,7 @@ public class PcscTest {
 
 		@Override
 		public boolean privacyQuestion(boolean includeAddress,
-				boolean includePhoto) {
+				boolean includePhoto, String identityDataUsage) {
 			return false;
 		}
 
