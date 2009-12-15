@@ -243,7 +243,9 @@ public class Controller {
 		printEnvironment();
 
 		try {
-			HelloMessage helloMessage = new HelloMessage();
+			Applet applet = this.runtime.getApplet();
+			String language = applet.getParameter(Applet.LANGUAGE_PARAM);
+			HelloMessage helloMessage = new HelloMessage(language);
 			Object resultMessage = sendMessage(helloMessage);
 			if (resultMessage instanceof CheckClientMessage) {
 				addDetailMessage("Need to check the client secure environment...");
@@ -351,13 +353,16 @@ public class Controller {
 						+ identificationRequestMessage.includeCertificates);
 				addDetailMessage("remove card: "
 						+ identificationRequestMessage.removeCard);
+				addDetailMessage("identity data usage: "
+						+ identificationRequestMessage.identityDataUsage);
 
 				performEidIdentificationOperation(
 						identificationRequestMessage.includeAddress,
 						identificationRequestMessage.includePhoto,
 						identificationRequestMessage.includeIntegrityData,
 						identificationRequestMessage.includeCertificates,
-						identificationRequestMessage.removeCard);
+						identificationRequestMessage.removeCard,
+						identificationRequestMessage.identityDataUsage);
 			}
 		} catch (PKCS11NotFoundException e) {
 			setStatusMessage(Status.ERROR, Controller.this.messages
@@ -1064,14 +1069,15 @@ public class Controller {
 
 	private void performEidIdentificationOperation(boolean includeAddress,
 			boolean includePhoto, boolean includeIntegrityData,
-			boolean includeCertificates, boolean removeCard) throws Exception {
+			boolean includeCertificates, boolean removeCard,
+			String identityDataUsage) throws Exception {
 		waitForEIdCard();
 
 		setStatusMessage(Status.NORMAL, this.messages
 				.getMessage(MESSAGE_ID.READING_IDENTITY));
 
 		boolean response = this.view.privacyQuestion(includeAddress,
-				includePhoto);
+				includePhoto, identityDataUsage);
 		if (false == response) {
 			this.pcscEidSpi.close();
 			throw new SecurityException(

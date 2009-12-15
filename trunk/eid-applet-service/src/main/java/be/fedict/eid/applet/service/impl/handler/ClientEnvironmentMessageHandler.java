@@ -37,6 +37,7 @@ import be.fedict.eid.applet.service.spi.AuthenticationService;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
 import be.fedict.eid.applet.service.spi.InsecureClientEnvironmentException;
+import be.fedict.eid.applet.service.spi.PrivacyService;
 import be.fedict.eid.applet.service.spi.SecureClientEnvironmentService;
 import be.fedict.eid.applet.service.spi.SignatureService;
 import be.fedict.eid.applet.shared.AdministrationMessage;
@@ -70,6 +71,8 @@ public class ClientEnvironmentMessageHandler implements
 	private ServiceLocator<IdentityIntegrityService> identityIntegrityServiceLocator;
 
 	private ServiceLocator<AuthenticationService> authenticationServiceLocator;
+
+	private ServiceLocator<PrivacyService> privacyServiceLocator;
 
 	private SecureRandom secureRandom;
 
@@ -174,10 +177,21 @@ public class ClientEnvironmentMessageHandler implements
 			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
 					.locateService();
 			boolean includeIntegrityData = null != identityIntegrityService;
+			PrivacyService privacyService = this.privacyServiceLocator
+					.locateService();
+			String identityDataUsage;
+			if (null != privacyService) {
+				String clientLanguage = HelloMessageHandler
+						.getClientLanguage(session);
+				identityDataUsage = privacyService
+						.getIdentityDataUsage(clientLanguage);
+			} else {
+				identityDataUsage = null;
+			}
 			IdentificationRequestMessage responseMessage = new IdentificationRequestMessage(
 					this.includeAddress, this.includePhoto,
 					includeIntegrityData, this.includeCertificates,
-					this.removeCard);
+					this.removeCard, identityDataUsage);
 			return responseMessage;
 		}
 	}
@@ -204,6 +218,8 @@ public class ClientEnvironmentMessageHandler implements
 				config);
 		this.signatureServiceLocator = new ServiceLocator<SignatureService>(
 				HelloMessageHandler.SIGNATURE_SERVICE_INIT_PARAM_NAME, config);
+		this.privacyServiceLocator = new ServiceLocator<PrivacyService>(
+				HelloMessageHandler.PRIVACY_SERVICE_INIT_PARAM_NAME, config);
 
 		this.secureRandom = new SecureRandom();
 		this.secureRandom.setSeed(System.currentTimeMillis());

@@ -559,8 +559,9 @@ public class Applet extends JApplet {
 		}
 
 		public boolean privacyQuestion(boolean includeAddress,
-				boolean includePhoto) {
-			return Applet.this.privacyQuestion(includeAddress, includePhoto);
+				boolean includePhoto, String identityDataUsage) {
+			return Applet.this.privacyQuestion(includeAddress, includePhoto,
+					identityDataUsage);
 		}
 
 		public void progressIndication(int max, int current) {
@@ -572,7 +573,8 @@ public class Applet extends JApplet {
 		}
 	}
 
-	private boolean privacyQuestion(boolean includeAddress, boolean includePhoto) {
+	private boolean privacyQuestion(boolean includeAddress,
+			boolean includePhoto, String identityDataUsage) {
 		String msg = this.messages.getMessage(MESSAGE_ID.PRIVACY_QUESTION)
 				+ "\n" + "Identity information: identity data";
 		if (includeAddress) {
@@ -580,6 +582,9 @@ public class Applet extends JApplet {
 		}
 		if (includePhoto) {
 			msg += ", photo";
+		}
+		if (null != identityDataUsage) {
+			msg += "\n" + "Usage: " + identityDataUsage;
 		}
 		int response = JOptionPane.showConfirmDialog(this, msg, "Privacy",
 				JOptionPane.YES_NO_OPTION);
