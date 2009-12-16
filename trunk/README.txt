@@ -52,7 +52,7 @@ You can speed up the development build cycle by skipping the unit tests via:
 
 An SDK build can be performed via:
 	mvn -Dhttp.proxyHost=proxy.yourict.net -Dhttp.proxyPort=8080 -Denv=sdk
--Dtoken=etoken clean install
+-Dtoken=etoken clean deploy
 
 The final artifact is located under:
 	eid-applet-sdk/target/
