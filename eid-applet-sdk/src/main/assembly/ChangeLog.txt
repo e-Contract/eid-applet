@@ -1,4 +1,4 @@
-1.0.0-rc-2 - 15 December 2009
+1.0.0-rc-2 - 16 December 2009
 	* fix to IncludeCertificates after CheckClientEnvironment
 	* fix to no longer use Tomahawk for email input validation
 	* javascript MessageCallback feature
