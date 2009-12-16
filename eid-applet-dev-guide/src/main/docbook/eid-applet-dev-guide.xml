@@ -102,7 +102,7 @@
 		<section>
 			<title>Linux</title>
 			<section>
-				<title>Fedora 9, 10, 11</title>
+				<title>Fedora 9, 10, 11, 12</title>
 				<para>
 					The Fedora operating system comes by default with the IcedTea JRE
 					which is based on the OpenJDK. If the Firefox browser uses this JRE
@@ -1643,7 +1643,7 @@ ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlis
 						<entry>1.0.0-rc-1</entry>
 					</row>
 					<row>
-						<entry>16 Dev 2009</entry>
+						<entry>16 Dec 2009</entry>
 						<entry>Frank Cornelis</entry>
 						<entry>1.0.0-rc-2</entry>
 					</row>
