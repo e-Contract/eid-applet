@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.1.0-SNAPSHOT.xsd">
+	<formats>
+		<format>zip</format>
+	</formats>
+	<baseDirectory>eid-applet-demo-${pom.version}</baseDirectory>
+	<fileSets>
+		<fileSet>
+			<directory>target/dependency/jboss-as-distribution</directory>
+			<outputDirectory>/</outputDirectory>
+			<excludes>
+				<exclude>bin/run.sh</exclude>
+				<exclude>bin/shutdown.sh</exclude>
+			</excludes>
+		</fileSet>
+		<fileSet>
+			<directory>target/dependency/jboss-as-distribution</directory>
+			<outputDirectory>/</outputDirectory>
+			<fileMode>0544</fileMode>
+			<includes>
+				<include>bin/run.sh</include>
+				<include>bin/shutdown.sh</include>
+			</includes>
+		</fileSet>
+	</fileSets>
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>server/default/deploy</outputDirectory>
+		</dependencySet>
+	</dependencySets>
+</assembly>
