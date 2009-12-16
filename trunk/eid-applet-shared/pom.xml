@@ -3,14 +3,14 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0-rc-2</version>
 	</parent>
 	<name>FedICT eID Applet Shared</name>
 	<description>Shared classes between the eID Applet and the eID
 		Applet Service.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-shared</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0-rc-2</version>
 	<packaging>jar</packaging>
 	<build>
 		<plugins>
