@@ -384,6 +384,7 @@ public class ControllerTest {
 		assertNotNull(identity.name);
 		LOG.debug("name: " + identity.name);
 		LOG.debug("document type: " + identity.getDocumentType());
+		LOG.debug("duplicate: " + identity.getDuplicate());
 		assertNull(httpSession.getAttribute("eid.identifier"));
 		assertNull(httpSession.getAttribute("eid.address"));
 		assertNull(httpSession.getAttribute("eid.photo"));
@@ -429,6 +430,8 @@ public class ControllerTest {
 		assertNotNull(identity);
 		assertNotNull(identity.name);
 		LOG.debug("name: " + identity.name);
+		LOG.debug("nationality: " + identity.getNationality());
+		LOG.debug("national number: " + identity.getNationalNumber());
 		assertNull(httpSession.getAttribute("eid.identifier"));
 		assertNotNull(httpSession.getAttribute("eid.address"));
 		assertNotNull(httpSession.getAttribute("eid.photo"));

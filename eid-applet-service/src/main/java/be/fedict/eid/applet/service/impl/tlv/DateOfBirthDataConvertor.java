@@ -40,6 +40,10 @@ public class DateOfBirthDataConvertor implements
 		String dateOfBirthStr = new String(value);
 		LOG.debug(dateOfBirthStr);
 		int spaceIdx = dateOfBirthStr.indexOf(' ');
+		if (-1 == spaceIdx) {
+			// german card
+			spaceIdx = dateOfBirthStr.indexOf('.');
+		}
 		String dayStr = dateOfBirthStr.substring(0, spaceIdx);
 		int day = Integer.parseInt(dayStr);
 		String monthStr = dateOfBirthStr.substring(spaceIdx + 1, dateOfBirthStr
