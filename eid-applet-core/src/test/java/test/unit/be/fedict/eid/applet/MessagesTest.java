@@ -18,12 +18,14 @@
 
 package test.unit.be.fedict.eid.applet;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.ResourceBundle;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -73,5 +75,13 @@ public class MessagesTest {
 					+ "\" for language \"" + language + "\"", properties
 					.containsKey(messageId.getId()));
 		}
+	}
+
+	@Test
+	public void testEncoding() throws Exception {
+		ResourceBundle resourceBundle = ResourceBundle.getBundle("test");
+		String testMessage = resourceBundle.getString("test");
+		LOG.debug("test message: " + testMessage);
+		assertEquals("é", testMessage);
 	}
 }
