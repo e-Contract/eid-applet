@@ -33,10 +33,14 @@ import org.apache.commons.logging.LogFactory;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
+import be.fedict.eid.applet.shared.AbstractProtocolMessage;
 import be.fedict.eid.applet.shared.AppletProtocolMessageCatalog;
 import be.fedict.eid.applet.shared.ClientEnvironmentMessage;
 import be.fedict.eid.applet.shared.IdentificationRequestMessage;
 import be.fedict.eid.applet.shared.IdentityDataMessage;
+import be.fedict.eid.applet.shared.annotation.HttpHeader;
+import be.fedict.eid.applet.shared.annotation.MessageDiscriminator;
+import be.fedict.eid.applet.shared.annotation.PostConstruct;
 import be.fedict.eid.applet.shared.protocol.HttpReceiver;
 import be.fedict.eid.applet.shared.protocol.ProtocolMessageCatalog;
 import be.fedict.eid.applet.shared.protocol.Unmarshaller;
@@ -210,6 +214,73 @@ public class UnmarshallerTest {
 		assertTrue(result instanceof IdentificationRequestMessage);
 		IdentificationRequestMessage message = (IdentificationRequestMessage) result;
 		assertTrue(message.includePhoto);
+	}
+
+	public static final class MyRuntimeException extends RuntimeException {
+
+		private static final long serialVersionUID = 1L;
+
+		public MyRuntimeException(String message) {
+			super(message);
+		}
+	}
+
+	public static final class TestMessage extends AbstractProtocolMessage {
+
+		@HttpHeader(TYPE_HTTP_HEADER)
+		@MessageDiscriminator
+		public static final String TYPE = TestMessage.class.getSimpleName();
+
+		@PostConstruct
+		public void postConstruct() {
+			LOG.debug("postConstruct method invoked");
+			throw new MyRuntimeException("failing post construct method");
+		}
+	}
+
+	@Test
+	public void testFailingPostConstructStackTrace() throws Exception {
+		// setup
+		ProtocolMessageCatalog catalog = new ProtocolMessageCatalog() {
+
+			public List<Class<?>> getCatalogClasses() {
+				List<Class<?>> catalogClasses = new LinkedList<Class<?>>();
+				catalogClasses.add(TestMessage.class);
+				return catalogClasses;
+			}
+		};
+		Unmarshaller unmarshaller = new Unmarshaller(catalog);
+
+		HttpReceiver mockHttpReceiver = EasyMock.createMock(HttpReceiver.class);
+
+		// stubs
+		EasyMock.expect(mockHttpReceiver.isSecure()).andStubReturn(true);
+		List<String> testHeaderNames = new LinkedList<String>();
+		testHeaderNames.add("foo-bar");
+		testHeaderNames.add("X-AppletProtocol-Version");
+		testHeaderNames.add("X-AppletProtocol-Type");
+		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(
+				testHeaderNames);
+		EasyMock.expect(
+				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version"))
+				.andStubReturn("1");
+		EasyMock.expect(
+				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type"))
+				.andStubReturn(TestMessage.class.getSimpleName());
+
+		// prepare
+		EasyMock.replay(mockHttpReceiver);
+
+		try {
+			// operate
+			unmarshaller.receive(mockHttpReceiver);
+			fail();
+		} catch (Exception e) {
+			LOG.debug("error: " + e.getMessage(), e);
+			// verify
+			EasyMock.verify(mockHttpReceiver);
+			assertTrue(e instanceof MyRuntimeException);
+		}
 	}
 
 	@Test
