@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -331,6 +332,20 @@ public class Unmarshaller {
 			if (null != postConstructAnnotation) {
 				try {
 					method.invoke(transferObject, new Object[] {});
+				} catch (InvocationTargetException e) {
+					Throwable methodException = e.getTargetException();
+					if (methodException instanceof RuntimeException) {
+						RuntimeException runtimeException = (RuntimeException) methodException;
+						/*
+						 * We directly rethrow the runtime exception to have a
+						 * cleaner stack trace.
+						 */
+						throw runtimeException;
+					}
+					throw new RuntimeException(
+							"@PostConstruct method invocation error: "
+									+ methodException.getMessage(),
+							methodException);
 				} catch (Exception e) {
 					throw new RuntimeException("@PostConstruct error: "
 							+ e.getMessage(), e);
