@@ -87,10 +87,20 @@ public class CleanSessionProtocolStateListener implements ProtocolStateListener 
 			LOG.debug("cleaning up the authn session attributes...");
 			this.httpSession
 					.removeAttribute(AuthenticationDataMessageHandler.AUTHENTICATED_USER_IDENTIFIER_SESSION_ATTRIBUTE);
+			this.httpSession
+					.removeAttribute(IdentityDataMessageHandler.IDENTITY_SESSION_ATTRIBUTE);
+			this.httpSession
+					.removeAttribute(IdentityDataMessageHandler.ADDRESS_SESSION_ATTRIBUTE);
+			this.httpSession
+					.removeAttribute(IdentityDataMessageHandler.PHOTO_SESSION_ATTRIBUTE);
 			EIdData eidData = (EIdData) this.httpSession
 					.getAttribute(IdentityDataMessageHandler.EID_SESSION_ATTRIBUTE);
 			if (null != eidData) {
 				eidData.identifier = null;
+				eidData.identity = null;
+				eidData.address = null;
+				eidData.photo = null;
+				eidData.certs = null;
 			}
 			break;
 		}

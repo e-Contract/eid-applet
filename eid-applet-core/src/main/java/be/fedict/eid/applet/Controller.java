@@ -835,6 +835,10 @@ public class Controller {
 		boolean preLogoff = authnRequest.preLogoff;
 		boolean sessionIdChannelBinding = authnRequest.sessionIdChannelBinding;
 		boolean serverCertificateChannelBinding = authnRequest.serverCertificateChannelBinding;
+		boolean includeIdentity = authnRequest.includeIdentity;
+		boolean includeAddress = authnRequest.includeAddress;
+		boolean includePhoto = authnRequest.includePhoto;
+		boolean includeIntegrityData = authnRequest.includeIntegrityData;
 		if (challenge.length < 20) {
 			throw new SecurityException(
 					"challenge should be at least 20 bytes long.");
@@ -848,6 +852,10 @@ public class Controller {
 				+ sessionIdChannelBinding);
 		addDetailMessage("server certificate channel binding: "
 				+ serverCertificateChannelBinding);
+		addDetailMessage("include identity: " + includeIdentity);
+		addDetailMessage("include address: " + includeAddress);
+		addDetailMessage("include photo: " + includePhoto);
+		addDetailMessage("include integrity data: " + includeIntegrityData);
 
 		SecureRandom secureRandom = new SecureRandom();
 		byte[] salt = new byte[20];
@@ -897,6 +905,14 @@ public class Controller {
 
 		setStatusMessage(Status.NORMAL, this.messages
 				.getMessage(MESSAGE_ID.DETECTING_CARD));
+		if (includeIdentity || includeAddress || includePhoto) {
+			if (null != this.pcscEidSpi) {
+				performEidPcscAuthnOperation(salt, sessionId, toBeSigned,
+						logoff, preLogoff, removeCard, includeIdentity,
+						includeAddress, includePhoto, includeIntegrityData);
+				return;
+			}
+		}
 		try {
 			if (false == this.pkcs11Eid.isEidPresent()) {
 				setStatusMessage(Status.NORMAL, this.messages
@@ -908,7 +924,8 @@ public class Controller {
 			if (null != this.pcscEidSpi) {
 				addDetailMessage("fallback to PC/SC interface for authentication...");
 				performEidPcscAuthnOperation(salt, sessionId, toBeSigned,
-						logoff, preLogoff, removeCard);
+						logoff, preLogoff, removeCard, includeIdentity,
+						includeAddress, includePhoto, includeIntegrityData);
 				return;
 			}
 			throw new PKCS11NotFoundException();
@@ -973,7 +990,8 @@ public class Controller {
 		}
 
 		AuthenticationDataMessage authenticationDataMessage = new AuthenticationDataMessage(
-				salt, sessionId, signatureValue, authnCertChain);
+				salt, sessionId, signatureValue, authnCertChain, null, null,
+				null, null, null, null);
 		Object responseMessage = sendMessage(authenticationDataMessage);
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");
@@ -982,13 +1000,32 @@ public class Controller {
 
 	private void performEidPcscAuthnOperation(byte[] salt, byte[] sessionId,
 			byte[] toBeSigned, boolean logoff, boolean preLogoff,
-			boolean removeCard) throws Exception {
+			boolean removeCard, boolean includeIdentity,
+			boolean includeAddress, boolean includePhoto,
+			boolean includeIntegrityData) throws Exception {
 		waitForEIdCard();
 
 		setStatusMessage(Status.NORMAL, this.messages
 				.getMessage(MESSAGE_ID.AUTHENTICATING));
+
+		if (includeIdentity || includeAddress || includePhoto) {
+			boolean response = this.view.privacyQuestion(includeAddress,
+					includePhoto, null);
+			if (false == response) {
+				this.pcscEidSpi.close();
+				throw new SecurityException(
+						"user did not agree to release eID identity information");
+			}
+		}
+
 		byte[] signatureValue;
 		List<X509Certificate> authnCertChain;
+		byte[] identityData = null;
+		byte[] addressData = null;
+		byte[] photoData = null;
+		byte[] identitySignatureData = null;
+		byte[] addressSignatureData = null;
+		byte[] rrnCertData = null;
 		try {
 			if (preLogoff) {
 				/*
@@ -1004,11 +1041,93 @@ public class Controller {
 			this.maxProgress += (1050 / 255) + 1; // authn cert file
 			this.maxProgress += (1050 / 255) + 1; // CA cert file
 			this.maxProgress += (1050 / 255) + 1; // Root cert file
+			if (includeIdentity) {
+				this.maxProgress++;
+			}
+			if (includeAddress) {
+				this.maxProgress++;
+			}
+			if (includePhoto) {
+				this.maxProgress += 3000 / 255;
+			}
+			if (includeIntegrityData) {
+				if (includeIdentity) {
+					this.maxProgress++; // identity signature file
+				}
+				if (includeAddress) {
+					this.maxProgress++; // address signature file
+				}
+				this.maxProgress += (1050 / 255) + 1; // RRN certificate file
+			}
 			this.currentProgress = 0;
 			this.view
 					.progressIndication(this.maxProgress, this.currentProgress);
 
-			authnCertChain = this.pcscEidSpi.getAuthnCertificateChain();
+			/*
+			 * Next design pattern is the only way to handle the case where
+			 * multiple application access the smart card at the same time.
+			 */
+			TaskRunner taskRunner = new TaskRunner(this.pcscEidSpi, this.view);
+			authnCertChain = taskRunner.run(new Task<List<X509Certificate>>() {
+				public List<X509Certificate> run() throws Exception {
+					return Controller.this.pcscEidSpi
+							.getAuthnCertificateChain();
+				}
+			});
+
+			if (includeIdentity || includeAddress || includePhoto) {
+				setStatusMessage(Status.NORMAL, this.messages
+						.getMessage(MESSAGE_ID.READING_IDENTITY));
+			}
+
+			if (includeIdentity) {
+				identityData = taskRunner.run(new Task<byte[]>() {
+					public byte[] run() throws Exception {
+						return Controller.this.pcscEidSpi
+								.readFile(PcscEid.IDENTITY_FILE_ID);
+					}
+				});
+			}
+			if (includeAddress) {
+				addressData = taskRunner.run(new Task<byte[]>() {
+					public byte[] run() throws Exception {
+						return Controller.this.pcscEidSpi
+								.readFile(PcscEid.ADDRESS_FILE_ID);
+					}
+				});
+			}
+			if (includePhoto) {
+				photoData = taskRunner.run(new Task<byte[]>() {
+					public byte[] run() throws Exception {
+						return Controller.this.pcscEidSpi
+								.readFile(PcscEid.PHOTO_FILE_ID);
+					}
+				});
+			}
+			if (includeIntegrityData) {
+				if (includeIdentity) {
+					identitySignatureData = taskRunner.run(new Task<byte[]>() {
+						public byte[] run() throws Exception {
+							return Controller.this.pcscEidSpi
+									.readFile(PcscEid.IDENTITY_SIGN_FILE_ID);
+						}
+					});
+				}
+				if (includeAddress) {
+					addressSignatureData = taskRunner.run(new Task<byte[]>() {
+						public byte[] run() throws Exception {
+							return Controller.this.pcscEidSpi
+									.readFile(PcscEid.ADDRESS_SIGN_FILE_ID);
+						}
+					});
+				}
+				rrnCertData = taskRunner.run(new Task<byte[]>() {
+					public byte[] run() throws Exception {
+						return Controller.this.pcscEidSpi
+								.readFile(PcscEid.RRN_CERT_FILE_ID);
+					}
+				});
+			}
 
 			this.view.progressIndication(-1, 0);
 
@@ -1025,7 +1144,9 @@ public class Controller {
 		}
 
 		AuthenticationDataMessage authenticationDataMessage = new AuthenticationDataMessage(
-				salt, sessionId, signatureValue, authnCertChain);
+				salt, sessionId, signatureValue, authnCertChain, identityData,
+				addressData, photoData, identitySignatureData,
+				addressSignatureData, rrnCertData);
 		Object responseMessage = sendMessage(authenticationDataMessage);
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");
@@ -1043,8 +1164,7 @@ public class Controller {
 		addDetailMessage("Web application URL: "
 				+ this.runtime.getDocumentBase());
 		addDetailMessage("Current time: " + new Date());
-		// TODO when using SunPKCS11 we only accept the Sun JRE
-		// TODO can we assume there is only Sun JRE? OpenJDK variants...
+		// XXX when using SunPKCS11 we only accept the Sun JRE and OpenJDK
 	}
 
 	public void addDetailMessage(String detailMessage) {

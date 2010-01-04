@@ -62,6 +62,8 @@ public class ContinueInsecureMessageHandler implements
 
 	private boolean includeAddress;
 
+	private boolean includeIdentity;
+
 	private boolean includeInetAddress;
 
 	private ServiceLocator<IdentityIntegrityService> identityIntegrityServiceLocator;
@@ -134,11 +136,16 @@ public class ContinueInsecureMessageHandler implements
 		if (null != authenticationService) {
 			byte[] challenge = AuthenticationChallenge
 					.generateChallenge(session);
+			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
+					.locateService();
+			boolean includeIntegrityData = null != identityIntegrityService;
 			AuthenticationRequestMessage authenticationRequestMessage = new AuthenticationRequestMessage(
 					challenge, this.includeHostname, this.includeInetAddress,
 					this.logoff, this.preLogoff, this.removeCard,
 					this.sessionIdChannelBinding,
-					this.serverCertificateChannelBinding);
+					this.serverCertificateChannelBinding, this.includeIdentity,
+					this.includeAddress, this.includePhoto,
+					includeIntegrityData);
 			return authenticationRequestMessage;
 		} else {
 			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
@@ -173,6 +180,11 @@ public class ContinueInsecureMessageHandler implements
 				.getInitParameter(HelloMessageHandler.INCLUDE_PHOTO_INIT_PARAM_NAME);
 		if (null != includePhoto) {
 			this.includePhoto = Boolean.parseBoolean(includePhoto);
+		}
+		String includeIdentity = config
+				.getInitParameter(HelloMessageHandler.INCLUDE_IDENTITY_INIT_PARAM_NAME);
+		if (null != includeIdentity) {
+			this.includeIdentity = Boolean.parseBoolean(includeIdentity);
 		}
 		this.identityIntegrityServiceLocator = new ServiceLocator<IdentityIntegrityService>(
 				HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME,

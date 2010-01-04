@@ -59,6 +59,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	private static final Log LOG = LogFactory.getLog(HelloMessageHandler.class);
 
+	public static final String INCLUDE_IDENTITY_INIT_PARAM_NAME = "IncludeIdentity";
+
 	public static final String INCLUDE_PHOTO_INIT_PARAM_NAME = "IncludePhoto";
 
 	public static final String INCLUDE_CERTS_INIT_PARAM_NAME = "IncludeCertificates";
@@ -96,6 +98,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 	private boolean includePhoto;
 
 	private boolean includeAddress;
+
+	private boolean includeIdentity;
 
 	private boolean removeCard;
 
@@ -189,11 +193,16 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 		if (null != authenticationService) {
 			byte[] challenge = AuthenticationChallenge
 					.generateChallenge(session);
+			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
+					.locateService();
+			boolean includeIntegrityData = null != identityIntegrityService;
 			AuthenticationRequestMessage authenticationRequestMessage = new AuthenticationRequestMessage(
 					challenge, this.includeHostname, this.includeInetAddress,
 					this.logoff, this.preLogoff, this.removeCard,
 					this.sessionIdChannelBinding,
-					this.serverCertificateChannelBinding);
+					this.serverCertificateChannelBinding, this.includeIdentity,
+					this.includeAddress, this.includePhoto,
+					includeIntegrityData);
 			return authenticationRequestMessage;
 		}
 
@@ -239,6 +248,11 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 				.getInitParameter(INCLUDE_PHOTO_INIT_PARAM_NAME);
 		if (null != includePhoto) {
 			this.includePhoto = Boolean.parseBoolean(includePhoto);
+		}
+		String includeIdentity = config
+				.getInitParameter(HelloMessageHandler.INCLUDE_IDENTITY_INIT_PARAM_NAME);
+		if (null != includeIdentity) {
+			this.includeIdentity = Boolean.parseBoolean(includeIdentity);
 		}
 		this.secureClientEnvServiceLocator = new ServiceLocator<SecureClientEnvironmentService>(
 				SECURE_CLIENT_ENV_SERVICE_INIT_PARAM_NAME, config);

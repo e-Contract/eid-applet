@@ -155,6 +155,31 @@ public class AuthenticationDataMessageHandlerTest {
 						mockServletConfig
 								.getInitParameter(AuthenticationDataMessageHandler.NRCID_SECRET_INIT_PARAM_NAME))
 				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_IDENTITY_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_ADDRESS_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_PHOTO_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME
+										+ "Class")).andStubReturn(null);
 
 		EasyMock.expect(
 				mockServletRequest
@@ -285,6 +310,31 @@ public class AuthenticationDataMessageHandlerTest {
 				mockServletRequest
 						.getAttribute("javax.servlet.request.ssl_session"))
 				.andStubReturn(new String(Hex.encodeHex(sessionId)));
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_IDENTITY_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_ADDRESS_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_PHOTO_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME
+										+ "Class")).andStubReturn(null);
 
 		// prepare
 		EasyMock.replay(mockServletRequest, mockServletConfig);
@@ -382,6 +432,31 @@ public class AuthenticationDataMessageHandlerTest {
 						mockServletConfig
 								.getInitParameter(HelloMessageHandler.SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME))
 				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_IDENTITY_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_ADDRESS_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_PHOTO_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME
+										+ "Class")).andStubReturn(null);
 		EasyMock
 				.expect(
 						mockServletConfig
@@ -518,6 +593,31 @@ public class AuthenticationDataMessageHandlerTest {
 						mockServletConfig
 								.getInitParameter(AuthenticationDataMessageHandler.NRCID_SECRET_INIT_PARAM_NAME))
 				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_IDENTITY_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_ADDRESS_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_PHOTO_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME
+										+ "Class")).andStubReturn(null);
 
 		EasyMock.expect(
 				mockServletRequest
@@ -641,6 +741,31 @@ public class AuthenticationDataMessageHandlerTest {
 						mockServletConfig
 								.getInitParameter(AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME
 										+ "Class")).andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_IDENTITY_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_ADDRESS_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_PHOTO_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME
+										+ "Class")).andStubReturn(null);
 
 		EasyMock.expect(
 				mockServletRequest

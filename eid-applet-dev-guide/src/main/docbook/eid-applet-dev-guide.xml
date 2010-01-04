@@ -1034,6 +1034,47 @@
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
 			</section>
+			<section>
+				<title>Authenticated Identification</title>
+				<para>
+					It is possible to combine an eID authentication operation with
+					an
+					eID identification operation. Activate the eID identification as
+					part of the eID authentication via the following
+					<code>init-param</code>
+					on the
+					<code>AppletServiceServlet</code>
+					:
+				</para>
+				<programlisting role="XML"><![CDATA[<init-param>
+	<param-name>IncludeIdentity</param-name>
+	<param-value>true</param-value>
+</init-param>]]></programlisting>
+				<para>
+					Also include the eID address via the following
+					<code>init-param</code>
+					on the
+					<code>AppletServiceServlet</code>
+					:
+				</para>
+				<programlisting role="XML"><![CDATA[<init-param>
+	<param-name>IncludeAddress</param-name>
+	<param-value>true</param-value>
+</init-param>]]></programlisting>
+				<para>
+					Also include the eID photo via the following
+					<code>init-param</code>
+					on the
+					<code>AppletServiceServlet</code>
+					:
+				</para>
+				<programlisting role="XML"><![CDATA[<init-param>
+	<param-name>IncludePhoto</param-name>
+	<param-value>true</param-value>
+</init-param>]]></programlisting>
+				<para>The identity integrity service can also be activated when
+					combining eID authentication with eID identification.</para>
+			</section>
 		</section>
 		<section>
 			<title>eID Signatures</title>
@@ -1436,11 +1477,18 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 					function by setting the
 					<code>MessageCallback</code>
 					eID Applet parameter.
-					The <code>status</code> parameter can be either 
-					<code>NORMAL</code> or <code>ERROR</code>.
+					The
+					<code>status</code>
+					parameter can be either
+					<code>NORMAL</code>
+					or
+					<code>ERROR</code>
+					.
 					In our example we simply display the incoming
-					message via some dynamic HTML. Of course more complex
-					visualizations are possible here.
+					message via some
+					dynamic HTML. Of course more complex
+					visualizations are possible
+					here.
 				</para>
 				<tip>
 					<title>mayscript</title>

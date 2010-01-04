@@ -23,12 +23,14 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,12 +44,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.util.encoders.Hex;
 
+import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.EIdData;
+import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.impl.AuthenticationChallenge;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.impl.UserIdentifierUtil;
+import be.fedict.eid.applet.service.impl.tlv.TlvParser;
 import be.fedict.eid.applet.service.spi.AuditService;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
+import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
 import be.fedict.eid.applet.shared.AuthenticationContract;
 import be.fedict.eid.applet.shared.AuthenticationDataMessage;
 import be.fedict.eid.applet.shared.FinishedMessage;
@@ -99,6 +105,14 @@ public class AuthenticationDataMessageHandler implements
 
 	private String nrcidAppId;
 
+	private boolean includeIdentity;
+
+	private boolean includeAddress;
+
+	private boolean includePhoto;
+
+	private ServiceLocator<IdentityIntegrityService> identityIntegrityServiceLocator;
+
 	public Object handleMessage(AuthenticationDataMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
 			HttpSession session) throws ServletException {
@@ -131,7 +145,7 @@ public class AuthenticationDataMessageHandler implements
 		byte[] challenge;
 		try {
 			challenge = AuthenticationChallenge.getAuthnChallenge(session,
-					maxMaturity);
+					this.maxMaturity);
 		} catch (SecurityException e) {
 			AuditService auditService = this.auditServiceLocator
 					.locateService();
@@ -212,7 +226,154 @@ public class AuthenticationDataMessageHandler implements
 			auditService.authenticated(userId);
 		}
 
+		/*
+		 * Also process the identity data in case it was requested.
+		 */
+		if (this.includeIdentity) {
+			if (null == message.identityData) {
+				throw new ServletException(
+						"identity data not included while requested");
+			}
+		}
+		if (this.includeAddress) {
+			if (null == message.addressData) {
+				throw new ServletException(
+						"address data not included while requested");
+			}
+		}
+		if (this.includePhoto) {
+			if (null == message.photoData) {
+				throw new ServletException(
+						"photo data not included while requested");
+			}
+		}
+		IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
+				.locateService();
+		if (null != identityIntegrityService) {
+			if (null == message.rrnCertificate) {
+				throw new ServletException(
+						"national registry certificate not included while requested");
+			}
+			List<X509Certificate> rrnCertificateChain = new LinkedList<X509Certificate>();
+			X509Certificate rootCertificate = certificateChain.get(2);
+			rrnCertificateChain.add(message.rrnCertificate);
+			rrnCertificateChain.add(rootCertificate);
+			identityIntegrityService
+					.checkNationalRegistrationCertificate(rrnCertificateChain);
+			PublicKey rrnPublicKey = message.rrnCertificate.getPublicKey();
+			if (this.includeIdentity) {
+				if (null == message.identitySignatureData) {
+					throw new ServletException(
+							"identity signature data not included while requested");
+				}
+				verifySignature(message.identitySignatureData, rrnPublicKey,
+						request, message.identityData);
+			}
+			if (this.includeAddress) {
+				if (null == message.addressSignatureData) {
+					throw new ServletException(
+							"address signature data not included while requested");
+				}
+				byte[] addressFile = trimRight(message.addressData);
+				verifySignature(message.addressSignatureData, rrnPublicKey,
+						request, addressFile, message.identitySignatureData);
+			}
+		}
+		if (this.includeIdentity) {
+			Identity identity = TlvParser.parse(message.identityData,
+					Identity.class);
+			if (false == UserIdentifierUtil.getUserId(signingCertificate)
+					.equals(identity.nationalNumber)) {
+				throw new ServletException("national number mismatch");
+			}
+			session.setAttribute(
+					IdentityDataMessageHandler.IDENTITY_SESSION_ATTRIBUTE,
+					identity);
+			eidData.identity = identity;
+			auditService = this.auditServiceLocator.locateService();
+			if (null != auditService) {
+				auditService.identified(identity.nationalNumber);
+			}
+		}
+		if (this.includeAddress) {
+			Address address = TlvParser.parse(message.addressData,
+					Address.class);
+			session.setAttribute(
+					IdentityDataMessageHandler.ADDRESS_SESSION_ATTRIBUTE,
+					address);
+			eidData.address = address;
+		}
+		if (this.includePhoto) {
+			if (this.includeIdentity) {
+				byte[] expectedPhotoDigest = eidData.identity.photoDigest;
+				byte[] actualPhotoDigest = digestPhoto(message.photoData);
+				if (false == Arrays.equals(expectedPhotoDigest,
+						actualPhotoDigest)) {
+					throw new ServletException("photo digest incorrect");
+				}
+			}
+			session.setAttribute(
+					IdentityDataMessageHandler.PHOTO_SESSION_ATTRIBUTE,
+					message.photoData);
+			eidData.photo = message.photoData;
+		}
+
 		return new FinishedMessage();
+	}
+
+	private byte[] trimRight(byte[] addressFile) {
+		int idx;
+		for (idx = 0; idx < addressFile.length; idx++) {
+			if (0 == addressFile[idx]) {
+				break;
+			}
+		}
+		byte[] result = new byte[idx];
+		System.arraycopy(addressFile, 0, result, 0, idx);
+		return result;
+	}
+
+	private byte[] digestPhoto(byte[] photoFile) {
+		MessageDigest messageDigest;
+		try {
+			messageDigest = MessageDigest.getInstance("SHA1");
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException("SHA1 error: " + e.getMessage(), e);
+		}
+		byte[] photoDigest = messageDigest.digest(photoFile);
+		return photoDigest;
+	}
+
+	private void verifySignature(byte[] signatureData, PublicKey publicKey,
+			HttpServletRequest request, byte[]... data) throws ServletException {
+		Signature signature;
+		try {
+			signature = Signature.getInstance("SHA1withRSA");
+		} catch (NoSuchAlgorithmException e) {
+			throw new ServletException("algo error: " + e.getMessage(), e);
+		}
+		try {
+			signature.initVerify(publicKey);
+		} catch (InvalidKeyException e) {
+			throw new ServletException("key error: " + e.getMessage(), e);
+		}
+		try {
+			for (byte[] dataItem : data) {
+				signature.update(dataItem);
+			}
+			boolean result = signature.verify(signatureData);
+			if (false == result) {
+				AuditService auditService = this.auditServiceLocator
+						.locateService();
+				if (null != auditService) {
+					String remoteAddress = request.getRemoteAddr();
+					auditService.identityIntegrityError(remoteAddress);
+				}
+				throw new ServletException("signature incorrect");
+			}
+		} catch (SignatureException e) {
+			throw new ServletException("signature error: " + e.getMessage(), e);
+		}
 	}
 
 	private void checkSessionIdChannelBinding(
@@ -309,5 +470,24 @@ public class AuthenticationDataMessageHandler implements
 			this.nrcidOrgId = config
 					.getInitParameter(NRCID_ORG_ID_INIT_PARAM_NAME);
 		}
+
+		String includeAddress = config
+				.getInitParameter(HelloMessageHandler.INCLUDE_ADDRESS_INIT_PARAM_NAME);
+		if (null != includeAddress) {
+			this.includeAddress = Boolean.parseBoolean(includeAddress);
+		}
+		String includePhoto = config
+				.getInitParameter(HelloMessageHandler.INCLUDE_PHOTO_INIT_PARAM_NAME);
+		if (null != includePhoto) {
+			this.includePhoto = Boolean.parseBoolean(includePhoto);
+		}
+		String includeIdentity = config
+				.getInitParameter(HelloMessageHandler.INCLUDE_IDENTITY_INIT_PARAM_NAME);
+		if (null != includeIdentity) {
+			this.includeIdentity = Boolean.parseBoolean(includeIdentity);
+		}
+		this.identityIntegrityServiceLocator = new ServiceLocator<IdentityIntegrityService>(
+				HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME,
+				config);
 	}
 }

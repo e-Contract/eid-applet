@@ -66,13 +66,34 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	public Integer sessionIdSize;
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "AuthnCertFileSize")
+	@NotNull
 	public Integer authnCertFileSize;
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "CaCertFileSize")
+	@NotNull
 	public Integer caCertFileSize;
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "RootCaCertFileSize")
+	@NotNull
 	public Integer rootCertFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "IdentityFileSize")
+	public Integer identityFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "AddressFileSize")
+	public Integer addressFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "PhotoFileSize")
+	public Integer photoFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "IdentitySignatureFileSize")
+	public Integer identitySignatureFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "AddressSignatureFileSize")
+	public Integer addressSignatureFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "NationalRegistryCertFileSize")
+	public Integer rrnCertFileSize;
 
 	@HttpBody
 	@NotNull
@@ -98,10 +119,19 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	 * @throws CertificateEncodingException
 	 */
 	public AuthenticationDataMessage(byte[] saltValue, byte[] sessionId,
-			byte[] signatureValue, List<X509Certificate> authnCertChain)
-			throws IOException, CertificateEncodingException {
+			byte[] signatureValue, List<X509Certificate> authnCertChain,
+			byte[] identityData, byte[] addressData, byte[] photoData,
+			byte[] identitySignatureData, byte[] addressSignatureData,
+			byte[] rrnCertData) throws IOException,
+			CertificateEncodingException {
 		this.saltValueSize = saltValue.length;
 		this.signatureValueSize = signatureValue.length;
+		X509Certificate authnCert = authnCertChain.get(0);
+		this.authnCertFileSize = getCertificateSize(authnCert);
+		X509Certificate citCaCert = authnCertChain.get(1);
+		this.caCertFileSize = getCertificateSize(citCaCert);
+		X509Certificate rootCaCert = authnCertChain.get(2);
+		this.rootCertFileSize = getCertificateSize(rootCaCert);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		baos.write(saltValue);
 		if (null != sessionId) {
@@ -112,13 +142,31 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 		for (X509Certificate cert : authnCertChain) {
 			baos.write(cert.getEncoded());
 		}
+		if (null != identityData) {
+			baos.write(identityData);
+			this.identityFileSize = identityData.length;
+		}
+		if (null != addressData) {
+			baos.write(addressData);
+			this.addressFileSize = addressData.length;
+		}
+		if (null != photoData) {
+			baos.write(photoData);
+			this.photoFileSize = photoData.length;
+		}
+		if (null != identitySignatureData) {
+			baos.write(identitySignatureData);
+			this.identitySignatureFileSize = identitySignatureData.length;
+		}
+		if (null != addressSignatureData) {
+			baos.write(addressSignatureData);
+			this.addressSignatureFileSize = addressSignatureData.length;
+		}
+		if (null != rrnCertData) {
+			baos.write(rrnCertData);
+			this.rrnCertFileSize = rrnCertData.length;
+		}
 		this.body = baos.toByteArray();
-		X509Certificate authnCert = authnCertChain.get(0);
-		X509Certificate citCaCert = authnCertChain.get(1);
-		X509Certificate rootCaCert = authnCertChain.get(2);
-		this.authnCertFileSize = getCertificateSize(authnCert);
-		this.caCertFileSize = getCertificateSize(citCaCert);
-		this.rootCertFileSize = getCertificateSize(rootCaCert);
 	}
 
 	private int getCertificateSize(X509Certificate certificate) {
@@ -156,19 +204,67 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 		this.signatureValue = copy(this.body, idx, this.signatureValueSize);
 		idx += this.signatureValueSize;
 
+		CertificateFactory certificateFactory;
 		try {
-			CertificateFactory certificateFactory = CertificateFactory
-					.getInstance("X.509");
+			certificateFactory = CertificateFactory.getInstance("X.509");
+		} catch (CertificateException e) {
+			throw new RuntimeException("cert factory error: " + e.getMessage(),
+					e);
+		}
+		try {
+			int certsSize = this.authnCertFileSize + this.caCertFileSize
+					+ this.rootCertFileSize;
 			Collection<? extends Certificate> certificates = certificateFactory
 					.generateCertificates(new ByteArrayInputStream(copy(
-							this.body, idx, this.body.length - idx)));
+							this.body, idx, certsSize)));
 			this.certificateChain = new LinkedList<X509Certificate>();
 			for (Certificate certificate : certificates) {
 				this.certificateChain.add((X509Certificate) certificate);
 			}
+			idx += certsSize;
 		} catch (CertificateException e) {
 			throw new RuntimeException("cert parsing error: " + e.getMessage(),
 					e);
+		}
+
+		if (null != this.identityFileSize) {
+			this.identityData = copy(this.body, idx, this.identityFileSize);
+			idx += this.identityFileSize;
+		}
+
+		if (null != this.addressFileSize) {
+			this.addressData = copy(this.body, idx, this.addressFileSize);
+			idx += this.addressFileSize;
+		}
+
+		if (null != this.photoFileSize) {
+			this.photoData = copy(this.body, idx, this.photoFileSize);
+			idx += this.photoFileSize;
+		}
+
+		if (null != this.identitySignatureFileSize) {
+			this.identitySignatureData = copy(this.body, idx,
+					this.identitySignatureFileSize);
+			idx += this.identitySignatureFileSize;
+		}
+
+		if (null != this.addressSignatureFileSize) {
+			this.addressSignatureData = copy(this.body, idx,
+					this.addressSignatureFileSize);
+			idx += this.addressSignatureFileSize;
+		}
+
+		if (null != this.rrnCertFileSize) {
+			byte[] rrnCertData = copy(this.body, idx, this.rrnCertFileSize);
+			try {
+				this.rrnCertificate = (X509Certificate) certificateFactory
+						.generateCertificate(new ByteArrayInputStream(
+								rrnCertData));
+			} catch (CertificateException e) {
+				throw new RuntimeException("cert parsing error: "
+						+ e.getMessage(), e);
+			}
+			idx += this.rrnCertFileSize;
 		}
 	}
 
@@ -179,4 +275,16 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	public byte[] signatureValue;
 
 	public List<X509Certificate> certificateChain;
+
+	public byte[] identityData;
+
+	public byte[] addressData;
+
+	public byte[] photoData;
+
+	public byte[] identitySignatureData;
+
+	public byte[] addressSignatureData;
+
+	public X509Certificate rrnCertificate;
 }
