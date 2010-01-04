@@ -404,6 +404,7 @@ public class PcscTest {
 		} finally {
 			pcscEidSpi.close();
 		}
+		LOG.debug("identity file size: " + identityFile.length);
 		File tmpIdentityFile = File.createTempFile("identity-", ".tlv");
 		LOG.debug("tmp identity file: " + tmpIdentityFile.getAbsolutePath());
 		FileUtils.writeByteArrayToFile(tmpIdentityFile, identityFile);
