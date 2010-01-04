@@ -26,8 +26,8 @@
 	deployJava.runApplet(attributes, parameters, version);
 </script>
 <script>
-	function messageCallback(message) {
-		document.getElementById('appletMessage').innerHTML = '<b>' + message + '</b>';
+	function messageCallback(status, message) {
+		document.getElementById('appletMessage').innerHTML = '<b>' + status + ': ' + message + '</b>';
 	}
 </script>
 <div id="appletMessage">Message placeholder</div>

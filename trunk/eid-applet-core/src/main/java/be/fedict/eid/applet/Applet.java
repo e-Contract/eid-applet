@@ -104,13 +104,13 @@ public class Applet extends JApplet {
 									.getDocument().getLength());
 				}
 			});
-			Applet.this.invokeMessageCallback(statusMessage);
+			Applet.this.invokeMessageCallback(status, statusMessage);
 		} catch (Exception e) {
 			// tja
 		}
 	}
 
-	protected void invokeMessageCallback(String statusMessage) {
+	protected void invokeMessageCallback(Status status, String statusMessage) {
 		if (null == this.messageCallbackParam) {
 			return;
 		}
@@ -134,7 +134,7 @@ public class Applet extends JApplet {
 			addDetailMessage("invoking Javascript message callback: "
 					+ this.messageCallbackParam);
 			callMethod.invoke(jsObject, this.messageCallbackParam,
-					new Object[] { statusMessage });
+					new Object[] { status.name(), statusMessage });
 		} catch (Exception e) {
 			this.detailMessages
 					.append("error locating: JSObject.getWindow().call: "

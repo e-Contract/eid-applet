@@ -9,10 +9,10 @@
 			applications.
 		</subtitle>
 		<copyright>
-			<year>2008-2009</year>
+			<year>2008-2010</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>draft 16 Dec 2009</releaseinfo>
+		<releaseinfo>4 Jan 2010</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -1425,8 +1425,8 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 	deployJava.runApplet(attributes, parameters, version);
 </script>
 <script>
-	function messageCallback(message) {
-		document.getElementById('appletMessage').innerHTML = '<b>' + message + '</b>';
+	function messageCallback(status, message) {
+		document.getElementById('appletMessage').innerHTML = '<b>' + status + ': ' + message + '</b>';
 	}
 </script>
 <div id="appletMessage">Message placeholder</div>]]></programlisting>
@@ -1435,7 +1435,10 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 					callback
 					function by setting the
 					<code>MessageCallback</code>
-					eID Applet parameter. In our example we simply display the incoming
+					eID Applet parameter.
+					The <code>status</code> parameter can be either 
+					<code>NORMAL</code> or <code>ERROR</code>.
+					In our example we simply display the incoming
 					message via some dynamic HTML. Of course more complex
 					visualizations are possible here.
 				</para>
