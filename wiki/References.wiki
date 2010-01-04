@@ -30,6 +30,7 @@
   * [http://www.rsa.com/rsalabs/node.asp?id=2133 PKCS#11]
   * [http://www.rsa.com/rsalabs/node.asp?id=2141 PKCS#15]
   * [http://www.usb.org/developers/devclass_docs/DWG_Smart-Card_CCID_Rev110.pdf CCID]
+  * [http://www.pcscworkgroup.com/specifications/specdownload.php PC/SC specifications]
 
 
 == Security ==
