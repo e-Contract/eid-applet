@@ -54,7 +54,9 @@ public class Dialogs {
 	 * TODO: should somehow also be declared in the View interface.
 	 */
 
-	public static final int PIN_SIZE = 4;
+	public static final int MIN_PIN_SIZE = 4;
+
+	public static final int MAX_PIN_SIZE = 12;
 
 	public static final int PUK_SIZE = 6;
 
@@ -124,7 +126,27 @@ public class Dialogs {
 		}
 	}
 
-	public void getPins(int retriesLeft, char[] oldPin, char[] newPin) {
+	public static final class Pins {
+		private final char[] oldPin;
+		private final char[] newPin;
+
+		public Pins(char[] oldPin, char[] newPin) {
+			this.oldPin = new char[oldPin.length];
+			this.newPin = new char[newPin.length];
+			System.arraycopy(oldPin, 0, this.oldPin, 0, oldPin.length);
+			System.arraycopy(newPin, 0, this.newPin, 0, newPin.length);
+		}
+
+		public char[] getOldPin() {
+			return this.oldPin;
+		}
+
+		public char[] getNewPin() {
+			return this.newPin;
+		}
+	}
+
+	public Pins getPins(int retriesLeft) {
 		Box mainPanel = Box.createVerticalBox();
 
 		if (-1 != retriesLeft) {
@@ -139,7 +161,7 @@ public class Dialogs {
 			mainPanel.add(Box.createVerticalStrut(5));
 		}
 
-		JPasswordField oldPinField = new JPasswordField(8);
+		JPasswordField oldPinField = new JPasswordField(MAX_PIN_SIZE);
 		{
 			Box oldPinPanel = Box.createHorizontalBox();
 			JLabel oldPinLabel = new JLabel(this.messages
@@ -153,7 +175,7 @@ public class Dialogs {
 
 		mainPanel.add(Box.createVerticalStrut(5));
 
-		JPasswordField newPinField = new JPasswordField(8);
+		JPasswordField newPinField = new JPasswordField(MAX_PIN_SIZE);
 		{
 			Box newPinPanel = Box.createHorizontalBox();
 			JLabel newPinLabel = new JLabel(this.messages
@@ -167,7 +189,7 @@ public class Dialogs {
 
 		mainPanel.add(Box.createVerticalStrut(5));
 
-		JPasswordField new2PinField = new JPasswordField(8);
+		JPasswordField new2PinField = new JPasswordField(MAX_PIN_SIZE);
 		{
 			Box new2PinPanel = Box.createHorizontalBox();
 			JLabel new2PinLabel = new JLabel(this.messages
@@ -190,10 +212,11 @@ public class Dialogs {
 				.getPassword())) {
 			throw new RuntimeException("new PINs not equal");
 		}
-		System.arraycopy(oldPinField.getPassword(), 0, oldPin, 0, PIN_SIZE);
+		Pins pins = new Pins(oldPinField.getPassword(), newPinField
+				.getPassword());
 		Arrays.fill(oldPinField.getPassword(), (char) 0);
-		System.arraycopy(newPinField.getPassword(), 0, newPin, 0, PIN_SIZE);
 		Arrays.fill(newPinField.getPassword(), (char) 0);
+		return pins;
 	}
 
 	public char[] getPin() {
@@ -271,7 +294,7 @@ public class Dialogs {
 		JLabel promptLabel = new JLabel("eID PIN:");
 		passwordPanel.add(promptLabel);
 		passwordPanel.add(Box.createHorizontalStrut(5));
-		final JPasswordField passwordField = new JPasswordField(8);
+		final JPasswordField passwordField = new JPasswordField(MAX_PIN_SIZE);
 		passwordPanel.add(passwordField);
 		mainPanel.add(passwordPanel);
 
@@ -314,7 +337,8 @@ public class Dialogs {
 		});
 		passwordField.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				if (passwordField.getPassword().length == PIN_SIZE) {
+				int pinSize = passwordField.getPassword().length;
+				if (MIN_PIN_SIZE <= pinSize && pinSize <= MAX_PIN_SIZE) {
 					dialogResult.result = DialogResult.Result.OK;
 					dialog.dispose();
 				}
@@ -326,7 +350,8 @@ public class Dialogs {
 			}
 
 			public void keyReleased(KeyEvent e) {
-				if (passwordField.getPassword().length == PIN_SIZE) {
+				int pinSize = passwordField.getPassword().length;
+				if (MIN_PIN_SIZE <= pinSize && pinSize <= MAX_PIN_SIZE) {
 					okButton.setEnabled(true);
 				} else {
 					okButton.setEnabled(false);
