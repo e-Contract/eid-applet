@@ -775,10 +775,14 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		byte[] verifyData = new byte[] { (byte) (0x20 | pin.length),
 				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
 				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
-		// XXX: odd PIN size
 		for (int idx = 0; idx < pin.length; idx += 2) {
 			char digit1 = pin[idx];
-			char digit2 = pin[idx + 1];
+			char digit2;
+			if (idx + 1 < pin.length) {
+				digit2 = pin[idx + 1];
+			} else {
+				digit2 = '0' + 0xf;
+			}
 			byte value = (byte) (byte) ((digit1 - '0' << 4) + (digit2 - '0'));
 			verifyData[idx / 2 + 1] = value;
 		}
@@ -822,7 +826,12 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 			for (int idx = 0; idx < oldPin.length; idx += 2) {
 				char digit1 = oldPin[idx];
-				char digit2 = oldPin[idx + 1];
+				char digit2;
+				if (idx + 1 < oldPin.length) {
+					digit2 = oldPin[idx + 1];
+				} else {
+					digit2 = '0' + 0xf;
+				}
 				byte value = (byte) (byte) ((digit1 - '0' << 4) + (digit2 - '0'));
 				changePinData[idx / 2 + 1] = value;
 			}
@@ -830,7 +839,12 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 			for (int idx = 0; idx < newPin.length; idx += 2) {
 				char digit1 = newPin[idx];
-				char digit2 = newPin[idx + 1];
+				char digit2;
+				if (idx + 1 < newPin.length) {
+					digit2 = newPin[idx + 1];
+				} else {
+					digit2 = '0' + 0xf;
+				}
 				byte value = (byte) (byte) ((digit1 - '0' << 4) + (digit2 - '0'));
 				changePinData[(idx / 2 + 1) + 8] = value;
 			}
