@@ -46,6 +46,7 @@ import javax.smartcardio.TerminalFactory;
 import be.fedict.eid.applet.Dialogs;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.View;
+import be.fedict.eid.applet.Dialogs.Pins;
 
 /**
  * Holds all function related to eID card access over PC/SC.
@@ -57,7 +58,9 @@ import be.fedict.eid.applet.View;
  */
 public class PcscEid extends Observable implements PcscEidSpi {
 
-	public static final int PIN_SIZE = 4;
+	public static final int MIN_PIN_SIZE = 4;
+
+	public static final int MAX_PIN_SIZE = 12;
 
 	public static final int PUK_SIZE = 6;
 
@@ -602,16 +605,15 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			Integer verifyPinStartFeature) throws IOException, CardException,
 			InterruptedException {
 		this.view.addDetailMessage("CCID verify PIN start/end sequence...");
-		byte[] verifyCommandData = createPINVerificationDataStructure(PIN_SIZE,
-				0x20);
+		byte[] verifyCommandData = createPINVerificationDataStructure(0x20);
 		this.dialogs.showPINPadFrame(retriesLeft);
 		try {
-			byte[] verifyPinStartResult = card.transmitControlCommand(
-					verifyPinStartFeature, verifyCommandData);
+			int getKeyPressedFeature = getFeature(FEATURE_GET_KEY_PRESSED_TAG);
+			this.card.transmitControlCommand(verifyPinStartFeature,
+					verifyCommandData);
 
 			// wait for key pressed
 			loop: while (true) {
-				int getKeyPressedFeature = getFeature(FEATURE_GET_KEY_PRESSED_TAG);
 				byte[] getKeyPressedResult = card.transmitControlCommand(
 						getKeyPressedFeature, new byte[0]);
 				byte key = getKeyPressedResult[0];
@@ -639,7 +641,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			this.dialogs.disposePINPadFrame();
 		}
 		int verifyPinFinishIoctl = getFeature(FEATURE_VERIFY_PIN_FINISH_TAG);
-		byte[] verifyPinFinishResult = card.transmitControlCommand(
+		byte[] verifyPinFinishResult = this.card.transmitControlCommand(
 				verifyPinFinishIoctl, new byte[0]);
 		ResponseAPDU responseApdu = new ResponseAPDU(verifyPinFinishResult);
 		return responseApdu;
@@ -648,12 +650,11 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	private ResponseAPDU verifyPinDirect(int retriesLeft,
 			Integer directPinVerifyFeature) throws IOException, CardException {
 		this.view.addDetailMessage("direct PIN verification...");
-		byte[] verifyCommandData = createPINVerificationDataStructure(PIN_SIZE,
-				0x20);
+		byte[] verifyCommandData = createPINVerificationDataStructure(0x20);
 		this.dialogs.showPINPadFrame(retriesLeft);
 		byte[] result;
 		try {
-			result = card.transmitControlCommand(directPinVerifyFeature,
+			result = this.card.transmitControlCommand(directPinVerifyFeature,
 					verifyCommandData);
 		} finally {
 			this.dialogs.disposePINPadFrame();
@@ -671,12 +672,11 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	private ResponseAPDU verifyPukDirect(int retriesLeft,
 			Integer directPinVerifyFeature) throws IOException, CardException {
 		this.view.addDetailMessage("direct PUK verification...");
-		byte[] verifyCommandData = createPINVerificationDataStructure(
-				PUK_SIZE * 2, 0x2C);
+		byte[] verifyCommandData = createPINVerificationDataStructure(0x2C);
 		this.dialogs.showPINPadFrame(retriesLeft);
 		byte[] result;
 		try {
-			result = card.transmitControlCommand(directPinVerifyFeature,
+			result = this.card.transmitControlCommand(directPinVerifyFeature,
 					verifyCommandData);
 		} finally {
 			this.dialogs.disposePINPadFrame();
@@ -691,12 +691,12 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		return responseApdu;
 	}
 
-	private byte[] createPINVerificationDataStructure(int pinSize, int apduIns)
+	private byte[] createPINVerificationDataStructure(int apduIns)
 			throws IOException {
 		ByteArrayOutputStream verifyCommand = new ByteArrayOutputStream();
 		verifyCommand.write(30); // bTimeOut
 		verifyCommand.write(30); // bTimeOut2
-		verifyCommand.write(0x89); // bmFormatString
+		verifyCommand.write(0x80 | 0x08 | 0x00 | 0x01); // bmFormatString
 		/*
 		 * bmFormatString. bit 7: 1 = system units are bytes
 		 * 
@@ -707,7 +707,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		 * 
 		 * bit 1-0: 1 = BCD
 		 */
-		verifyCommand.write(0x7 | (pinSize << 4)); // bmPINBlockString
+		verifyCommand.write(0x47); // bmPINBlockString
 		/*
 		 * bmPINBlockString
 		 * 
@@ -725,11 +725,12 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		 * 
 		 * bit 3-0: 4 = PIN length position in APDU
 		 */
-		verifyCommand.write(new byte[] { (byte) pinSize, (byte) pinSize }); // wPINMaxExtraDigit
+		verifyCommand.write(new byte[] { (byte) MAX_PIN_SIZE,
+				(byte) MIN_PIN_SIZE }); // wPINMaxExtraDigit
 		/*
-		 * 0x04 = minimum PIN size in digit
+		 * first byte = maximum PIN size in digit
 		 * 
-		 * 0x04 = maximum PIN size in digit.
+		 * second byte = minimum PIN size in digit.
 		 */
 		verifyCommand.write(0x02); // bEntryValidationCondition
 		/*
@@ -758,8 +759,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 				0x00, // P1
 				0x01, // P2
 				0x08, // Lc = 8 bytes in command data
-				(byte) ((int) 0x20 | pinSize), (byte) 0xFF, (byte) 0xFF,
-				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
+				(byte) 0x20, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
 		verifyCommand.write(verifyApdu.length & 0xff); // ulDataLength[0]
 		verifyCommand.write(0x00); // ulDataLength[1]
 		verifyCommand.write(0x00); // ulDataLength[2]
@@ -771,12 +772,10 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	private ResponseAPDU verifyPin(int retriesLeft) throws CardException {
 		char[] pin = this.dialogs.getPin(retriesLeft);
-		if (4 != pin.length) {
-			throw new RuntimeException("PIN length should be 4 digits");
-		}
 		byte[] verifyData = new byte[] { (byte) (0x20 | pin.length),
 				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
 				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
+		// XXX: odd PIN size
 		for (int idx = 0; idx < pin.length; idx += 2) {
 			char digit1 = pin[idx];
 			char digit2 = pin[idx + 1];
@@ -810,15 +809,16 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		ResponseAPDU responseApdu;
 		int retriesLeft = -1;
 		do {
-			char[] oldPin = new char[PIN_SIZE];
-			char[] newPin = new char[PIN_SIZE];
-			this.dialogs.getPins(retriesLeft, oldPin, newPin);
+			Pins pins = this.dialogs.getPins(retriesLeft);
+			char[] oldPin = pins.getOldPin();
+			char[] newPin = pins.getNewPin();
 
-			byte[] changePinData = new byte[] { 0x20 | PIN_SIZE, (byte) 0xFF,
+			byte[] changePinData = new byte[] { (byte) (0x20 | oldPin.length),
 					(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
-					(byte) 0xFF, (byte) 0xFF, 0x20 | 0x04, (byte) 0xFF,
+					(byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+					(byte) (0x20 | newPin.length), (byte) 0xFF, (byte) 0xFF,
 					(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
-					(byte) 0xFF, (byte) 0xFF };
+					(byte) 0xFF };
 
 			for (int idx = 0; idx < oldPin.length; idx += 2) {
 				char digit1 = oldPin[idx];
@@ -905,7 +905,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		char[] puk2 = new char[PUK_SIZE];
 		this.dialogs.getPuks(retriesLeft, puk1, puk2);
 
-		char[] fullPuk = new char[12];
+		char[] fullPuk = new char[2 * PUK_SIZE];
 		System.arraycopy(puk2, 0, fullPuk, 0, PUK_SIZE);
 		Arrays.fill(puk2, (char) 0);
 		System.arraycopy(puk1, 0, fullPuk, PUK_SIZE, PUK_SIZE);
@@ -988,7 +988,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 					+ readerName);
 			List<String> readerList = getReaderList();
 			this.view.addDetailMessage("reader list: " + readerList);
-			//throw new RuntimeException("card reader not found: " + readerName);
+			// throw new RuntimeException("card reader not found: " +
+			// readerName);
 			// we won't fail in this case...
 			return;
 		}
