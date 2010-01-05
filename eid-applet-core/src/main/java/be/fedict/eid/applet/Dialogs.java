@@ -409,4 +409,9 @@ public class Dialogs {
 		showPINPadFrame(retriesLeft, "eID PIN unblock", this.messages
 				.getMessage(MESSAGE_ID.PUK_PAD));
 	}
+
+	public void showPINChangePadFrame(int retriesLeft) {
+		showPINPadFrame(retriesLeft, "eID PIN change", this.messages
+				.getMessage(MESSAGE_ID.PIN_PAD_CHANGE));
+	}
 }
