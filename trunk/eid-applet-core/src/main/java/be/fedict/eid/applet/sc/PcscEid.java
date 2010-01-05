@@ -452,6 +452,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	public static final byte FEATURE_VERIFY_PIN_FINISH_TAG = 0x02;
 	public static final byte FEATURE_GET_KEY_PRESSED_TAG = 0x05;
 	public static final byte FEATURE_VERIFY_PIN_DIRECT_TAG = 0x06;
+	public static final byte FEATURE_MODIFY_PIN_DIRECT_TAG = 0x07;
 
 	private Integer getFeature(byte featureTag) {
 		this.view.addDetailMessage("CCID GET_FEATURE IOCTL...");
@@ -770,6 +771,123 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		return verifyCommandData;
 	}
 
+	private byte[] createPINModificationDataStructure(int apduIns)
+			throws IOException {
+		ByteArrayOutputStream modifyCommand = new ByteArrayOutputStream();
+		modifyCommand.write(30); // bTimeOut
+		modifyCommand.write(30); // bTimeOut2
+		modifyCommand.write(0x80 | 0x08 | 0x00 | 0x01); // bmFormatString
+		/*
+		 * bmFormatString. bit 7: 1 = system units are bytes
+		 * 
+		 * bit 6-3: 1 = PIN position in APDU command after Lc, so just after the
+		 * 0x20 | pinSize.
+		 * 
+		 * bit 2: 0 = left justify data
+		 * 
+		 * bit 1-0: 1 = BCD
+		 */
+
+		modifyCommand.write(0x47); // bmPINBlockString
+		/*
+		 * bmPINBlockString
+		 * 
+		 * bit 7-4: 4 = PIN length
+		 * 
+		 * bit 3-0: 7 = PIN block size (7 times 0xff)
+		 */
+
+		modifyCommand.write(0x04); // bmPINLengthFormat
+		/*
+		 * bmPINLengthFormat. weird... the values do not make any sense to me.
+		 * 
+		 * bit 7-5: 0 = RFU
+		 * 
+		 * bit 4: 0 = system units are bits
+		 * 
+		 * bit 3-0: 4 = PIN length position in APDU
+		 */
+
+		modifyCommand.write(0x00); // bInsertionOffsetOld
+		/*
+		 * bInsertionOffsetOld: Insertion position offset in bytes for the
+		 * current PIN
+		 */
+
+		modifyCommand.write(0x8); // bInsertionOffsetNew
+		/*
+		 * bInsertionOffsetNew: Insertion position offset in bytes for the new
+		 * PIN
+		 */
+
+		modifyCommand.write(new byte[] { (byte) MAX_PIN_SIZE,
+				(byte) MIN_PIN_SIZE }); // wPINMaxExtraDigit
+		/*
+		 * first byte = maximum PIN size in digit
+		 * 
+		 * second byte = minimum PIN size in digit.
+		 */
+
+		modifyCommand.write(0x03); // bConfirmPIN
+		/*
+		 * bConfirmPIN: Flags governing need for confirmation of new PIN
+		 */
+
+		modifyCommand.write(0x02); // bEntryValidationCondition
+		/*
+		 * 0x02 = validation key pressed. So the user must press the green
+		 * button on his pinpad.
+		 */
+
+		modifyCommand.write(0x03); // bNumberMessage
+		/*
+		 * 0x03 = message with index in bMsgIndex
+		 */
+
+		modifyCommand.write(new byte[] { 0x13, 0x08 }); // wLangId
+		/*
+		 * 0x13, 0x08 = ?
+		 */
+
+		modifyCommand.write(0x00); // bMsgIndex1
+		/*
+		 * 0x00 = PIN insertion prompt
+		 */
+
+		modifyCommand.write(0x01); // bMsgIndex2
+		/*
+		 * 0x01 = new PIN prompt
+		 */
+
+		modifyCommand.write(0x02); // bMsgIndex3
+		/*
+		 * 0x02 = new PIN again prompt
+		 */
+
+		modifyCommand.write(new byte[] { 0x00, 0x00, 0x00 }); // bTeoPrologue
+		/*
+		 * bTeoPrologue : only significant for T=1 protocol.
+		 */
+
+		byte[] modifyApdu = new byte[] {
+				0x00, // CLA
+				(byte) apduIns, // INS
+				0x00, // P1
+				0x01, // P2
+				0x10, // Lc = 16 bytes in command data
+				(byte) 0x20, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+				(byte) 0x20, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
+		modifyCommand.write(modifyApdu.length & 0xff); // ulDataLength[0]
+		modifyCommand.write(0x00); // ulDataLength[1]
+		modifyCommand.write(0x00); // ulDataLength[2]
+		modifyCommand.write(0x00); // ulDataLength[3]
+		modifyCommand.write(modifyApdu); // abData
+		byte[] modifyCommandData = modifyCommand.toByteArray();
+		return modifyCommandData;
+	}
+
 	private ResponseAPDU verifyPin(int retriesLeft) throws CardException {
 		char[] pin = this.dialogs.getPin(retriesLeft);
 		byte[] verifyData = new byte[] { (byte) (0x20 | pin.length),
@@ -810,56 +928,19 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	}
 
 	public void changePin() throws Exception {
-		ResponseAPDU responseApdu;
+		Integer directPinModifyFeature = getFeature(FEATURE_MODIFY_PIN_DIRECT_TAG);
 		int retriesLeft = -1;
+		ResponseAPDU responseApdu;
 		do {
-			Pins pins = this.dialogs.getPins(retriesLeft);
-			char[] oldPin = pins.getOldPin();
-			char[] newPin = pins.getNewPin();
-
-			byte[] changePinData = new byte[] { (byte) (0x20 | oldPin.length),
-					(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
-					(byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
-					(byte) (0x20 | newPin.length), (byte) 0xFF, (byte) 0xFF,
-					(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
-					(byte) 0xFF };
-
-			for (int idx = 0; idx < oldPin.length; idx += 2) {
-				char digit1 = oldPin[idx];
-				char digit2;
-				if (idx + 1 < oldPin.length) {
-					digit2 = oldPin[idx + 1];
-				} else {
-					digit2 = '0' + 0xf;
-				}
-				byte value = (byte) (byte) ((digit1 - '0' << 4) + (digit2 - '0'));
-				changePinData[idx / 2 + 1] = value;
+			if (null != directPinModifyFeature) {
+				this.view
+						.addDetailMessage("could use direct PIN modify here...");
+				responseApdu = doChangePinDirect(retriesLeft,
+						directPinModifyFeature);
+			} else {
+				responseApdu = doChangePin(retriesLeft);
 			}
-			Arrays.fill(oldPin, (char) 0); // minimize exposure
 
-			for (int idx = 0; idx < newPin.length; idx += 2) {
-				char digit1 = newPin[idx];
-				char digit2;
-				if (idx + 1 < newPin.length) {
-					digit2 = newPin[idx + 1];
-				} else {
-					digit2 = '0' + 0xf;
-				}
-				byte value = (byte) (byte) ((digit1 - '0' << 4) + (digit2 - '0'));
-				changePinData[(idx / 2 + 1) + 8] = value;
-			}
-			Arrays.fill(newPin, (char) 0); // minimize exposure
-
-			CommandAPDU changePinApdu = new CommandAPDU(0x00, 0x24, // change
-					// reference
-					// data
-					0x00, // user password change
-					0x01, changePinData);
-			try {
-				responseApdu = transmit(changePinApdu);
-			} finally {
-				Arrays.fill(changePinData, (byte) 0);
-			}
 			if (0x9000 != responseApdu.getSW()) {
 				this.view.addDetailMessage("CHANGE PIN error");
 				this.view.addDetailMessage("SW: "
@@ -878,6 +959,80 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			}
 		} while (0x9000 != responseApdu.getSW());
 		this.dialogs.showPinChanged();
+	}
+
+	private ResponseAPDU doChangePinDirect(int retriesLeft,
+			Integer directPinModifyFeature) throws IOException, CardException {
+		this.view.addDetailMessage("direct PIN modification...");
+		byte[] modifyCommandData = createPINModificationDataStructure(0x24);
+		this.dialogs.showPINChangePadFrame(retriesLeft);
+		byte[] result;
+		try {
+			result = this.card.transmitControlCommand(directPinModifyFeature,
+					modifyCommandData);
+		} finally {
+			this.dialogs.disposePINPadFrame();
+		}
+		ResponseAPDU responseApdu = new ResponseAPDU(result);
+		if (0x6402 == responseApdu.getSW()) {
+			this.view.addDetailMessage("PINs differ");
+		} else if (0x6401 == responseApdu.getSW()) {
+			this.view.addDetailMessage("canceled by user");
+			throw new SecurityException("canceled by user");
+		} else if (0x6400 == responseApdu.getSW()) {
+			this.view.addDetailMessage("PIN pad timeout");
+		}
+		return responseApdu;
+	}
+
+	private ResponseAPDU doChangePin(int retriesLeft) throws CardException {
+		Pins pins = this.dialogs.getPins(retriesLeft);
+		char[] oldPin = pins.getOldPin();
+		char[] newPin = pins.getNewPin();
+
+		byte[] changePinData = new byte[] { (byte) (0x20 | oldPin.length),
+				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+				(byte) (0x20 | newPin.length), (byte) 0xFF, (byte) 0xFF,
+				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
+
+		for (int idx = 0; idx < oldPin.length; idx += 2) {
+			char digit1 = oldPin[idx];
+			char digit2;
+			if (idx + 1 < oldPin.length) {
+				digit2 = oldPin[idx + 1];
+			} else {
+				digit2 = '0' + 0xf;
+			}
+			byte value = (byte) (byte) ((digit1 - '0' << 4) + (digit2 - '0'));
+			changePinData[idx / 2 + 1] = value;
+		}
+		Arrays.fill(oldPin, (char) 0); // minimize exposure
+
+		for (int idx = 0; idx < newPin.length; idx += 2) {
+			char digit1 = newPin[idx];
+			char digit2;
+			if (idx + 1 < newPin.length) {
+				digit2 = newPin[idx + 1];
+			} else {
+				digit2 = '0' + 0xf;
+			}
+			byte value = (byte) (byte) ((digit1 - '0' << 4) + (digit2 - '0'));
+			changePinData[(idx / 2 + 1) + 8] = value;
+		}
+		Arrays.fill(newPin, (char) 0); // minimize exposure
+
+		CommandAPDU changePinApdu = new CommandAPDU(0x00, 0x24, // change
+				// reference
+				// data
+				0x00, // user password change
+				0x01, changePinData);
+		try {
+			ResponseAPDU responseApdu = transmit(changePinApdu);
+			return responseApdu;
+		} finally {
+			Arrays.fill(changePinData, (byte) 0);
+		}
 	}
 
 	public void unblockPin() throws Exception {

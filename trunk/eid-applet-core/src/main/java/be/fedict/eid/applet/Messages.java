@@ -44,7 +44,8 @@ public class Messages {
 				"pinChanged"), PIN_UNBLOCKED("pinUnblocked"), RETRIES_LEFT(
 				"retriesLeft"), PIN_INCORRECT("pinIncorrect"), CONNECT_READER(
 				"connectReader"), PIN_PAD("pinPad"), CURRENT_PIN("currentPin"), NEW_PIN(
-				"newPin"), OK("ok"), CANCEL("cancel"), PUK_PAD("pukPad");
+				"newPin"), OK("ok"), CANCEL("cancel"), PUK_PAD("pukPad"), PIN_PAD_CHANGE(
+				"pinPadChange");
 
 		private final String id;
 
