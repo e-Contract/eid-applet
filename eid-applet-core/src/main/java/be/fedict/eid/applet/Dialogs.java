@@ -226,10 +226,15 @@ public class Dialogs {
 	private JFrame pinPadFrame;
 
 	public void showPINPadFrame(int retriesLeft) {
+		showPINPadFrame(retriesLeft, "PIN", this.messages
+				.getMessage(MESSAGE_ID.PIN_PAD));
+	}
+
+	private void showPINPadFrame(int retriesLeft, String title, String message) {
 		if (null != this.pinPadFrame) {
 			disposePINPadFrame();
 		}
-		this.pinPadFrame = new JFrame("PIN");
+		this.pinPadFrame = new JFrame(title);
 		JPanel panel = new JPanel() {
 			private static final long serialVersionUID = 1L;
 
@@ -248,7 +253,7 @@ public class Dialogs {
 			retriesLabel.setForeground(Color.RED);
 			panel.add(retriesLabel);
 		}
-		panel.add(new JLabel(this.messages.getMessage(MESSAGE_ID.PIN_PAD)));
+		panel.add(new JLabel(message));
 		this.pinPadFrame.getContentPane().add(panel);
 		this.pinPadFrame.pack();
 		this.pinPadFrame.setLocationRelativeTo(this.view.getParentComponent());
@@ -398,5 +403,10 @@ public class Dialogs {
 		JOptionPane.showMessageDialog(this.view.getParentComponent(),
 				this.messages.getMessage(MESSAGE_ID.PIN_UNBLOCKED),
 				"eID PIN unblock", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	public void showPUKPadFrame(int retriesLeft) {
+		showPINPadFrame(retriesLeft, "eID PIN unblock", this.messages
+				.getMessage(MESSAGE_ID.PUK_PAD));
 	}
 }

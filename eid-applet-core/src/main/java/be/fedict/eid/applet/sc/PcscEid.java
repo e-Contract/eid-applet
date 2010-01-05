@@ -673,7 +673,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			Integer directPinVerifyFeature) throws IOException, CardException {
 		this.view.addDetailMessage("direct PUK verification...");
 		byte[] verifyCommandData = createPINVerificationDataStructure(0x2C);
-		this.dialogs.showPINPadFrame(retriesLeft);
+		this.dialogs.showPUKPadFrame(retriesLeft);
 		byte[] result;
 		try {
 			result = this.card.transmitControlCommand(directPinVerifyFeature,
@@ -885,7 +885,6 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		ResponseAPDU responseApdu;
 		int retriesLeft = -1;
 		do {
-			directPinVerifyFeature = null; // TODO
 			if (null != directPinVerifyFeature) {
 				this.view
 						.addDetailMessage("could use direct PIN verify here...");
