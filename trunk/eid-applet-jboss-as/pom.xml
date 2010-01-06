@@ -3,14 +3,14 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.0-rc-3</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet JBoss AS</name>
 	<description>JBoss Application Server distribution for eID Applet
 		Service tests.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-jboss-as</artifactId>
-	<version>1.0.0-rc-3</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<properties>
 		<jboss.version>5.0.1.GA</jboss.version>
