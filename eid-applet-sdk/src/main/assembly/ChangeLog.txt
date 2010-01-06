@@ -1,3 +1,13 @@
+1.0.0-rc-3 - 6 January 2010
+	* fix for german date of birth
+	* improved the @PostConstruct stack tracing
+	* fix resource encoding from UTF-8 to ISO-8859-1
+	* javascript callback with status parameter
+	* eID authentication + identification feature
+	* fix for variable PIN size (4 till 12 chars)
+	* eID PIN unblock via CCID
+	* eID PIN change via CCID
+
 1.0.0-rc-2 - 16 December 2009
 	* fix to IncludeCertificates after CheckClientEnvironment
 	* fix to no longer use Tomahawk for email input validation
