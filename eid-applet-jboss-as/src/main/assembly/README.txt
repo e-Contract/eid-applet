@@ -4,7 +4,7 @@ FedICT eID Applet JBoss Application Server Distribution
 === 1. Introduction
 
 This package contains a JBoss Application Server configured to ease the
-development of the FedICT eID Applet. It is based on JBoss AS 5.0.1.GA.
+development of the FedICT eID Applet. It is based on JBoss AS 6.0.0.M1.
 
 
 === 2. Starting the server
