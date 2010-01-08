@@ -21,12 +21,10 @@ package be.fedict.eid.applet.shared;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,12 +57,15 @@ public class SignatureDataMessage extends AbstractProtocolMessage {
 	public Integer signatureValueSize;
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "SignCertFileSize")
+	@NotNull
 	public Integer signCertFileSize;
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "CaCertFileSize")
+	@NotNull
 	public Integer caCertFileSize;
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "RootCaCertFileSize")
+	@NotNull
 	public Integer rootCertFileSize;
 
 	@HttpBody
@@ -79,28 +80,24 @@ public class SignatureDataMessage extends AbstractProtocolMessage {
 	public SignatureDataMessage(byte[] signatureValue,
 			List<X509Certificate> signCertChain) throws IOException,
 			CertificateEncodingException {
+		this(signatureValue, signCertChain.get(0).getEncoded(), signCertChain
+				.get(1).getEncoded(), signCertChain.get(2).getEncoded());
+	}
+
+	public SignatureDataMessage(byte[] signatureValue, byte[] signCertFile,
+			byte[] citizenCaCertFile, byte[] rootCaCertFile)
+			throws IOException, CertificateEncodingException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		this.signatureValueSize = signatureValue.length;
 		baos.write(signatureValue);
-		for (X509Certificate cert : signCertChain) {
-			baos.write(cert.getEncoded());
-		}
+		baos.write(signCertFile);
+		baos.write(citizenCaCertFile);
+		baos.write(rootCaCertFile);
 		this.body = baos.toByteArray();
-		X509Certificate signCert = signCertChain.get(0);
-		X509Certificate citCaCert = signCertChain.get(1);
-		X509Certificate rootCaCert = signCertChain.get(2);
-		this.signCertFileSize = getCertificateSize(signCert);
-		this.caCertFileSize = getCertificateSize(citCaCert);
-		this.rootCertFileSize = getCertificateSize(rootCaCert);
-	}
 
-	private int getCertificateSize(X509Certificate certificate) {
-		try {
-			return certificate.getEncoded().length;
-		} catch (CertificateEncodingException e) {
-			throw new RuntimeException("certificate encoding error: "
-					+ e.getMessage(), e);
-		}
+		this.signCertFileSize = signCertFile.length;
+		this.caCertFileSize = citizenCaCertFile.length;
+		this.rootCertFileSize = rootCaCertFile.length;
 	}
 
 	private byte[] copy(byte[] source, int idx, int count) {
@@ -114,21 +111,46 @@ public class SignatureDataMessage extends AbstractProtocolMessage {
 		if (this.signatureValueSize != 128) {
 			throw new RuntimeException("signature value size invalid");
 		}
-		this.signatureValue = copy(this.body, 0, this.signatureValueSize);
+		int idx = 0;
+		this.signatureValue = copy(this.body, idx, this.signatureValueSize);
+		idx += this.signatureValueSize;
+
+		byte[] signCertFile = copy(this.body, idx, this.signCertFileSize);
+		idx += this.signCertFileSize;
+		X509Certificate signCert = getCertificate(signCertFile);
+
+		byte[] citizenCaCertFile = copy(this.body, idx, this.caCertFileSize);
+		idx += this.caCertFileSize;
+		X509Certificate citizenCaCert = getCertificate(citizenCaCertFile);
+
+		byte[] rootCaCertFile = copy(this.body, idx, this.rootCertFileSize);
+		idx += this.rootCertFileSize;
+		X509Certificate rootCaCert = getCertificate(rootCaCertFile);
+
+		this.certificateChain = new LinkedList<X509Certificate>();
+		this.certificateChain.add(signCert);
+		this.certificateChain.add(citizenCaCert);
+		this.certificateChain.add(rootCaCert);
+	}
+
+	private X509Certificate getCertificate(byte[] certData) {
+		CertificateFactory certificateFactory;
 		try {
-			CertificateFactory certificateFactory = CertificateFactory
-					.getInstance("X.509");
-			Collection<? extends Certificate> certificates = certificateFactory
-					.generateCertificates(new ByteArrayInputStream(copy(
-							this.body, this.signatureValueSize,
-							this.body.length - this.signatureValueSize)));
-			this.certificateChain = new LinkedList<X509Certificate>();
-			for (Certificate certificate : certificates) {
-				this.certificateChain.add((X509Certificate) certificate);
-			}
+			certificateFactory = CertificateFactory.getInstance("X.509");
 		} catch (CertificateException e) {
-			throw new RuntimeException("cert parsing error: " + e.getMessage(),
+			throw new RuntimeException("cert factory error: " + e.getMessage(),
 					e);
+		}
+		try {
+			X509Certificate certificate = (X509Certificate) certificateFactory
+					.generateCertificate(new ByteArrayInputStream(certData));
+			return certificate;
+		} catch (CertificateException e) {
+			/*
+			 * Can happen in case of missing certificates. Missing certificates
+			 * are represented by means of 1300 null bytes.
+			 */
+			return null;
 		}
 	}
 

@@ -590,8 +590,9 @@ public class PcscTest {
 		}
 
 		try {
-			List<X509Certificate> certChain = pcscEid.getSignCertificateChain();
-
+			// List<X509Certificate> certChain = pcscEid.getSignCertificateChain();
+			List<X509Certificate> certChain = pcscEid.getAuthnCertificateChain();
+			
 			MemoryCertificateRepository certificateRepository = new MemoryCertificateRepository();
 			certificateRepository.addTrustPoint(certChain
 					.get(certChain.size() - 1));
