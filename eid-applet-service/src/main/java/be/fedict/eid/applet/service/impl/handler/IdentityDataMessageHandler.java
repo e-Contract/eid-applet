@@ -39,6 +39,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -325,16 +326,43 @@ public class IdentityDataMessageHandler implements
 		}
 	}
 
-	private X509Certificate getCertificate(byte[] rrnCertFile) {
+	/**
+	 * Tries to parse the X509 certificate.
+	 * 
+	 * @param certFile
+	 * @return the X509 certificate, or <code>null</code> in case of a DER
+	 *         decoding error.
+	 */
+	private X509Certificate getCertificate(byte[] certFile) {
 		try {
 			CertificateFactory certificateFactory = CertificateFactory
 					.getInstance("X509");
 			X509Certificate certificate = (X509Certificate) certificateFactory
-					.generateCertificate(new ByteArrayInputStream(rrnCertFile));
+					.generateCertificate(new ByteArrayInputStream(certFile));
 			return certificate;
 		} catch (CertificateException e) {
-			throw new RuntimeException("certificate error: " + e.getMessage(),
-					e);
+			LOG.warn("certificate error: " + e.getMessage(), e);
+			LOG.debug("certificate size: " + certFile.length);
+			LOG.debug("certificate file content: "
+					+ Hex.encodeHexString(certFile));
+			/*
+			 * Missing eID authentication and eID non-repudiation certificates
+			 * could become possible for future eID cards. A missing certificate
+			 * is represented as a block of 1300 null bytes.
+			 */
+			if (1300 == certFile.length) {
+				boolean missingCertificate = true;
+				for (int idx = 0; idx < certFile.length; idx++) {
+					if (0 != certFile[idx]) {
+						missingCertificate = false;
+					}
+				}
+				if (missingCertificate) {
+					LOG
+							.debug("the certificate data indicates a missing certificate");
+				}
+			}
+			return null;
 		}
 	}
 

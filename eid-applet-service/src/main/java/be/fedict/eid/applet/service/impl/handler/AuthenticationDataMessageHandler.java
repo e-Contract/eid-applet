@@ -118,12 +118,19 @@ public class AuthenticationDataMessageHandler implements
 			HttpSession session) throws ServletException {
 		LOG.debug("authentication data message received");
 
+		if (null == message.authnCert) {
+			/*
+			 * Can be the case for future (Kids) eID cards that have some
+			 * certificates missing.
+			 */
+			String msg = "authentication certificate not present";
+			LOG.warn(msg);
+			throw new ServletException(msg);
+		}
 		byte[] signatureValue = message.signatureValue;
-		List<X509Certificate> certificateChain = message.certificateChain;
-		X509Certificate signingCertificate = certificateChain.get(0);
 		LOG.debug("authn signing certificate subject: "
-				+ signingCertificate.getSubjectX500Principal());
-		PublicKey signingKey = signingCertificate.getPublicKey();
+				+ message.authnCert.getSubjectX500Principal());
+		PublicKey signingKey = message.authnCert.getPublicKey();
 
 		if (this.sessionIdChannelBinding) {
 			checkSessionIdChannelBinding(message, request);
@@ -152,7 +159,7 @@ public class AuthenticationDataMessageHandler implements
 			if (null != auditService) {
 				String remoteAddress = request.getRemoteAddr();
 				auditService.authenticationError(remoteAddress,
-						signingCertificate);
+						message.authnCert);
 			}
 			throw new ServletException("security error: " + e.getMessage(), e);
 		}
@@ -177,7 +184,7 @@ public class AuthenticationDataMessageHandler implements
 				if (null != auditService) {
 					String remoteAddress = request.getRemoteAddr();
 					auditService.authenticationError(remoteAddress,
-							signingCertificate);
+							message.authnCert);
 				}
 				throw new SecurityException("authn signature incorrect");
 			}
@@ -191,9 +198,13 @@ public class AuthenticationDataMessageHandler implements
 
 		AuthenticationService authenticationService = this.authenticationServiceLocator
 				.locateService();
+		List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
+		certificateChain.add(message.authnCert);
+		certificateChain.add(message.citizenCaCert);
+		certificateChain.add(message.rootCaCert);
 		authenticationService.validateCertificateChain(certificateChain);
 
-		String userId = UserIdentifierUtil.getUserId(signingCertificate);
+		String userId = UserIdentifierUtil.getUserId(message.authnCert);
 		if (null != this.nrcidSecret) {
 			userId = UserIdentifierUtil.getNonReversibleCitizenIdentifier(
 					userId, this.nrcidOrgId, this.nrcidAppId, this.nrcidSecret);
@@ -255,9 +266,8 @@ public class AuthenticationDataMessageHandler implements
 						"national registry certificate not included while requested");
 			}
 			List<X509Certificate> rrnCertificateChain = new LinkedList<X509Certificate>();
-			X509Certificate rootCertificate = certificateChain.get(2);
 			rrnCertificateChain.add(message.rrnCertificate);
-			rrnCertificateChain.add(rootCertificate);
+			rrnCertificateChain.add(message.rootCaCert);
 			identityIntegrityService
 					.checkNationalRegistrationCertificate(rrnCertificateChain);
 			PublicKey rrnPublicKey = message.rrnCertificate.getPublicKey();
@@ -282,7 +292,7 @@ public class AuthenticationDataMessageHandler implements
 		if (this.includeIdentity) {
 			Identity identity = TlvParser.parse(message.identityData,
 					Identity.class);
-			if (false == UserIdentifierUtil.getUserId(signingCertificate)
+			if (false == UserIdentifierUtil.getUserId(message.authnCert)
 					.equals(identity.nationalNumber)) {
 				throw new ServletException("national number mismatch");
 			}
