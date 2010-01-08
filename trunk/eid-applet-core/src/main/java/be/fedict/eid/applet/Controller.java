@@ -470,13 +470,26 @@ public class Controller {
 	private SignCertificatesDataMessage performPcscSignCertificatesOperation()
 			throws Exception {
 		waitForEIdCard();
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.READING_IDENTITY));
-		List<X509Certificate> certificateChain = this.pcscEidSpi
-				.getSignCertificateChain();
-		this.pcscEidSpi.close();
+		byte[] signCertFile;
+		byte[] citizenCaCertFile;
+		byte[] rootCaCertFile;
+		try {
+			setStatusMessage(Status.NORMAL, this.messages
+					.getMessage(MESSAGE_ID.READING_IDENTITY));
+			signCertFile = this.pcscEidSpi.readFile(PcscEid.SIGN_CERT_FILE_ID);
+			addDetailMessage("size sign cert file: " + signCertFile.length);
+			citizenCaCertFile = this.pcscEidSpi
+					.readFile(PcscEid.CA_CERT_FILE_ID);
+			addDetailMessage("size citizen CA cert file: "
+					+ citizenCaCertFile.length);
+			rootCaCertFile = this.pcscEidSpi
+					.readFile(PcscEid.ROOT_CERT_FILE_ID);
+			addDetailMessage("size root CA cert file: " + rootCaCertFile.length);
+		} finally {
+			this.pcscEidSpi.close();
+		}
 		SignCertificatesDataMessage signCertificatesDataMessage = new SignCertificatesDataMessage(
-				certificateChain);
+				signCertFile, citizenCaCertFile, rootCaCertFile);
 		return signCertificatesDataMessage;
 	}
 
@@ -743,7 +756,9 @@ public class Controller {
 		setStatusMessage(Status.NORMAL, this.messages
 				.getMessage(MESSAGE_ID.SIGNING));
 		byte[] signatureValue;
-		List<X509Certificate> signCertChain;
+		byte[] signCertFile;
+		byte[] citizenCaCertFile;
+		byte[] rootCaCertFile;
 		try {
 			/*
 			 * Via next dialog we try to implement WYSIWYS using the digest
@@ -772,7 +787,11 @@ public class Controller {
 			this.view
 					.progressIndication(this.maxProgress, this.currentProgress);
 
-			signCertChain = this.pcscEidSpi.getSignCertificateChain();
+			signCertFile = this.pcscEidSpi.readFile(PcscEid.SIGN_CERT_FILE_ID);
+			citizenCaCertFile = this.pcscEidSpi
+					.readFile(PcscEid.CA_CERT_FILE_ID);
+			rootCaCertFile = this.pcscEidSpi
+					.readFile(PcscEid.ROOT_CERT_FILE_ID);
 
 			this.view.progressIndication(-1, 0);
 
@@ -789,7 +808,7 @@ public class Controller {
 		}
 
 		SignatureDataMessage signatureDataMessage = new SignatureDataMessage(
-				signatureValue, signCertChain);
+				signatureValue, signCertFile, citizenCaCertFile, rootCaCertFile);
 		Object responseMessage = sendMessage(signatureDataMessage);
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");

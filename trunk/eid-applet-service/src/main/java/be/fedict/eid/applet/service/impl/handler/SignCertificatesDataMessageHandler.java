@@ -57,6 +57,10 @@ public class SignCertificatesDataMessageHandler implements
 				.locateService();
 
 		List<X509Certificate> signingCertificateChain = message.certificateChain;
+		X509Certificate signingCertificate = signingCertificateChain.get(0);
+		if (null == signingCertificate) {
+			throw new ServletException("missing non-repudiation certificate");
+		}
 		LOG.debug("signing certificate: "
 				+ signingCertificateChain.get(0).getSubjectX500Principal());
 

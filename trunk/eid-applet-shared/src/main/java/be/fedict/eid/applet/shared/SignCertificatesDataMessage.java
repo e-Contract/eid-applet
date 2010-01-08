@@ -21,12 +21,10 @@ package be.fedict.eid.applet.shared;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -56,12 +54,15 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 			.getSimpleName();
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "SignCertFileSize")
+	@NotNull
 	public Integer signCertFileSize;
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "CaCertFileSize")
+	@NotNull
 	public Integer caCertFileSize;
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "RootCaCertFileSize")
+	@NotNull
 	public Integer rootCertFileSize;
 
 	@HttpBody
@@ -76,70 +77,70 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 		super();
 	}
 
-	public SignCertificatesDataMessage(X509Certificate[] certificateChain)
-			throws IOException {
+	public SignCertificatesDataMessage(byte[] signCertFile,
+			byte[] citizenCaCertFile, byte[] rootCaCertFile) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		for (X509Certificate certificate : certificateChain) {
-			try {
-				baos.write(certificate.getEncoded());
-			} catch (CertificateEncodingException e) {
-				throw new RuntimeException("certificate encoding error: "
-						+ e.getMessage(), e);
-			}
-		}
+		baos.write(signCertFile);
+		baos.write(citizenCaCertFile);
+		baos.write(rootCaCertFile);
 		this.body = baos.toByteArray();
-		X509Certificate signCert = certificateChain[0];
-		X509Certificate citCaCert = certificateChain[1];
-		X509Certificate rootCaCert = certificateChain[2];
-		this.signCertFileSize = getCertificateSize(signCert);
-		this.caCertFileSize = getCertificateSize(citCaCert);
-		this.rootCertFileSize = getCertificateSize(rootCaCert);
+
+		this.signCertFileSize = signCertFile.length;
+		this.caCertFileSize = citizenCaCertFile.length;
+		this.rootCertFileSize = rootCaCertFile.length;
 	}
 
-	public SignCertificatesDataMessage(List<X509Certificate> certificateChain)
-			throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		for (X509Certificate certificate : certificateChain) {
-			try {
-				baos.write(certificate.getEncoded());
-			} catch (CertificateEncodingException e) {
-				throw new RuntimeException("certificate encoding error: "
-						+ e.getMessage(), e);
-			}
-		}
-		this.body = baos.toByteArray();
-		X509Certificate signCert = certificateChain.get(0);
-		X509Certificate citCaCert = certificateChain.get(1);
-		X509Certificate rootCaCert = certificateChain.get(2);
-		this.signCertFileSize = getCertificateSize(signCert);
-		this.caCertFileSize = getCertificateSize(citCaCert);
-		this.rootCertFileSize = getCertificateSize(rootCaCert);
+	public SignCertificatesDataMessage(X509Certificate[] signCertChain)
+			throws IOException, CertificateEncodingException {
+		this(signCertChain[0].getEncoded(), signCertChain[1].getEncoded(),
+				signCertChain[2].getEncoded());
 	}
 
-	private int getCertificateSize(X509Certificate certificate) {
-		try {
-			return certificate.getEncoded().length;
-		} catch (CertificateEncodingException e) {
-			throw new RuntimeException("certificate encoding error: "
-					+ e.getMessage(), e);
-		}
+	private byte[] copy(byte[] source, int idx, int count) {
+		byte[] result = new byte[count];
+		System.arraycopy(source, idx, result, 0, count);
+		return result;
 	}
 
 	@PostConstruct
 	public void postConstruct() {
+		int idx = 0;
+		byte[] signCertFile = copy(this.body, idx, this.signCertFileSize);
+		idx += this.signCertFileSize;
+		X509Certificate signCert = getCertificate(signCertFile);
+
+		byte[] citizenCaCertFile = copy(this.body, idx, this.caCertFileSize);
+		idx += this.caCertFileSize;
+		X509Certificate citizenCaCert = getCertificate(citizenCaCertFile);
+
+		byte[] rootCaCertFile = copy(this.body, idx, this.rootCertFileSize);
+		idx += this.rootCertFileSize;
+		X509Certificate rootCaCert = getCertificate(rootCaCertFile);
+
+		this.certificateChain = new LinkedList<X509Certificate>();
+		this.certificateChain.add(signCert);
+		this.certificateChain.add(citizenCaCert);
+		this.certificateChain.add(rootCaCert);
+	}
+
+	private X509Certificate getCertificate(byte[] certData) {
+		CertificateFactory certificateFactory;
 		try {
-			CertificateFactory certificateFactory = CertificateFactory
-					.getInstance("X.509");
-			Collection<? extends Certificate> certificates = certificateFactory
-					.generateCertificates(new ByteArrayInputStream(this.body));
-			this.certificateChain = new LinkedList<X509Certificate>();
-			for (Certificate certificate : certificates) {
-				X509Certificate x509Certificate = (X509Certificate) certificate;
-				this.certificateChain.add(x509Certificate);
-			}
+			certificateFactory = CertificateFactory.getInstance("X.509");
 		} catch (CertificateException e) {
-			throw new RuntimeException("certificate decoding error: "
-					+ e.getMessage(), e);
+			throw new RuntimeException("cert factory error: " + e.getMessage(),
+					e);
+		}
+		try {
+			X509Certificate certificate = (X509Certificate) certificateFactory
+					.generateCertificate(new ByteArrayInputStream(certData));
+			return certificate;
+		} catch (CertificateException e) {
+			/*
+			 * Can happen in case of missing certificates. Missing certificates
+			 * are represented by means of 1300 null bytes.
+			 */
+			return null;
 		}
 	}
 
