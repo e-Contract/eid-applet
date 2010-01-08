@@ -1019,13 +1019,15 @@ public class Controller {
 		}
 
 		byte[] signatureValue;
-		List<X509Certificate> authnCertChain;
 		byte[] identityData = null;
 		byte[] addressData = null;
 		byte[] photoData = null;
 		byte[] identitySignatureData = null;
 		byte[] addressSignatureData = null;
 		byte[] rrnCertData = null;
+		byte[] authnCertFile = null;
+		byte[] citCaCertFile = null;
+		byte[] rootCaCertFile = null;
 		try {
 			if (preLogoff) {
 				/*
@@ -1068,10 +1070,22 @@ public class Controller {
 			 * multiple application access the smart card at the same time.
 			 */
 			TaskRunner taskRunner = new TaskRunner(this.pcscEidSpi, this.view);
-			authnCertChain = taskRunner.run(new Task<List<X509Certificate>>() {
-				public List<X509Certificate> run() throws Exception {
+			authnCertFile = taskRunner.run(new Task<byte[]>() {
+				public byte[] run() throws Exception {
 					return Controller.this.pcscEidSpi
-							.getAuthnCertificateChain();
+							.readFile(PcscEid.AUTHN_CERT_FILE_ID);
+				}
+			});
+			citCaCertFile = taskRunner.run(new Task<byte[]>() {
+				public byte[] run() throws Exception {
+					return Controller.this.pcscEidSpi
+							.readFile(PcscEid.CA_CERT_FILE_ID);
+				}
+			});
+			rootCaCertFile = taskRunner.run(new Task<byte[]>() {
+				public byte[] run() throws Exception {
+					return Controller.this.pcscEidSpi
+							.readFile(PcscEid.ROOT_CERT_FILE_ID);
 				}
 			});
 
@@ -1144,9 +1158,9 @@ public class Controller {
 		}
 
 		AuthenticationDataMessage authenticationDataMessage = new AuthenticationDataMessage(
-				salt, sessionId, signatureValue, authnCertChain, identityData,
-				addressData, photoData, identitySignatureData,
-				addressSignatureData, rrnCertData);
+				salt, sessionId, signatureValue, authnCertFile, citCaCertFile,
+				rootCaCertFile, identityData, addressData, photoData,
+				identitySignatureData, addressSignatureData, rrnCertData);
 		Object responseMessage = sendMessage(authenticationDataMessage);
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");
@@ -1301,6 +1315,7 @@ public class Controller {
 							.readFile(PcscEid.RRN_CERT_FILE_ID);
 				}
 			});
+			addDetailMessage("size RRN cert file: " + rrnCertFile.length);
 			addDetailMessage("reading root certificate file...");
 			rootCertFile = taskRunner.run(new Task<byte[]>() {
 				public byte[] run() throws Exception {
@@ -1308,6 +1323,7 @@ public class Controller {
 							.readFile(PcscEid.ROOT_CERT_FILE_ID);
 				}
 			});
+			addDetailMessage("size Root CA cert file: " + rootCertFile.length);
 		}
 
 		byte[] authnCertFile = null;
@@ -1321,6 +1337,7 @@ public class Controller {
 							.readFile(PcscEid.AUTHN_CERT_FILE_ID);
 				}
 			});
+			addDetailMessage("size authn cert file: " + authnCertFile.length);
 
 			addDetailMessage("reading sign certificate file...");
 			signCertFile = taskRunner.run(new Task<byte[]>() {
@@ -1329,6 +1346,7 @@ public class Controller {
 							.readFile(PcscEid.SIGN_CERT_FILE_ID);
 				}
 			});
+			addDetailMessage("size non-repud cert file: " + signCertFile.length);
 
 			addDetailMessage("reading citizen CA certificate file...");
 			caCertFile = taskRunner.run(new Task<byte[]>() {
@@ -1337,6 +1355,7 @@ public class Controller {
 							.readFile(PcscEid.CA_CERT_FILE_ID);
 				}
 			});
+			addDetailMessage("size Cit CA cert file: " + caCertFile.length);
 
 			if (null == rootCertFile) {
 				addDetailMessage("reading root certificate file...");
@@ -1346,6 +1365,8 @@ public class Controller {
 								.readFile(PcscEid.ROOT_CERT_FILE_ID);
 					}
 				});
+				addDetailMessage("size Root CA cert file: "
+						+ rootCertFile.length);
 			}
 		}
 

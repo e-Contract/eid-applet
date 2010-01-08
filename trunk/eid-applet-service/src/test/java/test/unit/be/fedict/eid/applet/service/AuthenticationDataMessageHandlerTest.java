@@ -28,7 +28,6 @@ import java.security.KeyPair;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -79,8 +78,7 @@ public class AuthenticationDataMessageHandlerTest {
 		byte[] sessionId = "session-id".getBytes();
 
 		AuthenticationDataMessage message = new AuthenticationDataMessage();
-		message.certificateChain = new LinkedList<X509Certificate>();
-		message.certificateChain.add(certificate);
+		message.authnCert = certificate;
 		message.saltValue = salt;
 		message.sessionId = sessionId;
 
@@ -216,8 +214,7 @@ public class AuthenticationDataMessageHandlerTest {
 		byte[] sessionId = "session-id".getBytes();
 
 		AuthenticationDataMessage message = new AuthenticationDataMessage();
-		message.certificateChain = new LinkedList<X509Certificate>();
-		message.certificateChain.add(certificate);
+		message.authnCert = certificate;
 		message.saltValue = salt;
 		message.sessionId = sessionId;
 
@@ -370,8 +367,7 @@ public class AuthenticationDataMessageHandlerTest {
 		byte[] sessionId = "session-id".getBytes();
 
 		AuthenticationDataMessage message = new AuthenticationDataMessage();
-		message.certificateChain = new LinkedList<X509Certificate>();
-		message.certificateChain.add(certificate);
+		message.authnCert = certificate;
 		message.saltValue = salt;
 		message.sessionId = sessionId;
 
@@ -517,8 +513,7 @@ public class AuthenticationDataMessageHandlerTest {
 		byte[] sessionId = "session-id".getBytes();
 
 		AuthenticationDataMessage message = new AuthenticationDataMessage();
-		message.certificateChain = new LinkedList<X509Certificate>();
-		message.certificateChain.add(certificate);
+		message.authnCert = certificate;
 		message.saltValue = salt;
 		message.sessionId = sessionId;
 
@@ -666,8 +661,7 @@ public class AuthenticationDataMessageHandlerTest {
 		byte[] sessionId = "session-id".getBytes();
 
 		AuthenticationDataMessage message = new AuthenticationDataMessage();
-		message.certificateChain = new LinkedList<X509Certificate>();
-		message.certificateChain.add(certificate);
+		message.authnCert = certificate;
 		message.saltValue = salt;
 		message.sessionId = sessionId;
 

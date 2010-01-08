@@ -21,13 +21,10 @@ package be.fedict.eid.applet.shared;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import be.fedict.eid.applet.shared.annotation.Description;
@@ -119,19 +116,16 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	 * @throws CertificateEncodingException
 	 */
 	public AuthenticationDataMessage(byte[] saltValue, byte[] sessionId,
-			byte[] signatureValue, List<X509Certificate> authnCertChain,
-			byte[] identityData, byte[] addressData, byte[] photoData,
-			byte[] identitySignatureData, byte[] addressSignatureData,
-			byte[] rrnCertData) throws IOException,
-			CertificateEncodingException {
+			byte[] signatureValue, byte[] authnCertFile, byte[] citCaCertFile,
+			byte[] rootCaCertFile, byte[] identityData, byte[] addressData,
+			byte[] photoData, byte[] identitySignatureData,
+			byte[] addressSignatureData, byte[] rrnCertData)
+			throws IOException, CertificateEncodingException {
 		this.saltValueSize = saltValue.length;
 		this.signatureValueSize = signatureValue.length;
-		X509Certificate authnCert = authnCertChain.get(0);
-		this.authnCertFileSize = getCertificateSize(authnCert);
-		X509Certificate citCaCert = authnCertChain.get(1);
-		this.caCertFileSize = getCertificateSize(citCaCert);
-		X509Certificate rootCaCert = authnCertChain.get(2);
-		this.rootCertFileSize = getCertificateSize(rootCaCert);
+		this.authnCertFileSize = authnCertFile.length;
+		this.caCertFileSize = citCaCertFile.length;
+		this.rootCertFileSize = rootCaCertFile.length;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		baos.write(saltValue);
 		if (null != sessionId) {
@@ -139,9 +133,11 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 			baos.write(sessionId);
 		}
 		baos.write(signatureValue);
-		for (X509Certificate cert : authnCertChain) {
-			baos.write(cert.getEncoded());
-		}
+
+		baos.write(authnCertFile);
+		baos.write(citCaCertFile);
+		baos.write(rootCaCertFile);
+
 		if (null != identityData) {
 			baos.write(identityData);
 			this.identityFileSize = identityData.length;
@@ -169,13 +165,17 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 		this.body = baos.toByteArray();
 	}
 
-	private int getCertificateSize(X509Certificate certificate) {
-		try {
-			return certificate.getEncoded().length;
-		} catch (CertificateEncodingException e) {
-			throw new RuntimeException("certificate encoding error: "
-					+ e.getMessage(), e);
-		}
+	public AuthenticationDataMessage(byte[] saltValue, byte[] sessionId,
+			byte[] signatureValue, List<X509Certificate> authnCertChain,
+			byte[] identityData, byte[] addressData, byte[] photoData,
+			byte[] identitySignatureData, byte[] addressSignatureData,
+			byte[] rrnCertData) throws IOException,
+			CertificateEncodingException {
+		this(saltValue, sessionId, signatureValue, authnCertChain.get(0)
+				.getEncoded(), authnCertChain.get(1).getEncoded(),
+				authnCertChain.get(2).getEncoded(), identityData, addressData,
+				photoData, identitySignatureData, addressSignatureData,
+				rrnCertData);
 	}
 
 	private byte[] copy(byte[] source, int idx, int count) {
@@ -204,28 +204,17 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 		this.signatureValue = copy(this.body, idx, this.signatureValueSize);
 		idx += this.signatureValueSize;
 
-		CertificateFactory certificateFactory;
-		try {
-			certificateFactory = CertificateFactory.getInstance("X.509");
-		} catch (CertificateException e) {
-			throw new RuntimeException("cert factory error: " + e.getMessage(),
-					e);
-		}
-		try {
-			int certsSize = this.authnCertFileSize + this.caCertFileSize
-					+ this.rootCertFileSize;
-			Collection<? extends Certificate> certificates = certificateFactory
-					.generateCertificates(new ByteArrayInputStream(copy(
-							this.body, idx, certsSize)));
-			this.certificateChain = new LinkedList<X509Certificate>();
-			for (Certificate certificate : certificates) {
-				this.certificateChain.add((X509Certificate) certificate);
-			}
-			idx += certsSize;
-		} catch (CertificateException e) {
-			throw new RuntimeException("cert parsing error: " + e.getMessage(),
-					e);
-		}
+		byte[] authnCertFile = copy(this.body, idx, this.authnCertFileSize);
+		idx += this.authnCertFileSize;
+		this.authnCert = getCertificate(authnCertFile);
+
+		byte[] citizenCaCertFile = copy(this.body, idx, this.caCertFileSize);
+		idx += this.caCertFileSize;
+		this.citizenCaCert = getCertificate(citizenCaCertFile);
+
+		byte[] rootCaCertFile = copy(this.body, idx, this.rootCertFileSize);
+		idx += this.rootCertFileSize;
+		this.rootCaCert = getCertificate(rootCaCertFile);
 
 		if (null != this.identityFileSize) {
 			this.identityData = copy(this.body, idx, this.identityFileSize);
@@ -256,15 +245,29 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 
 		if (null != this.rrnCertFileSize) {
 			byte[] rrnCertData = copy(this.body, idx, this.rrnCertFileSize);
-			try {
-				this.rrnCertificate = (X509Certificate) certificateFactory
-						.generateCertificate(new ByteArrayInputStream(
-								rrnCertData));
-			} catch (CertificateException e) {
-				throw new RuntimeException("cert parsing error: "
-						+ e.getMessage(), e);
-			}
+			this.rrnCertificate = getCertificate(rrnCertData);
 			idx += this.rrnCertFileSize;
+		}
+	}
+
+	private X509Certificate getCertificate(byte[] certData) {
+		CertificateFactory certificateFactory;
+		try {
+			certificateFactory = CertificateFactory.getInstance("X.509");
+		} catch (CertificateException e) {
+			throw new RuntimeException("cert factory error: " + e.getMessage(),
+					e);
+		}
+		try {
+			X509Certificate certificate = (X509Certificate) certificateFactory
+					.generateCertificate(new ByteArrayInputStream(certData));
+			return certificate;
+		} catch (CertificateException e) {
+			/*
+			 * Can happen in case of missing certificates. Missing certificates
+			 * are represented by means of 1300 null bytes.
+			 */
+			return null;
 		}
 	}
 
@@ -274,7 +277,11 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 
 	public byte[] signatureValue;
 
-	public List<X509Certificate> certificateChain;
+	public X509Certificate authnCert;
+
+	public X509Certificate citizenCaCert;
+
+	public X509Certificate rootCaCert;
 
 	public byte[] identityData;
 
