@@ -419,7 +419,7 @@ public class Applet extends JApplet {
 	private class AppletThread implements Runnable {
 		@SuppressWarnings("unchecked")
 		public void run() {
-			addDetailMessage("eID Applet - Copyright (C) 2008-2009 FedICT.");
+			addDetailMessage("eID Applet - Copyright (C) 2008-2010 FedICT.");
 			addDetailMessage("Released under GNU LGPL version 3.0 license.");
 			addDetailMessage("More info: http://code.google.com/p/eid-applet/");
 			/*
