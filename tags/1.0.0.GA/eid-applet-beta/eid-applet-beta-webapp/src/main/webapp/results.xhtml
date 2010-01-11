@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core">
+<body>
+<ui:composition template="/WEB-INF/template.xhtml">
+	<ui:param name="activeMenu" value="results" />
+	<ui:define name="body">
+		<h2>eID Applet Test Report</h2>
+		<h:form>
+			<rich:dataTable var="testResult" value="#{testReport}" rows="20">
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="Test" />
+					</f:facet>
+					<h:outputText value="#{testResult.test}" />
+				</rich:column>
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="Result" />
+					</f:facet>
+					<h:outputText value="#{testResult.result}" />
+				</rich:column>
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="OS Name" />
+					</f:facet>
+					<h:outputText value="#{testResult.osName}" />
+				</rich:column>
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="OS Version" />
+					</f:facet>
+					<h:outputText value="#{testResult.osVersion}" />
+				</rich:column>
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="Java Version" />
+					</f:facet>
+					<h:outputText value="#{testResult.javaVersion}" />
+				</rich:column>
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="User Agent" />
+					</f:facet>
+					<h:outputText value="#{testResult.navigatorUserAgent}" />
+				</rich:column>
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="Created" />
+					</f:facet>
+					<h:outputText value="#{testResult.created.time}">
+						<f:convertDateTime timeZone="Europe/Paris" dateStyle="full"
+							type="both" />
+					</h:outputText>
+				</rich:column>
+				<f:facet name="footer">
+					<rich:datascroller />
+				</f:facet>
+			</rich:dataTable>
+		</h:form>
+	</ui:define>
+</ui:composition>
+</body>
+</html>
