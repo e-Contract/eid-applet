@@ -12,7 +12,7 @@
 			<year>2008-2010</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>6 Jan 2010</releaseinfo>
+		<releaseinfo>11 Jan 2010</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -1702,6 +1702,11 @@ ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlis
 						<entry>6 Jan 2010</entry>
 						<entry>Frank Cornelis</entry>
 						<entry>1.0.0-rc-3</entry>
+					</row>
+					<row>
+						<entry>11 Jan 2010</entry>
+						<entry>Frank Cornelis</entry>
+						<entry>1.0.0.GA</entry>
 					</row>
 				</tbody>
 			</tgroup>

@@ -1,3 +1,8 @@
+1.0.0.GA - 11 January 2010
+	* upgrade to JBoss Application Server 6.0.0.M1
+	* allow for missing authentication certificate
+	* allow for missing non-repudiation certificate
+
 1.0.0-rc-3 - 6 January 2010
 	* fix for german date of birth
 	* improved the @PostConstruct stack tracing
