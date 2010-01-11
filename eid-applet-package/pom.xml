@@ -3,36 +3,16 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0.GA</version>
 	</parent>
 	<name>FedICT eID Applet Package</name>
 	<description>Packaging of the eID applet.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-package</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0.GA</version>
 	<packaging>jar</packaging>
 	<build>
 		<plugins>
-			<!--
-				<plugin> <groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId> <executions>
-				<execution> <id>unpack-dependencies</id>
-				<phase>process-resources</phase> <goals>
-				<goal>unpack-dependencies</goal> </goals> <configuration>
-				<includes>**/*.class</includes>
-				<outputDirectory>${project.build.directory}/classes</outputDirectory>
-				<excludeTransitive>true</excludeTransitive> </configuration>
-				</execution> </executions> </plugin> <plugin>
-				<artifactId>minijar-maven-plugin</artifactId>
-				<groupId>org.codehaus.mojo</groupId> <executions> <execution>
-				<phase>process-resources</phase> <goals> <goal>ueberjar</goal>
-				</goals> <configuration> <includeArtifact>false</includeArtifact>
-				<excludeDependenciesInRelocation>
-				<param>be.fedict.eid-applet:eid-applet-core</param>
-				</excludeDependenciesInRelocation>
-				<replaceArtifact>true</replaceArtifact> </configuration>
-				</execution> </executions> </plugin>
-			-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -153,7 +133,7 @@
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-core</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0.GA</version>
 		</dependency>
 	</dependencies>
 </project>
