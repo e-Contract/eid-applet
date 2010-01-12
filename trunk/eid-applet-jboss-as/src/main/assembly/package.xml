@@ -70,11 +70,9 @@
 			<outputDirectory>server/default/lib</outputDirectory>
 			<excludes>
 				<!-- scope compile doesn't work... -->
-				<exclude>org.jboss:jboss-as-distribution</exclude>
+				<exclude>org.jboss.jbossas:jboss-as-distribution</exclude>
 				<!-- Richfaces triggers commons-logging -->
 				<exclude>commons-logging:commons-logging</exclude>
-				<!-- Tomahawk12 -->
-				<exclude>javax.servlet:jstl</exclude>
 			</excludes>
 		</dependencySet>
 	</dependencySets>
