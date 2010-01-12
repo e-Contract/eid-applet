@@ -59,6 +59,7 @@ import be.fedict.eid.applet.sc.PcscEid;
 import be.fedict.eid.applet.sc.PcscEidSpi;
 import be.fedict.eid.applet.sc.Task;
 import be.fedict.eid.applet.sc.TaskRunner;
+import be.fedict.trust.BelgianTrustValidatorFactory;
 import be.fedict.trust.FallbackTrustLinker;
 import be.fedict.trust.MemoryCertificateRepository;
 import be.fedict.trust.NetworkConfig;
@@ -582,6 +583,29 @@ public class PcscTest {
 	}
 
 	@Test
+	public void testBeIDPKIValidation() throws Exception {
+		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEid.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEid.waitForEidPresent();
+		}
+
+		try {
+			List<X509Certificate> certChain = pcscEid.getSignCertificateChain();
+			LOG.debug("certificate: " + certChain.get(0));
+
+			NetworkConfig networkConfig = new NetworkConfig(
+					"proxy.yourict.net", 8080);
+			TrustValidator trustValidator = BelgianTrustValidatorFactory
+					.createNonRepudiationTrustValidator(networkConfig);
+
+			trustValidator.isTrusted(certChain);
+		} finally {
+			pcscEid.close();
+		}
+	}
+
+	@Test
 	public void testPKIValidation() throws Exception {
 		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEid.isEidPresent()) {
@@ -590,9 +614,10 @@ public class PcscTest {
 		}
 
 		try {
-			// List<X509Certificate> certChain = pcscEid.getSignCertificateChain();
-			List<X509Certificate> certChain = pcscEid.getAuthnCertificateChain();
-			
+			List<X509Certificate> certChain = pcscEid.getSignCertificateChain();
+			// List<X509Certificate> certChain =
+			// pcscEid.getAuthnCertificateChain();
+
 			MemoryCertificateRepository certificateRepository = new MemoryCertificateRepository();
 			certificateRepository.addTrustPoint(certChain
 					.get(certChain.size() - 1));
