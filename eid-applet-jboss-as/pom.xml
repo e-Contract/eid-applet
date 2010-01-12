@@ -30,10 +30,9 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<groupId>org.jboss</groupId>
+									<groupId>org.jboss.jbossas</groupId>
 									<artifactId>jboss-as-distribution</artifactId>
 									<type>zip</type>
-									<classifier>jdk6</classifier>
 									<outputDirectory>${project.build.directory}/dependency</outputDirectory>
 								</artifactItem>
 							</artifactItems>
@@ -104,7 +103,7 @@
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>org.jboss</groupId>
+			<groupId>org.jboss.jbossas</groupId>
 			<artifactId>jboss-as-distribution</artifactId>
 			<type>zip</type>
 			<version>${jboss.version}</version>
