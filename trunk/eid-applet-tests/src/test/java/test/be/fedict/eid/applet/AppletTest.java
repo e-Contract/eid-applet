@@ -101,6 +101,11 @@ public class AppletTest {
 	@Test
 	public void testWelcomePage() throws Exception {
 		LOG.debug("test welcome page");
+
+		this.selenium.open("about:plugins");
+		assertTrue(this.selenium.isTextPresent("Installed plugins"));
+		assertTrue(this.selenium.isTextPresent("Java(TM) Plug-in 1.6.0"));
+
 		this.selenium.open("chrome://pippki/content/certManager.xul");
 
 		JOptionPane.showMessageDialog(null,
