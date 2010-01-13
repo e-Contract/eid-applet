@@ -22,6 +22,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.ServerSocket;
 
+import javax.swing.JOptionPane;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
@@ -66,16 +68,7 @@ public class AppletTest {
 		this.seleniumServer.start();
 		// int seleniumPort = this.seleniumServer.getPort();
 		LOG.debug("selenium port: " + this.seleniumServer.getPort());
-		String browserStartCommand;
-		if ("Linux".equals(System.getProperty("os.name"))
-				&& System.getProperty("os.version").contains("fc9")) {
-			/*
-			 * Fedora 9 work-around.
-			 */
-			browserStartCommand = "*firefox /usr/lib/firefox-3.0.4/firefox";
-		} else {
-			browserStartCommand = "*firefox";
-		}
+		String browserStartCommand = "*firefox";
 		this.selenium = new DefaultSelenium("localhost", seleniumPort,
 				browserStartCommand, "http://www.google.be");
 		LOG.debug("starting selenium...");
@@ -108,18 +101,88 @@ public class AppletTest {
 	@Test
 	public void testWelcomePage() throws Exception {
 		LOG.debug("test welcome page");
-		this.selenium.open("http://localhost:8080/demo/");
+		this.selenium.open("chrome://pippki/content/certManager.xul");
+
+		JOptionPane.showMessageDialog(null,
+				"Waiting for certificate configuration...");
+
+		this.selenium.open("https://localhost/eid-applet-test/");
 		assertTrue(this.selenium
 				.isTextPresent("eID Applet Test Web Application"));
 	}
 
 	@Test
-	public void testTargetPage() throws Exception {
-		LOG.debug("test target page");
-		this.selenium
-				.open("http://localhost:8080/demo/test-applet-target-page.html");
+	public void testIdentification() throws Exception {
+		LOG.debug("functional eID identification test");
+
+		this.selenium.open("chrome://pippki/content/certManager.xul");
+
+		JOptionPane.showMessageDialog(null,
+				"Waiting for certificate configuration...");
+
+		JOptionPane.showMessageDialog(null,
+				"Remove your eID from your card reader...");
+		this.selenium.open("https://localhost/eid-applet-test/identify.jsp");
 		assertTrue(this.selenium
-				.isTextPresent("eID Applet Test Web Application"));
-		Thread.sleep(10000);
+				.isTextPresent("eID Applet Identification Demo"));
+
+		JOptionPane.showMessageDialog(null,
+				"Press OK after the eID operation completed...");
+
+		assertTrue(this.selenium.isTextPresent("Identity Result Page"));
+
+		JOptionPane.showMessageDialog(null, "End of functional test.");
+	}
+
+	@Test
+	public void testAuthentication() throws Exception {
+		LOG.debug("functional eID authentication test");
+
+		this.selenium.open("chrome://pippki/content/certManager.xul");
+
+		JOptionPane.showMessageDialog(null,
+				"Waiting for certificate configuration...");
+
+		this.selenium
+				.open("https://localhost/eid-applet-test/authenticate.jsp");
+		assertTrue(this.selenium
+				.isTextPresent("eID Applet Authentication Demo"));
+
+		while (false == this.selenium
+				.isTextPresent("Authentication Result Page")) {
+			LOG.debug("waiting for eID Applet completion...");
+			Thread.sleep(1000);
+		}
+		assertTrue(this.selenium
+				.isTextPresent("Authenticated User Identifier:"));
+		assertTrue(this.selenium
+				.isTextPresent("Signature Algorithm: SHA1withRSA, OID = 1.2.840.113549.1.1.5"));
+	}
+
+	@Test
+	public void testSignature() throws Exception {
+		LOG.debug("functional eID signature test");
+
+		this.selenium.open("chrome://pippki/content/certManager.xul");
+
+		JOptionPane.showMessageDialog(null,
+				"Waiting for certificate configuration...");
+
+		this.selenium.open("https://localhost/eid-applet-test/sign-text.jsp");
+		assertTrue(this.selenium.isTextPresent("eID Applet Signature Demo"));
+
+		this.selenium.type("toBeSigned", "Hello World");
+		this.selenium.click("//input");
+
+		assertTrue(this.selenium.isTextPresent("eID Applet Signature Test"));
+		while (false == this.selenium
+				.isTextPresent("eID Applet Signature Demo")) {
+			LOG.debug("waiting for eID Applet completion...");
+			Thread.sleep(1000);
+		}
+		assertTrue(this.selenium
+				.isTextPresent("Signature created successfully."));
+		assertTrue(this.selenium
+				.isTextPresent("Signature Algorithm: SHA1withRSA, OID = 1.2.840.113549.1.1.5"));
 	}
 }
