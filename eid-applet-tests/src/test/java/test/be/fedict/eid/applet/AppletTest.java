@@ -48,8 +48,6 @@ public class AppletTest {
 
 	private SeleniumServer seleniumServer;
 
-	private String location;
-
 	private Selenium selenium;
 
 	public static int getFreePort() throws Exception {
@@ -104,7 +102,9 @@ public class AppletTest {
 
 		this.selenium.open("about:plugins");
 		assertTrue(this.selenium.isTextPresent("Installed plugins"));
-		assertTrue(this.selenium.isTextPresent("Java(TM) Plug-in 1.6.0"));
+		assertTrue(this.selenium.isTextPresent("Java(TM) Plug-in 1.6.0")
+				|| this.selenium
+						.isTextPresent("IcedTea Java Web Browser Plugin"));
 
 		this.selenium.open("chrome://pippki/content/certManager.xul");
 
