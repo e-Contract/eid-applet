@@ -506,13 +506,13 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			return XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256;
 		}
 		if ("SHA-512".equals(digestAlgo)) {
-			return XMLSignature.ALGO_ID_MAC_HMAC_SHA512;
+			return XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA512;
 		}
 		if ("SHA-384".equals(digestAlgo)) {
-			return XMLSignature.ALGO_ID_MAC_HMAC_SHA384;
+			return XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA384;
 		}
 		if ("RIPEMD160".equals(digestAlgo)) {
-			return XMLSignature.ALGO_ID_MAC_HMAC_RIPEMD160;
+			return XMLSignature.ALGO_ID_SIGNATURE_RSA_RIPEMD160;
 		}
 		throw new RuntimeException("unsupported sign algo: " + digestAlgo);
 	}
