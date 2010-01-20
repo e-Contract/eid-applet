@@ -79,3 +79,5 @@
   * [http://code.google.com/p/jtrust/ jTrust - Java library for PKI validation]
   * [http://rcardon.free.fr/websign/ WebSign Project]
   * [http://j4sign.sourceforge.net/ j4sign]
+  * [http://adullact.net/projects/libersign/ LiberSign - Java PKCS7 / XAdES applet]
+  * [http://ooo-xadessig-it.forge.osor.eu OOoXAdESSigIT - OpenOffice.org extension for (Italian) XAdES]
