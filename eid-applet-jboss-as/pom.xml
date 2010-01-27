@@ -74,6 +74,7 @@
 						<configuration>
 							<targetDirectory>target/dependency/jboss-${jboss.version}</targetDirectory>
 							<patches>
+								<patch>jboss-conf-memory.patch</patch>
 								<patch>jboss-log4j.patch</patch>
 								<patch>jbossweb-ssl.patch</patch>
 							</patches>

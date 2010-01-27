@@ -1,0 +1,11 @@
+--- bin/run.conf.orig	2010-01-27 10:43:19.885414079 +0100
++++ bin/run.conf	2010-01-27 10:44:11.863386865 +0100
+@@ -42,7 +42,7 @@
+ # Specify options to pass to the Java VM.
+ #
+ if [ "x$JAVA_OPTS" = "x" ]; then
+-   JAVA_OPTS="-Xms128m -Xmx512m -XX:MaxPermSize=256m -Dorg.jboss.resolver.warning=true -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000"
++   JAVA_OPTS="-Xms512m -Xmx1024m -XX:MaxPermSize=1024m -Dorg.jboss.resolver.warning=true -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000"
+ fi
+ 
+ # Sample JPDA settings for remote socket debugging
