@@ -161,6 +161,11 @@ public class AuthenticationDataMessageHandlerTest {
 		EasyMock
 				.expect(
 						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_CERTS_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
 								.getInitParameter(HelloMessageHandler.INCLUDE_ADDRESS_INIT_PARAM_NAME))
 				.andStubReturn(null);
 		EasyMock
@@ -315,6 +320,11 @@ public class AuthenticationDataMessageHandlerTest {
 		EasyMock
 				.expect(
 						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_CERTS_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
 								.getInitParameter(HelloMessageHandler.INCLUDE_ADDRESS_INIT_PARAM_NAME))
 				.andStubReturn(null);
 		EasyMock
@@ -432,6 +442,11 @@ public class AuthenticationDataMessageHandlerTest {
 				.expect(
 						mockServletConfig
 								.getInitParameter(HelloMessageHandler.INCLUDE_IDENTITY_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_CERTS_INIT_PARAM_NAME))
 				.andStubReturn(null);
 		EasyMock
 				.expect(
@@ -596,6 +611,11 @@ public class AuthenticationDataMessageHandlerTest {
 		EasyMock
 				.expect(
 						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_CERTS_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
 								.getInitParameter(HelloMessageHandler.INCLUDE_ADDRESS_INIT_PARAM_NAME))
 				.andStubReturn(null);
 		EasyMock
@@ -739,6 +759,11 @@ public class AuthenticationDataMessageHandlerTest {
 				.expect(
 						mockServletConfig
 								.getInitParameter(HelloMessageHandler.INCLUDE_IDENTITY_INIT_PARAM_NAME))
+				.andStubReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(HelloMessageHandler.INCLUDE_CERTS_INIT_PARAM_NAME))
 				.andStubReturn(null);
 		EasyMock
 				.expect(

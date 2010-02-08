@@ -201,8 +201,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 					this.logoff, this.preLogoff, this.removeCard,
 					this.sessionIdChannelBinding,
 					this.serverCertificateChannelBinding, this.includeIdentity,
-					this.includeAddress, this.includePhoto,
-					includeIntegrityData);
+					this.includeCertificates, this.includeAddress,
+					this.includePhoto, includeIntegrityData);
 			return authenticationRequestMessage;
 		}
 

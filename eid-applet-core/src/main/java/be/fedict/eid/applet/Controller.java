@@ -855,6 +855,7 @@ public class Controller {
 		boolean sessionIdChannelBinding = authnRequest.sessionIdChannelBinding;
 		boolean serverCertificateChannelBinding = authnRequest.serverCertificateChannelBinding;
 		boolean includeIdentity = authnRequest.includeIdentity;
+		boolean includeCertificates = authnRequest.includeCertificates;
 		boolean includeAddress = authnRequest.includeAddress;
 		boolean includePhoto = authnRequest.includePhoto;
 		boolean includeIntegrityData = authnRequest.includeIntegrityData;
@@ -872,6 +873,7 @@ public class Controller {
 		addDetailMessage("server certificate channel binding: "
 				+ serverCertificateChannelBinding);
 		addDetailMessage("include identity: " + includeIdentity);
+		addDetailMessage("include certificates: " + includeCertificates);
 		addDetailMessage("include address: " + includeAddress);
 		addDetailMessage("include photo: " + includePhoto);
 		addDetailMessage("include integrity data: " + includeIntegrityData);
@@ -924,11 +926,13 @@ public class Controller {
 
 		setStatusMessage(Status.NORMAL, this.messages
 				.getMessage(MESSAGE_ID.DETECTING_CARD));
-		if (includeIdentity || includeAddress || includePhoto) {
+		if (includeIdentity || includeAddress || includePhoto
+				|| includeCertificates) {
 			if (null != this.pcscEidSpi) {
 				performEidPcscAuthnOperation(salt, sessionId, toBeSigned,
 						logoff, preLogoff, removeCard, includeIdentity,
-						includeAddress, includePhoto, includeIntegrityData);
+						includeCertificates, includeAddress, includePhoto,
+						includeIntegrityData);
 				return;
 			}
 		}
@@ -944,7 +948,8 @@ public class Controller {
 				addDetailMessage("fallback to PC/SC interface for authentication...");
 				performEidPcscAuthnOperation(salt, sessionId, toBeSigned,
 						logoff, preLogoff, removeCard, includeIdentity,
-						includeAddress, includePhoto, includeIntegrityData);
+						includeCertificates, includeAddress, includePhoto,
+						includeIntegrityData);
 				return;
 			}
 			throw new PKCS11NotFoundException();
@@ -1010,7 +1015,7 @@ public class Controller {
 
 		AuthenticationDataMessage authenticationDataMessage = new AuthenticationDataMessage(
 				salt, sessionId, signatureValue, authnCertChain, null, null,
-				null, null, null, null);
+				null, null, null, null, null);
 		Object responseMessage = sendMessage(authenticationDataMessage);
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");
@@ -1020,8 +1025,9 @@ public class Controller {
 	private void performEidPcscAuthnOperation(byte[] salt, byte[] sessionId,
 			byte[] toBeSigned, boolean logoff, boolean preLogoff,
 			boolean removeCard, boolean includeIdentity,
-			boolean includeAddress, boolean includePhoto,
-			boolean includeIntegrityData) throws Exception {
+			boolean includeCertificates, boolean includeAddress,
+			boolean includePhoto, boolean includeIntegrityData)
+			throws Exception {
 		waitForEIdCard();
 
 		setStatusMessage(Status.NORMAL, this.messages
@@ -1045,6 +1051,7 @@ public class Controller {
 		byte[] addressSignatureData = null;
 		byte[] rrnCertData = null;
 		byte[] authnCertFile = null;
+		byte[] signCertFile = null;
 		byte[] citCaCertFile = null;
 		byte[] rootCaCertFile = null;
 		try {
@@ -1107,6 +1114,17 @@ public class Controller {
 							.readFile(PcscEid.ROOT_CERT_FILE_ID);
 				}
 			});
+			if (includeCertificates) {
+				addDetailMessage("reading sign certificate file...");
+				signCertFile = taskRunner.run(new Task<byte[]>() {
+					public byte[] run() throws Exception {
+						return Controller.this.pcscEidSpi
+								.readFile(PcscEid.SIGN_CERT_FILE_ID);
+					}
+				});
+				addDetailMessage("size non-repud cert file: "
+						+ signCertFile.length);
+			}
 
 			if (includeIdentity || includeAddress || includePhoto) {
 				setStatusMessage(Status.NORMAL, this.messages
@@ -1178,8 +1196,9 @@ public class Controller {
 
 		AuthenticationDataMessage authenticationDataMessage = new AuthenticationDataMessage(
 				salt, sessionId, signatureValue, authnCertFile, citCaCertFile,
-				rootCaCertFile, identityData, addressData, photoData,
-				identitySignatureData, addressSignatureData, rrnCertData);
+				rootCaCertFile, signCertFile, identityData, addressData,
+				photoData, identitySignatureData, addressSignatureData,
+				rrnCertData);
 		Object responseMessage = sendMessage(authenticationDataMessage);
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");

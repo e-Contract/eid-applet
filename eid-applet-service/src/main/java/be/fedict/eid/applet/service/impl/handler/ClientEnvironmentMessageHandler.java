@@ -177,8 +177,8 @@ public class ClientEnvironmentMessageHandler implements
 					this.logoff, this.preLogoff, this.removeCard,
 					this.sessionIdChannelBinding,
 					this.serverCertificateChannelBinding, this.includeIdentity,
-					this.includeAddress, this.includePhoto,
-					includeIntegrityData);
+					this.includeCertificates, this.includeAddress,
+					this.includePhoto, includeIntegrityData);
 			return authenticationRequestMessage;
 		} else {
 			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator

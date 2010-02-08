@@ -59,10 +59,13 @@ public class AuthenticationRequestMessage extends AbstractProtocolMessage {
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "ServerCertificateChannelBinding")
 	public boolean serverCertificateChannelBinding;
-	
+
 	@HttpHeader(HTTP_HEADER_PREFIX + "IncludeIdentity")
 	public boolean includeIdentity;
-	
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "IncludeCertificates")
+	public boolean includeCertificates;
+
 	@HttpHeader(HTTP_HEADER_PREFIX + "IncludeAddress")
 	public boolean includeAddress;
 
@@ -85,9 +88,9 @@ public class AuthenticationRequestMessage extends AbstractProtocolMessage {
 			boolean includeHostname, boolean includeInetAddress,
 			boolean logoff, boolean preLogoff, boolean removeCard,
 			boolean sessionIdChannelBinding,
-			boolean serverCertificateChannelBinding,
-			boolean includeIdentity, boolean includeAddress, boolean includePhoto,
-			boolean includeIntegrityData) {
+			boolean serverCertificateChannelBinding, boolean includeIdentity,
+			boolean includeCertificates, boolean includeAddress,
+			boolean includePhoto, boolean includeIntegrityData) {
 		this.challenge = challenge;
 		this.includeHostname = includeHostname;
 		this.includeInetAddress = includeInetAddress;
@@ -97,6 +100,7 @@ public class AuthenticationRequestMessage extends AbstractProtocolMessage {
 		this.sessionIdChannelBinding = sessionIdChannelBinding;
 		this.serverCertificateChannelBinding = serverCertificateChannelBinding;
 		this.includeIdentity = includeIdentity;
+		this.includeCertificates = includeCertificates;
 		this.includeAddress = includeAddress;
 		this.includePhoto = includePhoto;
 		this.includeIntegrityData = includeIntegrityData;
