@@ -1075,6 +1075,37 @@
 				<para>The identity integrity service can also be activated when
 					combining eID authentication with eID identification.</para>
 			</section>
+			<section>
+				<title>eID Certificates</title>
+				<para>If you need to have explicit access to
+					the
+					eID citizen
+					certificates, you can instruct the eID Applet to
+					extract the
+					certificates via the following eID Applet Service
+					servlet
+					configuration:</para>
+				<programlisting role="XML"><![CDATA[<init-param>
+	<param-name>IncludeCertificates</param-name>
+	<param-value>true</param-value>
+</init-param>]]></programlisting>
+				<para>
+					After a successful eID authentication, the certificates will be
+					available as session attributes of Java type
+					<code>java.security.cert.X509Certificate
+					</code>
+					. The authentication certificate will be available as
+					<code>eid.certs.authn</code>
+					session attribute. The non-repudiation (i.e. signature) certificate
+					will be available as
+					<code>eid.certs.sign</code>
+					session attribute. The Citizen CA certificate will be available as
+					<code>eid.certs.ca</code>
+					session attribute. The Root CA certificate will be available as
+					<code>eid.certs.root</code>
+					session attribute.
+				</para>
+			</section>
 		</section>
 		<section>
 			<title>eID Signatures</title>

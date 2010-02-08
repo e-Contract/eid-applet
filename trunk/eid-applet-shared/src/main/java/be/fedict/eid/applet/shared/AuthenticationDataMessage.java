@@ -74,6 +74,9 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	@NotNull
 	public Integer rootCertFileSize;
 
+	@HttpHeader(HTTP_HEADER_PREFIX + "SignCertFileSize")
+	public Integer signCertFileSize;
+
 	@HttpHeader(HTTP_HEADER_PREFIX + "IdentityFileSize")
 	public Integer identityFileSize;
 
@@ -117,8 +120,8 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	 */
 	public AuthenticationDataMessage(byte[] saltValue, byte[] sessionId,
 			byte[] signatureValue, byte[] authnCertFile, byte[] citCaCertFile,
-			byte[] rootCaCertFile, byte[] identityData, byte[] addressData,
-			byte[] photoData, byte[] identitySignatureData,
+			byte[] rootCaCertFile, byte[] signCertFile, byte[] identityData,
+			byte[] addressData, byte[] photoData, byte[] identitySignatureData,
 			byte[] addressSignatureData, byte[] rrnCertData)
 			throws IOException, CertificateEncodingException {
 		this.saltValueSize = saltValue.length;
@@ -137,6 +140,11 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 		baos.write(authnCertFile);
 		baos.write(citCaCertFile);
 		baos.write(rootCaCertFile);
+
+		if (null != signCertFile) {
+			this.signCertFileSize = signCertFile.length;
+			baos.write(signCertFile);
+		}
 
 		if (null != identityData) {
 			baos.write(identityData);
@@ -167,15 +175,15 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 
 	public AuthenticationDataMessage(byte[] saltValue, byte[] sessionId,
 			byte[] signatureValue, List<X509Certificate> authnCertChain,
-			byte[] identityData, byte[] addressData, byte[] photoData,
-			byte[] identitySignatureData, byte[] addressSignatureData,
-			byte[] rrnCertData) throws IOException,
-			CertificateEncodingException {
+			byte[] signCertFile, byte[] identityData, byte[] addressData,
+			byte[] photoData, byte[] identitySignatureData,
+			byte[] addressSignatureData, byte[] rrnCertData)
+			throws IOException, CertificateEncodingException {
 		this(saltValue, sessionId, signatureValue, authnCertChain.get(0)
 				.getEncoded(), authnCertChain.get(1).getEncoded(),
-				authnCertChain.get(2).getEncoded(), identityData, addressData,
-				photoData, identitySignatureData, addressSignatureData,
-				rrnCertData);
+				authnCertChain.get(2).getEncoded(), signCertFile, identityData,
+				addressData, photoData, identitySignatureData,
+				addressSignatureData, rrnCertData);
 	}
 
 	private byte[] copy(byte[] source, int idx, int count) {
@@ -215,6 +223,12 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 		byte[] rootCaCertFile = copy(this.body, idx, this.rootCertFileSize);
 		idx += this.rootCertFileSize;
 		this.rootCaCert = getCertificate(rootCaCertFile);
+
+		if (null != this.signCertFileSize) {
+			byte[] signCertFile = copy(this.body, idx, this.signCertFileSize);
+			idx += this.signCertFileSize;
+			this.signCert = getCertificate(signCertFile);
+		}
 
 		if (null != this.identityFileSize) {
 			this.identityData = copy(this.body, idx, this.identityFileSize);
@@ -282,6 +296,8 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	public X509Certificate citizenCaCert;
 
 	public X509Certificate rootCaCert;
+
+	public X509Certificate signCert;
 
 	public byte[] identityData;
 

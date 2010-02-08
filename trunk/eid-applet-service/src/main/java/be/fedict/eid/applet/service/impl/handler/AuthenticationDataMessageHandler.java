@@ -45,6 +45,7 @@ import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.util.encoders.Hex;
 
 import be.fedict.eid.applet.service.Address;
+import be.fedict.eid.applet.service.EIdCertsData;
 import be.fedict.eid.applet.service.EIdData;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.impl.AuthenticationChallenge;
@@ -106,6 +107,8 @@ public class AuthenticationDataMessageHandler implements
 	private String nrcidAppId;
 
 	private boolean includeIdentity;
+
+	private boolean includeCertificates;
 
 	private boolean includeAddress;
 
@@ -327,6 +330,27 @@ public class AuthenticationDataMessageHandler implements
 					message.photoData);
 			eidData.photo = message.photoData;
 		}
+		if (this.includeCertificates) {
+			if (this.includeIdentity) {
+				eidData.certs = new EIdCertsData();
+				eidData.certs.authn = message.authnCert;
+				eidData.certs.ca = message.citizenCaCert;
+				eidData.certs.root = message.rootCaCert;
+				eidData.certs.sign = message.signCert;
+			}
+			session.setAttribute(
+					IdentityDataMessageHandler.AUTHN_CERT_SESSION_ATTRIBUTE,
+					message.authnCert);
+			session.setAttribute(
+					IdentityDataMessageHandler.CA_CERT_SESSION_ATTRIBUTE,
+					message.citizenCaCert);
+			session.setAttribute(
+					IdentityDataMessageHandler.ROOT_CERT_SESSION_ATTRIBTUE,
+					message.rootCaCert);
+			session.setAttribute(
+					IdentityDataMessageHandler.SIGN_CERT_SESSION_ATTRIBUTE,
+					message.signCert);
+		}
 
 		return new FinishedMessage();
 	}
@@ -495,6 +519,12 @@ public class AuthenticationDataMessageHandler implements
 				.getInitParameter(HelloMessageHandler.INCLUDE_IDENTITY_INIT_PARAM_NAME);
 		if (null != includeIdentity) {
 			this.includeIdentity = Boolean.parseBoolean(includeIdentity);
+		}
+		String includeCertificates = config
+				.getInitParameter(HelloMessageHandler.INCLUDE_CERTS_INIT_PARAM_NAME);
+		if (null != includeCertificates) {
+			this.includeCertificates = Boolean
+					.parseBoolean(includeCertificates);
 		}
 		this.identityIntegrityServiceLocator = new ServiceLocator<IdentityIntegrityService>(
 				HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME,
