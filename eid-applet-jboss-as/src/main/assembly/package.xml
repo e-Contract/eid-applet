@@ -30,6 +30,8 @@
 				<exclude>common/lib/commons-collections.jar</exclude>
 				<!-- we provider our own commons-httpclient -->
 				<exclude>common/lib/commons-httpclient.jar</exclude>
+				<!-- opensaml -->
+				<exclude>lib/endorsed/serializer.jar</exclude>
 				<!-- chmod+x on the UNIX scripts -->
 				<exclude>bin/run.sh</exclude>
 				<exclude>bin/shutdown.sh</exclude>
@@ -73,7 +75,15 @@
 				<exclude>org.jboss.jbossas:jboss-as-distribution</exclude>
 				<!-- Richfaces triggers commons-logging -->
 				<exclude>commons-logging:commons-logging</exclude>
+				<!-- OpenSAML -->
+				<exclude>org.apache.xerces:serializer</exclude>
 			</excludes>
+		</dependencySet>
+		<dependencySet>
+			<outputDirectory>lib/endorsed</outputDirectory>
+			<includes>
+				<include>org.apache.xerces:serializer</include>
+			</includes>
 		</dependencySet>
 	</dependencySets>
 </assembly>
