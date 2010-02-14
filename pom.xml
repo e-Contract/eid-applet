@@ -612,6 +612,10 @@
 			<url>http://svn.codehaus.org/fest/m2/repo/</url>
 		</repository>
 		<repository>
+			<id>shibboleth</id>
+			<url>http://shibboleth.internet2.edu/downloads/maven2/</url>
+		</repository>
+		<repository>
 			<id>maven-java.net</id>
 			<url>http://download.java.net/maven/1/</url>
 			<layout>legacy</layout>
