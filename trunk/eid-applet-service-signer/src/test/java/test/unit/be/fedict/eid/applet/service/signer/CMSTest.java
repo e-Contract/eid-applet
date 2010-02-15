@@ -20,16 +20,19 @@ package test.unit.be.fedict.eid.applet.service.signer;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
+import java.security.InvalidParameterException;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
@@ -40,11 +43,13 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.X509Certificate;
-import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.crypto.Cipher;
+
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -82,7 +87,7 @@ public class CMSTest {
 	@Test
 	public void testPkcs1Signature() throws Exception {
 		// setup
-		KeyPair keyPair = generateKeyPair();
+		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		byte[] toBeSigned = "hello world".getBytes();
 
 		// operate
@@ -107,7 +112,7 @@ public class CMSTest {
 	@Test
 	public void testBasicCmsSignature() throws Exception {
 		// setup
-		KeyPair keyPair = generateKeyPair();
+		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusMonths(1);
 		X509Certificate certificate = generateSelfSignedCertificate(keyPair,
@@ -151,7 +156,7 @@ public class CMSTest {
 	@Test
 	public void testCmsSignatureWithContent() throws Exception {
 		// setup
-		KeyPair keyPair = generateKeyPair();
+		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusMonths(1);
 		X509Certificate certificate = generateSelfSignedCertificate(keyPair,
@@ -198,7 +203,7 @@ public class CMSTest {
 	@Test
 	public void testCmsSignatureWithCertificate() throws Exception {
 		// setup
-		KeyPair keyPair = generateKeyPair();
+		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusMonths(1);
 		X509Certificate certificate = generateSelfSignedCertificate(keyPair,
@@ -247,13 +252,154 @@ public class CMSTest {
 		LOG.debug("content type: " + signedData.getSignedContentTypeOID());
 	}
 
-	private KeyPair generateKeyPair() throws Exception {
-		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-		SecureRandom random = new SecureRandom();
-		keyPairGenerator.initialize(new RSAKeyGenParameterSpec(1024,
-				RSAKeyGenParameterSpec.F4), random);
-		KeyPair keyPair = keyPairGenerator.generateKeyPair();
-		return keyPair;
+	public static class SHA1WithRSASignature extends Signature {
+
+		private static final Log LOG = LogFactory
+				.getLog(SHA1WithRSASignature.class);
+
+		private static final ThreadLocal<byte[]> digestValues = new ThreadLocal<byte[]>();
+
+		private static final ThreadLocal<byte[]> signatureValues = new ThreadLocal<byte[]>();
+
+		private final MessageDigest messageDigest;
+
+		public SHA1WithRSASignature() throws NoSuchAlgorithmException {
+			super("SHA1withRSA");
+			LOG.debug("constructor");
+			this.messageDigest = MessageDigest.getInstance("SHA1");
+		}
+
+		@Override
+		protected Object engineGetParameter(String param)
+				throws InvalidParameterException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		protected void engineInitSign(PrivateKey privateKey)
+				throws InvalidKeyException {
+			LOG.debug("engineInitSign: " + privateKey.getAlgorithm());
+		}
+
+		@Override
+		protected void engineInitVerify(PublicKey publicKey)
+				throws InvalidKeyException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		protected void engineSetParameter(String param, Object value)
+				throws InvalidParameterException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		protected byte[] engineSign() throws SignatureException {
+			LOG.debug("engineSign");
+			byte[] signatureValue = SHA1WithRSASignature.signatureValues.get();
+			if (null != signatureValue) {
+				SHA1WithRSASignature.signatureValues.set(null);
+				return signatureValue;
+			}
+			return "dummy".getBytes();
+		}
+
+		public static void setSignatureValue(byte[] signatureValue) {
+			SHA1WithRSASignature.signatureValues.set(signatureValue);
+		}
+
+		@Override
+		protected void engineUpdate(byte b) throws SignatureException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		protected void engineUpdate(byte[] b, int off, int len)
+				throws SignatureException {
+			LOG.debug("engineUpdate(b,off,len): off=" + off + "; len=" + len);
+			this.messageDigest.update(b, off, len);
+			byte[] digestValue = this.messageDigest.digest();
+			SHA1WithRSASignature.digestValues.set(digestValue);
+		}
+
+		@Override
+		protected boolean engineVerify(byte[] sigBytes)
+				throws SignatureException {
+			throw new UnsupportedOperationException();
+		}
+
+		public static byte[] getDigestValue() {
+			return SHA1WithRSASignature.digestValues.get();
+		}
+	}
+
+	private static class CMSTestProvider extends Provider {
+
+		private static final long serialVersionUID = 1L;
+
+		public static final String NAME = "CMSTestProvider";
+
+		private CMSTestProvider() {
+			super(NAME, 1.0, "CMS Test Security Provider");
+			put("Signature.SHA1withRSA", SHA1WithRSASignature.class.getName());
+		}
+	}
+
+	@Test
+	public void testRetrieveCMSDigestValue() throws Exception {
+		// setup
+		KeyPair keyPair = PkiTestUtils.generateKeyPair();
+		DateTime notBefore = new DateTime();
+		DateTime notAfter = notBefore.plusMonths(1);
+		X509Certificate certificate = generateSelfSignedCertificate(keyPair,
+				"CN=Test", notBefore, notAfter);
+		byte[] toBeSigned = "hello world".getBytes();
+
+		// operate
+		CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
+		generator.addSigner(keyPair.getPrivate(), certificate,
+				CMSSignedDataGenerator.DIGEST_SHA1);
+		CMSProcessable content = new CMSProcessableByteArray(toBeSigned);
+
+		CMSTestProvider provider = new CMSTestProvider();
+		generator.generate(content, false, provider);
+
+		byte[] digestValue = SHA1WithRSASignature.getDigestValue();
+		assertNotNull(digestValue);
+		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
+		byte[] digestInfoValue = ArrayUtils.addAll(
+				PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestValue);
+		byte[] signatureValue = cipher.doFinal(digestInfoValue);
+		SHA1WithRSASignature.setSignatureValue(signatureValue);
+
+		generator = new CMSSignedDataGenerator();
+		generator.addSigner(keyPair.getPrivate(), certificate,
+				CMSSignedDataGenerator.DIGEST_SHA1);
+		content = new CMSProcessableByteArray(toBeSigned);
+		provider = new CMSTestProvider();
+
+		CMSSignedData signedData = generator.generate(content, false, provider);
+
+		byte[] cmsSignature = signedData.getEncoded();
+		LOG.debug("CMS signature: "
+				+ ASN1Dump.dumpAsString(new ASN1StreamParser(cmsSignature)
+						.readObject()));
+
+		// verify
+		content = new CMSProcessableByteArray(toBeSigned);
+		signedData = new CMSSignedData(content, cmsSignature);
+		SignerInformationStore signers = signedData.getSignerInfos();
+		Iterator<SignerInformation> iter = signers.getSigners().iterator();
+		while (iter.hasNext()) {
+			SignerInformation signer = iter.next();
+			SignerId signerId = signer.getSID();
+			LOG.debug("signer: " + signerId);
+			assertTrue(signerId.match(certificate));
+			assertTrue(signer.verify(keyPair.getPublic(),
+					BouncyCastleProvider.PROVIDER_NAME));
+		}
+		LOG.debug("content type: " + signedData.getSignedContentTypeOID());
 	}
 
 	private X509Certificate generateSelfSignedCertificate(KeyPair keyPair,
