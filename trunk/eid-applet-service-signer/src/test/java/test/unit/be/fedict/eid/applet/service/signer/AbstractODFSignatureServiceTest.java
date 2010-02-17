@@ -165,6 +165,11 @@ public class AbstractODFSignatureServiceTest {
 		sign("/hello-world.odt", 1);
 	}
 
+	//@Test
+	public void testMathMLWithDTDReference() throws Exception {
+		sign("/mathml-dtd.odt", 1);
+	}
+
 	@Test
 	public void testSignZipEntriesWithSpaces() throws Exception {
 		sign("/hello-world-spaces.odt", 1);
