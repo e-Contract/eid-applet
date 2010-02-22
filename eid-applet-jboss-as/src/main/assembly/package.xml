@@ -25,7 +25,7 @@
 				<exclude>server/minimal/**</exclude>
 				<exclude>server/standard/**</exclude>
 				<exclude>server/web/**</exclude>
-				<exclude>server/default/deploy/admin-console.war/**</exclude>
+				<exclude>common/deploy/admin-console.war/**</exclude>
 				<!-- commons-collections via Richfaces -->
 				<exclude>common/lib/commons-collections.jar</exclude>
 				<!-- we provider our own commons-httpclient -->
@@ -73,8 +73,6 @@
 			<excludes>
 				<!-- scope compile doesn't work... -->
 				<exclude>org.jboss.jbossas:jboss-as-distribution</exclude>
-				<!-- Richfaces triggers commons-logging -->
-				<exclude>commons-logging:commons-logging</exclude>
 				<!-- OpenSAML -->
 				<exclude>org.apache.xerces:serializer</exclude>
 			</excludes>
