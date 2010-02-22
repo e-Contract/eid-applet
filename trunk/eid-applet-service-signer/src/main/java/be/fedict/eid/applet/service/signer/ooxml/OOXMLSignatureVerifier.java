@@ -96,9 +96,7 @@ public class OOXMLSignatureVerifier {
 			if (false == "[Content_Types].xml".equals(zipEntry.getName())) {
 				continue;
 			}
-			if (zipEntry.getSize() > 0) {
-				return true;
-			}
+			return true;
 		}
 		return false;
 	}

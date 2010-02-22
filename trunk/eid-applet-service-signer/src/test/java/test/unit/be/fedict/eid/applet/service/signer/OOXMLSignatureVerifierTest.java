@@ -102,6 +102,19 @@ public class OOXMLSignatureVerifierTest {
 		// verify
 		assertTrue(result);
 	}
+	
+	@Test
+	public void testIsOOXMLDocument2() throws Exception {
+		// setup
+		URL url = OOXMLSignatureVerifierTest.class
+				.getResource("/signed-ooxml.docx");
+
+		// operate
+		boolean result = OOXMLSignatureVerifier.isOOXML(url);
+
+		// verify
+		assertTrue(result);
+	}
 
 	@Test
 	public void testODFIsNotOOXML() throws Exception {
@@ -217,6 +230,22 @@ public class OOXMLSignatureVerifierTest {
 		// setup
 		URL url = OOXMLSignatureVerifierTest.class
 				.getResource("/hello-world-signed.docx");
+
+		// operate
+		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+
+		// verify
+		assertNotNull(result);
+		assertEquals(1, result.size());
+		X509Certificate signer = result.get(0);
+		LOG.debug("signer: " + signer.getSubjectX500Principal());
+	}
+
+	@Test
+	public void testSignedOOXML() throws Exception {
+		// setup
+		URL url = OOXMLSignatureVerifierTest.class
+				.getResource("/signed-ooxml.docx");
 
 		// operate
 		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
