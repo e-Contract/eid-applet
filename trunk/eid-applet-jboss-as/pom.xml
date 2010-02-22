@@ -15,7 +15,7 @@
 	<version>1.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<properties>
-		<jboss.version>6.0.0.M1</jboss.version>
+		<jboss.version>6.0.0.20100216-M2</jboss.version>
 	</properties>
 	<build>
 		<plugins>
@@ -77,7 +77,7 @@
 							<targetDirectory>target/dependency/jboss-${jboss.version}</targetDirectory>
 							<patches>
 								<patch>jboss-conf-memory.patch</patch>
-								<patch>jboss-log4j.patch</patch>
+								<patch>jboss-logging.patch</patch>
 								<patch>jbossweb-ssl.patch</patch>
 							</patches>
 						</configuration>
@@ -110,6 +110,7 @@
 			<artifactId>jboss-as-distribution</artifactId>
 			<type>zip</type>
 			<version>${jboss.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -134,6 +135,10 @@
 		<dependency>
 			<groupId>commons-digester</groupId>
 			<artifactId>commons-digester</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
