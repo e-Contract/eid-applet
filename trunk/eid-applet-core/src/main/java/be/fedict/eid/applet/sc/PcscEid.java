@@ -139,6 +139,17 @@ public class PcscEid extends Observable implements PcscEidSpi {
 				System.setProperty("sun.security.smartcardio.library",
 						libPcscLite.getAbsolutePath());
 			}
+			/*
+			 * Workaround for Ubuntu 9.10.
+			 * 
+			 * See also:
+			 * https://bugs.launchpad.net/ubuntu/+source/pcsc-lite/+bug/378294
+			 */
+			libPcscLite = new File("/lib/libpcsclite.so.1");
+			if (libPcscLite.exists()) {
+				System.setProperty("sun.security.smartcardio.library",
+						libPcscLite.getAbsolutePath());
+			}
 		}
 	}
 
