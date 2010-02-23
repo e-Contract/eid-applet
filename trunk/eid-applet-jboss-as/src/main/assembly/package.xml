@@ -25,6 +25,7 @@
 				<exclude>server/minimal/**</exclude>
 				<exclude>server/standard/**</exclude>
 				<exclude>server/web/**</exclude>
+				<exclude>server/jbossweb-standalone/**</exclude>
 				<exclude>common/deploy/admin-console.war/**</exclude>
 				<!-- commons-collections via Richfaces -->
 				<exclude>common/lib/commons-collections.jar</exclude>
