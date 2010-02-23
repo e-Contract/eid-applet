@@ -18,7 +18,9 @@
 
 package be.fedict.eid.applet.service.impl;
 
+import java.awt.Color;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 import org.apache.commons.logging.Log;
@@ -29,12 +31,15 @@ import be.fedict.eid.applet.service.EIdData;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.PdfServlet;
 
+import com.lowagie.text.BadElementException;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
 import com.lowagie.text.Font;
 import com.lowagie.text.Image;
 import com.lowagie.text.Paragraph;
+
+import com.lowagie.text.pdf.Barcode128;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
@@ -43,86 +48,168 @@ import com.lowagie.text.pdf.PdfWriter;
  * PDF generator for eID identity data. The implementation is using iText.
  * 
  * @author Frank Cornelis
+ * @author Bart Hanssens
  * @see PdfServlet
  */
 public class PdfGenerator {
 
 	private static final Log LOG = LogFactory.getLog(PdfGenerator.class);
 
+        /**
+         * Generate a Code128C barcode
+         *
+         * @param rrn unique Rijksregister number
+         * @param cardNumber number of the card
+         * @return Image containing barcode
+         * @throws IOException
+         * @throws BadElementException
+         */
+        private Image createBarcodeImage(String rrn, String cardNumber) throws IOException, BadElementException {
+            if (null == rrn || rrn.length() != 11  ||
+                    null == cardNumber || cardNumber.length() < 9) {
+                throw new IllegalArgumentException("Missing or invalid length for RRN or Card Number");
+            }
+
+            String lastDigits = cardNumber.substring(cardNumber.length() - 9);
+            String code = rrn + lastDigits;
+
+            Barcode128 barcode = new Barcode128();
+            barcode.setCodeType(Barcode128.CODE_C);
+            barcode.setCode(code);
+            barcode.setFont(null);
+
+            return Image.getInstance(barcode.createAwtImage(Color.BLACK, Color.WHITE), null, true);
+        }
+
+
+        /**
+         * Create a PDF image from eID photo
+         *
+         * @param photoData raw bytes
+         * @return PDF image
+         * @throws IOException
+         * @throws BadElementException
+         */
+        private Image createImageFromPhoto(byte[] photoData) throws IOException, BadElementException {
+            Image image = Image.getInstance(photoData);
+            image.setAlt("Photo");
+            image.setAlignment(Element.ALIGN_CENTER);
+            image.setSpacingAfter(20);
+
+            return image;
+        }
+
+
+        /**
+         * Set the metadata on the PDF document
+         * 
+         * @param doc PDF document
+         * @param firstName first name of the person
+         * @param lastName last name of the person
+         */
+        private void setDocumentMetadata(Document doc, String firstName, String lastName) {
+            doc.addTitle(firstName + " " + lastName);
+            doc.addSubject("Data from the eID card");
+            doc.addCreator("Belgian eID applet");
+            doc.addProducer();
+            doc.addCreationDate();
+        }
+
+
 	public byte[] generatePdf(EIdData eIdData) throws DocumentException {
-		Document document = new Document();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		PdfWriter.getInstance(document, baos);
-		document.open();
+            Document document = new Document();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PdfWriter writer = PdfWriter.getInstance(document, baos);
 
-		Paragraph titleParagraph = new Paragraph("eID Identity Data");
-		titleParagraph.setAlignment(Paragraph.ALIGN_CENTER);
-		Font titleFont = titleParagraph.getFont();
-		titleFont.setSize((float) 20.0);
-		titleFont.setStyle(Font.BOLD);
-		titleParagraph.setSpacingAfter(20);
-		document.add(titleParagraph);
+            document.open();
 
-		if (null != eIdData && null != eIdData.getIdentity()) {
-			if (null != eIdData.getPhoto()) {
-				byte[] photoData = eIdData.getPhoto();
-				try {
-					Image image = Image.getInstance(photoData);
-					image.setAlignment(Element.ALIGN_CENTER);
-					image.setSpacingAfter(20);
-					document.add(image);
-				} catch (Exception e) {
-					LOG.debug("photo error: " + e.getMessage(), e);
-					document.add(new Paragraph("Photo contains some errors."));
-				}
-			}
+            Paragraph titleParagraph = new Paragraph("eID Identity Data");
+            titleParagraph.setAlignment(Paragraph.ALIGN_CENTER);
 
-			Identity identity = eIdData.getIdentity();
-			PdfPTable table = new PdfPTable(2);
-			table.getDefaultCell().setBorder(0);
+            Font titleFont = titleParagraph.getFont();
+            titleFont.setSize((float) 20.0);
+            titleFont.setStyle(Font.BOLD);
+            titleParagraph.setSpacingAfter(20);
+            document.add(titleParagraph);
 
-			table.addCell("Name");
-			table.addCell(identity.name);
+            if (null != eIdData && null != eIdData.getIdentity()) {
+		if (null != eIdData.getPhoto()) {
+                    try {
+                        Image image = createImageFromPhoto(eIdData.getPhoto());
+                        document.add(image);
+                    } catch (Exception e) {
+                        LOG.error("Error getting photo: " + e.getMessage());
+                    }
 
-			table.addCell("First name");
-			String firstName = identity.firstName;
-			if (null != identity.middleName) {
-				firstName += " " + identity.middleName;
-			}
-			table.addCell(firstName);
+                    Identity identity = eIdData.getIdentity();
 
-			table.addCell("Nationality");
-			table.addCell(identity.nationality);
+                    // metadata
+                    setDocumentMetadata(document, identity.firstName, identity.name);
+                    writer.createXmpMetadata();
 
-			table.addCell("National Registration Number");
-			table.addCell(identity.nationalNumber);
+                    // create a table with the data of the eID card
+                    PdfPTable table = new PdfPTable(2);
+                    table.getDefaultCell().setBorder(0);
 
-			table.addCell("Gender");
-			table.addCell(identity.gender.toString());
+                    table.addCell("Name");
+                    table.addCell(identity.name);
 
-			table.addCell("Date of birth");
-			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-			table.addCell(formatter.format(identity.dateOfBirth.getTime()));
+                    table.addCell("First name");
+                    String firstName = identity.firstName;
+                    if (null != identity.middleName) {
+			firstName += " " + identity.middleName;
+                    }
+                    table.addCell(firstName);
 
-			table.addCell("Place of birth");
-			table.addCell(identity.placeOfBirth);
+                    table.addCell("Nationality");
+                    table.addCell(identity.nationality);
 
-			if (null != eIdData.getAddress()) {
-				Address address = eIdData.getAddress();
-				table.addCell("Address");
-				PdfPCell cell = new PdfPCell();
-				cell.setBorder(0);
-				cell.addElement(new Paragraph(address.streetAndNumber));
-				cell.addElement(new Paragraph(address.zip + " "
+                    table.addCell("National Registration Number");
+                    table.addCell(identity.nationalNumber);
+
+                    table.addCell("Gender");
+                    table.addCell(identity.gender.toString());
+
+                    table.addCell("Date of birth");
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                    table.addCell(formatter.format(identity.dateOfBirth.getTime()));
+
+                    table.addCell("Place of birth");
+                    table.addCell(identity.placeOfBirth);
+
+                    if (null != eIdData.getAddress()) {
+			Address address = eIdData.getAddress();
+			table.addCell("Address");
+			PdfPCell cell = new PdfPCell();
+			cell.setBorder(0);
+			cell.addElement(new Paragraph(address.streetAndNumber));
+			cell.addElement(new Paragraph(address.zip + " "
 						+ address.municipality));
-				table.addCell(cell);
-			}
+			table.addCell(cell);
+                    }
 
-			document.add(table);
+                    document.add(table);
+
+                    // TODO: to be tested
+                    /*
+                    try {
+                        Image barcodeImage =
+                            createBarcodeImage(identity.nationalNumber, identity.cardNumber);
+
+                        barcodeImage.setAlignment(Element.ALIGN_CENTER);
+                        Paragraph barcodePara = new Paragraph();
+                        barcodePara.add(barcodeImage);
+
+                        document.add(barcodeImage);
+                    } catch (Exception e) {
+                        LOG.error("Error adding barcode: " + e.getMessage());
+                    }
+                    */
 		} else {
-			document.add(new Paragraph("No eID identity data available."));
+                    document.add(new Paragraph("No eID identity data available."));
 		}
-		document.close();
-		return baos.toByteArray();
+            }
+            document.close();
+            return baos.toByteArray();
 	}
 }
