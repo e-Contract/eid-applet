@@ -28,6 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.security.Security;
 import java.security.Signature;
 import java.security.cert.CertificateFactory;
@@ -46,6 +47,9 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.util.ASN1Dump;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMWriter;
 import org.junit.Before;
@@ -57,6 +61,7 @@ import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
 import be.fedict.eid.applet.sc.PcscEid;
 import be.fedict.eid.applet.sc.PcscEidSpi;
+import be.fedict.eid.applet.sc.Pkcs11Eid;
 import be.fedict.eid.applet.sc.Task;
 import be.fedict.eid.applet.sc.TaskRunner;
 import be.fedict.trust.BelgianTrustValidatorFactory;
@@ -123,20 +128,20 @@ public class PcscTest {
 
 	@Test
 	public void pcscAuthnSignature() throws Exception {
-		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
-		if (false == pcscEidSpi.isEidPresent()) {
+		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEid.isEidPresent()) {
 			LOG.debug("insert eID card");
-			pcscEidSpi.waitForEidPresent();
+			pcscEid.waitForEidPresent();
 		}
 		byte[] challenge = "hello world".getBytes();
 		byte[] signatureValue;
 		List<X509Certificate> authnCertChain;
 		try {
-			signatureValue = pcscEidSpi.signAuthn(challenge);
-			authnCertChain = pcscEidSpi.getAuthnCertificateChain();
-			pcscEidSpi.logoff();
+			signatureValue = pcscEid.signAuthn(challenge);
+			authnCertChain = pcscEid.getAuthnCertificateChain();
+			pcscEid.logoff();
 		} finally {
-			pcscEidSpi.close();
+			pcscEid.close();
 		}
 
 		Signature signature = Signature.getInstance("SHA1withRSA");
@@ -144,6 +149,46 @@ public class PcscTest {
 		signature.update(challenge);
 		boolean result = signature.verify(signatureValue);
 		assertTrue(result);
+	}
+
+	@Test
+	public void testCardSignature() throws Exception {
+		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEid.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEid.waitForEidPresent();
+		}
+		try {
+			CardChannel cardChannel = pcscEid.getCardChannel();
+			CommandAPDU setApdu = new CommandAPDU(0x00, 0x22, 0x41, 0xB6,
+					new byte[] { 0x04, // length of following data
+							(byte) 0x80, // algo ref
+							0x01, // rsa pkcs#1
+							(byte) 0x84, // tag for private key ref
+							(byte) 0x81 });
+			ResponseAPDU responseApdu = cardChannel.transmit(setApdu);
+			if (0x9000 != responseApdu.getSW()) {
+				throw new RuntimeException("SELECT error");
+			}
+
+			byte[] message = "hello world".getBytes();
+			MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
+			byte[] digestValue = messageDigest.digest(message);
+
+			ByteArrayOutputStream digestInfo = new ByteArrayOutputStream();
+			digestInfo.write(Pkcs11Eid.SHA1_DIGEST_INFO_PREFIX);
+			digestInfo.write(digestValue);
+			CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00,
+					0x2A, 0x9E, 0x9A, digestInfo.toByteArray());
+			responseApdu = cardChannel.transmit(computeDigitalSignatureApdu);
+			if (0x9000 != responseApdu.getSW()) {
+				throw new RuntimeException("error CDS: "
+						+ Integer.toHexString(responseApdu.getSW()));
+			}
+
+		} finally {
+			pcscEid.close();
+		}
 	}
 
 	@Test
@@ -218,6 +263,25 @@ public class PcscTest {
 		pcscEidSpi.readFile(PcscEid.ADDRESS_FILE_ID);
 
 		pcscEidSpi.close();
+	}
+
+	@Test
+	public void testDEREncoding() throws Exception {
+		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEidSpi.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEidSpi.waitForEidPresent();
+		}
+
+		try {
+			byte[] authnCert = pcscEidSpi.readFile(PcscEid.AUTHN_CERT_FILE_ID);
+			DERSequence sequence = (DERSequence) new ASN1InputStream(
+					new ByteArrayInputStream(authnCert)).readObject();
+			String str = ASN1Dump.dumpAsString(sequence);
+			LOG.debug(str);
+		} finally {
+			pcscEidSpi.close();
+		}
 	}
 
 	private void selectCardManager(CardChannel cardChannel) {
@@ -358,6 +422,8 @@ public class PcscTest {
 		byte[] signCertData = pcscEidSpi.readFile(PcscEid.SIGN_CERT_FILE_ID);
 		byte[] citizenCaCertData = pcscEidSpi.readFile(PcscEid.CA_CERT_FILE_ID);
 		byte[] rootCaCertData = pcscEidSpi.readFile(PcscEid.ROOT_CERT_FILE_ID);
+		byte[] nationalRegitryCertData = pcscEidSpi
+				.readFile(PcscEid.RRN_CERT_FILE_ID);
 
 		CertificateFactory certificateFactory = CertificateFactory
 				.getInstance("X.509");
@@ -369,9 +435,13 @@ public class PcscTest {
 				.generateCertificate(new ByteArrayInputStream(citizenCaCertData));
 		X509Certificate rootCaCert = (X509Certificate) certificateFactory
 				.generateCertificate(new ByteArrayInputStream(rootCaCertData));
+		X509Certificate nationalRegitryCert = (X509Certificate) certificateFactory
+				.generateCertificate(new ByteArrayInputStream(
+						nationalRegitryCertData));
 
 		LOG.debug("authentication certificate: " + authnCert);
 		LOG.debug("signature certificate: " + signCert);
+		LOG.debug("national registry certificate: " + nationalRegitryCert);
 		LOG.debug("authn cert size: " + authnCertData.length);
 		LOG.debug("sign cert size: " + signCertData.length);
 
@@ -614,9 +684,11 @@ public class PcscTest {
 		}
 
 		try {
-			List<X509Certificate> certChain = pcscEid.getSignCertificateChain();
+			List<X509Certificate> certChain = pcscEid
+					.getAuthnCertificateChain();
 			// List<X509Certificate> certChain =
 			// pcscEid.getAuthnCertificateChain();
+			LOG.debug("end-entity certificate: " + certChain.get(0));
 
 			MemoryCertificateRepository certificateRepository = new MemoryCertificateRepository();
 			certificateRepository.addTrustPoint(certChain
