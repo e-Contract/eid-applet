@@ -510,7 +510,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		return null;
 	}
 
-	private byte[] sign(byte[] digestValue, String digestAlgo, byte keyId)
+	public byte[] sign(byte[] digestValue, String digestAlgo, byte keyId)
 			throws CardException, IOException, InterruptedException {
 		Integer directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
 		Integer verifyPinStartFeature = getFeature(FEATURE_VERIFY_PIN_START_TAG);

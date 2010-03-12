@@ -19,7 +19,7 @@
 +         <only-once/>
 +      </error-manager>
 +      <formatter>
-+         <pattern-formatter pattern="%d %-5p [%c] (%t) %m%n"/>
++         <pattern-formatter pattern="%d %-5p [%C{1}] %m%n"/>
 +      </formatter>
 +   </size-rotating-file-handler>
  
