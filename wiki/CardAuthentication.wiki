@@ -1,0 +1,71 @@
+=eID Card Authentication=
+
+==Introduction==
+
+The eID card allows for two basic operations, namely simple digital
+identification of the card holder, and the creation of digital signatures.
+During an eID identification we simply read out the identity files of the
+citizen's eID card.  Two types of digital signatures are supported: (1)
+provide entity authentication via the private authentication key and
+corresponding certificate chain, and (2) to provide electronic signatures
+using the private non-repudiation key and corresponding certificate chain.
+Digital signatures are created according to the PKCS#1v1.5 standard.
+
+Because the private keys cannot be copied from the card, one has the
+guarantee that authentication operations have been performed using the
+genuine eID card of the citizen. The PIN verification also assures us that
+the operation took place with the user's consent. Especially for
+non-repudiation signatures this is the case as the citizen has to enter
+the PIN code upon each signature generation.  This is very important from
+a legal point of view for the creation of electronic signatures.
+
+Looking at it from another point-of-view, one could state that the
+creation of a digital signature leads to two cryptographic primitives.
+One is entity authentication, and the other one is card authentication. On
+the other hand, when performing an identification, card authentication can
+be verified using the third private key of an eID card, namely the private
+basic key.  Unfortunately this form of card authentication requires the
+availability of the corresponding public key, and this is only known to
+the eID card issuer, namely the National Register.  This card
+authentication allows for the detection of eID card cloning.  eID card
+authentication should be possible with the eID card to allow for a truly
+secure eID identification.  The existing basic key pair can be used
+without PIN verification. The only thing that needs to change is the
+availability of the corresponding public key via the eID card itself.
+
+==Implementations==
+
+We describe two possible implementations.
+
+===Implementation via public key and reference in identity file===
+
+ The
+easiest way to make this information available is by including an
+additional file in the eID card's file structure that holds this public
+basic key, and by including the hash value of this key in the identity
+file.  The same principle has already been applied to protect the
+integrity of the citizen's picture on the eID card.
+
+This feature does not jeopardize any of the existing card management
+authentication schemes.
+
+As for the implementation of this eID clone detection scheme, it should be
+possible to issue eID cards that have the additional file with the public
+basic key (and the corresponding hash in the identity file).
+
+First the application reads out the identity file, corresponding identity
+signature file, RRN certificate, authentication certificate, Citizen CA
+certificate, and the Root CA. The application verifies the signature over
+the identity file using the RRN certificate. Then the application verifies
+the validity of the RRN certificate chain (full PKI validation). Next the
+application verifies whether the national number within the identity file
+corresponds with the national number within the authentication
+certificate. Next the application verifies the authentication certificate
+chain for validity (full PKI validation). Next the application check
+whether the authentication certificate was issued after a certain date at
+which eID cards with this additional file came into production. If so, the
+application reads out the file with the basic public key (which indeed
+should be present). It verifies whether the public basic key's hash value
+corresponds with the value retrieved from the identity file. Subsequently,
+a challenge is sent to the eID card and the resulting signature is
+verified using the public basic key.
