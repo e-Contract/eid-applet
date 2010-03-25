@@ -39,8 +39,7 @@ We describe two possible implementations.
 
 ===Implementation via public key and reference in identity file===
 
- The
-easiest way to make this information available is by including an
+The easiest way to make this information available is by including an
 additional file in the eID card's file structure that holds this public
 basic key, and by including the hash value of this key in the identity
 file.  The same principle has already been applied to protect the
@@ -69,3 +68,5 @@ should be present). It verifies whether the public basic key's hash value
 corresponds with the value retrieved from the identity file. Subsequently,
 a challenge is sent to the eID card and the resulting signature is
 verified using the public basic key.
+
+===Implementation via a card certificate===
