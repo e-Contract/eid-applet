@@ -33,6 +33,12 @@
 				<exclude>common/lib/commons-httpclient.jar</exclude>
 				<!-- opensaml -->
 				<exclude>lib/endorsed/serializer.jar</exclude>
+				<!-- JAX-WS/JAXB -->
+				<exclude>server/default/deployers/jbossws.deployer/**</exclude>
+				<exclude>server/default/deployers/resteasy.deployer/jaxb-impl-2.2.jar</exclude>
+				<exclude>common/lib/jaxws-api.jar</exclude>
+				<exclude>common/lib/jsr181-api.jar</exclude>
+				<exclude>common/lib/saaj-api.jar</exclude>
 				<!-- chmod+x on the UNIX scripts -->
 				<exclude>bin/run.sh</exclude>
 				<exclude>bin/shutdown.sh</exclude>
@@ -76,6 +82,14 @@
 				<exclude>org.jboss.jbossas:jboss-as-distribution</exclude>
 				<!-- OpenSAML -->
 				<exclude>org.apache.xerces:serializer</exclude>
+				<!-- JAXB/JAXWS 2.2 -->
+				<exclude>javax.xml.bind:jaxb-api</exclude>
+				<exclude>com.sun.xml.bind:jaxb-impl</exclude>
+				<exclude>javax.xml.ws:jaxws-api</exclude>
+				<exclude>stax:stax-api</exclude>
+				<exclude>woodstox:wstx-asl</exclude>
+				<exclude>javax.xml.stream:stax-api</exclude>
+				<exclude>org.apache.xalan:xalan</exclude>
 			</excludes>
 		</dependencySet>
 		<dependencySet>
