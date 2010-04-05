@@ -1,4 +1,5 @@
 #summary Get The Facts on Signatures
+#sidebar TableOfContents
 
 = Get The Facts on Signatures =
 
