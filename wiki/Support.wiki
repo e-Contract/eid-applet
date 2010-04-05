@@ -1,4 +1,5 @@
 #summary eID Applet Support Model
+#sidebar TableOfContents
 
 = eID Applet Support Model =
 
