@@ -1,4 +1,5 @@
 #summary eID Applet Demo
+#sidebar TableOfContents
 
 = eID Applet Demo =
 
