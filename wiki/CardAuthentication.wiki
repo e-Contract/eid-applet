@@ -1,4 +1,5 @@
 #summary eID Card Authentication
+#sidebar TableOfContents
 
 =eID Card Authentication=
 
