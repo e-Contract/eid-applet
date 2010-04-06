@@ -4,3 +4,5 @@
   * Get The Facts
     * [GetTheFactsSignatures Get The Facts on Signatures]
     * [GetTheFacts Get The Facts: eID Applet Identification]
+  * Specifications
+    * [CardAuthentication eID Card Authentication]
