@@ -95,6 +95,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	public static final String CHANNEL_BINDING_SERVER_CERTIFICATE = "ChannelBindingServerCertificate";
 
+	public static final String CHANNEL_BINDING_SERVICE = "ChannelBindingService";
+
 	private boolean includePhoto;
 
 	private boolean includeAddress;
@@ -326,6 +328,11 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 		String channelBindingServerCertificate = config
 				.getInitParameter(CHANNEL_BINDING_SERVER_CERTIFICATE);
 		if (null != channelBindingServerCertificate) {
+			this.serverCertificateChannelBinding = true;
+		}
+		String channelBindingService = config
+				.getInitParameter(CHANNEL_BINDING_SERVICE);
+		if (null != channelBindingService) {
 			this.serverCertificateChannelBinding = true;
 		}
 	}

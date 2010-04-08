@@ -28,6 +28,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -54,6 +55,7 @@ import be.fedict.eid.applet.service.impl.UserIdentifierUtil;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
 import be.fedict.eid.applet.service.spi.AuditService;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
+import be.fedict.eid.applet.service.spi.ChannelBindingService;
 import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
 import be.fedict.eid.applet.shared.AuthenticationContract;
 import be.fedict.eid.applet.shared.AuthenticationDataMessage;
@@ -77,6 +79,8 @@ public class AuthenticationDataMessageHandler implements
 	private ServiceLocator<AuthenticationService> authenticationServiceLocator;
 
 	private ServiceLocator<AuditService> auditServiceLocator;
+
+	private ServiceLocator<ChannelBindingService> channelBindingServiceLocator;
 
 	private String hostname;
 
@@ -143,13 +147,17 @@ public class AuthenticationDataMessageHandler implements
 			}
 		}
 
-		if (null != this.encodedServerCertificate) {
+		ChannelBindingService channelBindingService = this.channelBindingServiceLocator
+				.locateService();
+		if (null != this.encodedServerCertificate
+				|| null != channelBindingService) {
 			LOG.debug("using server certificate channel binding");
 		}
 
 		if (false == this.sessionIdChannelBinding
-				&& null == this.encodedServerCertificate) {
-			LOG.warn("no using any secure channel binding");
+				&& null == this.encodedServerCertificate
+				&& null == channelBindingService) {
+			LOG.warn("not using any secure channel binding");
 		}
 
 		byte[] challenge;
@@ -166,9 +174,21 @@ public class AuthenticationDataMessageHandler implements
 			}
 			throw new ServletException("security error: " + e.getMessage(), e);
 		}
+		byte[] usedEncodedServerCertificate;
+		if (null != channelBindingService) {
+			try {
+				usedEncodedServerCertificate = channelBindingService
+						.getServerCertificate().getEncoded();
+			} catch (CertificateEncodingException e) {
+				throw new ServletException("X509 encoding error: "
+						+ e.getMessage(), e);
+			}
+		} else {
+			usedEncodedServerCertificate = this.encodedServerCertificate;
+		}
 		AuthenticationContract authenticationContract = new AuthenticationContract(
 				message.saltValue, this.hostname, this.inetAddress,
-				message.sessionId, this.encodedServerCertificate, challenge);
+				message.sessionId, usedEncodedServerCertificate, challenge);
 		byte[] toBeSigned;
 		try {
 			toBeSigned = authenticationContract.calculateToBeSigned();
@@ -495,6 +515,9 @@ public class AuthenticationDataMessageHandler implements
 						+ e.getMessage(), e);
 			}
 		}
+
+		this.channelBindingServiceLocator = new ServiceLocator<ChannelBindingService>(
+				HelloMessageHandler.CHANNEL_BINDING_SERVICE, config);
 
 		this.nrcidSecret = config
 				.getInitParameter(NRCID_SECRET_INIT_PARAM_NAME);

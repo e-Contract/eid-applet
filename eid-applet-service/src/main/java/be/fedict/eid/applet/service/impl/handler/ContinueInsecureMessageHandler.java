@@ -261,5 +261,10 @@ public class ContinueInsecureMessageHandler implements
 		if (null != channelBindingServerCertificate) {
 			this.serverCertificateChannelBinding = true;
 		}
+		String channelBindingService = config
+				.getInitParameter(HelloMessageHandler.CHANNEL_BINDING_SERVICE);
+		if (null != channelBindingService) {
+			this.serverCertificateChannelBinding = true;
+		}
 	}
 }
