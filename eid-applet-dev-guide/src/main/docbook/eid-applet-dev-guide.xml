@@ -983,6 +983,20 @@
 						properties compared to mutual TLS entity authentication.</para>
 				</warning>
 				<para>
+					The server certificate used to verify the secure channel
+					binding can also be provided by implementing an SPI component.
+				This
+					option can be activated via the following
+					<code>init-param</code>
+					on the
+					<code>AppletServiceServlet</code>
+					:
+				</para>
+				<programlisting role="XML"><![CDATA[<init-param>
+	<param-name>ChannelBindingService</param-name>
+	<param-value>your/location/in/jndi/ChannelBindingServiceBean</param-value>
+</init-param>]]></programlisting>
+				<para>
 					Besides server certificate channel binding the eID Applet also
 					supports unique channel binding using the TLS session identifier.
 					This option can be activated via the following
@@ -1550,10 +1564,16 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 			<programlisting><![CDATA[LoadModule proxy_ajp_module modules/mod_proxy_ajp.so
 ProxyPass /eid-applet-test/ ajp://localhost:8009/eid-applet-test/
 ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlisting>
-			<para>This AJP proxy can then terminate the SSL in a transparent way towards the 
+			<para>This AJP proxy can then terminate the SSL in a transparent way
+				towards the
 				Application Service.</para>
-			<para>On an Ubuntu server you can add the following configuration to your SSL site 
-			(which will most likely live under <code>/etc/apache2/sites-enabled/default-ssl</code>).</para>
+			<para>
+				On an Ubuntu server you can add the following configuration to your
+				SSL site
+				(which will most likely live under
+				<code>/etc/apache2/sites-enabled/default-ssl</code>
+				).
+			</para>
 			<programlisting><![CDATA[<IfModule mod_proxy_ajp.c>
                 ProxyRequests On
                 ProxyVia On
@@ -1575,7 +1595,8 @@ ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlis
 			<title>Reverse proxy</title>
 			<para>Some configuration use non-AJP aware reverse proxies. An
 				example
-				on how to configure the Apache HTTPD as a reverse proxy is given
+				on how to configure the Apache HTTPD as a reverse proxy is
+				given
 				below:
 		</para>
 			<programlisting><![CDATA[ProxyRequests Off
@@ -1596,7 +1617,8 @@ ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlis
 				can no longer
 				detect whether it's using a secure connection or not.
 				The eID Applet
-				Service can be configured to skip the secure connection check using
+				Service can be configured to skip the secure
+				connection check using
 				the following
 				<code>init-param</code>
 				on the
