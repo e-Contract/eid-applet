@@ -29,7 +29,7 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "admin")
+@Table(name = "beta_admin")
 public class AdministratorEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;

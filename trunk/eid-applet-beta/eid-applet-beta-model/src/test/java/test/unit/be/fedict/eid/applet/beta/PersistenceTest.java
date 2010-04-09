@@ -20,6 +20,7 @@ package test.unit.be.fedict.eid.applet.beta;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Calendar;
@@ -42,6 +43,7 @@ import be.fedict.eid.applet.beta.FeedbackEntity;
 import be.fedict.eid.applet.beta.SessionContextEntity;
 import be.fedict.eid.applet.beta.TestReportEntity;
 import be.fedict.eid.applet.beta.TestResultEntity;
+import be.fedict.eid.applet.beta.admin.AdministratorEntity;
 
 public class PersistenceTest {
 
@@ -64,6 +66,7 @@ public class PersistenceTest {
 		configuration.addAnnotatedClass(FeedbackEntity.class);
 		configuration.addAnnotatedClass(TestResultEntity.class);
 		configuration.addAnnotatedClass(TestReportEntity.class);
+		configuration.addAnnotatedClass(AdministratorEntity.class);
 		EntityManagerFactory entityManagerFactory = configuration
 				.buildEntityManagerFactory();
 
@@ -229,5 +232,15 @@ public class PersistenceTest {
 
 		// verify
 		assertEquals(1, resultList.size());
+	}
+
+	@Test
+	public void testQueryAdministratorEntity() throws Exception {
+		// setup
+		Query query = this.entityManager
+				.createQuery("FROM AdministratorEntity");
+
+		// operate & verify
+		assertTrue(query.getResultList().isEmpty());
 	}
 }
