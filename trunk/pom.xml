@@ -392,6 +392,11 @@
 				<version>1.0.13</version>
 			</dependency>
 			<dependency>
+				<groupId>org.apache.ws.security</groupId>
+				<artifactId>wss4j</artifactId>
+				<version>1.5.8</version>
+			</dependency>
+			<dependency>
 				<groupId>be.fedict</groupId>
 				<artifactId>jtrust</artifactId>
 				<version>1.1.0-SNAPSHOT</version>

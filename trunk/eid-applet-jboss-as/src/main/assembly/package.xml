@@ -39,6 +39,7 @@
 				<exclude>common/lib/jaxws-api.jar</exclude>
 				<exclude>common/lib/jsr181-api.jar</exclude>
 				<exclude>common/lib/saaj-api.jar</exclude>
+				<exclude>lib/endorsed/jbossws-native-factories.jar</exclude>
 				<!-- chmod+x on the UNIX scripts -->
 				<exclude>bin/run.sh</exclude>
 				<exclude>bin/shutdown.sh</exclude>
