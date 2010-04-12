@@ -29,9 +29,11 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.CookieHandler;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -40,8 +42,10 @@ import java.security.SecureRandom;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -1217,6 +1221,30 @@ public class Controller {
 				+ this.runtime.getDocumentBase());
 		addDetailMessage("Current time: " + new Date());
 		// XXX when using SunPKCS11 we only accept the Sun JRE and OpenJDK
+
+		/*
+		 * Next we check for the presence of the session cookie.
+		 */
+		CookieHandler cookieHandler = CookieHandler.getDefault();
+		if (null != cookieHandler) {
+			URL documentBase = this.runtime.getApplet().getDocumentBase();
+			try {
+				Map<String, List<String>> headers = cookieHandler.get(
+						documentBase.toURI(),
+						new HashMap<String, List<String>>());
+				List<String> cookieHeaderValues = headers.get("Cookie");
+				if (null == cookieHeaderValues || cookieHeaderValues.isEmpty()) {
+					addDetailMessage("ERROR: no session cookie detected!");
+				} else {
+					/*
+					 * Of course we don't print out the session cookie...
+					 */
+					addDetailMessage("session cookie detected");
+				}
+			} catch (Exception e) {
+				addDetailMessage("error getting cookies from default cookie handler");
+			}
+		}
 	}
 
 	public void addDetailMessage(String detailMessage) {
