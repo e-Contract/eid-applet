@@ -191,7 +191,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	public void close() {
 		try {
-			this.card.endExclusive();
+			//this.card.endExclusive();
 			this.card.disconnect(true);
 		} catch (CardException e) {
 			/*
@@ -429,7 +429,17 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	}
 
 	public void removeCard() throws CardException {
-		this.cardTerminal.waitForCardAbsent(0);
+		/*
+		 * Next doesn't work all the time. 
+		 */
+		//this.cardTerminal.waitForCardAbsent(0);
+		while (this.cardTerminal.isCardPresent()) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				this.view.addDetailMessage("sleep error: " + e.getMessage());
+			}
+		}
 	}
 
 	public List<X509Certificate> getAuthnCertificateChain()

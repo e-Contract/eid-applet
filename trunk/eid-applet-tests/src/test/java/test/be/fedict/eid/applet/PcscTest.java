@@ -139,7 +139,7 @@ public class PcscTest {
 		try {
 			signatureValue = pcscEid.signAuthn(challenge);
 			authnCertChain = pcscEid.getAuthnCertificateChain();
-			pcscEid.logoff();
+			//pcscEid.logoff();
 		} finally {
 			pcscEid.close();
 		}
@@ -149,6 +149,25 @@ public class PcscTest {
 		signature.update(challenge);
 		boolean result = signature.verify(signatureValue);
 		assertTrue(result);
+	}
+
+	@Test
+	public void pcscAuthnSignatureWithCardRemoval() throws Exception {
+		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEid.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEid.waitForEidPresent();
+		}
+		byte[] challenge = "hello world".getBytes();
+		try {
+			pcscEid.signAuthn(challenge);
+			pcscEid.getAuthnCertificateChain();
+			LOG.debug("remove card");
+			pcscEid.removeCard();
+		} finally {
+			pcscEid.close();
+		}
+		LOG.debug("test: " + (true ? "true" : "false"));
 	}
 
 	@Test
