@@ -38,7 +38,7 @@ availability of the corresponding public key via the eID card itself.
 
 ==Implementations==
 
-We describe two possible implementations.
+We describe two possible implementations. None of the proposed implementations require a change in the PKCS#15 structure of the eID card.
 
 ===Implementation via public key and reference in identity file===
 
