@@ -6,4 +6,5 @@
     * [GetTheFacts Get The Facts: eID Applet Identification]
   * Specifications
     * [CardAuthentication eID Card Authentication]
+    * [SmartCardReader eID Smart Card Reader]
   * [References References]
