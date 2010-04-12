@@ -1,4 +1,5 @@
 #summary eID Smart Card Reader
+#sidebar TableOfContents
 
 = Requirements for eID Smart Card Reader with secure display and secure pinpad  =
 
