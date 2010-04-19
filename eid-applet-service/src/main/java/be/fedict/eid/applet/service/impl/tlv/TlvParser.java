@@ -18,6 +18,7 @@
 
 package be.fedict.eid.applet.service.impl.tlv;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +69,7 @@ public class TlvParser {
 
 	private static <T> T parseThrowing(byte[] file, Class<T> tlvClass)
 			throws InstantiationException, IllegalAccessException,
-			DataConvertorException {
+			DataConvertorException, UnsupportedEncodingException {
 		Field[] fields = tlvClass.getDeclaredFields();
 		Map<Integer, Field> tlvFields = new HashMap<Integer, Field>();
 		for (Field field : fields) {
@@ -115,7 +116,7 @@ public class TlvParser {
 							.newInstance();
 					fieldValue = dataConvertor.convert(tlvValue);
 				} else if (String.class == tlvType) {
-					fieldValue = new String(tlvValue);
+					fieldValue = new String(tlvValue, "UTF-8");
 				} else if (tlvType.isArray()
 						&& Byte.TYPE == tlvType.getComponentType()) {
 					fieldValue = tlvValue;

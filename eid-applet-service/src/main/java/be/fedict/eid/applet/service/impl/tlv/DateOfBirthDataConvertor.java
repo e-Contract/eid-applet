@@ -18,6 +18,7 @@
 
 package be.fedict.eid.applet.service.impl.tlv;
 
+import java.io.UnsupportedEncodingException;
 import java.util.GregorianCalendar;
 
 import org.apache.commons.logging.Log;
@@ -37,7 +38,12 @@ public class DateOfBirthDataConvertor implements
 
 	public GregorianCalendar convert(byte[] value)
 			throws DataConvertorException {
-		String dateOfBirthStr = new String(value);
+		String dateOfBirthStr;
+		try {
+			dateOfBirthStr = new String(value, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new DataConvertorException("UTF-8 not supported");
+		}
 		LOG.debug(dateOfBirthStr);
 		int spaceIdx = dateOfBirthStr.indexOf(' ');
 		if (-1 == spaceIdx) {
