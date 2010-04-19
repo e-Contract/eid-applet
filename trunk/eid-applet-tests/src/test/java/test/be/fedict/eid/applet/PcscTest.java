@@ -64,6 +64,8 @@ import be.fedict.eid.applet.sc.PcscEidSpi;
 import be.fedict.eid.applet.sc.Pkcs11Eid;
 import be.fedict.eid.applet.sc.Task;
 import be.fedict.eid.applet.sc.TaskRunner;
+import be.fedict.eid.applet.service.Identity;
+import be.fedict.eid.applet.service.impl.tlv.TlvParser;
 import be.fedict.trust.BelgianTrustValidatorFactory;
 import be.fedict.trust.FallbackTrustLinker;
 import be.fedict.trust.MemoryCertificateRepository;
@@ -498,6 +500,8 @@ public class PcscTest {
 		File tmpIdentityFile = File.createTempFile("identity-", ".tlv");
 		LOG.debug("tmp identity file: " + tmpIdentityFile.getAbsolutePath());
 		FileUtils.writeByteArrayToFile(tmpIdentityFile, identityFile);
+		Identity identity = TlvParser.parse(identityFile, Identity.class);
+		LOG.debug("DoB: " + identity.getDateOfBirth().getTime());
 	}
 
 	@Test
