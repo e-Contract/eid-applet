@@ -180,6 +180,17 @@
 		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.ws</groupId>
+			<artifactId>policy</artifactId>
+			<exclusions>
+				<exclusion>
+					<!-- endorsed by JBoss AS -->
+					<groupId>javax.activation</groupId>
+					<artifactId>activation</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.ws</groupId>
 			<artifactId>jaxws-rt</artifactId>
 			<exclusions>
 				<exclusion>
