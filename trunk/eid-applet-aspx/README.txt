@@ -39,13 +39,13 @@ xmlns="http://schemas.microsoft.com/.NetConfiguration/v2.0">
     <httpHandlers>
        <add path="/applet-authn-service" verb="*"
 type="Be.FedICT.EID.Applet.Service.AuthnAppletService, AppletService"
-validate="True"/>
+validate="true"/>
     </httpHandlers>
 </system.web>
 </configuration>
 
 
-=== 3. ASP.NET runtime
+=== 3. Mono ASP.NET runtime
 
 Mono comes with an ASP.NET runtime program named xsp2. Here we'll describe
 how to configure xsp2.
@@ -64,3 +64,30 @@ Test by browsing to:
 	https://localhost:8443
 
 Create some index.aspx file in the directory where you launched xsp2.
+
+=== 4. IIS ASP.NET runtime
+
+Because the IIS sets the HttpOnly flag on the session cookie, the eID Applet
+will not communicate with the correct instance of the web application
+ eID Applet Service. A work-around is to clear the HttpOnly flag on the session
+cookie by adding the following Global.asax configuration file:
+
+<%@ Application Language="C#" %>
+
+<script runat="server">
+
+    void Session_Start(object sender, EventArgs e) 
+    {
+        if (Response.Cookies.Count > 0)
+        {
+            foreach (string s in Response.Cookies.AllKeys)
+            {
+                if (s == "ASP.NET_SessionId")
+                {
+                    Response.Cookies["ASP.NET_SessionId"].HttpOnly = false;
+                }
+            }
+        }
+    }
+</script>
+
