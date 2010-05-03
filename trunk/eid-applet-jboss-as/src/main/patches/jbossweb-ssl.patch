@@ -1,5 +1,5 @@
---- server/default/deploy/jbossweb.sar/server.xml.orig	2008-12-14 10:41:46.000000000 +0100
-+++ server/default/deploy/jbossweb.sar/server.xml	2008-12-14 10:44:42.000000000 +0100
+--- server/all/deploy/jbossweb.sar/server.xml.orig	2008-12-14 10:41:46.000000000 +0100
++++ server/all/deploy/jbossweb.sar/server.xml	2008-12-14 10:44:42.000000000 +0100
 @@ -28,6 +28,11 @@
             keystoreFile="${jboss.server.home.dir}/conf/chap8.keystore"
             keystorePass="rmi+ssl" sslProtocol = "TLS" />
