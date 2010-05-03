@@ -1,5 +1,5 @@
---- server/default/deploy/jboss-logging.xml.orig	2010-02-22 11:45:22.979747409 +0100
-+++ server/default/deploy/jboss-logging.xml	2010-02-22 11:49:47.619744828 +0100
+--- server/all/deploy/jboss-logging.xml.orig	2010-02-22 11:45:22.979747409 +0100
++++ server/all/deploy/jboss-logging.xml	2010-02-22 11:49:47.619744828 +0100
 @@ -52,7 +52,23 @@
           <pattern-formatter pattern="%d %-5p [%c] (%t) %m%n"/>
        </formatter>

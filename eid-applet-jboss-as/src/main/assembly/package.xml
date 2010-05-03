@@ -21,7 +21,7 @@
 			<excludes>
 				<exclude>client/**</exclude>
 				<exclude>docs/**</exclude>
-				<exclude>server/all/**</exclude>
+				<exclude>server/default/**</exclude>
 				<exclude>server/minimal/**</exclude>
 				<exclude>server/standard/**</exclude>
 				<exclude>server/web/**</exclude>
@@ -34,8 +34,8 @@
 				<!-- opensaml -->
 				<exclude>lib/endorsed/serializer.jar</exclude>
 				<!-- JAX-WS/JAXB -->
-				<exclude>server/default/deployers/jbossws.deployer/**</exclude>
-				<exclude>server/default/deployers/resteasy.deployer/jaxb-impl-2.2.jar</exclude>
+				<exclude>server/all/deployers/jbossws.deployer/**</exclude>
+				<exclude>server/all/deployers/resteasy.deployer/jaxb-impl-2.2.jar</exclude>
 				<exclude>common/lib/jaxws-api.jar</exclude>
 				<exclude>common/lib/jsr181-api.jar</exclude>
 				<exclude>common/lib/saaj-api.jar</exclude>
@@ -77,7 +77,7 @@
 	</fileSets>
 	<dependencySets>
 		<dependencySet>
-			<outputDirectory>server/default/lib</outputDirectory>
+			<outputDirectory>server/all/lib</outputDirectory>
 			<excludes>
 				<!-- scope compile doesn't work... -->
 				<exclude>org.jboss.jbossas:jboss-as-distribution</exclude>
