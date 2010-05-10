@@ -15,7 +15,7 @@
 	<version>1.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<properties>
-		<jboss.version>6.0.0.20100216-M2</jboss.version>
+		<jboss.version>6.0.0.20100429-M3</jboss.version>
 	</properties>
 	<build>
 		<plugins>

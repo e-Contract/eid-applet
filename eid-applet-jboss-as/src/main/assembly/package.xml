@@ -26,6 +26,7 @@
 				<exclude>server/standard/**</exclude>
 				<exclude>server/web/**</exclude>
 				<exclude>server/jbossweb-standalone/**</exclude>
+				<exclude>server/osgi/**</exclude>
 				<exclude>common/deploy/admin-console.war/**</exclude>
 				<!-- commons-collections via Richfaces -->
 				<exclude>common/lib/commons-collections.jar</exclude>
@@ -35,6 +36,7 @@
 				<exclude>lib/endorsed/serializer.jar</exclude>
 				<!-- JAX-WS/JAXB -->
 				<exclude>server/all/deployers/jbossws.deployer/**</exclude>
+				<exclude>server/all/deployers/jbossws-jaxrpc.deployer/**</exclude>
 				<exclude>server/all/deployers/resteasy.deployer/jaxb-impl-2.2.jar</exclude>
 				<exclude>common/lib/jaxws-api.jar</exclude>
 				<exclude>common/lib/jsr181-api.jar</exclude>
@@ -63,7 +65,7 @@
 				<include>client/jboss-system-jmx-client.jar</include>
 				<include>client/jboss-j2se.jar</include>
 				<include>client/jnp-client.jar</include>
-				<include>client/jboss-logging-spi.jar</include>
+				<include>client/jboss-logging.jar</include>
 				<include>client/jmx-invoker-adaptor-client.jar</include>
 				<include>client/jboss-client.jar</include>
 				<include>client/jboss-serialization.jar</include>

@@ -1,11 +1,11 @@
---- bin/run.conf.orig	2010-01-27 10:43:19.885414079 +0100
-+++ bin/run.conf	2010-01-27 10:44:11.863386865 +0100
+--- bin/run.conf.orig	2010-05-06 15:29:12.274477661 +0200
++++ bin/run.conf	2010-05-06 15:29:46.064478416 +0200
 @@ -42,7 +42,7 @@
- # Specify options to pass to the Java VM.
+ # issues from IPv4 multicast addresses. See JBAS-7936.)
  #
  if [ "x$JAVA_OPTS" = "x" ]; then
 -   JAVA_OPTS="-Xms128m -Xmx512m -XX:MaxPermSize=256m -Dorg.jboss.resolver.warning=true -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000"
 +   JAVA_OPTS="-Xms512m -Xmx1024m -XX:MaxPermSize=512m -Dorg.jboss.resolver.warning=true -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000"
+    JAVA_OPTS="$JAVA_OPTS -Djava.net.preferIPv4Stack=true"
  fi
  
- # Sample JPDA settings for remote socket debugging
