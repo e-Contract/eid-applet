@@ -88,6 +88,12 @@ public class HttpURLConnectionHttpReceiver implements HttpReceiver {
 	}
 
 	public boolean isSecure() {
+		if ("localhost".equals(this.connection.getURL().getHost())) {
+			/*
+			 * We trust localhost web applications.
+			 */
+			return true;
+		}
 		if (false == "https".equals(this.connection.getURL().getProtocol())) {
 			/*
 			 * Never trust the other side. We really need the SSL secure channel

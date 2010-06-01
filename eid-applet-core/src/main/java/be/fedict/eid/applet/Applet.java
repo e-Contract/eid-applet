@@ -490,11 +490,15 @@ public class Applet extends JApplet {
 			addDetailMessage("checking web application trust...");
 			URL documentBase = getDocumentBase();
 			if (false == "https".equals(documentBase.getProtocol())) {
-				setStatusMessage(Status.ERROR, Applet.this.messages
-						.getMessage(MESSAGE_ID.SECURITY_ERROR));
-				addDetailMessage("web application not trusted.");
-				addDetailMessage("use the web application via \"https\" instead of \"http\"");
-				return;
+				if (false == "localhost".equals(documentBase.getHost())) {
+					setStatusMessage(Status.ERROR, Applet.this.messages
+							.getMessage(MESSAGE_ID.SECURITY_ERROR));
+					addDetailMessage("web application not trusted.");
+					addDetailMessage("use the web application via \"https\" instead of \"http\"");
+					return;
+				} else {
+					addDetailMessage("trusting localhost web applications");
+				}
 			}
 			URL codeBase = getCodeBase();
 			if (false == "https".equals(codeBase.getProtocol())) {
