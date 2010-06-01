@@ -125,6 +125,36 @@
 		<servlet-name>AppletAddressServiceServlet</servlet-name>
 		<url-pattern>/applet-service-address</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>OWASPIdentificationServiceServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+		<init-param>
+			<param-name>IncludeAddress</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>OWASPIdentificationServiceServlet</servlet-name>
+		<url-pattern>/owasp-identification</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>OWASPIdentificationIntegrityServiceServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+		<init-param>
+			<param-name>IncludeAddress</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>IdentityIntegrityService</param-name>
+			<param-value>test/eid/applet/model/IdentityIntegrityServiceBean</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>OWASPIdentificationIntegrityServiceServlet</servlet-name>
+		<url-pattern>/owasp-identification-integrity</url-pattern>
+	</servlet-mapping>
 
 	<servlet>
 		<servlet-name>AppletSecureClientServiceServlet</servlet-name>
@@ -226,6 +256,19 @@
 	<servlet-mapping>
 		<servlet-name>AppletAuthnServiceServlet</servlet-name>
 		<url-pattern>/applet-service-authn</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>OWASPAuthenticationServiceServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+		<init-param>
+			<param-name>AuthenticationService</param-name>
+			<param-value>test/eid/applet/model/AuthenticationServiceBean</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>OWASPAuthenticationServiceServlet</servlet-name>
+		<url-pattern>/owasp-authentication</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
