@@ -63,18 +63,20 @@ public class JSONServlet extends HttpServlet {
 						+ identity.dateOfBirth.getTime() + "\",");
 				writer.println("\t\tgender: \"" + identity.gender + "\"");
 			}
-			writer.println("\t},");
-
-			writer.println("\taddress: {");
-			{
-				Address address = eIdData.address;
-				writer.println("\t\tstreetAndNumber: \""
-						+ address.streetAndNumber + "\",");
-				writer.println("\t\tmunicipality: \"" + address.municipality
-						+ "\",");
-				writer.println("\t\tzip: \"" + address.zip + "\"");
-			}
 			writer.println("\t}");
+
+			Address address = eIdData.address;
+			if (null != address) {
+				writer.println(",\taddress: {");
+				{
+					writer.println("\t\tstreetAndNumber: \""
+							+ address.streetAndNumber + "\",");
+					writer.println("\t\tmunicipality: \""
+							+ address.municipality + "\",");
+					writer.println("\t\tzip: \"" + address.zip + "\"");
+				}
+				writer.println("\t}");
+			}
 		}
 		writer.println("}");
 	}
