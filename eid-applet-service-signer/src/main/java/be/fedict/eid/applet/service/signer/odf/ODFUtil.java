@@ -159,11 +159,12 @@ public class ODFUtil {
         String name = zipEntry.getName();
 
         /* OOo 3.0/3.1 bug: don't sign mimetype stream nor the manifest */
-        /* OOo 3.2 might correct this */
-        if (zipEntry.isDirectory() ||
-                name.equals(MIMETYPE_FILE) ||
-                name.equals(MANIFEST_FILE) ||
-                name.equals(SIGNATURE_FILE)) {
+        /* if (zipEntry.isDirectory() ||
+             name.equals(MIMETYPE_FILE) ||
+             name.equals(MANIFEST_FILE) || */
+        /* Corrected in OOo 3.2 */
+
+        if (zipEntry.isDirectory() || name.equals(SIGNATURE_FILE)) {
             return false;
         }
         return true;
