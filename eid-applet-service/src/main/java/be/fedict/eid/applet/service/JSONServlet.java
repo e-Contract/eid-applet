@@ -52,16 +52,37 @@ public class JSONServlet extends HttpServlet {
 		PrintWriter writer = response.getWriter();
 		writer.println("{");
 		{
+			Identity identity = eIdData.identity;
 			writer.println("\tidentity: {");
 			{
-				Identity identity = eIdData.identity;
+				writer.println("\t\tnationalNumber: \""
+						+ identity.nationalNumber + "\",");
 				writer.println("\t\tname: \"" + identity.name + "\",");
 				writer
 						.println("\t\tfirstName: \"" + identity.firstName
 								+ "\",");
+				writer.println("\t\tmiddleName: \"" + identity.middleName
+						+ "\",");
 				writer.println("\t\tdateOfBirth: \""
 						+ identity.dateOfBirth.getTime() + "\",");
+				writer.println("\t\tplaceOfBirth: \"" + identity.placeOfBirth
+						+ "\",");
 				writer.println("\t\tgender: \"" + identity.gender + "\"");
+			}
+			writer.println("\t},");
+
+			writer.println("\tcard: {");
+			{
+				writer.println("\t\tcardNumber: \"" + identity.cardNumber
+						+ "\",");
+				writer.println("\t\tchipNumber: \"" + identity.chipNumber
+						+ "\",");
+				writer.println("\t\tcardDeliveryMunicipality: \""
+						+ identity.cardDeliveryMunicipality + "\",");
+				writer.println("\t\tcardValidityDateBegin: \""
+						+ identity.cardValidityDateBegin.getTime() + "\",");
+				writer.println("\t\tcardValidityDateEnd: \""
+						+ identity.cardValidityDateEnd.getTime() + "\"");
 			}
 			writer.println("\t}");
 
