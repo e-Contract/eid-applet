@@ -97,6 +97,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	public static final String CHANNEL_BINDING_SERVICE = "ChannelBindingService";
 
+	public static final String REQUIRE_SECURE_READER_INIT_PARAM_NAME = "RequireSecureReader";
+
 	private boolean includePhoto;
 
 	private boolean includeAddress;
@@ -124,6 +126,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 	private boolean sessionIdChannelBinding;
 
 	private boolean serverCertificateChannelBinding;
+
+	private boolean requireSecureReader;
 
 	private ServiceLocator<SecureClientEnvironmentService> secureClientEnvServiceLocator;
 
@@ -187,7 +191,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 			SignRequestMessage signRequestMessage = new SignRequestMessage(
 					digestInfo.digestValue, digestInfo.digestAlgo,
-					digestInfo.description, this.logoff, this.removeCard);
+					digestInfo.description, this.logoff, this.removeCard,
+					this.requireSecureReader);
 			return signRequestMessage;
 		}
 		AuthenticationService authenticationService = this.authenticationServiceLocator
@@ -204,7 +209,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 					this.sessionIdChannelBinding,
 					this.serverCertificateChannelBinding, this.includeIdentity,
 					this.includeCertificates, this.includeAddress,
-					this.includePhoto, includeIntegrityData);
+					this.includePhoto, includeIntegrityData,
+					this.requireSecureReader);
 			return authenticationRequestMessage;
 		}
 
@@ -316,6 +322,13 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 		String kiosk = config.getInitParameter(KIOSK_INIT_PARAM_NAME);
 		if (null != kiosk) {
 			this.kiosk = Boolean.parseBoolean(kiosk);
+		}
+
+		String requireSecureReader = config
+				.getInitParameter(REQUIRE_SECURE_READER_INIT_PARAM_NAME);
+		if (null != requireSecureReader) {
+			this.requireSecureReader = Boolean
+					.parseBoolean(requireSecureReader);
 		}
 
 		String sessionIdChannelBinding = config

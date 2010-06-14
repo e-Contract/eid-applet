@@ -51,6 +51,9 @@ public class SignRequestMessage extends AbstractProtocolMessage {
 	@HttpHeader(HTTP_HEADER_PREFIX + "Logoff")
 	public boolean logoff;
 
+	@HttpHeader(HTTP_HEADER_PREFIX + "RequireSecureReader")
+	public boolean requireSecureReader;
+
 	@HttpBody
 	@NotNull
 	@Description("The digest value to be signed using the non-repudiation certificate")
@@ -61,11 +64,13 @@ public class SignRequestMessage extends AbstractProtocolMessage {
 	}
 
 	public SignRequestMessage(byte[] digestValue, String digestAlgo,
-			String description, boolean logoff, boolean removeCard) {
+			String description, boolean logoff, boolean removeCard,
+			boolean requireSecureReader) {
 		this.digestValue = digestValue;
 		this.digestAlgo = digestAlgo;
 		this.description = description;
 		this.logoff = logoff;
 		this.removeCard = removeCard;
+		this.requireSecureReader = requireSecureReader;
 	}
 }

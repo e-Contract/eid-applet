@@ -191,7 +191,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	public void close() {
 		try {
-			//this.card.endExclusive();
+			// this.card.endExclusive();
 			this.card.disconnect(true);
 		} catch (CardException e) {
 			/*
@@ -430,9 +430,9 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	public void removeCard() throws CardException {
 		/*
-		 * Next doesn't work all the time. 
+		 * Next doesn't work all the time.
 		 */
-		//this.cardTerminal.waitForCardAbsent(0);
+		// this.cardTerminal.waitForCardAbsent(0);
 		while (this.cardTerminal.isCardPresent()) {
 			try {
 				Thread.sleep(100);
@@ -520,10 +520,16 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		return null;
 	}
 
-	public byte[] sign(byte[] digestValue, String digestAlgo, byte keyId)
-			throws CardException, IOException, InterruptedException {
+	public byte[] sign(byte[] digestValue, String digestAlgo, byte keyId,
+			boolean requireSecureReader) throws CardException, IOException,
+			InterruptedException {
 		Integer directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
 		Integer verifyPinStartFeature = getFeature(FEATURE_VERIFY_PIN_START_TAG);
+
+		if (requireSecureReader && null == directPinVerifyFeature
+				&& null == verifyPinStartFeature) {
+			throw new SecurityException("not a secure reader");
+		}
 
 		// select the key
 		this.view.addDetailMessage("selecting key...");
@@ -938,13 +944,15 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		}
 	}
 
-	public byte[] signAuthn(byte[] toBeSigned) throws NoSuchAlgorithmException,
-			CardException, IOException, InterruptedException {
+	public byte[] signAuthn(byte[] toBeSigned, boolean requireSecureReader)
+			throws NoSuchAlgorithmException, CardException, IOException,
+			InterruptedException {
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
 		byte[] digest = messageDigest.digest(toBeSigned);
 		byte keyId = (byte) 0x82; // authentication key
 
-		byte[] signatureValue = sign(digest, "SHA-1", keyId);
+		byte[] signatureValue = sign(digest, "SHA-1", keyId,
+				requireSecureReader);
 		return signatureValue;
 	}
 
@@ -1149,11 +1157,12 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		return signCertificateChain;
 	}
 
-	public byte[] sign(byte[] digestValue, String digestAlgo)
-			throws NoSuchAlgorithmException, CardException, IOException,
-			InterruptedException {
+	public byte[] sign(byte[] digestValue, String digestAlgo,
+			boolean requireSecureReader) throws NoSuchAlgorithmException,
+			CardException, IOException, InterruptedException {
 		byte keyId = (byte) 0x83; // non-repudiation key
-		byte[] signatureValue = sign(digestValue, digestAlgo, keyId);
+		byte[] signatureValue = sign(digestValue, digestAlgo, keyId,
+				requireSecureReader);
 		return signatureValue;
 	}
 
@@ -1247,5 +1256,16 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		} else {
 			this.view.addDetailMessage("BELPIC JavaCard applet selected");
 		}
+	}
+
+	public byte[] signAuthn(byte[] toBeSigned) throws NoSuchAlgorithmException,
+			CardException, IOException, InterruptedException {
+		return signAuthn(toBeSigned, false);
+	}
+
+	public byte[] sign(byte[] digestValue, String digestAlgo)
+			throws NoSuchAlgorithmException, CardException, IOException,
+			InterruptedException {
+		return sign(digestValue, digestAlgo, false);
 	}
 }

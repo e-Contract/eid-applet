@@ -1586,6 +1586,33 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 					</para>
 				</tip>
 			</section>
+			<section>
+				<title>Requiring a secure smart card reader</title>
+				<para>
+					The eID Applet Service can be configured to make the eID
+					Applet to
+					check whether the eID crypto operation (either
+					authentication or
+					non-repudiation signature) is being executed
+					using a CCID
+					secure
+					smart card reader. Although this feature could
+					be spoofed it
+					aims to
+					increase the security awareness on some
+					applications.
+					This feature
+					can be enabled by setting the following
+					<code>init-param</code>
+					on the
+					<code>AppletServiceServlet</code>
+					:
+				</para>
+				<programlisting role="XML"><![CDATA[<init-param>
+	<param-name>RequireSecureReader</param-name>
+	<param-value>true</param-value>
+</init-param>]]></programlisting>
+			</section>
 		</section>
 	</section>
 	<section>

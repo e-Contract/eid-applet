@@ -259,6 +259,23 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>AppletAuthnSecureReaderServiceServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+		<init-param>
+			<param-name>AuthenticationService</param-name>
+			<param-value>test/eid/applet/model/AuthenticationServiceBean</param-value>
+		</init-param>
+		<init-param>
+			<param-name>RequireSecureReader</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AppletAuthnSecureReaderServiceServlet</servlet-name>
+		<url-pattern>/applet-service-authn-secure-reader</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>OWASPAuthenticationServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
 		<init-param>

@@ -92,6 +92,8 @@ public class ContinueInsecureMessageHandler implements
 
 	private boolean serverCertificateChannelBinding;
 
+	private boolean requireSecureReader;
+
 	private ServiceLocator<SignatureService> signatureServiceLocator;
 
 	public Object handleMessage(ContinueInsecureMessage message,
@@ -128,7 +130,8 @@ public class ContinueInsecureMessageHandler implements
 
 			SignRequestMessage signRequestMessage = new SignRequestMessage(
 					digestInfo.digestValue, digestInfo.digestAlgo,
-					digestInfo.description, this.logoff, this.removeCard);
+					digestInfo.description, this.logoff, this.removeCard,
+					this.requireSecureReader);
 			return signRequestMessage;
 		}
 		AuthenticationService authenticationService = this.authenticationServiceLocator
@@ -145,7 +148,8 @@ public class ContinueInsecureMessageHandler implements
 					this.sessionIdChannelBinding,
 					this.serverCertificateChannelBinding, this.includeIdentity,
 					this.includeCertificates, this.includeAddress,
-					this.includePhoto, includeIntegrityData);
+					this.includePhoto, includeIntegrityData,
+					this.requireSecureReader);
 			return authenticationRequestMessage;
 		} else {
 			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
@@ -247,6 +251,13 @@ public class ContinueInsecureMessageHandler implements
 				.getInitParameter(HelloMessageHandler.PRE_LOGOFF_INIT_PARAM_NAME);
 		if (null != preLogoff) {
 			this.preLogoff = Boolean.parseBoolean(preLogoff);
+		}
+
+		String requireSecureReader = config
+				.getInitParameter(HelloMessageHandler.REQUIRE_SECURE_READER_INIT_PARAM_NAME);
+		if (null != requireSecureReader) {
+			this.requireSecureReader = Boolean
+					.parseBoolean(requireSecureReader);
 		}
 
 		String sessionIdChannelBinding = config
