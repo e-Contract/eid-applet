@@ -237,6 +237,13 @@ public class AuthenticationDataMessageHandler implements
 			} else {
 				if (false == serverCertificate
 						.equals(message.serverCertificate)) {
+					AuditService auditService = this.auditServiceLocator
+							.locateService();
+					if (null != auditService) {
+						String remoteAddress = request.getRemoteAddr();
+						auditService.authenticationError(remoteAddress,
+								message.authnCert);
+					}
 					throw new SecurityException(
 							"secure channel binding identity mismatch");
 				}
@@ -246,6 +253,13 @@ public class AuthenticationDataMessageHandler implements
 			if (null != this.serverCertificate) {
 				if (false == this.serverCertificate
 						.equals(message.serverCertificate)) {
+					AuditService auditService = this.auditServiceLocator
+							.locateService();
+					if (null != auditService) {
+						String remoteAddress = request.getRemoteAddr();
+						auditService.authenticationError(remoteAddress,
+								message.authnCert);
+					}
 					throw new SecurityException(
 							"secure channel binding identity mismatch");
 				}

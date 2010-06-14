@@ -282,6 +282,16 @@
 				cross-site scripting
 				security reasons.</para>
 		</note>
+		<tip>
+			<title>Javascript TargetPage</title>
+			<para>
+				The
+				<code>TargetPage</code>
+				applet parameter can also be used to execute a Javascript when the
+				eID operation is finished. Example:
+				<code>TargetPage: 'javascript:alert("Hello World");'</code>
+			</para>
+		</tip>
 	</section>
 	<section>
 		<title>eID Applet Service</title>
@@ -984,9 +994,11 @@
 				</warning>
 				<para>
 					The server certificate used to verify the secure channel
-					binding can also be provided by implementing an SPI component.
-				This
-					option can be activated via the following
+					binding can
+					also be provided by implementing an SPI component.
+					This
+					option can be
+					activated via the following
 					<code>init-param</code>
 					on the
 					<code>AppletServiceServlet</code>
