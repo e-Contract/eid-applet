@@ -30,7 +30,7 @@ public interface View {
 
 	void addDetailMessage(String detailMessage);
 
-	void setStatusMessage(Status status, String statusMessage);
+	void setStatusMessage(Status status, Messages.MESSAGE_ID messageId);
 
 	boolean privacyQuestion(boolean includeAddress, boolean includePhoto,
 			String identityDataUsage);

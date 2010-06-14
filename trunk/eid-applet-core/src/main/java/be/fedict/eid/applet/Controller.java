@@ -291,10 +291,8 @@ public class Controller {
 										JOptionPane.OK_CANCEL_OPTION,
 										JOptionPane.WARNING_MESSAGE);
 						if (JOptionPane.OK_OPTION != result) {
-							setStatusMessage(
-									Status.ERROR,
-									Controller.this.messages
-											.getMessage(MESSAGE_ID.SECURITY_ERROR));
+							setStatusMessage(Status.ERROR,
+									MESSAGE_ID.SECURITY_ERROR);
 							addDetailMessage("insecure client environment");
 							return null;
 						}
@@ -306,8 +304,8 @@ public class Controller {
 										"Your system has been marked as insecure client environment.",
 										"Insecure Client Environment",
 										JOptionPane.ERROR_MESSAGE);
-						setStatusMessage(Status.ERROR, Controller.this.messages
-								.getMessage(MESSAGE_ID.SECURITY_ERROR));
+						setStatusMessage(Status.ERROR,
+								MESSAGE_ID.SECURITY_ERROR);
 						addDetailMessage("received an insecure client environment message");
 						return null;
 					}
@@ -368,13 +366,11 @@ public class Controller {
 						identificationRequestMessage.identityDataUsage);
 			}
 		} catch (PKCS11NotFoundException e) {
-			setStatusMessage(Status.ERROR, Controller.this.messages
-					.getMessage(MESSAGE_ID.NO_MIDDLEWARE_ERROR));
+			setStatusMessage(Status.ERROR, MESSAGE_ID.NO_MIDDLEWARE_ERROR);
 			addDetailMessage("error: no eID Middleware PKCS#11 library found");
 			return null;
 		} catch (SecurityException e) {
-			setStatusMessage(Status.ERROR, Controller.this.messages
-					.getMessage(MESSAGE_ID.SECURITY_ERROR));
+			setStatusMessage(Status.ERROR, MESSAGE_ID.SECURITY_ERROR);
 			addDetailMessage("error: " + e.getMessage());
 			return null;
 		} catch (Throwable e) {
@@ -400,8 +396,7 @@ public class Controller {
 				 * Next is specific for the OpenSC PKCS#11 library.
 				 */
 				if (FailedLoginException.class == cause.getClass()) {
-					setStatusMessage(Status.ERROR, Controller.this.messages
-							.getMessage(MESSAGE_ID.PIN_INCORRECT));
+					setStatusMessage(Status.ERROR, MESSAGE_ID.PIN_INCORRECT);
 					return null;
 				}
 				if (LoginException.class == cause.getClass()) {
@@ -409,12 +404,10 @@ public class Controller {
 						/*
 						 * This seems to be the case for OpenSC.
 						 */
-						setStatusMessage(Status.ERROR, Controller.this.messages
-								.getMessage(MESSAGE_ID.PIN_BLOCKED));
+						setStatusMessage(Status.ERROR, MESSAGE_ID.PIN_BLOCKED);
 						return null;
 					}
-					setStatusMessage(Status.ERROR, Controller.this.messages
-							.getMessage(MESSAGE_ID.SECURITY_ERROR));
+					setStatusMessage(Status.ERROR, MESSAGE_ID.SECURITY_ERROR);
 					return null;
 				}
 			}
@@ -424,30 +417,25 @@ public class Controller {
 			 */
 			if ("javax.smartcardio.CardException"
 					.equals(e.getClass().getName())) {
-				setStatusMessage(Status.ERROR, Controller.this.messages
-						.getMessage(MESSAGE_ID.CARD_ERROR));
+				setStatusMessage(Status.ERROR, MESSAGE_ID.CARD_ERROR);
 				addDetailMessage("card error: " + e.getMessage());
 				return null;
 			}
-			setStatusMessage(Status.ERROR, Controller.this.messages
-					.getMessage(MESSAGE_ID.GENERIC_ERROR));
+			setStatusMessage(Status.ERROR, MESSAGE_ID.GENERIC_ERROR);
 			return null;
 		}
 
-		setStatusMessage(Status.NORMAL, Controller.this.messages
-				.getMessage(MESSAGE_ID.DONE));
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.DONE);
 		this.runtime.gotoTargetPage();
 		return null;
 	}
 
 	private SignCertificatesDataMessage performSignCertificatesOperation()
 			throws Exception {
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.DETECTING_CARD));
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
 		try {
 			if (false == this.pkcs11Eid.isEidPresent()) {
-				setStatusMessage(Status.NORMAL, this.messages
-						.getMessage(MESSAGE_ID.INSERT_CARD_QUESTION));
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.INSERT_CARD_QUESTION);
 				this.pkcs11Eid.waitForEidPresent();
 			}
 		} catch (PKCS11NotFoundException e) {
@@ -458,8 +446,7 @@ public class Controller {
 			}
 			throw new PKCS11NotFoundException();
 		}
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.READING_IDENTITY));
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.READING_IDENTITY);
 		PrivateKeyEntry privateKeyEntry = this.pkcs11Eid
 				.getPrivateKeyEntry("Signature");
 		X509Certificate[] certificateChain = (X509Certificate[]) privateKeyEntry
@@ -477,8 +464,7 @@ public class Controller {
 		byte[] citizenCaCertFile;
 		byte[] rootCaCertFile;
 		try {
-			setStatusMessage(Status.NORMAL, this.messages
-					.getMessage(MESSAGE_ID.READING_IDENTITY));
+			setStatusMessage(Status.NORMAL, MESSAGE_ID.READING_IDENTITY);
 			signCertFile = this.pcscEidSpi.readFile(PcscEid.SIGN_CERT_FILE_ID);
 			addDetailMessage("size sign cert file: " + signCertFile.length);
 			citizenCaCertFile = this.pcscEidSpi
@@ -501,7 +487,8 @@ public class Controller {
 			InterruptedException, NoSuchFieldException, IllegalAccessException,
 			InvocationTargetException, NoSuchMethodException, Exception {
 		addDetailMessage("entering Kiosk Mode...");
-		this.view.setStatusMessage(Status.NORMAL, "Kiosk Mode...");
+		this.view.setStatusMessage(Status.NORMAL,
+				Messages.MESSAGE_ID.KIOSK_MODE);
 		while (true) {
 			try {
 				if (false == this.pkcs11Eid.isEidPresent()) {
@@ -576,8 +563,7 @@ public class Controller {
 		MessageDigest messageDigest = MessageDigest
 				.getInstance(filesDigestAlgo);
 
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.SELECT_FILES));
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.SELECT_FILES);
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setMultiSelectionEnabled(true);
 		int returnCode = fileChooser.showDialog(getParentComponent(),
@@ -586,8 +572,7 @@ public class Controller {
 			throw new RuntimeException("file selection aborted");
 		}
 
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.DIGESTING_FILES));
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.DIGESTING_FILES);
 
 		FileDigestsDataMessage fileDigestsDataMessage = new FileDigestsDataMessage();
 		fileDigestsDataMessage.fileDigestInfos = new LinkedList<String>();
@@ -663,12 +648,10 @@ public class Controller {
 		boolean removeCard = signRequestMessage.removeCard;
 		addDetailMessage("logoff: " + logoff);
 		addDetailMessage("remove card: " + removeCard);
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.DETECTING_CARD));
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
 		try {
 			if (false == this.pkcs11Eid.isEidPresent()) {
-				setStatusMessage(Status.NORMAL, this.messages
-						.getMessage(MESSAGE_ID.INSERT_CARD_QUESTION));
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.INSERT_CARD_QUESTION);
 				this.pkcs11Eid.waitForEidPresent();
 			}
 		} catch (PKCS11NotFoundException e) {
@@ -680,8 +663,7 @@ public class Controller {
 			}
 			throw new PKCS11NotFoundException();
 		}
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.SIGNING));
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.SIGNING);
 
 		String logoffReaderName;
 		if (logoff) {
@@ -730,8 +712,7 @@ public class Controller {
 					signRequestMessage.digestAlgo);
 			signCertChain = this.pkcs11Eid.getSignCertificateChain();
 			if (removeCard) {
-				setStatusMessage(Status.NORMAL, this.messages
-						.getMessage(MESSAGE_ID.REMOVE_CARD));
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.REMOVE_CARD);
 				this.pkcs11Eid.removeCard();
 			}
 		} finally {
@@ -756,8 +737,7 @@ public class Controller {
 			SignRequestMessage signRequestMessage) throws Exception {
 		waitForEIdCard();
 
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.SIGNING));
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.SIGNING);
 		byte[] signatureValue;
 		byte[] signCertFile;
 		byte[] citizenCaCertFile;
@@ -802,8 +782,7 @@ public class Controller {
 				this.pcscEidSpi.logoff();
 			}
 			if (signRequestMessage.removeCard) {
-				setStatusMessage(Status.NORMAL, this.messages
-						.getMessage(MESSAGE_ID.REMOVE_CARD));
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.REMOVE_CARD);
 				this.pcscEidSpi.removeCard();
 			}
 		} finally {
@@ -823,19 +802,18 @@ public class Controller {
 		waitForEIdCard();
 		try {
 			if (unblockPin) {
-				setStatusMessage(Status.NORMAL, "Unblock PIN...");
+				setStatusMessage(Status.NORMAL, Messages.MESSAGE_ID.PIN_UNBLOCK);
 				this.pcscEidSpi.unblockPin();
 			}
 			if (changePin) {
-				setStatusMessage(Status.NORMAL, "Change PIN...");
+				setStatusMessage(Status.NORMAL, Messages.MESSAGE_ID.PIN_CHANGE);
 				this.pcscEidSpi.changePin();
 			}
 			if (logoff) {
 				this.pcscEidSpi.logoff();
 			}
 			if (removeCard) {
-				setStatusMessage(Status.NORMAL, this.messages
-						.getMessage(MESSAGE_ID.REMOVE_CARD));
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.REMOVE_CARD);
 				this.pcscEidSpi.removeCard();
 			}
 		} finally {
@@ -927,8 +905,7 @@ public class Controller {
 				encodedServerCertificate, challenge);
 		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
 
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.DETECTING_CARD));
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
 		if (includeIdentity || includeAddress || includePhoto
 				|| includeCertificates) {
 			if (null != this.pcscEidSpi) {
@@ -941,8 +918,7 @@ public class Controller {
 		}
 		try {
 			if (false == this.pkcs11Eid.isEidPresent()) {
-				setStatusMessage(Status.NORMAL, this.messages
-						.getMessage(MESSAGE_ID.INSERT_CARD_QUESTION));
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.INSERT_CARD_QUESTION);
 				this.pkcs11Eid.waitForEidPresent();
 			}
 		} catch (PKCS11NotFoundException e) {
@@ -957,8 +933,7 @@ public class Controller {
 			}
 			throw new PKCS11NotFoundException();
 		}
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.AUTHENTICATING));
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.AUTHENTICATING);
 
 		String logoffReaderName;
 		if (logoff) {
@@ -1001,8 +976,7 @@ public class Controller {
 			signatureValue = this.pkcs11Eid.signAuthn(toBeSigned);
 			authnCertChain = this.pkcs11Eid.getAuthnCertificateChain();
 			if (removeCard) {
-				setStatusMessage(Status.NORMAL, this.messages
-						.getMessage(MESSAGE_ID.REMOVE_CARD));
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.REMOVE_CARD);
 				this.pkcs11Eid.removeCard();
 			}
 		} finally {
@@ -1033,8 +1007,7 @@ public class Controller {
 			byte[] encodedServerCertificate) throws Exception {
 		waitForEIdCard();
 
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.AUTHENTICATING));
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.AUTHENTICATING);
 
 		if (includeIdentity || includeAddress || includePhoto) {
 			boolean response = this.view.privacyQuestion(includeAddress,
@@ -1130,8 +1103,7 @@ public class Controller {
 			}
 
 			if (includeIdentity || includeAddress || includePhoto) {
-				setStatusMessage(Status.NORMAL, this.messages
-						.getMessage(MESSAGE_ID.READING_IDENTITY));
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.READING_IDENTITY);
 			}
 
 			if (includeIdentity) {
@@ -1189,8 +1161,7 @@ public class Controller {
 				this.pcscEidSpi.logoff();
 			}
 			if (removeCard) {
-				setStatusMessage(Status.NORMAL, this.messages
-						.getMessage(MESSAGE_ID.REMOVE_CARD));
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.REMOVE_CARD);
 				this.pcscEidSpi.removeCard();
 			}
 		} finally {
@@ -1272,8 +1243,7 @@ public class Controller {
 			String identityDataUsage) throws Exception {
 		waitForEIdCard();
 
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.READING_IDENTITY));
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.READING_IDENTITY);
 
 		boolean response = this.view.privacyQuestion(includeAddress,
 				includePhoto, identityDataUsage);
@@ -1438,15 +1408,13 @@ public class Controller {
 		this.view.progressIndication(-1, 0);
 
 		if (removeCard) {
-			setStatusMessage(Status.NORMAL, this.messages
-					.getMessage(MESSAGE_ID.REMOVE_CARD));
+			setStatusMessage(Status.NORMAL, MESSAGE_ID.REMOVE_CARD);
 			this.pcscEidSpi.removeCard();
 		}
 
 		this.pcscEidSpi.close();
 
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.TRANSMITTING_IDENTITY));
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.TRANSMITTING_IDENTITY);
 
 		IdentityDataMessage identityData = new IdentityDataMessage(idFile,
 				addressFile, photoFile, identitySignatureFile,
@@ -1456,16 +1424,13 @@ public class Controller {
 	}
 
 	private void waitForEIdCard() throws Exception {
-		setStatusMessage(Status.NORMAL, this.messages
-				.getMessage(MESSAGE_ID.DETECTING_CARD));
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
 		if (false == this.pcscEidSpi.hasCardReader()) {
-			setStatusMessage(Status.NORMAL, this.messages
-					.getMessage(MESSAGE_ID.CONNECT_READER));
+			setStatusMessage(Status.NORMAL, MESSAGE_ID.CONNECT_READER);
 			this.pcscEidSpi.waitForCardReader();
 		}
 		if (false == this.pcscEidSpi.isEidPresent()) {
-			setStatusMessage(Status.NORMAL, this.messages
-					.getMessage(MESSAGE_ID.INSERT_CARD_QUESTION));
+			setStatusMessage(Status.NORMAL, MESSAGE_ID.INSERT_CARD_QUESTION);
 			this.pcscEidSpi.waitForEidPresent();
 		}
 	}
@@ -1494,8 +1459,8 @@ public class Controller {
 		return connection;
 	}
 
-	private void setStatusMessage(Status status, String statusMessage) {
-		this.view.setStatusMessage(status, statusMessage);
+	private void setStatusMessage(Status status, Messages.MESSAGE_ID messageId) {
+		this.view.setStatusMessage(status, messageId);
 	}
 
 	public Component getParentComponent() {
