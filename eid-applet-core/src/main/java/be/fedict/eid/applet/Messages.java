@@ -45,7 +45,8 @@ public class Messages {
 				"retriesLeft"), PIN_INCORRECT("pinIncorrect"), CONNECT_READER(
 				"connectReader"), PIN_PAD("pinPad"), CURRENT_PIN("currentPin"), NEW_PIN(
 				"newPin"), OK("ok"), CANCEL("cancel"), PUK_PAD("pukPad"), PIN_PAD_CHANGE(
-				"pinPadChange");
+				"pinPadChange"), KIOSK_MODE("kioskMode"), PIN_CHANGE(
+				"pinChange"), PIN_UNBLOCK("pinUnblock");
 
 		private final String id;
 

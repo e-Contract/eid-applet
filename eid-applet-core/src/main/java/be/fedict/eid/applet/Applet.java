@@ -79,6 +79,8 @@ public class Applet extends JApplet {
 
 	public static final String MESSAGE_CALLBACK_PARAM = "MessageCallback";
 
+	public static final String MESSAGE_CALLBACK_EX_PARAM = "MessageCallbackEx";
+
 	private JLabel statusLabel;
 
 	private JTextArea detailMessages;
@@ -88,7 +90,8 @@ public class Applet extends JApplet {
 	private boolean securityConditionTrustedWebApp;
 
 	private void setStatusMessage(final Status status,
-			final String statusMessage) {
+			Messages.MESSAGE_ID messageId) {
+		final String statusMessage = this.messages.getMessage(messageId);
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
 				public void run() {
@@ -104,14 +107,16 @@ public class Applet extends JApplet {
 									.getDocument().getLength());
 				}
 			});
-			Applet.this.invokeMessageCallback(status, statusMessage);
+			Applet.this.invokeMessageCallback(status, messageId);
 		} catch (Exception e) {
 			// tja
 		}
 	}
 
-	protected void invokeMessageCallback(Status status, String statusMessage) {
-		if (null == this.messageCallbackParam) {
+	protected void invokeMessageCallback(Status status,
+			Messages.MESSAGE_ID messageId) {
+		if (null == this.messageCallbackParam
+				&& null == this.messageCallbackExParam) {
 			return;
 		}
 		ClassLoader classLoader = Applet.class.getClassLoader();
@@ -131,10 +136,21 @@ public class Applet extends JApplet {
 			Object jsObject = getWindowMethod.invoke(null, this);
 			Method callMethod = jsObjectClass.getMethod("call", new Class<?>[] {
 					String.class, Class.forName("[Ljava.lang.Object;") });
-			addDetailMessage("invoking Javascript message callback: "
-					+ this.messageCallbackParam);
-			callMethod.invoke(jsObject, this.messageCallbackParam,
-					new Object[] { status.name(), statusMessage });
+			if (null != this.messageCallbackParam) {
+				addDetailMessage("invoking Javascript message callback: "
+						+ this.messageCallbackParam);
+				String statusMessage = this.messages.getMessage(messageId);
+				callMethod.invoke(jsObject, this.messageCallbackParam,
+						new Object[] { status.name(), statusMessage });
+			}
+			if (null != this.messageCallbackExParam) {
+				addDetailMessage("invoking Javascript message callback (ex): "
+						+ this.messageCallbackExParam);
+				String statusMessage = this.messages.getMessage(messageId);
+				callMethod.invoke(jsObject, this.messageCallbackExParam,
+						new Object[] { status.name(), messageId.name(),
+								statusMessage });
+			}
 		} catch (Exception e) {
 			this.detailMessages
 					.append("error locating: JSObject.getWindow().call: "
@@ -241,11 +257,15 @@ public class Applet extends JApplet {
 
 	private String messageCallbackParam;
 
+	private String messageCallbackExParam;
+
 	private void initUI() {
 		loadMessages();
 		initStyle();
 
 		this.messageCallbackParam = super.getParameter(MESSAGE_CALLBACK_PARAM);
+		this.messageCallbackExParam = super
+				.getParameter(MESSAGE_CALLBACK_EX_PARAM);
 
 		Container contentPane = this.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
@@ -429,8 +449,7 @@ public class Applet extends JApplet {
 			addDetailMessage("checking applet privileges...");
 			SecurityManager securityManager = System.getSecurityManager();
 			if (null == securityManager) {
-				setStatusMessage(Status.ERROR, Applet.this.messages
-						.getMessage(MESSAGE_ID.SECURITY_ERROR));
+				setStatusMessage(Status.ERROR, MESSAGE_ID.SECURITY_ERROR);
 				addDetailMessage("no security manager found. not running as an applet?");
 				return;
 			}
@@ -463,8 +482,7 @@ public class Applet extends JApplet {
 					permission = (Permission) cardPermissionConstructor
 							.newInstance("*", "*");
 				} catch (Exception e) {
-					setStatusMessage(Status.ERROR, Applet.this.messages
-							.getMessage(MESSAGE_ID.GENERIC_ERROR));
+					setStatusMessage(Status.ERROR, MESSAGE_ID.GENERIC_ERROR);
 					addDetailMessage("javax.smartcardio not available: "
 							+ e.getMessage());
 					return;
@@ -473,8 +491,7 @@ public class Applet extends JApplet {
 					securityManager
 							.checkPermission(permission, securityContext);
 				} catch (SecurityException e) {
-					setStatusMessage(Status.ERROR, Applet.this.messages
-							.getMessage(MESSAGE_ID.SECURITY_ERROR));
+					setStatusMessage(Status.ERROR, MESSAGE_ID.SECURITY_ERROR);
 					addDetailMessage("applet not authorized to access smart card. applet not signed?");
 					return;
 				}
@@ -491,8 +508,7 @@ public class Applet extends JApplet {
 			URL documentBase = getDocumentBase();
 			if (false == "https".equals(documentBase.getProtocol())) {
 				if (false == "localhost".equals(documentBase.getHost())) {
-					setStatusMessage(Status.ERROR, Applet.this.messages
-							.getMessage(MESSAGE_ID.SECURITY_ERROR));
+					setStatusMessage(Status.ERROR, MESSAGE_ID.SECURITY_ERROR);
 					addDetailMessage("web application not trusted.");
 					addDetailMessage("use the web application via \"https\" instead of \"http\"");
 					return;
@@ -572,8 +588,9 @@ public class Applet extends JApplet {
 			Applet.this.progressIndication(max, current);
 		}
 
-		public void setStatusMessage(Status status, String statusMessage) {
-			Applet.this.setStatusMessage(status, statusMessage);
+		public void setStatusMessage(Status status,
+				Messages.MESSAGE_ID messageId) {
+			Applet.this.setStatusMessage(status, messageId);
 		}
 	}
 

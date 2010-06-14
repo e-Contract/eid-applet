@@ -20,7 +20,8 @@
 		AppletService :'applet-service-address',
 		BackgroundColor :'#ffffff',
 		Language : 'nl',
-		MessageCallback :'messageCallback'
+		MessageCallback :'messageCallback',
+		MessageCallbackEx : 'messageCallbackEx'
 	};
 	var version = '1.6';
 	deployJava.runApplet(attributes, parameters, version);
@@ -29,7 +30,11 @@
 	function messageCallback(status, message) {
 		document.getElementById('appletMessage').innerHTML = '<b>' + status + ': ' + message + '</b>';
 	}
+	function messageCallbackEx(status, messageId, message) {
+		document.getElementById('appletMessageEx').innerHTML = '<b>' + status + ': ' + messageId + ' = ' + message + '</b>';
+	}
 </script>
 <div id="appletMessage">Message placeholder</div>
+<div id="appletMessageEx">Message placeholder</div>
 </body>
 </html>

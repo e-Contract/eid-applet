@@ -269,9 +269,30 @@
 							<code>MessageCallback</code>
 						</entry>
 						<entry>optional</entry>
-						<entry>Via this parameter a web developer can configure a
-							Javascript callback. This callback function will be invoked
-							everytime the eID Applet displays an info message.</entry>
+						<entry>
+							Via this parameter a web developer can configure a
+							Javascript
+							callback. This callback function will be invoked
+							everytime the eID
+							Applet displays an info message. The function signature looks
+							like:
+							<code>function messageCallback(status, message)</code>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<code>MessageCallbackEx</code>
+						</entry>
+						<entry>optional</entry>
+						<entry>
+							Via this parameter a web developer can configure a
+							Javascript
+							callback. This callback function will be invoked
+							everytime the eID
+							Applet displays an info message. The function signature looks
+							like:
+							<code>function messageCallback(status, messageId, message)</code>
+						</entry>
 					</row>
 				</tbody>
 			</tgroup>
@@ -1517,7 +1538,8 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 	};
 	var parameters = {
 		AppletService :'applet-service',
-		MessageCallback :'messageCallback'
+		MessageCallback :'messageCallback',
+		MessageCallbackEx : 'messageCallbackEx'
 	};
 	var version = '1.6';
 	deployJava.runApplet(attributes, parameters, version);
@@ -1526,8 +1548,12 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 	function messageCallback(status, message) {
 		document.getElementById('appletMessage').innerHTML = '<b>' + status + ': ' + message + '</b>';
 	}
+	function messageCallbackEx(status, messageId, message) {
+		document.getElementById('appletMessageEx').innerHTML = '<b>' + status + ': ' + messageId + ' = ' + message + '</b>';
+	}
 </script>
-<div id="appletMessage">Message placeholder</div>]]></programlisting>
+<div id="appletMessage">Message placeholder</div>
+<div id="appletMessageEx">Message placeholder</div>]]></programlisting>
 				<para>
 					As you can see the web developer can install a Javascript
 					callback
@@ -1545,7 +1571,10 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 					message via some
 					dynamic HTML. Of course more complex
 					visualizations are possible
-					here.
+					here. Via the
+					<code>MessageCallbackEx</code>
+					eID Applet parameter you can even receive a machine processable
+					message identifier.
 				</para>
 				<tip>
 					<title>mayscript</title>
