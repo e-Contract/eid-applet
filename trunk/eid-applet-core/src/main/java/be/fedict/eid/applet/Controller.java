@@ -646,9 +646,19 @@ public class Controller {
 			throws Exception {
 		boolean logoff = signRequestMessage.logoff;
 		boolean removeCard = signRequestMessage.removeCard;
+		boolean requireSecureReader = signRequestMessage.requireSecureReader;
 		addDetailMessage("logoff: " + logoff);
 		addDetailMessage("remove card: " + removeCard);
+		addDetailMessage("require secure smart card reader: "
+				+ requireSecureReader);
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
+		if (requireSecureReader) {
+			if (null != this.pcscEidSpi) {
+				performEidPcscSignOperation(signRequestMessage,
+						requireSecureReader);
+				return;
+			}
+		}
 		try {
 			if (false == this.pkcs11Eid.isEidPresent()) {
 				setStatusMessage(Status.NORMAL, MESSAGE_ID.INSERT_CARD_QUESTION);
@@ -658,7 +668,8 @@ public class Controller {
 			addDetailMessage("eID Middleware PKCS#11 library not found.");
 			if (null != this.pcscEidSpi) {
 				addDetailMessage("fallback to PC/SC signing...");
-				performEidPcscSignOperation(signRequestMessage);
+				performEidPcscSignOperation(signRequestMessage,
+						requireSecureReader);
 				return;
 			}
 			throw new PKCS11NotFoundException();
@@ -734,7 +745,8 @@ public class Controller {
 	}
 
 	private void performEidPcscSignOperation(
-			SignRequestMessage signRequestMessage) throws Exception {
+			SignRequestMessage signRequestMessage, boolean requireSecureReader)
+			throws Exception {
 		waitForEIdCard();
 
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.SIGNING);
@@ -760,7 +772,7 @@ public class Controller {
 			}
 			signatureValue = this.pcscEidSpi.sign(
 					signRequestMessage.digestValue,
-					signRequestMessage.digestAlgo);
+					signRequestMessage.digestAlgo, requireSecureReader);
 
 			this.maxProgress = 0;
 			this.maxProgress += (1050 / 255) + 1; // sign cert file
@@ -840,6 +852,7 @@ public class Controller {
 		boolean includeAddress = authnRequest.includeAddress;
 		boolean includePhoto = authnRequest.includePhoto;
 		boolean includeIntegrityData = authnRequest.includeIntegrityData;
+		boolean requireSecureReader = authnRequest.requireSecureReader;
 		if (challenge.length < 20) {
 			throw new SecurityException(
 					"challenge should be at least 20 bytes long.");
@@ -858,6 +871,8 @@ public class Controller {
 		addDetailMessage("include address: " + includeAddress);
 		addDetailMessage("include photo: " + includePhoto);
 		addDetailMessage("include integrity data: " + includeIntegrityData);
+		addDetailMessage("require secure smart card reader: "
+				+ requireSecureReader);
 
 		SecureRandom secureRandom = new SecureRandom();
 		byte[] salt = new byte[20];
@@ -907,12 +922,13 @@ public class Controller {
 
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
 		if (includeIdentity || includeAddress || includePhoto
-				|| includeCertificates) {
+				|| includeCertificates || requireSecureReader) {
 			if (null != this.pcscEidSpi) {
 				performEidPcscAuthnOperation(salt, sessionId, toBeSigned,
 						logoff, preLogoff, removeCard, includeIdentity,
 						includeCertificates, includeAddress, includePhoto,
-						includeIntegrityData, encodedServerCertificate);
+						includeIntegrityData, encodedServerCertificate,
+						requireSecureReader);
 				return;
 			}
 		}
@@ -928,7 +944,8 @@ public class Controller {
 				performEidPcscAuthnOperation(salt, sessionId, toBeSigned,
 						logoff, preLogoff, removeCard, includeIdentity,
 						includeCertificates, includeAddress, includePhoto,
-						includeIntegrityData, encodedServerCertificate);
+						includeIntegrityData, encodedServerCertificate,
+						requireSecureReader);
 				return;
 			}
 			throw new PKCS11NotFoundException();
@@ -1004,7 +1021,8 @@ public class Controller {
 			boolean removeCard, boolean includeIdentity,
 			boolean includeCertificates, boolean includeAddress,
 			boolean includePhoto, boolean includeIntegrityData,
-			byte[] encodedServerCertificate) throws Exception {
+			byte[] encodedServerCertificate, boolean requireSecureReader)
+			throws Exception {
 		waitForEIdCard();
 
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.AUTHENTICATING);
@@ -1039,7 +1057,8 @@ public class Controller {
 				this.view.addDetailMessage("performing a pre-logoff");
 				this.pcscEidSpi.logoff();
 			}
-			signatureValue = this.pcscEidSpi.signAuthn(toBeSigned);
+			signatureValue = this.pcscEidSpi.signAuthn(toBeSigned,
+					requireSecureReader);
 
 			this.maxProgress = 0;
 			this.maxProgress += (1050 / 255) + 1; // authn cert file

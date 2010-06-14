@@ -50,6 +50,8 @@ public class SignCertificatesDataMessageHandler implements
 
 	private boolean logoff;
 
+	private boolean requireSecureReader;
+
 	public Object handleMessage(SignCertificatesDataMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
 			HttpSession session) throws ServletException {
@@ -78,7 +80,8 @@ public class SignCertificatesDataMessageHandler implements
 
 		SignRequestMessage signRequestMessage = new SignRequestMessage(
 				digestInfo.digestValue, digestInfo.digestAlgo,
-				digestInfo.description, this.logoff, this.removeCard);
+				digestInfo.description, this.logoff, this.removeCard,
+				this.requireSecureReader);
 		return signRequestMessage;
 	}
 
@@ -96,6 +99,13 @@ public class SignCertificatesDataMessageHandler implements
 				.getInitParameter(HelloMessageHandler.LOGOFF_INIT_PARAM_NAME);
 		if (null != logoff) {
 			this.logoff = Boolean.parseBoolean(logoff);
+		}
+
+		String requireSecureReader = config
+				.getInitParameter(HelloMessageHandler.REQUIRE_SECURE_READER_INIT_PARAM_NAME);
+		if (null != requireSecureReader) {
+			this.requireSecureReader = Boolean
+					.parseBoolean(requireSecureReader);
 		}
 	}
 }
