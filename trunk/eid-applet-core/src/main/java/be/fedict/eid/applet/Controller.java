@@ -33,7 +33,6 @@ import java.net.CookieHandler;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -936,7 +935,7 @@ public class Controller {
 				performEidPcscAuthnOperation(salt, sessionId, toBeSigned,
 						logoff, preLogoff, removeCard, includeIdentity,
 						includeCertificates, includeAddress, includePhoto,
-						includeIntegrityData);
+						includeIntegrityData, encodedServerCertificate);
 				return;
 			}
 		}
@@ -953,7 +952,7 @@ public class Controller {
 				performEidPcscAuthnOperation(salt, sessionId, toBeSigned,
 						logoff, preLogoff, removeCard, includeIdentity,
 						includeCertificates, includeAddress, includePhoto,
-						includeIntegrityData);
+						includeIntegrityData, encodedServerCertificate);
 				return;
 			}
 			throw new PKCS11NotFoundException();
@@ -1019,7 +1018,7 @@ public class Controller {
 
 		AuthenticationDataMessage authenticationDataMessage = new AuthenticationDataMessage(
 				salt, sessionId, signatureValue, authnCertChain, null, null,
-				null, null, null, null, null);
+				null, null, null, null, null, encodedServerCertificate);
 		Object responseMessage = sendMessage(authenticationDataMessage);
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");
@@ -1030,8 +1029,8 @@ public class Controller {
 			byte[] toBeSigned, boolean logoff, boolean preLogoff,
 			boolean removeCard, boolean includeIdentity,
 			boolean includeCertificates, boolean includeAddress,
-			boolean includePhoto, boolean includeIntegrityData)
-			throws Exception {
+			boolean includePhoto, boolean includeIntegrityData,
+			byte[] encodedServerCertificate) throws Exception {
 		waitForEIdCard();
 
 		setStatusMessage(Status.NORMAL, this.messages
@@ -1202,7 +1201,7 @@ public class Controller {
 				salt, sessionId, signatureValue, authnCertFile, citCaCertFile,
 				rootCaCertFile, signCertFile, identityData, addressData,
 				photoData, identitySignatureData, addressSignatureData,
-				rrnCertData);
+				rrnCertData, encodedServerCertificate);
 		Object responseMessage = sendMessage(authenticationDataMessage);
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");

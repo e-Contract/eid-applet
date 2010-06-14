@@ -18,6 +18,7 @@
 
 package be.fedict.eid.applet.service.impl.handler;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -29,6 +30,8 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -88,7 +91,7 @@ public class AuthenticationDataMessageHandler implements
 
 	private Long maxMaturity;
 
-	private byte[] encodedServerCertificate;
+	private X509Certificate serverCertificate;
 
 	private boolean sessionIdChannelBinding;
 
@@ -141,7 +144,7 @@ public class AuthenticationDataMessageHandler implements
 
 		if (this.sessionIdChannelBinding) {
 			checkSessionIdChannelBinding(message, request);
-			if (null == this.encodedServerCertificate) {
+			if (null == this.serverCertificate) {
 				LOG
 						.warn("adviced to use in combination with server certificate channel binding");
 			}
@@ -149,13 +152,12 @@ public class AuthenticationDataMessageHandler implements
 
 		ChannelBindingService channelBindingService = this.channelBindingServiceLocator
 				.locateService();
-		if (null != this.encodedServerCertificate
-				|| null != channelBindingService) {
+		if (null != this.serverCertificate || null != channelBindingService) {
 			LOG.debug("using server certificate channel binding");
 		}
 
 		if (false == this.sessionIdChannelBinding
-				&& null == this.encodedServerCertificate
+				&& null == this.serverCertificate
 				&& null == channelBindingService) {
 			LOG.warn("not using any secure channel binding");
 		}
@@ -174,21 +176,25 @@ public class AuthenticationDataMessageHandler implements
 			}
 			throw new ServletException("security error: " + e.getMessage(), e);
 		}
-		byte[] usedEncodedServerCertificate;
-		if (null != channelBindingService) {
-			try {
-				usedEncodedServerCertificate = channelBindingService
-						.getServerCertificate().getEncoded();
-			} catch (CertificateEncodingException e) {
-				throw new ServletException("X509 encoding error: "
-						+ e.getMessage(), e);
+
+		byte[] serverCertificateClientPOV = null;
+		try {
+			if (null != message.serverCertificate) {
+				serverCertificateClientPOV = message.serverCertificate
+						.getEncoded();
 			}
-		} else {
-			usedEncodedServerCertificate = this.encodedServerCertificate;
+		} catch (CertificateEncodingException e) {
+			throw new ServletException("server cert decoding error: "
+					+ e.getMessage(), e);
 		}
+		/*
+		 * We validate the authentication contract using the client-side
+		 * communicated server SSL certificate in case of secure channel
+		 * binding.
+		 */
 		AuthenticationContract authenticationContract = new AuthenticationContract(
 				message.saltValue, this.hostname, this.inetAddress,
-				message.sessionId, usedEncodedServerCertificate, challenge);
+				message.sessionId, serverCertificateClientPOV, challenge);
 		byte[] toBeSigned;
 		try {
 			toBeSigned = authenticationContract.calculateToBeSigned();
@@ -217,6 +223,34 @@ public class AuthenticationDataMessageHandler implements
 			throw new SecurityException("authn key error");
 		} catch (SignatureException e) {
 			throw new SecurityException("signature error");
+		}
+
+		/*
+		 * Secure channel binding verification.
+		 */
+		if (null != channelBindingService) {
+			X509Certificate serverCertificate = channelBindingService
+					.getServerCertificate();
+			if (null == serverCertificate) {
+				LOG
+						.warn("could not verify secure channel binding as the server does not know its identity yet");
+			} else {
+				if (false == serverCertificate
+						.equals(message.serverCertificate)) {
+					throw new SecurityException(
+							"secure channel binding identity mismatch");
+				}
+				LOG.debug("secure channel binding verified");
+			}
+		} else {
+			if (null != this.serverCertificate) {
+				if (false == this.serverCertificate
+						.equals(message.serverCertificate)) {
+					throw new SecurityException(
+							"secure channel binding identity mismatch");
+				}
+				LOG.debug("secure channel binding verified");
+			}
 		}
 
 		AuthenticationService authenticationService = this.authenticationServiceLocator
@@ -507,13 +541,15 @@ public class AuthenticationDataMessageHandler implements
 				throw new ServletException("server certificate not found: "
 						+ serverCertificateFile);
 			}
+			byte[] encodedServerCertificate;
 			try {
-				this.encodedServerCertificate = FileUtils
+				encodedServerCertificate = FileUtils
 						.readFileToByteArray(serverCertificateFile);
 			} catch (IOException e) {
 				throw new ServletException("error reading server certificate: "
 						+ e.getMessage(), e);
 			}
+			this.serverCertificate = getCertificate(encodedServerCertificate);
 		}
 
 		this.channelBindingServiceLocator = new ServiceLocator<ChannelBindingService>(
@@ -552,5 +588,23 @@ public class AuthenticationDataMessageHandler implements
 		this.identityIntegrityServiceLocator = new ServiceLocator<IdentityIntegrityService>(
 				HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME,
 				config);
+	}
+
+	private X509Certificate getCertificate(byte[] certData) {
+		CertificateFactory certificateFactory;
+		try {
+			certificateFactory = CertificateFactory.getInstance("X.509");
+		} catch (CertificateException e) {
+			throw new RuntimeException("cert factory error: " + e.getMessage(),
+					e);
+		}
+		try {
+			X509Certificate certificate = (X509Certificate) certificateFactory
+					.generateCertificate(new ByteArrayInputStream(certData));
+			return certificate;
+		} catch (CertificateException e) {
+			throw new RuntimeException("certificate decoding error: "
+					+ e.getMessage(), e);
+		}
 	}
 }
