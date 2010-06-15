@@ -31,6 +31,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Observable;
 
 import javax.smartcardio.ATR;
@@ -115,12 +116,15 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	private final Dialogs dialogs;
 
+	private final Locale locale;
+
 	public PcscEid(View view, Messages messages) {
 		this.view = view;
 		linuxPcscliteLibraryConfig();
 		TerminalFactory factory = TerminalFactory.getDefault();
 		this.cardTerminals = factory.terminals();
 		this.dialogs = new Dialogs(this.view, messages);
+		this.locale = messages.getLocale();
 	}
 
 	private void linuxPcscliteLibraryConfig() {
@@ -747,9 +751,9 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		/*
 		 * 0x01 = message with index in bMsgIndex
 		 */
-		verifyCommand.write(new byte[] { 0x13, 0x08 }); // wLangId
+		verifyCommand.write(new byte[] { getLanguageId(), 0x04 }); // wLangId
 		/*
-		 * 0x13, 0x08 = ?
+		 * 0x04 = default sub-language
 		 */
 		verifyCommand.write(0x00); // bMsgIndex
 		/*
@@ -774,6 +778,23 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		verifyCommand.write(verifyApdu); // abData
 		byte[] verifyCommandData = verifyCommand.toByteArray();
 		return verifyCommandData;
+	}
+
+	private byte getLanguageId() {
+		/*
+		 * USB language Ids
+		 */
+		if (Locale.FRENCH.equals(this.locale)) {
+			return 0x0c;
+		}
+		if (Locale.GERMAN.equals(this.locale)) {
+			return 0x07;
+		}
+		String language = this.locale.getLanguage();
+		if ("nl".equals(language)) {
+			return 0x13;
+		}
+		return 0x09; // ENGLISH
 	}
 
 	private byte[] createPINModificationDataStructure(int apduIns)
@@ -849,9 +870,9 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		 * 0x03 = message with index in bMsgIndex
 		 */
 
-		modifyCommand.write(new byte[] { 0x13, 0x08 }); // wLangId
+		modifyCommand.write(new byte[] { getLanguageId(), 0x04 }); // wLangId
 		/*
-		 * 0x13, 0x08 = ?
+		 * 0x04 = default sub-language
 		 */
 
 		modifyCommand.write(0x00); // bMsgIndex1
