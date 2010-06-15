@@ -31,6 +31,8 @@ public class Messages {
 
 	private final ResourceBundle resourceBundle;
 
+	private final Locale locale;
+
 	public static enum MESSAGE_ID {
 		LOADING("loading"), SECURITY_ERROR("securityError"), CARD_ERROR(
 				"cardError"), GENERIC_ERROR("genericError"), DETECTING_CARD(
@@ -62,12 +64,17 @@ public class Messages {
 	};
 
 	public Messages(Locale locale) {
+		this.locale = locale;
 		this.resourceBundle = ResourceBundle.getBundle(
-				"be.fedict.eid.applet.Messages", locale);
+				"be.fedict.eid.applet.Messages", this.locale);
 	}
 
 	public String getMessage(MESSAGE_ID messageId) {
 		String message = this.resourceBundle.getString(messageId.id);
 		return message;
+	}
+
+	public Locale getLocale() {
+		return this.locale;
 	}
 }

@@ -91,7 +91,7 @@ public class PcscTest {
 	public static class TestView implements View {
 
 		private Messages messages = new Messages(Locale.getDefault());
-		
+
 		@Override
 		public void addDetailMessage(String detailMessage) {
 			LOG.debug("detail: " + detailMessage);
@@ -109,7 +109,8 @@ public class PcscTest {
 		}
 
 		@Override
-		public void setStatusMessage(Status status, Messages.MESSAGE_ID messageId) {
+		public void setStatusMessage(Status status,
+				Messages.MESSAGE_ID messageId) {
 			String statusMessage = this.messages.getMessage(messageId);
 			LOG.debug("status message: " + status + ": " + statusMessage);
 			if (Status.ERROR == status) {
@@ -136,6 +137,7 @@ public class PcscTest {
 
 	@Test
 	public void pcscAuthnSignature() throws Exception {
+		this.messages = new Messages(Locale.GERMAN);
 		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEid.isEidPresent()) {
 			LOG.debug("insert eID card");
@@ -148,7 +150,7 @@ public class PcscTest {
 			pcscEid.logoff();
 			signatureValue = pcscEid.signAuthn(challenge);
 			authnCertChain = pcscEid.getAuthnCertificateChain();
-			//pcscEid.logoff();
+			// pcscEid.logoff();
 		} finally {
 			pcscEid.close();
 		}
@@ -177,6 +179,12 @@ public class PcscTest {
 			pcscEid.close();
 		}
 		LOG.debug("test: " + (true ? "true" : "false"));
+	}
+
+	@Test
+	public void testLocale() throws Exception {
+		Locale locale = Locale.GERMAN;
+		LOG.debug("locale: " + locale.getLanguage());
 	}
 
 	@Test
@@ -234,6 +242,7 @@ public class PcscTest {
 
 	@Test
 	public void pcscChangePin() throws Exception {
+		this.messages = new Messages(Locale.GERMAN);
 		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEidSpi.isEidPresent()) {
 			LOG.debug("insert eID card");
