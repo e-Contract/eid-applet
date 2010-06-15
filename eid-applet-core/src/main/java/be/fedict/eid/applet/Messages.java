@@ -46,7 +46,9 @@ public class Messages {
 				"connectReader"), PIN_PAD("pinPad"), CURRENT_PIN("currentPin"), NEW_PIN(
 				"newPin"), OK("ok"), CANCEL("cancel"), PUK_PAD("pukPad"), PIN_PAD_CHANGE(
 				"pinPadChange"), KIOSK_MODE("kioskMode"), PIN_CHANGE(
-				"pinChange"), PIN_UNBLOCK("pinUnblock");
+				"pinChange"), PIN_UNBLOCK("pinUnblock"), PIN_PAD_MODIFY_OLD(
+				"pinPadModifyOld"), PIN_PAD_MODIFY_NEW("pinPadModifyNew"), PIN_PAD_MODIFY_NEW_AGAIN(
+				"pinPadModifyNewAgain");
 
 		private final String id;
 

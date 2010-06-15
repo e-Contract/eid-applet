@@ -145,6 +145,7 @@ public class PcscTest {
 		byte[] signatureValue;
 		List<X509Certificate> authnCertChain;
 		try {
+			pcscEid.logoff();
 			signatureValue = pcscEid.signAuthn(challenge);
 			authnCertChain = pcscEid.getAuthnCertificateChain();
 			//pcscEid.logoff();

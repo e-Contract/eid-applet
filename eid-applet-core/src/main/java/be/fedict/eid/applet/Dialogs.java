@@ -88,7 +88,7 @@ public class Dialogs {
 		{
 			Box puk1Panel = Box.createHorizontalBox();
 			JLabel puk1Label = new JLabel("eID PUK1:");
-                        puk1Label.setLabelFor(puk1Field);
+			puk1Label.setLabelFor(puk1Field);
 			puk1Panel.add(puk1Label);
 			puk1Panel.add(Box.createHorizontalStrut(5));
 			puk1Panel.add(puk1Field);
@@ -101,7 +101,7 @@ public class Dialogs {
 		{
 			Box puk2Panel = Box.createHorizontalBox();
 			JLabel puk2Label = new JLabel("eID PUK2:");
-                        puk2Label.setLabelFor(puk2Field);
+			puk2Label.setLabelFor(puk2Field);
 			puk2Panel.add(puk2Label);
 			puk2Panel.add(Box.createHorizontalStrut(5));
 			puk2Panel.add(puk2Field);
@@ -169,7 +169,7 @@ public class Dialogs {
 			JLabel oldPinLabel = new JLabel(this.messages
 					.getMessage(MESSAGE_ID.CURRENT_PIN)
 					+ ":");
-                        oldPinLabel.setLabelFor(oldPinField);
+			oldPinLabel.setLabelFor(oldPinField);
 			oldPinPanel.add(oldPinLabel);
 			oldPinPanel.add(Box.createHorizontalStrut(5));
 			oldPinPanel.add(oldPinField);
@@ -184,7 +184,7 @@ public class Dialogs {
 			JLabel newPinLabel = new JLabel(this.messages
 					.getMessage(MESSAGE_ID.NEW_PIN)
 					+ ":");
-                        newPinLabel.setLabelFor(newPinField);
+			newPinLabel.setLabelFor(newPinField);
 			newPinPanel.add(newPinLabel);
 			newPinPanel.add(Box.createHorizontalStrut(5));
 			newPinPanel.add(newPinField);
@@ -199,7 +199,7 @@ public class Dialogs {
 			JLabel new2PinLabel = new JLabel(this.messages
 					.getMessage(MESSAGE_ID.NEW_PIN)
 					+ ":");
-                        new2PinLabel.setLabelFor(new2PinField);
+			new2PinLabel.setLabelFor(new2PinField);
 			new2PinPanel.add(new2PinLabel);
 			new2PinPanel.add(Box.createHorizontalStrut(5));
 			new2PinPanel.add(new2PinField);
@@ -305,7 +305,7 @@ public class Dialogs {
 		passwordPanel.add(promptLabel);
 		passwordPanel.add(Box.createHorizontalStrut(5));
 		final JPasswordField passwordField = new JPasswordField(MAX_PIN_SIZE);
-                promptLabel.setLabelFor(passwordField);
+		promptLabel.setLabelFor(passwordField);
 		passwordPanel.add(passwordField);
 		mainPanel.add(passwordPanel);
 
@@ -419,5 +419,20 @@ public class Dialogs {
 	public void showPINChangePadFrame(int retriesLeft) {
 		showPINPadFrame(retriesLeft, "eID PIN change", this.messages
 				.getMessage(MESSAGE_ID.PIN_PAD_CHANGE));
+	}
+
+	public void showPINModifyOldPINFrame(int retriesLeft) {
+		showPINPadFrame(retriesLeft, "eID PIN change", this.messages
+				.getMessage(MESSAGE_ID.PIN_PAD_MODIFY_OLD));
+	}
+
+	public void showPINModifyNewPINFrame(int retriesLeft) {
+		showPINPadFrame(retriesLeft, "eID PIN change", this.messages
+				.getMessage(MESSAGE_ID.PIN_PAD_MODIFY_NEW));
+	}
+
+	public void showPINModifyNewPINAgainFrame(int retriesLeft) {
+		showPINPadFrame(retriesLeft, "eID PIN change", this.messages
+				.getMessage(MESSAGE_ID.PIN_PAD_MODIFY_NEW_AGAIN));
 	}
 }
