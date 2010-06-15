@@ -471,6 +471,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	public static final byte FEATURE_VERIFY_PIN_START_TAG = 0x01;
 	public static final byte FEATURE_VERIFY_PIN_FINISH_TAG = 0x02;
+	public static final byte FEATURE_MODIFY_PIN_START_TAG = 0x03;
+	public static final byte FEATURE_MODIFY_PIN_FINISH_TAG = 0x04;
 	public static final byte FEATURE_GET_KEY_PRESSED_TAG = 0x05;
 	public static final byte FEATURE_VERIFY_PIN_DIRECT_TAG = 0x06;
 	public static final byte FEATURE_MODIFY_PIN_DIRECT_TAG = 0x07;
@@ -640,31 +642,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			this.card.transmitControlCommand(verifyPinStartFeature,
 					verifyCommandData);
 
-			// wait for key pressed
-			loop: while (true) {
-				byte[] getKeyPressedResult = card.transmitControlCommand(
-						getKeyPressedFeature, new byte[0]);
-				byte key = getKeyPressedResult[0];
-				switch (key) {
-				case 0x00:
-					// this.view.addDetailMessage("waiting for CCID...");
-					Thread.sleep(200);
-					break;
-				case 0x0d:
-					this.view.addDetailMessage("user confirmed");
-					break loop;
-				case 0x1b:
-					this.view.addDetailMessage("user canceled");
-					// XXX: need to send the PIN finish ioctl?
-					throw new SecurityException("canceled by user");
-				case 0x40:
-					this.view.addDetailMessage("PIN abort");
-					break loop;
-				default:
-					this.view.addDetailMessage("CCID get key pressed result: "
-							+ key);
-				}
-			}
+			ccidWaitForOK(getKeyPressedFeature);
 		} finally {
 			this.dialogs.disposePINPadFrame();
 		}
@@ -958,10 +936,15 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	public void changePin() throws Exception {
 		Integer directPinModifyFeature = getFeature(FEATURE_MODIFY_PIN_DIRECT_TAG);
+		Integer modifyPinStartFeature = getFeature(FEATURE_MODIFY_PIN_START_TAG);
 		int retriesLeft = -1;
 		ResponseAPDU responseApdu;
 		do {
-			if (null != directPinModifyFeature) {
+			if (null != modifyPinStartFeature) {
+				this.view.addDetailMessage("using modify pin start/finish...");
+				responseApdu = doChangePinStartFinish(retriesLeft,
+						modifyPinStartFeature);
+			} else if (null != directPinModifyFeature) {
 				this.view
 						.addDetailMessage("could use direct PIN modify here...");
 				responseApdu = doChangePinDirect(retriesLeft,
@@ -988,6 +971,75 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			}
 		} while (0x9000 != responseApdu.getSW());
 		this.dialogs.showPinChanged();
+	}
+
+	private ResponseAPDU doChangePinStartFinish(int retriesLeft,
+			Integer modifyPinStartFeature) throws IOException, CardException,
+			InterruptedException {
+		byte[] modifyCommandData = createPINModificationDataStructure(0x24);
+		this.card.transmitControlCommand(modifyPinStartFeature,
+				modifyCommandData);
+		int getKeyPressedFeature = getFeature(FEATURE_GET_KEY_PRESSED_TAG);
+
+		try {
+			this.view.addDetailMessage("enter old PIN...");
+			this.dialogs.showPINModifyOldPINFrame(retriesLeft);
+			ccidWaitForOK(getKeyPressedFeature);
+			this.dialogs.disposePINPadFrame();
+
+			this.dialogs.showPINModifyNewPINFrame(retriesLeft);
+			this.view.addDetailMessage("enter new PIN...");
+			ccidWaitForOK(getKeyPressedFeature);
+			this.dialogs.disposePINPadFrame();
+
+			this.dialogs.showPINModifyNewPINAgainFrame(retriesLeft);
+			this.view.addDetailMessage("enter new PIN again...");
+			ccidWaitForOK(getKeyPressedFeature);
+		} finally {
+			this.dialogs.disposePINPadFrame();
+		}
+
+		int modifyPinFinishIoctl = getFeature(FEATURE_MODIFY_PIN_FINISH_TAG);
+		byte[] modifyPinFinishResult = this.card.transmitControlCommand(
+				modifyPinFinishIoctl, new byte[0]);
+		ResponseAPDU responseApdu = new ResponseAPDU(modifyPinFinishResult);
+		return responseApdu;
+	}
+
+	private void ccidWaitForOK(int getKeyPressedFeature) throws CardException,
+			InterruptedException {
+		// wait for key pressed
+		loop: while (true) {
+			byte[] getKeyPressedResult = this.card.transmitControlCommand(
+					getKeyPressedFeature, new byte[0]);
+			byte key = getKeyPressedResult[0];
+			switch (key) {
+			case 0x00:
+				// this.view.addDetailMessage("waiting for CCID...");
+				Thread.sleep(200);
+				break;
+			case 0x2b:
+				this.view.addDetailMessage("PIN digit");
+				break;
+			case 0x0a:
+				this.view.addDetailMessage("erase PIN digit");
+				break;
+			case 0x0d:
+				this.view.addDetailMessage("user confirmed");
+				break loop;
+			case 0x1b:
+				this.view.addDetailMessage("user canceled");
+				// XXX: need to send the PIN finish ioctl?
+				throw new SecurityException("canceled by user");
+			case 0x40:
+				// happens in case of a reader timeout
+				this.view.addDetailMessage("PIN abort");
+				break loop;
+			default:
+				this.view.addDetailMessage("CCID get key pressed result: "
+						+ key + " hex: " + Integer.toHexString(key));
+			}
+		}
 	}
 
 	private ResponseAPDU doChangePinDirect(int retriesLeft,
