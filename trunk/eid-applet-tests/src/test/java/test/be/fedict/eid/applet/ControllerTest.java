@@ -91,6 +91,7 @@ import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.Runtime;
 import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
+import be.fedict.eid.applet.Messages.MESSAGE_ID;
 import be.fedict.eid.applet.service.AppletServiceServlet;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
@@ -314,6 +315,8 @@ public class ControllerTest {
 
 	private static class TestView implements View {
 
+		private Messages messages = new Messages(Locale.getDefault());
+		
 		@Override
 		public void addDetailMessage(String detailMessage) {
 			LOG.debug("detail message: " + detailMessage);
@@ -333,7 +336,8 @@ public class ControllerTest {
 		}
 
 		@Override
-		public void setStatusMessage(Status status, String statusMessage) {
+		public void setStatusMessage(Status status, Messages.MESSAGE_ID messageId) {
+			String statusMessage = this.messages.getMessage(messageId);
 			LOG.debug("status message: " + status + ": " + statusMessage);
 			if (Status.ERROR == status) {
 				throw new RuntimeException("status ERROR received");

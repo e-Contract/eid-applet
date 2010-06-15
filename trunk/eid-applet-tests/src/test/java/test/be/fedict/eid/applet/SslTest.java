@@ -261,6 +261,8 @@ public class SslTest {
 
 		private static final Log LOG = LogFactory.getLog(TestView.class);
 
+		private Messages messages = new Messages(Locale.getDefault());
+		
 		@Override
 		public void addDetailMessage(String detailMessage) {
 			LOG.debug("detail message: " + detailMessage);
@@ -282,8 +284,12 @@ public class SslTest {
 		}
 
 		@Override
-		public void setStatusMessage(Status status, String statusMessage) {
-			LOG.debug("status [" + status + "] " + statusMessage);
+		public void setStatusMessage(Status status, Messages.MESSAGE_ID messageId) {
+			String statusMessage = this.messages.getMessage(messageId);
+			LOG.debug("status message: " + status + ": " + statusMessage);
+			if (Status.ERROR == status) {
+				throw new RuntimeException("status ERROR received");
+			}
 		}
 	}
 
