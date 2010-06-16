@@ -320,11 +320,15 @@ public class Controller {
 				boolean unblockPin = administrationMessage.unblockPin;
 				boolean removeCard = administrationMessage.removeCard;
 				boolean logoff = administrationMessage.logoff;
+				boolean requireSecureReader = administrationMessage.requireSecureReader;
 				addDetailMessage("change pin: " + changePin);
 				addDetailMessage("unblock pin: " + unblockPin);
 				addDetailMessage("remove card: " + removeCard);
 				addDetailMessage("logoff: " + logoff);
-				administration(unblockPin, changePin, logoff, removeCard);
+				addDetailMessage("require secure reader: "
+						+ requireSecureReader);
+				administration(unblockPin, changePin, logoff, removeCard,
+						requireSecureReader);
 			}
 			if (resultMessage instanceof FilesDigestRequestMessage) {
 				FilesDigestRequestMessage filesDigestRequestMessage = (FilesDigestRequestMessage) resultMessage;
@@ -810,16 +814,17 @@ public class Controller {
 	}
 
 	private void administration(boolean unblockPin, boolean changePin,
-			boolean logoff, boolean removeCard) throws Exception {
+			boolean logoff, boolean removeCard, boolean requireSecureReader)
+			throws Exception {
 		waitForEIdCard();
 		try {
 			if (unblockPin) {
 				setStatusMessage(Status.NORMAL, Messages.MESSAGE_ID.PIN_UNBLOCK);
-				this.pcscEidSpi.unblockPin();
+				this.pcscEidSpi.unblockPin(requireSecureReader);
 			}
 			if (changePin) {
 				setStatusMessage(Status.NORMAL, Messages.MESSAGE_ID.PIN_CHANGE);
-				this.pcscEidSpi.changePin();
+				this.pcscEidSpi.changePin(requireSecureReader);
 			}
 			if (logoff) {
 				this.pcscEidSpi.logoff();

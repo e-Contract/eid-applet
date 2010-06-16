@@ -1591,15 +1591,14 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 				<para>
 					The eID Applet Service can be configured to make the eID
 					Applet to
-					check whether the eID crypto operation (either
-					authentication or
-					non-repudiation signature) is being executed
+					check whether the eID operation that requires the user to enter the eID PIN code (in
+					case of authentication or non-repudiation signature, PIN change or PIN unblock) is being executed
 					using a CCID
 					secure
 					smart card reader. Although this feature could
 					be spoofed it
 					aims to
-					increase the security awareness on some
+					increase the security awareness as required for some
 					applications.
 					This feature
 					can be enabled by setting the following
@@ -1612,6 +1611,11 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 	<param-name>RequireSecureReader</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
+				<warning>
+					<title>Not everybody has a secure pinpad reader</title>
+					<para>Before enabling this feature, make sure that your target audience indeed 
+					has access to a secure pinpad reader.</para>
+				</warning>
 			</section>
 		</section>
 	</section>

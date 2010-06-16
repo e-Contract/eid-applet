@@ -47,15 +47,19 @@ public class AdministrationMessage extends AbstractProtocolMessage {
 	@HttpHeader(HTTP_HEADER_PREFIX + "Logoff")
 	public boolean logoff;
 
+	@HttpHeader(HTTP_HEADER_PREFIX + "RequireSecureReader")
+	public boolean requireSecureReader;
+
 	public AdministrationMessage() {
 		super();
 	}
 
 	public AdministrationMessage(boolean changePin, boolean unblockPin,
-			boolean logoff, boolean removeCard) {
+			boolean logoff, boolean removeCard, boolean requireSecureReader) {
 		this.changePin = changePin;
 		this.unblockPin = unblockPin;
 		this.logoff = logoff;
 		this.removeCard = removeCard;
+		this.requireSecureReader = requireSecureReader;
 	}
 }
