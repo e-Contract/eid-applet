@@ -41,6 +41,7 @@ import be.fedict.eid.applet.service.spi.SignatureService;
 import be.fedict.eid.applet.shared.AdministrationMessage;
 import be.fedict.eid.applet.shared.AuthenticationRequestMessage;
 import be.fedict.eid.applet.shared.CheckClientMessage;
+import be.fedict.eid.applet.shared.DiagnosticMessage;
 import be.fedict.eid.applet.shared.FilesDigestRequestMessage;
 import be.fedict.eid.applet.shared.HelloMessage;
 import be.fedict.eid.applet.shared.IdentificationRequestMessage;
@@ -99,6 +100,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	public static final String REQUIRE_SECURE_READER_INIT_PARAM_NAME = "RequireSecureReader";
 
+	public static final String DIAGNOSTIC_MODE_INIT_PARAM_NAME = "DiagnosticMode";
+
 	private boolean includePhoto;
 
 	private boolean includeAddress;
@@ -129,6 +132,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	private boolean requireSecureReader;
 
+	private boolean diagnosticMode;
+
 	private ServiceLocator<SecureClientEnvironmentService> secureClientEnvServiceLocator;
 
 	private ServiceLocator<IdentityIntegrityService> identityIntegrityServiceLocator;
@@ -145,6 +150,13 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 		LOG.debug("hello message received");
 
 		storeClientLanguage(message.language, session);
+
+		if (this.diagnosticMode) {
+			LOG.debug("diagnostic mode");
+			DiagnosticMessage diagnosticMessage = new DiagnosticMessage();
+			return diagnosticMessage;
+		}
+
 		SecureClientEnvironmentService secureClientEnvService = this.secureClientEnvServiceLocator
 				.locateService();
 		if (null != secureClientEnvService) {
@@ -322,6 +334,12 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 		String kiosk = config.getInitParameter(KIOSK_INIT_PARAM_NAME);
 		if (null != kiosk) {
 			this.kiosk = Boolean.parseBoolean(kiosk);
+		}
+
+		String diagnosticMode = config
+				.getInitParameter(DIAGNOSTIC_MODE_INIT_PARAM_NAME);
+		if (null != diagnosticMode) {
+			this.diagnosticMode = Boolean.parseBoolean(diagnosticMode);
 		}
 
 		String requireSecureReader = config

@@ -59,6 +59,7 @@ import be.fedict.eid.applet.io.AppletSSLSocketFactory;
 import be.fedict.eid.applet.io.HttpURLConnectionHttpReceiver;
 import be.fedict.eid.applet.io.HttpURLConnectionHttpTransmitter;
 import be.fedict.eid.applet.io.LocalAppletProtocolContext;
+import be.fedict.eid.applet.sc.DiagnosticCallbackHandler;
 import be.fedict.eid.applet.sc.PKCS11NotFoundException;
 import be.fedict.eid.applet.sc.PcscEid;
 import be.fedict.eid.applet.sc.PcscEidSpi;
@@ -73,6 +74,7 @@ import be.fedict.eid.applet.shared.AuthenticationRequestMessage;
 import be.fedict.eid.applet.shared.CheckClientMessage;
 import be.fedict.eid.applet.shared.ClientEnvironmentMessage;
 import be.fedict.eid.applet.shared.ContinueInsecureMessage;
+import be.fedict.eid.applet.shared.DiagnosticMessage;
 import be.fedict.eid.applet.shared.FileDigestsDataMessage;
 import be.fedict.eid.applet.shared.FilesDigestRequestMessage;
 import be.fedict.eid.applet.shared.FinishedMessage;
@@ -311,6 +313,9 @@ public class Controller {
 					}
 				}
 			}
+			if (resultMessage instanceof DiagnosticMessage) {
+				diagnosticMode();
+			}
 			if (resultMessage instanceof KioskMessage) {
 				kioskMode();
 			}
@@ -432,6 +437,34 @@ public class Controller {
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DONE);
 		this.runtime.gotoTargetPage();
 		return null;
+	}
+
+	private void diagnosticMode() {
+		addDetailMessage("diagnostic mode...");
+		String javaVersion = System.getProperty("java.version");
+		String javaVendor = System.getProperty("java.vendor");
+		String javaRuntimeDescription = javaVendor + " " + javaVersion;
+		this.view.addTestResult(DiagnosticTests.JAVA_RUNTIME, true,
+				javaRuntimeDescription);
+		ControllerDiagnosticCallbackHandler callbackHandler = new ControllerDiagnosticCallbackHandler();
+		this.pcscEidSpi.diagnosticTests(callbackHandler);
+		this.pcscEidSpi.close();
+
+		this.pkcs11Eid.diagnosticTests(callbackHandler);
+		try {
+			this.pkcs11Eid.close();
+		} catch (Exception e) {
+			addDetailMessage("error closing PKCS#11: " + e.getMessage());
+		}
+	}
+
+	private class ControllerDiagnosticCallbackHandler implements
+			DiagnosticCallbackHandler {
+
+		public void addTestResult(DiagnosticTests test, boolean success,
+				String information) {
+			Controller.this.view.addTestResult(test, success, information);
+		}
 	}
 
 	private SignCertificatesDataMessage performSignCertificatesOperation()

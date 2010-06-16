@@ -54,6 +54,7 @@ import sun.security.pkcs11.wrapper.CK_TOKEN_INFO;
 import sun.security.pkcs11.wrapper.PKCS11;
 import sun.security.pkcs11.wrapper.PKCS11Constants;
 import sun.security.pkcs11.wrapper.PKCS11Exception;
+import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.View;
 
@@ -605,5 +606,55 @@ public class Pkcs11Eid {
 		this.pkcs11Provider = null;
 
 		return signatureValue;
+	}
+
+	public void diagnosticTests(
+			DiagnosticCallbackHandler diagnosticCallbackHandler) {
+		String pkcs11Path;
+		try {
+			pkcs11Path = getPkcs11Path();
+		} catch (PKCS11NotFoundException e) {
+			diagnosticCallbackHandler.addTestResult(
+					DiagnosticTests.PKCS11_AVAILABLE, false, null);
+			return;
+		}
+		diagnosticCallbackHandler.addTestResult(
+				DiagnosticTests.PKCS11_AVAILABLE, true, pkcs11Path);
+
+		try {
+			this.pkcs11 = loadPkcs11(pkcs11Path);
+		} catch (Exception e) {
+			diagnosticCallbackHandler.addTestResult(
+					DiagnosticTests.PKCS11_RUNTIME, false, e.getMessage());
+			return;
+		}
+
+		CK_INFO ck_info;
+		try {
+			ck_info = this.pkcs11.C_GetInfo();
+		} catch (PKCS11Exception e) {
+			diagnosticCallbackHandler.addTestResult(
+					DiagnosticTests.PKCS11_RUNTIME, false, e.getMessage());
+			return;
+		}
+		String libraryDescription = new String(ck_info.libraryDescription)
+				.trim();
+		this.view
+				.addDetailMessage("library description: " + libraryDescription);
+		String manufacturerId = new String(ck_info.manufacturerID).trim();
+		this.view.addDetailMessage("manufacturer ID: " + manufacturerId);
+		String libraryVersion = Integer.toString(ck_info.libraryVersion.major,
+				16)
+				+ "." + Integer.toString(ck_info.libraryVersion.minor, 16);
+		this.view.addDetailMessage("library version: " + libraryVersion);
+		String cryptokiVersion = Integer.toString(
+				ck_info.cryptokiVersion.major, 16)
+				+ "." + Integer.toString(ck_info.cryptokiVersion.minor, 16);
+		this.view.addDetailMessage("cryptoki version: " + cryptokiVersion);
+		String pkcs11Information = libraryDescription + ", " + manufacturerId
+				+ ", " + libraryVersion + ", " + cryptokiVersion;
+
+		diagnosticCallbackHandler.addTestResult(DiagnosticTests.PKCS11_RUNTIME,
+				true, pkcs11Information);
 	}
 }

@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2010 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -16,29 +16,28 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet;
+package be.fedict.eid.applet.sc;
 
-import java.awt.Component;
+import be.fedict.eid.applet.DiagnosticTests;
 
 /**
- * Interface for view component.
+ * Callback handler for diagnostic tests.
  * 
  * @author Frank Cornelis
  * 
  */
-public interface View {
+public interface DiagnosticCallbackHandler {
 
-	void addDetailMessage(String detailMessage);
-
-	void setStatusMessage(Status status, Messages.MESSAGE_ID messageId);
-
-	boolean privacyQuestion(boolean includeAddress, boolean includePhoto,
-			String identityDataUsage);
-
-	Component getParentComponent();
-
-	void progressIndication(int max, int current);
-
-	void addTestResult(DiagnosticTests diagnosticTest, boolean success,
-			String description);
+	/**
+	 * Adds a test result from the running diagnostics.
+	 * 
+	 * @param test
+	 *            the performed test.
+	 * @param success
+	 *            the result of the performed test. <code>true</code> is OK,
+	 *            <code>false</code> otherwise.
+	 * @param information
+	 *            additional optional information about the performed test.
+	 */
+	void addTestResult(DiagnosticTests test, boolean success, String information);
 }

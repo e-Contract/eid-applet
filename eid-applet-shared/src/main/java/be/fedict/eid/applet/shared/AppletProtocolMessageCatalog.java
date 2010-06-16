@@ -50,6 +50,7 @@ public class AppletProtocolMessageCatalog implements ProtocolMessageCatalog {
 		catalog.add(KioskMessage.class);
 		catalog.add(SignCertificatesRequestMessage.class);
 		catalog.add(SignCertificatesDataMessage.class);
+		catalog.add(DiagnosticMessage.class);
 
 		catalog.add(IdentityDataMessage.class);
 		catalog.add(FinishedMessage.class);
