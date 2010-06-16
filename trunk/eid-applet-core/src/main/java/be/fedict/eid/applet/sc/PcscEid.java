@@ -44,10 +44,13 @@ import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 import javax.smartcardio.TerminalFactory;
 
+import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Dialogs;
 import be.fedict.eid.applet.Messages;
+import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
 import be.fedict.eid.applet.Dialogs.Pins;
+import be.fedict.eid.applet.Messages.MESSAGE_ID;
 
 /**
  * Holds all function related to eID card access over PC/SC.
@@ -112,6 +115,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	private final View view;
 
+	private final TerminalFactory terminalFactory;
+
 	private final CardTerminals cardTerminals;
 
 	private final Dialogs dialogs;
@@ -121,8 +126,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	public PcscEid(View view, Messages messages) {
 		this.view = view;
 		linuxPcscliteLibraryConfig();
-		TerminalFactory factory = TerminalFactory.getDefault();
-		this.cardTerminals = factory.terminals();
+		this.terminalFactory = TerminalFactory.getDefault();
+		this.cardTerminals = this.terminalFactory.terminals();
 		this.dialogs = new Dialogs(this.view, messages);
 		this.locale = messages.getLocale();
 	}
@@ -492,7 +497,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		}
 		byte[] features;
 		try {
-			features = card.transmitControlCommand(ioctl, new byte[0]);
+			features = this.card.transmitControlCommand(ioctl, new byte[0]);
 		} catch (CardException e) {
 			this.view.addDetailMessage("GET_FEATURES IOCTL error: "
 					+ e.getMessage());
@@ -1359,5 +1364,199 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	public void unblockPin() throws Exception {
 		unblockPin(false);
+	}
+
+	public void diagnosticTests(
+			DiagnosticCallbackHandler diagnosticCallbackHandler) {
+		this.view.addDetailMessage("start diagnostic tests");
+		this.view.setStatusMessage(Status.NORMAL, MESSAGE_ID.DIAGNOSTIC_MODE);
+		/*
+		 * PC/SC tests
+		 */
+		if ("None".equals(this.terminalFactory.getType())) {
+			diagnosticCallbackHandler.addTestResult(DiagnosticTests.PCSC,
+					false, "PC/SC service not available");
+			return;
+		}
+		List<CardTerminal> cardTerminalList;
+		try {
+			cardTerminalList = this.cardTerminals.list();
+		} catch (CardException e) {
+			this.view
+					.addDetailMessage("error retrieving list of card terminals: "
+							+ e.getMessage());
+			diagnosticCallbackHandler.addTestResult(DiagnosticTests.PCSC,
+					false, e.getMessage());
+			return;
+		}
+		diagnosticCallbackHandler.addTestResult(DiagnosticTests.PCSC, true,
+				terminalFactory.getType());
+
+		/*
+		 * CARD READER tests
+		 */
+		if (cardTerminalList.isEmpty()) {
+			this.view.addDetailMessage("no card terminals present");
+			diagnosticCallbackHandler.addTestResult(
+					DiagnosticTests.CARD_READER, false,
+					"No card reader present");
+			return;
+		}
+		this.view.addDetailMessage("number of card terminals: "
+				+ cardTerminalList.size());
+
+		try {
+			if (false == isEidPresent()) {
+				this.view.setStatusMessage(Status.NORMAL,
+						MESSAGE_ID.INSERT_CARD_QUESTION);
+				waitForEidPresent();
+			}
+		} catch (Exception e) {
+			diagnosticCallbackHandler.addTestResult(
+					DiagnosticTests.CARD_READER, false, e.getMessage());
+			return;
+		}
+
+		this.view.setStatusMessage(Status.NORMAL, MESSAGE_ID.DIAGNOSTIC_MODE);
+
+		Integer directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
+		Integer verifyPinStartFeature = getFeature(FEATURE_VERIFY_PIN_START_TAG);
+
+		String terminalName = this.cardTerminal.getName();
+		String cardReaderInformation = terminalName;
+		if (null != directPinVerifyFeature || null != verifyPinStartFeature) {
+			cardReaderInformation += " (CCID secure pinpad reader)";
+		}
+		diagnosticCallbackHandler.addTestResult(DiagnosticTests.CARD_READER,
+				true, cardReaderInformation);
+
+		/*
+		 * eID Readout tests.
+		 */
+		try {
+			readFile(IDENTITY_FILE_ID);
+		} catch (Exception e) {
+			diagnosticCallbackHandler.addTestResult(
+					DiagnosticTests.EID_READOUT, false, "Identity file");
+			return;
+		}
+		try {
+			readFile(ADDRESS_FILE_ID);
+		} catch (Exception e) {
+			diagnosticCallbackHandler.addTestResult(
+					DiagnosticTests.EID_READOUT, false, "Address file");
+			return;
+		}
+		try {
+			readFile(PHOTO_FILE_ID);
+		} catch (Exception e) {
+			diagnosticCallbackHandler.addTestResult(
+					DiagnosticTests.EID_READOUT, false, "Photo file");
+			return;
+		}
+		try {
+			readFile(IDENTITY_SIGN_FILE_ID);
+		} catch (Exception e) {
+			diagnosticCallbackHandler.addTestResult(
+					DiagnosticTests.EID_READOUT, false,
+					"Identity signature file");
+			return;
+		}
+		try {
+			readFile(ADDRESS_SIGN_FILE_ID);
+		} catch (Exception e) {
+			diagnosticCallbackHandler.addTestResult(
+					DiagnosticTests.EID_READOUT, false,
+					"Address signature file");
+			return;
+		}
+		try {
+			readFile(AUTHN_CERT_FILE_ID);
+		} catch (Exception e) {
+			diagnosticCallbackHandler.addTestResult(
+					DiagnosticTests.EID_READOUT, false,
+					"Authentication certificate file");
+			return;
+		}
+		try {
+			readFile(SIGN_CERT_FILE_ID);
+		} catch (Exception e) {
+			diagnosticCallbackHandler.addTestResult(
+					DiagnosticTests.EID_READOUT, false,
+					"Signature certificate file");
+			return;
+		}
+		try {
+			readFile(CA_CERT_FILE_ID);
+		} catch (Exception e) {
+			diagnosticCallbackHandler.addTestResult(
+					DiagnosticTests.EID_READOUT, false,
+					"Citizen CA certificate file");
+			return;
+		}
+		try {
+			readFile(ROOT_CERT_FILE_ID);
+		} catch (Exception e) {
+			diagnosticCallbackHandler.addTestResult(
+					DiagnosticTests.EID_READOUT, false,
+					"Root CA certificate file");
+			return;
+		}
+		try {
+			readFile(RRN_CERT_FILE_ID);
+		} catch (Exception e) {
+			diagnosticCallbackHandler.addTestResult(
+					DiagnosticTests.EID_READOUT, false, "NRN certificate file");
+			return;
+		}
+		diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_READOUT,
+				true, null);
+
+		/*
+		 * eID crypto tests.
+		 */
+		CommandAPDU getChallengeApdu = new CommandAPDU(0x00, 0x84, 0x00, 0x00,
+				new byte[] {}, 0, 0, 20);
+		ResponseAPDU responseApdu;
+		try {
+			responseApdu = transmit(getChallengeApdu);
+		} catch (CardException e) {
+			diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
+					false, e.getMessage());
+			return;
+		}
+		if (0x9000 != responseApdu.getSW()) {
+			diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
+					false, "Challenge error");
+			return;
+		}
+		byte[] challenge = responseApdu.getData();
+
+		ByteArrayOutputStream internalAuthnData = new ByteArrayOutputStream();
+		internalAuthnData.write(0x94);
+		internalAuthnData.write(0x14);
+		try {
+			internalAuthnData.write(challenge);
+		} catch (IOException e) {
+			diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
+					false, e.getMessage());
+			return;
+		}
+		CommandAPDU internalAuthnApdu = new CommandAPDU(0x00, 0x88, 0x02, 0x81,
+				internalAuthnData.toByteArray());
+		try {
+			responseApdu = transmit(internalAuthnApdu);
+		} catch (CardException e) {
+			diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
+					false, e.getMessage());
+			return;
+		}
+		if (0x9000 != responseApdu.getSW()) {
+			diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
+					false, "Internal authentication failed");
+			return;
+		}
+		diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
+				true, null);
 	}
 }

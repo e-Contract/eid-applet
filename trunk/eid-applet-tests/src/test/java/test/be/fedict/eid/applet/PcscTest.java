@@ -56,9 +56,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
+import be.fedict.eid.applet.sc.DiagnosticCallbackHandler;
 import be.fedict.eid.applet.sc.PcscEid;
 import be.fedict.eid.applet.sc.PcscEidSpi;
 import be.fedict.eid.applet.sc.Pkcs11Eid;
@@ -120,6 +122,11 @@ public class PcscTest {
 
 		@Override
 		public void progressIndication(int max, int current) {
+		}
+
+		@Override
+		public void addTestResult(DiagnosticTests diagnosticTest,
+				boolean success, String description) {
 		}
 	}
 
@@ -252,6 +259,34 @@ public class PcscTest {
 		pcscEidSpi.changePin();
 
 		pcscEidSpi.close();
+	}
+
+	@Test
+	public void diagnosticTests() throws Exception {
+		this.messages = new Messages(Locale.GERMAN);
+		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
+
+		DiagnosticTestCallbackHandler callbackHandler = new DiagnosticTestCallbackHandler();
+
+		pcscEidSpi.diagnosticTests(callbackHandler);
+
+		pcscEidSpi.close();
+	}
+
+	public static class DiagnosticTestCallbackHandler implements
+			DiagnosticCallbackHandler {
+
+		private static final Log LOG = LogFactory
+				.getLog(DiagnosticTestCallbackHandler.class);
+
+		@Override
+		public void addTestResult(DiagnosticTests test, boolean success,
+				String information) {
+			LOG.debug("test result: " + test.name() + ": "
+					+ test.getDescription() + " = " + success + " ("
+					+ information + ")");
+		}
+
 	}
 
 	@Test

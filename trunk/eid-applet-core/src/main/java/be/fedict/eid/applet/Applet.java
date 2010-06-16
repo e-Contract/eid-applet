@@ -81,6 +81,8 @@ public class Applet extends JApplet {
 
 	public static final String MESSAGE_CALLBACK_EX_PARAM = "MessageCallbackEx";
 
+	public static final String DIAGNOSTIC_TEST_CALLBACK_PARAM = "DiagnosticTestCallback";
+
 	private JLabel statusLabel;
 
 	private JTextArea detailMessages;
@@ -259,6 +261,8 @@ public class Applet extends JApplet {
 
 	private String messageCallbackExParam;
 
+	private String diagnosticTestCallbackParam;
+
 	private void initUI() {
 		loadMessages();
 		initStyle();
@@ -266,6 +270,8 @@ public class Applet extends JApplet {
 		this.messageCallbackParam = super.getParameter(MESSAGE_CALLBACK_PARAM);
 		this.messageCallbackExParam = super
 				.getParameter(MESSAGE_CALLBACK_EX_PARAM);
+		this.diagnosticTestCallbackParam = super
+				.getParameter(DIAGNOSTIC_TEST_CALLBACK_PARAM);
 
 		Container contentPane = this.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
@@ -592,6 +598,11 @@ public class Applet extends JApplet {
 				Messages.MESSAGE_ID messageId) {
 			Applet.this.setStatusMessage(status, messageId);
 		}
+
+		public void addTestResult(DiagnosticTests diagnosticTest,
+				boolean success, String description) {
+			Applet.this.addTestResult(diagnosticTest, success, description);
+		}
 	}
 
 	private boolean privacyQuestion(boolean includeAddress,
@@ -610,6 +621,40 @@ public class Applet extends JApplet {
 		int response = JOptionPane.showConfirmDialog(this, msg, "Privacy",
 				JOptionPane.YES_NO_OPTION);
 		return response == JOptionPane.YES_OPTION;
+	}
+
+	private void addTestResult(DiagnosticTests diagnosticTest, boolean success,
+			String description) {
+		if (null == this.diagnosticTestCallbackParam) {
+			addDetailMessage("no DiagnosticTestCallback applet param set");
+			return;
+		}
+		ClassLoader classLoader = Applet.class.getClassLoader();
+		Class<?> jsObjectClass;
+		try {
+			jsObjectClass = classLoader
+					.loadClass("netscape.javascript.JSObject");
+		} catch (ClassNotFoundException e) {
+			addDetailMessage("JSObject class not found");
+			return;
+		}
+		try {
+			Method getWindowMethod = jsObjectClass.getMethod("getWindow",
+					new Class<?>[] { java.applet.Applet.class });
+			Object jsObject = getWindowMethod.invoke(null, this);
+			Method callMethod = jsObjectClass.getMethod("call", new Class<?>[] {
+					String.class, Class.forName("[Ljava.lang.Object;") });
+			addDetailMessage("invoking Javascript message callback: "
+					+ this.diagnosticTestCallbackParam);
+			callMethod.invoke(jsObject, this.diagnosticTestCallbackParam,
+					new Object[] { diagnosticTest.name(),
+							diagnosticTest.getDescription(), success,
+							description });
+		} catch (Exception e) {
+			addDetailMessage("error locating: JSObject.getWindow().call: "
+					+ e.getMessage());
+			return;
+		}
 	}
 
 	private Component getParentComponent() {

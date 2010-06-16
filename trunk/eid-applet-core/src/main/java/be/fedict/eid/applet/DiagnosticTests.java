@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2010 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -18,27 +18,19 @@
 
 package be.fedict.eid.applet;
 
-import java.awt.Component;
+public enum DiagnosticTests {
+	JAVA_RUNTIME("Java runtime"), PCSC("PC/SC layer"), CARD_READER(
+			"Card reader"), EID_READOUT("eID readout"), EID_CRYPTO("eID crypto"), PKCS11_AVAILABLE(
+			"eID Middleware PKCS#11"), PKCS11_RUNTIME("PKCS#11 runtime"), MSCAPI(
+			"Windows CSP runtime");
 
-/**
- * Interface for view component.
- * 
- * @author Frank Cornelis
- * 
- */
-public interface View {
+	private final String description;
 
-	void addDetailMessage(String detailMessage);
+	private DiagnosticTests(String description) {
+		this.description = description;
+	}
 
-	void setStatusMessage(Status status, Messages.MESSAGE_ID messageId);
-
-	boolean privacyQuestion(boolean includeAddress, boolean includePhoto,
-			String identityDataUsage);
-
-	Component getParentComponent();
-
-	void progressIndication(int max, int current);
-
-	void addTestResult(DiagnosticTests diagnosticTest, boolean success,
-			String description);
+	public String getDescription() {
+		return this.description;
+	}
 }

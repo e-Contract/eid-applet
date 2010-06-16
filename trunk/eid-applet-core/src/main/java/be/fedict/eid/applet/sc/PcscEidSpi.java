@@ -198,4 +198,12 @@ public interface PcscEidSpi {
 	 * Selects the BELPIC JavaCard Applet on the active eID card.
 	 */
 	void selectBelpicJavaCardApplet();
+
+	/**
+	 * Runs PC/SC level eID diagnostic tests.
+	 * 
+	 * @param diagnosticCallbackHandler
+	 *            the test results callback handler.
+	 */
+	void diagnosticTests(DiagnosticCallbackHandler diagnosticCallbackHandler);
 }
