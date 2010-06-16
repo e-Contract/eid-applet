@@ -103,6 +103,24 @@ public interface PcscEidSpi {
 	void unblockPin() throws Exception;
 
 	/**
+	 * Change the PIN code of the eID card. The PIN will be queried to the
+	 * citizen via some GUI dialog.
+	 * 
+	 * @param requireSecureReader
+	 * @throws Exception
+	 */
+	void changePin(boolean requireSecureReader) throws Exception;
+
+	/**
+	 * Unblock the eID card. The PUK1 and PUK2 codes will be queried to the
+	 * citizen via some GUI dialog.
+	 * 
+	 * @param requireSecureReader
+	 * @throws Exception
+	 */
+	void unblockPin(boolean requireSecureReader) throws Exception;
+
+	/**
 	 * Creates an authentication signature.
 	 * 
 	 * @param toBeSigned

@@ -102,7 +102,7 @@ public class ContinueInsecureMessageHandler implements
 		if (this.changePin || this.unblockPin) {
 			AdministrationMessage administrationMessage = new AdministrationMessage(
 					this.changePin, this.unblockPin, this.logoff,
-					this.removeCard);
+					this.removeCard, this.requireSecureReader);
 			return administrationMessage;
 		}
 		SignatureService signatureService = this.signatureServiceLocator

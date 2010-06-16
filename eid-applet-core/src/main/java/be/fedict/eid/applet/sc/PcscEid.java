@@ -955,9 +955,15 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		return signatureValue;
 	}
 
-	public void changePin() throws Exception {
+	public void changePin(boolean requireSecureReader) throws Exception {
 		Integer directPinModifyFeature = getFeature(FEATURE_MODIFY_PIN_DIRECT_TAG);
 		Integer modifyPinStartFeature = getFeature(FEATURE_MODIFY_PIN_START_TAG);
+
+		if (requireSecureReader && null == directPinModifyFeature
+				&& null == modifyPinStartFeature) {
+			throw new SecurityException("not a secure reader");
+		}
+
 		int retriesLeft = -1;
 		ResponseAPDU responseApdu;
 		do {
@@ -1137,8 +1143,13 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		}
 	}
 
-	public void unblockPin() throws Exception {
+	public void unblockPin(boolean requireSecureReader) throws Exception {
 		Integer directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
+
+		if (requireSecureReader && null == directPinVerifyFeature) {
+			throw new SecurityException("not a secure reader");
+		}
+
 		ResponseAPDU responseApdu;
 		int retriesLeft = -1;
 		do {
@@ -1340,5 +1351,13 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			throws NoSuchAlgorithmException, CardException, IOException,
 			InterruptedException {
 		return sign(digestValue, digestAlgo, false);
+	}
+
+	public void changePin() throws Exception {
+		changePin(false);
+	}
+
+	public void unblockPin() throws Exception {
+		unblockPin(false);
 	}
 }
