@@ -37,8 +37,16 @@ public interface View {
 
 	Component getParentComponent();
 
-	void progressIndication(int max, int current);
-
 	void addTestResult(DiagnosticTests diagnosticTest, boolean success,
 			String description);
+
+	/*
+	 * Progress indication functions.
+	 */
+
+	void setProgressIndeterminate();
+
+	void resetProgress(int max);
+
+	void increaseProgress();
 }

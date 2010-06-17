@@ -590,10 +590,6 @@ public class Applet extends JApplet {
 					identityDataUsage);
 		}
 
-		public void progressIndication(int max, int current) {
-			Applet.this.progressIndication(max, current);
-		}
-
 		public void setStatusMessage(Status status,
 				Messages.MESSAGE_ID messageId) {
 			Applet.this.setStatusMessage(status, messageId);
@@ -602,6 +598,18 @@ public class Applet extends JApplet {
 		public void addTestResult(DiagnosticTests diagnosticTest,
 				boolean success, String description) {
 			Applet.this.addTestResult(diagnosticTest, success, description);
+		}
+
+		public void setProgressIndeterminate() {
+			Applet.this.setProgressIndetermintate();
+		}
+
+		public void resetProgress(int max) {
+			Applet.this.resetProgress(max);
+		}
+
+		public void increaseProgress() {
+			Applet.this.increaseProgress();
 		}
 	}
 
@@ -621,6 +629,25 @@ public class Applet extends JApplet {
 		int response = JOptionPane.showConfirmDialog(this, msg, "Privacy",
 				JOptionPane.YES_NO_OPTION);
 		return response == JOptionPane.YES_OPTION;
+	}
+
+	private int progress;
+
+	private void resetProgress(int max) {
+		this.progressBar.setMinimum(0);
+		this.progressBar.setMaximum(max);
+		this.progressBar.setIndeterminate(false);
+		this.progressBar.setValue(0);
+		this.progress = 0;
+	}
+
+	private void setProgressIndetermintate() {
+		this.progressBar.setIndeterminate(true);
+	}
+
+	private void increaseProgress() {
+		this.progress++;
+		this.progressBar.setValue(this.progress);
 	}
 
 	private void addTestResult(DiagnosticTests diagnosticTest, boolean success,
@@ -659,20 +686,5 @@ public class Applet extends JApplet {
 
 	private Component getParentComponent() {
 		return this;
-	}
-
-	private int maxProgress;
-
-	private void progressIndication(int max, int current) {
-		if (max != this.maxProgress) {
-			if (-1 == max) {
-				this.progressBar.setIndeterminate(true);
-			} else {
-				this.progressBar.setIndeterminate(false);
-				this.progressBar.setMinimum(0);
-				this.progressBar.setMaximum(max);
-			}
-		}
-		this.progressBar.setValue(current);
 	}
 }
