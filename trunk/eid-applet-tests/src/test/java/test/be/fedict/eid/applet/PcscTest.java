@@ -121,12 +121,20 @@ public class PcscTest {
 		}
 
 		@Override
-		public void progressIndication(int max, int current) {
+		public void addTestResult(DiagnosticTests diagnosticTest,
+				boolean success, String description) {
 		}
 
 		@Override
-		public void addTestResult(DiagnosticTests diagnosticTest,
-				boolean success, String description) {
+		public void setProgressIndeterminate() {
+		}
+
+		@Override
+		public void resetProgress(int max) {
+		}
+
+		@Override
+		public void increaseProgress() {
 		}
 	}
 

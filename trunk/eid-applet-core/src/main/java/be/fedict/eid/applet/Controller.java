@@ -441,11 +441,18 @@ public class Controller {
 
 	private void diagnosticMode() {
 		addDetailMessage("diagnostic mode...");
+		String osName = System.getProperty("os.name");
+		String osVersion = System.getProperty("os.version");
+		String osArch = System.getProperty("os.arch");
+		String osDescription = osName + " " + osVersion + " (" + osArch + ")";
+		this.view.addTestResult(DiagnosticTests.OS, true, osDescription);
+
 		String javaVersion = System.getProperty("java.version");
 		String javaVendor = System.getProperty("java.vendor");
 		String javaRuntimeDescription = javaVendor + " " + javaVersion;
 		this.view.addTestResult(DiagnosticTests.JAVA_RUNTIME, true,
 				javaRuntimeDescription);
+
 		ControllerDiagnosticCallbackHandler callbackHandler = new ControllerDiagnosticCallbackHandler();
 		this.pcscEidSpi.diagnosticTests(callbackHandler);
 		this.pcscEidSpi.close();
@@ -456,6 +463,7 @@ public class Controller {
 		} catch (Exception e) {
 			addDetailMessage("error closing PKCS#11: " + e.getMessage());
 		}
+		this.view.resetProgress(1);
 	}
 
 	private class ControllerDiagnosticCallbackHandler implements
@@ -620,10 +628,9 @@ public class Controller {
 		}
 		final int BUFFER_SIZE = 1024 * 10;
 		int progressMax = (int) (totalSize / BUFFER_SIZE);
-		this.view.progressIndication(progressMax, 0);
+		this.view.resetProgress(progressMax);
 		addDetailMessage("total data size to digest: " + (totalSize / 1024)
 				+ " KiB");
-		int progress = 0;
 		for (File selectedFile : selectedFiles) {
 			fileDigestsDataMessage.fileDigestInfos.add(filesDigestAlgo);
 			long fileSize = selectedFile.length();
@@ -634,8 +641,7 @@ public class Controller {
 					fileInputStream, messageDigest);
 			byte[] buffer = new byte[BUFFER_SIZE];
 			while (-1 != digestInputStream.read(buffer)) {
-				progress++;
-				this.view.progressIndication(progressMax, progress);
+				this.view.increaseProgress();
 			}
 			digestInputStream.close();
 			byte[] fileDigestValue = messageDigest.digest();
@@ -644,7 +650,7 @@ public class Controller {
 			fileDigestsDataMessage.fileDigestInfos.add(fileDigest);
 			fileDigestsDataMessage.fileDigestInfos.add(selectedFile.getName());
 		}
-		this.view.progressIndication(-1, 0);
+		this.view.setProgressIndeterminate();
 		Object resultMessage = sendMessage(fileDigestsDataMessage);
 		return resultMessage;
 	}
@@ -811,13 +817,11 @@ public class Controller {
 					signRequestMessage.digestValue,
 					signRequestMessage.digestAlgo, requireSecureReader);
 
-			this.maxProgress = 0;
-			this.maxProgress += (1050 / 255) + 1; // sign cert file
-			this.maxProgress += (1050 / 255) + 1; // CA cert file
-			this.maxProgress += (1050 / 255) + 1; // Root cert file
-			this.currentProgress = 0;
-			this.view
-					.progressIndication(this.maxProgress, this.currentProgress);
+			int maxProgress = 0;
+			maxProgress += (1050 / 255) + 1; // sign cert file
+			maxProgress += (1050 / 255) + 1; // CA cert file
+			maxProgress += (1050 / 255) + 1; // Root cert file
+			this.view.resetProgress(maxProgress);
 
 			signCertFile = this.pcscEidSpi.readFile(PcscEid.SIGN_CERT_FILE_ID);
 			citizenCaCertFile = this.pcscEidSpi
@@ -825,7 +829,7 @@ public class Controller {
 			rootCaCertFile = this.pcscEidSpi
 					.readFile(PcscEid.ROOT_CERT_FILE_ID);
 
-			this.view.progressIndication(-1, 0);
+			this.view.setProgressIndeterminate();
 
 			if (signRequestMessage.logoff && !signRequestMessage.removeCard) {
 				this.pcscEidSpi.logoff();
@@ -1098,31 +1102,29 @@ public class Controller {
 			signatureValue = this.pcscEidSpi.signAuthn(toBeSigned,
 					requireSecureReader);
 
-			this.maxProgress = 0;
-			this.maxProgress += (1050 / 255) + 1; // authn cert file
-			this.maxProgress += (1050 / 255) + 1; // CA cert file
-			this.maxProgress += (1050 / 255) + 1; // Root cert file
+			int maxProgress = 0;
+			maxProgress += (1050 / 255) + 1; // authn cert file
+			maxProgress += (1050 / 255) + 1; // CA cert file
+			maxProgress += (1050 / 255) + 1; // Root cert file
 			if (includeIdentity) {
-				this.maxProgress++;
+				maxProgress++;
 			}
 			if (includeAddress) {
-				this.maxProgress++;
+				maxProgress++;
 			}
 			if (includePhoto) {
-				this.maxProgress += 3000 / 255;
+				maxProgress += 3000 / 255;
 			}
 			if (includeIntegrityData) {
 				if (includeIdentity) {
-					this.maxProgress++; // identity signature file
+					maxProgress++; // identity signature file
 				}
 				if (includeAddress) {
-					this.maxProgress++; // address signature file
+					maxProgress++; // address signature file
 				}
-				this.maxProgress += (1050 / 255) + 1; // RRN certificate file
+				maxProgress += (1050 / 255) + 1; // RRN certificate file
 			}
-			this.currentProgress = 0;
-			this.view
-					.progressIndication(this.maxProgress, this.currentProgress);
+			this.view.resetProgress(maxProgress);
 
 			/*
 			 * Next design pattern is the only way to handle the case where
@@ -1212,7 +1214,7 @@ public class Controller {
 				});
 			}
 
-			this.view.progressIndication(-1, 0);
+			this.view.setProgressIndeterminate();
 
 			if (logoff && !removeCard) {
 				this.pcscEidSpi.logoff();
@@ -1278,19 +1280,10 @@ public class Controller {
 		this.view.addDetailMessage(detailMessage);
 	}
 
-	private int maxProgress;
-
-	private int currentProgress;
-
-	private void visualizeProgress() {
-		this.currentProgress++;
-		this.view.progressIndication(this.maxProgress, this.currentProgress);
-	}
-
 	private class PcscEidObserver implements Observer {
 
 		public void update(Observable observable, Object arg) {
-			Controller.this.visualizeProgress();
+			Controller.this.view.increaseProgress();
 		}
 	}
 
@@ -1315,31 +1308,30 @@ public class Controller {
 		/*
 		 * Calculate the maximum progress bar indication
 		 */
-		this.maxProgress = 1; // identity file
+		int maxProgress = 1; // identity file
 		if (includeAddress) {
-			this.maxProgress++;
+			maxProgress++;
 		}
 		if (includePhoto) {
-			this.maxProgress += 3000 / 255;
+			maxProgress += 3000 / 255;
 		}
 		if (includeIntegrityData) {
-			this.maxProgress++; // identity signature file
+			maxProgress++; // identity signature file
 			if (includeAddress) {
-				this.maxProgress++; // address signature file
+				maxProgress++; // address signature file
 			}
-			this.maxProgress += (1050 / 255) + 1; // RRN certificate file
-			this.maxProgress += (1050 / 255) + 1; // Root certificate file
+			maxProgress += (1050 / 255) + 1; // RRN certificate file
+			maxProgress += (1050 / 255) + 1; // Root certificate file
 		}
 		if (includeCertificates) {
-			this.maxProgress += (1050 / 255) + 1; // authn cert file
-			this.maxProgress += (1050 / 255) + 1; // sign cert file
-			this.maxProgress += (1050 / 255) + 1; // citizen CA cert file
+			maxProgress += (1050 / 255) + 1; // authn cert file
+			maxProgress += (1050 / 255) + 1; // sign cert file
+			maxProgress += (1050 / 255) + 1; // citizen CA cert file
 			if (false == includeIntegrityData) {
-				this.maxProgress += (1050 / 255) + 1; // root CA cert file
+				maxProgress += (1050 / 255) + 1; // root CA cert file
 			}
 		}
-		this.currentProgress = 0;
-		this.view.progressIndication(this.maxProgress, this.currentProgress);
+		this.view.resetProgress(maxProgress);
 
 		TaskRunner taskRunner = new TaskRunner(this.pcscEidSpi, this.view);
 		/*
@@ -1462,7 +1454,7 @@ public class Controller {
 			}
 		}
 
-		this.view.progressIndication(-1, 0);
+		this.view.setProgressIndeterminate();
 
 		if (removeCard) {
 			setStatusMessage(Status.NORMAL, MESSAGE_ID.REMOVE_CARD);

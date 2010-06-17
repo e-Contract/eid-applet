@@ -281,10 +281,10 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		}
 	}
 
-	public void waitForCardReader() throws CardException {
+	public void waitForCardReader() {
 		while (false == hasCardReader()) {
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
@@ -1378,32 +1378,17 @@ public class PcscEid extends Observable implements PcscEidSpi {
 					false, "PC/SC service not available");
 			return;
 		}
-		List<CardTerminal> cardTerminalList;
-		try {
-			cardTerminalList = this.cardTerminals.list();
-		} catch (CardException e) {
-			this.view
-					.addDetailMessage("error retrieving list of card terminals: "
-							+ e.getMessage());
-			diagnosticCallbackHandler.addTestResult(DiagnosticTests.PCSC,
-					false, e.getMessage());
-			return;
-		}
 		diagnosticCallbackHandler.addTestResult(DiagnosticTests.PCSC, true,
 				terminalFactory.getType());
 
 		/*
 		 * CARD READER tests
 		 */
-		if (cardTerminalList.isEmpty()) {
-			this.view.addDetailMessage("no card terminals present");
-			diagnosticCallbackHandler.addTestResult(
-					DiagnosticTests.CARD_READER, false,
-					"No card reader present");
-			return;
+		if (false == hasCardReader()) {
+			this.view
+					.setStatusMessage(Status.NORMAL, MESSAGE_ID.CONNECT_READER);
+			waitForCardReader();
 		}
-		this.view.addDetailMessage("number of card terminals: "
-				+ cardTerminalList.size());
 
 		try {
 			if (false == isEidPresent()) {
@@ -1433,6 +1418,17 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		/*
 		 * eID Readout tests.
 		 */
+		int maxProgress = 1; // identity file
+		maxProgress++; // address file
+		maxProgress += 3000 / 255; // photo
+		maxProgress++; // identity signature file
+		maxProgress++; // address signature file
+		maxProgress += (1050 / 255) + 1; // authn cert file
+		maxProgress += (1050 / 255) + 1; // sign cert file
+		maxProgress += (1050 / 255) + 1; // citizen CA cert file
+		maxProgress += (1050 / 255) + 1; // root CA cert file
+		maxProgress += (1050 / 255) + 1; // NRN CA cert file
+		this.view.resetProgress(maxProgress);
 		try {
 			readFile(IDENTITY_FILE_ID);
 		} catch (Exception e) {
@@ -1511,6 +1507,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		}
 		diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_READOUT,
 				true, null);
+		this.view.setProgressIndeterminate();
 
 		/*
 		 * eID crypto tests.
