@@ -204,6 +204,9 @@ public interface PcscEidSpi {
 	 * 
 	 * @param diagnosticCallbackHandler
 	 *            the test results callback handler.
+	 * @return the authentication user certificate, or <code>null</code> in case
+	 *         of some error.
 	 */
-	void diagnosticTests(DiagnosticCallbackHandler diagnosticCallbackHandler);
+	X509Certificate diagnosticTests(
+			DiagnosticCallbackHandler diagnosticCallbackHandler);
 }
