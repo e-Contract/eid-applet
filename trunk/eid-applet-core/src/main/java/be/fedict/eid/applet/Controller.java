@@ -35,12 +35,15 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.DigestInputStream;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -463,7 +466,57 @@ public class Controller {
 		} catch (Exception e) {
 			addDetailMessage("error closing PKCS#11: " + e.getMessage());
 		}
+
+		mscapiDiagnosticTest();
+
 		this.view.resetProgress(1);
+	}
+
+	private void mscapiDiagnosticTest() {
+		String osName = System.getProperty("os.name");
+		if (false == osName.startsWith("Windows")) {
+			this.view.addDetailMessage("skipping MSCAPI test as we're not on windows");
+			return;
+		}
+		KeyStore keyStore;
+		Enumeration<String> aliases;
+		try {
+			keyStore = KeyStore.getInstance("Windows-MY");
+			keyStore.load(null, null);
+			aliases = keyStore.aliases();
+		} catch (Exception e) {
+			this.view.addDetailMessage("error loading MSCAPI keystore: "
+					+ e.getMessage());
+			this.view.addTestResult(DiagnosticTests.MSCAPI, false, e
+					.getMessage());
+			return;
+		}
+		String eIDSubjectName = null;
+		while (aliases.hasMoreElements()) {
+			String alias = aliases.nextElement();
+			this.view.addDetailMessage("alias: " + alias);
+			X509Certificate certificate;
+			try {
+				certificate = (X509Certificate) keyStore.getCertificate(alias);
+			} catch (KeyStoreException e) {
+				this.view.addDetailMessage("error loading MSCAPI certificate: "
+						+ e.getMessage());
+				this.view.addTestResult(DiagnosticTests.MSCAPI, false, e
+						.getMessage());
+				return;
+			}
+			String subjectName = certificate.getSubjectX500Principal()
+					.toString();
+			if (subjectName.contains("(Authentication)")
+					&& subjectName.contains("C=BE")) {
+				eIDSubjectName = subjectName;
+			}
+		}
+		if (null == eIDSubjectName) {
+			this.view.addTestResult(DiagnosticTests.MSCAPI, false,
+					"No eID certificate found in the Windows keystore");
+		}
+		this.view.addTestResult(DiagnosticTests.MSCAPI, true, eIDSubjectName);
 	}
 
 	private class ControllerDiagnosticCallbackHandler implements
