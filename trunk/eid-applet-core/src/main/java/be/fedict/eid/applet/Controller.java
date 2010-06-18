@@ -444,17 +444,9 @@ public class Controller {
 
 	private void diagnosticMode() {
 		addDetailMessage("diagnostic mode...");
-		String osName = System.getProperty("os.name");
-		String osVersion = System.getProperty("os.version");
-		String osArch = System.getProperty("os.arch");
-		String osDescription = osName + " " + osVersion + " (" + osArch + ")";
-		this.view.addTestResult(DiagnosticTests.OS, true, osDescription);
-
-		String javaVersion = System.getProperty("java.version");
-		String javaVendor = System.getProperty("java.vendor");
-		String javaRuntimeDescription = javaVendor + " " + javaVersion;
-		this.view.addTestResult(DiagnosticTests.JAVA_RUNTIME, true,
-				javaRuntimeDescription);
+		osDiagnosticTest();
+		jvmDiagnosticTest();
+		browserDiagnosticTest();
 
 		ControllerDiagnosticCallbackHandler callbackHandler = new ControllerDiagnosticCallbackHandler();
 		this.pcscEidSpi.diagnosticTests(callbackHandler);
@@ -472,10 +464,61 @@ public class Controller {
 		this.view.resetProgress(1);
 	}
 
+	private void jvmDiagnosticTest() {
+		String javaVersion = System.getProperty("java.version");
+		String javaVendor = System.getProperty("java.vendor");
+		String javaRuntimeDescription = javaVendor + " " + javaVersion;
+		this.view.addTestResult(DiagnosticTests.JAVA_RUNTIME, true,
+				javaRuntimeDescription);
+	}
+
+	private void osDiagnosticTest() {
+		String osName = System.getProperty("os.name");
+		String osVersion = System.getProperty("os.version");
+		String osArch = System.getProperty("os.arch");
+		String osDescription = osName + " " + osVersion + " (" + osArch + ")";
+		this.view.addTestResult(DiagnosticTests.OS, true, osDescription);
+	}
+
+	private void browserDiagnosticTest() {
+		ClassLoader classLoader = Controller.class.getClassLoader();
+		Class<?> jsObjectClass;
+		try {
+			jsObjectClass = classLoader
+					.loadClass("netscape.javascript.JSObject");
+		} catch (ClassNotFoundException e) {
+			addDetailMessage("JSObject class not found");
+			addDetailMessage("not running inside a browser?");
+			this.view.addTestResult(DiagnosticTests.BROWSER, false, e
+					.getMessage());
+			return;
+		}
+		try {
+			Method getWindowMethod = jsObjectClass.getMethod("getWindow",
+					new Class<?>[] { java.applet.Applet.class });
+			Method getMemberMethod = jsObjectClass.getMethod("getMember",
+					new Class<?>[] { String.class });
+			Object windowJSObject = getWindowMethod.invoke(null, this.runtime
+					.getApplet());
+			Object navigatorJSObject = getMemberMethod.invoke(windowJSObject,
+					"navigator");
+			Object userAgent = getMemberMethod.invoke(navigatorJSObject,
+					"userAgent");
+			addDetailMessage("user agent: " + userAgent);
+			this.view.addTestResult(DiagnosticTests.BROWSER, true, userAgent
+					.toString());
+		} catch (Exception e) {
+			this.view.addTestResult(DiagnosticTests.BROWSER, false, e
+					.getMessage());
+			return;
+		}
+	}
+
 	private void mscapiDiagnosticTest() {
 		String osName = System.getProperty("os.name");
 		if (false == osName.startsWith("Windows")) {
-			this.view.addDetailMessage("skipping MSCAPI test as we're not on windows");
+			this.view
+					.addDetailMessage("skipping MSCAPI test as we're not on windows");
 			return;
 		}
 		KeyStore keyStore;
