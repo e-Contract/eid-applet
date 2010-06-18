@@ -36,7 +36,9 @@
 		<profile>
 			<id>token-soft</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
+				<file>
+					<missing>target/sign.p12</missing>
+				</file>
 			</activation>
 			<build>
 				<plugins>
@@ -63,6 +65,38 @@
 							<verbose>true</verbose>
 						</configuration>
 					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jar-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<archive>
+								<addMavenDescriptor>false</addMavenDescriptor>
+							</archive>
+							<type>PKCS12</type>
+							<keystore>target/sign.p12</keystore>
+							<alias>SIGN</alias>
+							<storepass>secret</storepass>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>token-soft-existing-key</id>
+			<activation>
+				<file>
+					<exists>target/sign.p12</exists>
+				</file>
+			</activation>
+			<build>
+				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-jar-plugin</artifactId>
