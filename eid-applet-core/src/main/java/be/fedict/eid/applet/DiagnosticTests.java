@@ -19,8 +19,9 @@
 package be.fedict.eid.applet;
 
 public enum DiagnosticTests {
-	OS("Operating system"), JAVA_RUNTIME("Java runtime"), PCSC("PC/SC layer"), CARD_READER(
-			"Card reader"), EID_READOUT("eID readout"), EID_CRYPTO("eID crypto"), PKCS11_AVAILABLE(
+	OS("Operating system"), JAVA_RUNTIME("Java runtime"), BROWSER("Browser"), PCSC(
+			"PC/SC layer"), CARD_READER("Card reader"), EID_READOUT(
+			"eID readout"), EID_CRYPTO("eID crypto"), PKCS11_AVAILABLE(
 			"eID Middleware PKCS#11"), PKCS11_RUNTIME("PKCS#11 runtime"), MSCAPI(
 			"Windows CSP runtime");
 
