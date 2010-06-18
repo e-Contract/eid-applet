@@ -449,7 +449,8 @@ public class Controller {
 		browserDiagnosticTest();
 
 		ControllerDiagnosticCallbackHandler callbackHandler = new ControllerDiagnosticCallbackHandler();
-		this.pcscEidSpi.diagnosticTests(callbackHandler);
+		X509Certificate authnCertificate = this.pcscEidSpi
+				.diagnosticTests(callbackHandler);
 		this.pcscEidSpi.close();
 
 		this.pkcs11Eid.diagnosticTests(callbackHandler);
@@ -459,7 +460,7 @@ public class Controller {
 			addDetailMessage("error closing PKCS#11: " + e.getMessage());
 		}
 
-		mscapiDiagnosticTest();
+		mscapiDiagnosticTest(authnCertificate);
 
 		this.view.resetProgress(1);
 	}
@@ -514,7 +515,7 @@ public class Controller {
 		}
 	}
 
-	private void mscapiDiagnosticTest() {
+	private void mscapiDiagnosticTest(X509Certificate authnCertificate) {
 		String osName = System.getProperty("os.name");
 		if (false == osName.startsWith("Windows")) {
 			this.view
@@ -548,16 +549,17 @@ public class Controller {
 						.getMessage());
 				return;
 			}
-			String subjectName = certificate.getSubjectX500Principal()
-					.toString();
-			if (subjectName.contains("(Authentication)")
-					&& subjectName.contains("C=BE")) {
+
+			if (certificate.equals(authnCertificate)) {
+				String subjectName = certificate.getSubjectX500Principal()
+						.toString();
 				eIDSubjectName = subjectName;
 			}
 		}
 		if (null == eIDSubjectName) {
 			this.view.addTestResult(DiagnosticTests.MSCAPI, false,
 					"No eID certificate found in the Windows keystore");
+			return;
 		}
 		this.view.addTestResult(DiagnosticTests.MSCAPI, true, eIDSubjectName);
 	}

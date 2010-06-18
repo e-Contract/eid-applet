@@ -1366,7 +1366,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		unblockPin(false);
 	}
 
-	public void diagnosticTests(
+	public X509Certificate diagnosticTests(
 			DiagnosticCallbackHandler diagnosticCallbackHandler) {
 		this.view.addDetailMessage("start diagnostic tests");
 		this.view.setStatusMessage(Status.NORMAL, MESSAGE_ID.DIAGNOSTIC_MODE);
@@ -1376,7 +1376,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		if ("None".equals(this.terminalFactory.getType())) {
 			diagnosticCallbackHandler.addTestResult(DiagnosticTests.PCSC,
 					false, "PC/SC service not available");
-			return;
+			return null;
 		}
 		diagnosticCallbackHandler.addTestResult(DiagnosticTests.PCSC, true,
 				terminalFactory.getType());
@@ -1399,7 +1399,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		} catch (Exception e) {
 			diagnosticCallbackHandler.addTestResult(
 					DiagnosticTests.CARD_READER, false, e.getMessage());
-			return;
+			return null;
 		}
 
 		this.view.setStatusMessage(Status.NORMAL, MESSAGE_ID.DIAGNOSTIC_MODE);
@@ -1418,6 +1418,14 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		/*
 		 * eID Readout tests.
 		 */
+		CertificateFactory certificateFactory;
+		try {
+			certificateFactory = CertificateFactory.getInstance("X.509");
+		} catch (CertificateException e) {
+			this.view.addTestResult(DiagnosticTests.EID_READOUT, false, e
+					.getMessage());
+			return null;
+		}
 		int maxProgress = 1; // identity file
 		maxProgress++; // address file
 		maxProgress += 3000 / 255; // photo
@@ -1434,21 +1442,21 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		} catch (Exception e) {
 			diagnosticCallbackHandler.addTestResult(
 					DiagnosticTests.EID_READOUT, false, "Identity file");
-			return;
+			return null;
 		}
 		try {
 			readFile(ADDRESS_FILE_ID);
 		} catch (Exception e) {
 			diagnosticCallbackHandler.addTestResult(
 					DiagnosticTests.EID_READOUT, false, "Address file");
-			return;
+			return null;
 		}
 		try {
 			readFile(PHOTO_FILE_ID);
 		} catch (Exception e) {
 			diagnosticCallbackHandler.addTestResult(
 					DiagnosticTests.EID_READOUT, false, "Photo file");
-			return;
+			return null;
 		}
 		try {
 			readFile(IDENTITY_SIGN_FILE_ID);
@@ -1456,7 +1464,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			diagnosticCallbackHandler.addTestResult(
 					DiagnosticTests.EID_READOUT, false,
 					"Identity signature file");
-			return;
+			return null;
 		}
 		try {
 			readFile(ADDRESS_SIGN_FILE_ID);
@@ -1464,46 +1472,57 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			diagnosticCallbackHandler.addTestResult(
 					DiagnosticTests.EID_READOUT, false,
 					"Address signature file");
-			return;
+			return null;
 		}
+		X509Certificate authnCertificate;
 		try {
-			readFile(AUTHN_CERT_FILE_ID);
+			byte[] certData = readFile(AUTHN_CERT_FILE_ID);
+			authnCertificate = (X509Certificate) certificateFactory
+					.generateCertificate(new ByteArrayInputStream(certData));
 		} catch (Exception e) {
 			diagnosticCallbackHandler.addTestResult(
 					DiagnosticTests.EID_READOUT, false,
 					"Authentication certificate file");
-			return;
+			return null;
 		}
 		try {
-			readFile(SIGN_CERT_FILE_ID);
+			byte[] certData = readFile(SIGN_CERT_FILE_ID);
+			certificateFactory.generateCertificate(new ByteArrayInputStream(
+					certData));
 		} catch (Exception e) {
 			diagnosticCallbackHandler.addTestResult(
 					DiagnosticTests.EID_READOUT, false,
 					"Signature certificate file");
-			return;
+			return authnCertificate;
 		}
 		try {
-			readFile(CA_CERT_FILE_ID);
+			byte[] certData = readFile(CA_CERT_FILE_ID);
+			certificateFactory.generateCertificate(new ByteArrayInputStream(
+					certData));
 		} catch (Exception e) {
 			diagnosticCallbackHandler.addTestResult(
 					DiagnosticTests.EID_READOUT, false,
 					"Citizen CA certificate file");
-			return;
+			return authnCertificate;
 		}
 		try {
-			readFile(ROOT_CERT_FILE_ID);
+			byte[] certData = readFile(ROOT_CERT_FILE_ID);
+			certificateFactory.generateCertificate(new ByteArrayInputStream(
+					certData));
 		} catch (Exception e) {
 			diagnosticCallbackHandler.addTestResult(
 					DiagnosticTests.EID_READOUT, false,
 					"Root CA certificate file");
-			return;
+			return authnCertificate;
 		}
 		try {
-			readFile(RRN_CERT_FILE_ID);
+			byte[] certData = readFile(RRN_CERT_FILE_ID);
+			certificateFactory.generateCertificate(new ByteArrayInputStream(
+					certData));
 		} catch (Exception e) {
 			diagnosticCallbackHandler.addTestResult(
 					DiagnosticTests.EID_READOUT, false, "NRN certificate file");
-			return;
+			return authnCertificate;
 		}
 		diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_READOUT,
 				true, null);
@@ -1520,12 +1539,12 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		} catch (CardException e) {
 			diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
 					false, e.getMessage());
-			return;
+			return authnCertificate;
 		}
 		if (0x9000 != responseApdu.getSW()) {
 			diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
 					false, "Challenge error");
-			return;
+			return authnCertificate;
 		}
 		byte[] challenge = responseApdu.getData();
 
@@ -1537,7 +1556,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		} catch (IOException e) {
 			diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
 					false, e.getMessage());
-			return;
+			return authnCertificate;
 		}
 		CommandAPDU internalAuthnApdu = new CommandAPDU(0x00, 0x88, 0x02, 0x81,
 				internalAuthnData.toByteArray());
@@ -1546,14 +1565,15 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		} catch (CardException e) {
 			diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
 					false, e.getMessage());
-			return;
+			return authnCertificate;
 		}
 		if (0x9000 != responseApdu.getSW()) {
 			diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
 					false, "Internal authentication failed");
-			return;
+			return authnCertificate;
 		}
 		diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
 				true, null);
+		return authnCertificate;
 	}
 }
