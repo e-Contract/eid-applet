@@ -26,7 +26,7 @@
 	</fileSets>
 	<dependencySets>
 		<dependencySet>
-			<outputDirectory>server/default/deploy</outputDirectory>
+			<outputDirectory>server/all/deploy</outputDirectory>
 		</dependencySet>
 	</dependencySets>
 </assembly>
