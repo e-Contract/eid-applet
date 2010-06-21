@@ -21,6 +21,7 @@ package be.fedict.eid.applet.service.impl.handler;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
@@ -58,10 +59,14 @@ import be.fedict.eid.applet.service.impl.UserIdentifierUtil;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
 import be.fedict.eid.applet.service.spi.AuditService;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
+import be.fedict.eid.applet.service.spi.CertificateSecurityException;
 import be.fedict.eid.applet.service.spi.ChannelBindingService;
+import be.fedict.eid.applet.service.spi.ExpiredCertificateSecurityException;
 import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
+import be.fedict.eid.applet.service.spi.RevokedCertificateSecurityException;
 import be.fedict.eid.applet.shared.AuthenticationContract;
 import be.fedict.eid.applet.shared.AuthenticationDataMessage;
+import be.fedict.eid.applet.shared.ErrorCode;
 import be.fedict.eid.applet.shared.FinishedMessage;
 
 /**
@@ -273,7 +278,45 @@ public class AuthenticationDataMessageHandler implements
 		certificateChain.add(message.authnCert);
 		certificateChain.add(message.citizenCaCert);
 		certificateChain.add(message.rootCaCert);
-		authenticationService.validateCertificateChain(certificateChain);
+		try {
+			authenticationService.validateCertificateChain(certificateChain);
+		} catch (ExpiredCertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE_EXPIRED);
+		} catch (RevokedCertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE_REVOKED);
+		} catch (CertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE);
+		} catch (Exception e) {
+			/*
+			 * We don't want to depend on the full JavaEE profile in this
+			 * artifact.
+			 */
+			if ("javax.ejb.EJBException".equals(e.getClass().getName())) {
+				Exception exception;
+				try {
+					Method getCausedByExceptionMethod = e.getClass().getMethod(
+							"getCausedByException", new Class[] {});
+					exception = (Exception) getCausedByExceptionMethod.invoke(
+							e, new Object[] {});
+				} catch (Exception e2) {
+					LOG.debug("error: " + e.getMessage(), e);
+					throw new SecurityException(
+							"error retrieving the root cause: "
+									+ e2.getMessage());
+				}
+				if (exception instanceof ExpiredCertificateSecurityException) {
+					return new FinishedMessage(ErrorCode.CERTIFICATE_EXPIRED);
+				}
+				if (exception instanceof RevokedCertificateSecurityException) {
+					return new FinishedMessage(ErrorCode.CERTIFICATE_REVOKED);
+				}
+				if (exception instanceof CertificateSecurityException) {
+					return new FinishedMessage(ErrorCode.CERTIFICATE);
+				}
+				throw new SecurityException("authn service error: "
+						+ e.getMessage());
+			}
+		}
 
 		String userId = UserIdentifierUtil.getUserId(message.authnCert);
 		if (null != this.nrcidSecret) {

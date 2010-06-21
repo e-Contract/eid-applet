@@ -439,6 +439,11 @@ public class Unmarshaller {
 							|| Boolean.class.equals(httpHeaderField.getType())) {
 						Boolean boolValue = Boolean.parseBoolean(headerValue);
 						httpHeaderField.set(transferObject, boolValue);
+					} else if (httpHeaderField.getType().isEnum()) {
+						Enum<?> e = (Enum<?>) httpHeaderField.getType()
+								.getEnumConstants()[0];
+						Object value = e.valueOf(e.getClass(), headerValue);
+						httpHeaderField.set(transferObject, value);
 					} else {
 						throw new RuntimeException(
 								"unsupported http header field type: "

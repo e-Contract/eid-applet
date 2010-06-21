@@ -50,7 +50,9 @@ public class Messages {
 				"pinPadChange"), KIOSK_MODE("kioskMode"), PIN_CHANGE(
 				"pinChange"), PIN_UNBLOCK("pinUnblock"), PIN_PAD_MODIFY_OLD(
 				"pinPadModifyOld"), PIN_PAD_MODIFY_NEW("pinPadModifyNew"), PIN_PAD_MODIFY_NEW_AGAIN(
-				"pinPadModifyNewAgain"), DIAGNOSTIC_MODE("diagnosticMode");
+				"pinPadModifyNewAgain"), DIAGNOSTIC_MODE("diagnosticMode"), CERTIFICATE_EXPIRED_ERROR(
+				"certificateExpiredError"), CERTIFICATE_REVOKED_ERROR(
+				"certificateRevokedError");
 
 		private final String id;
 

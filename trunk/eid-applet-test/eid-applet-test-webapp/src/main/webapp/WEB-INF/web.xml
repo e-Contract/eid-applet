@@ -272,6 +272,32 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>AppletAuthnRevokeServiceServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+		<init-param>
+			<param-name>AuthenticationService</param-name>
+			<param-value>test/eid/applet/model/AuthenticationRevokeServiceBean</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AppletAuthnRevokeServiceServlet</servlet-name>
+		<url-pattern>/applet-service-authn-revoke</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>AppletAuthnExpiredServiceServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+		<init-param>
+			<param-name>AuthenticationService</param-name>
+			<param-value>test/eid/applet/model/AuthenticationExpiredServiceBean</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AppletAuthnExpiredServiceServlet</servlet-name>
+		<url-pattern>/applet-service-authn-expired</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>AppletAuthnSecureReaderServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
 		<init-param>

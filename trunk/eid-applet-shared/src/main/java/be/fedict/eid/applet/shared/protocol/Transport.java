@@ -152,6 +152,8 @@ public class Transport {
 				} else if (Boolean.TYPE.equals(field.getType())
 						|| Boolean.class.equals(field.getType())) {
 					httpHeaderValue = ((Boolean) fieldValue).toString();
+				} else if (field.getType().isEnum()) {
+					httpHeaderValue = ((Enum<?>) fieldValue).name();
 				} else {
 					throw new RuntimeException("unsupported field type: "
 							+ field.getType().getName());
