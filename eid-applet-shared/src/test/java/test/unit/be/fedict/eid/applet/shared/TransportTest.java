@@ -26,6 +26,8 @@ import org.easymock.EasyMock;
 import org.junit.Test;
 
 import be.fedict.eid.applet.shared.ClientEnvironmentMessage;
+import be.fedict.eid.applet.shared.ErrorCode;
+import be.fedict.eid.applet.shared.FinishedMessage;
 import be.fedict.eid.applet.shared.IdentificationRequestMessage;
 import be.fedict.eid.applet.shared.IdentityDataMessage;
 import be.fedict.eid.applet.shared.protocol.HttpTransmitter;
@@ -62,6 +64,59 @@ public class TransportTest {
 
 		// operate
 		Transport.transfer(identityDataMessage, mockHttpTransmitter);
+
+		// verify
+		EasyMock.verify(mockHttpTransmitter);
+	}
+
+	@Test
+	public void transmitFinishedMessage() throws Exception {
+		// setup
+		FinishedMessage finishedMessage = new FinishedMessage();
+
+		HttpTransmitter mockHttpTransmitter = EasyMock
+				.createMock(HttpTransmitter.class);
+
+		// expectations
+		EasyMock.expect(mockHttpTransmitter.isSecure()).andReturn(true);
+		mockHttpTransmitter.addHeader("X-AppletProtocol-Version", "1");
+		mockHttpTransmitter.addHeader("X-AppletProtocol-Type",
+				"FinishedMessage");
+		mockHttpTransmitter.addHeader("Content-Length", "0");
+
+		// prepare
+		EasyMock.replay(mockHttpTransmitter);
+
+		// operate
+		Transport.transfer(finishedMessage, mockHttpTransmitter);
+
+		// verify
+		EasyMock.verify(mockHttpTransmitter);
+	}
+
+	@Test
+	public void transmitFinishedMessageWithErrorCode() throws Exception {
+		// setup
+		FinishedMessage finishedMessage = new FinishedMessage(
+				ErrorCode.CERTIFICATE_EXPIRED);
+
+		HttpTransmitter mockHttpTransmitter = EasyMock
+				.createMock(HttpTransmitter.class);
+
+		// expectations
+		EasyMock.expect(mockHttpTransmitter.isSecure()).andReturn(true);
+		mockHttpTransmitter.addHeader("X-AppletProtocol-Version", "1");
+		mockHttpTransmitter.addHeader("X-AppletProtocol-Type",
+				"FinishedMessage");
+		mockHttpTransmitter.addHeader("X-AppletProtocol-ErrorCode",
+				ErrorCode.CERTIFICATE_EXPIRED.name());
+		mockHttpTransmitter.addHeader("Content-Length", "0");
+
+		// prepare
+		EasyMock.replay(mockHttpTransmitter);
+
+		// operate
+		Transport.transfer(finishedMessage, mockHttpTransmitter);
 
 		// verify
 		EasyMock.verify(mockHttpTransmitter);

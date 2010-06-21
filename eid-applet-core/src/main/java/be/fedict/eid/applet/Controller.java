@@ -352,7 +352,7 @@ public class Controller {
 			}
 			if (resultMessage instanceof AuthenticationRequestMessage) {
 				AuthenticationRequestMessage authnRequest = (AuthenticationRequestMessage) resultMessage;
-				performEidAuthnOperation(authnRequest);
+				resultMessage = performEidAuthnOperation(authnRequest);
 			}
 			if (resultMessage instanceof IdentificationRequestMessage) {
 				IdentificationRequestMessage identificationRequestMessage = (IdentificationRequestMessage) resultMessage;
@@ -376,6 +376,30 @@ public class Controller {
 						identificationRequestMessage.includeCertificates,
 						identificationRequestMessage.removeCard,
 						identificationRequestMessage.identityDataUsage);
+			}
+			if (resultMessage instanceof FinishedMessage) {
+				FinishedMessage finishedMessage = (FinishedMessage) resultMessage;
+				if (null != finishedMessage.errorCode) {
+					switch (finishedMessage.errorCode) {
+					case CERTIFICATE:
+						setStatusMessage(Status.ERROR,
+								MESSAGE_ID.SECURITY_ERROR);
+						return null;
+					case CERTIFICATE_EXPIRED:
+						setStatusMessage(Status.ERROR,
+								MESSAGE_ID.CERTIFICATE_EXPIRED_ERROR);
+						return null;
+					case CERTIFICATE_REVOKED:
+						setStatusMessage(Status.ERROR,
+								MESSAGE_ID.CERTIFICATE_REVOKED_ERROR);
+						return null;
+					default:
+					}
+					setStatusMessage(Status.ERROR, MESSAGE_ID.GENERIC_ERROR);
+					addDetailMessage("error code @ finish: "
+							+ finishedMessage.errorCode);
+					return null;
+				}
 			}
 		} catch (PKCS11NotFoundException e) {
 			setStatusMessage(Status.ERROR, MESSAGE_ID.NO_MIDDLEWARE_ERROR);
@@ -977,7 +1001,7 @@ public class Controller {
 		}
 	}
 
-	private void performEidAuthnOperation(
+	private FinishedMessage performEidAuthnOperation(
 			AuthenticationRequestMessage authnRequest) throws Exception {
 		byte[] challenge = authnRequest.challenge;
 		boolean removeCard = authnRequest.removeCard;
@@ -1064,12 +1088,12 @@ public class Controller {
 		if (includeIdentity || includeAddress || includePhoto
 				|| includeCertificates || requireSecureReader) {
 			if (null != this.pcscEidSpi) {
-				performEidPcscAuthnOperation(salt, sessionId, toBeSigned,
-						logoff, preLogoff, removeCard, includeIdentity,
-						includeCertificates, includeAddress, includePhoto,
-						includeIntegrityData, encodedServerCertificate,
-						requireSecureReader);
-				return;
+				FinishedMessage finishedMessage = performEidPcscAuthnOperation(
+						salt, sessionId, toBeSigned, logoff, preLogoff,
+						removeCard, includeIdentity, includeCertificates,
+						includeAddress, includePhoto, includeIntegrityData,
+						encodedServerCertificate, requireSecureReader);
+				return finishedMessage;
 			}
 		}
 		try {
@@ -1081,12 +1105,12 @@ public class Controller {
 			addDetailMessage("eID Middleware PKCS#11 library not found.");
 			if (null != this.pcscEidSpi) {
 				addDetailMessage("fallback to PC/SC interface for authentication...");
-				performEidPcscAuthnOperation(salt, sessionId, toBeSigned,
-						logoff, preLogoff, removeCard, includeIdentity,
-						includeCertificates, includeAddress, includePhoto,
-						includeIntegrityData, encodedServerCertificate,
-						requireSecureReader);
-				return;
+				FinishedMessage finishedMessage = performEidPcscAuthnOperation(
+						salt, sessionId, toBeSigned, logoff, preLogoff,
+						removeCard, includeIdentity, includeCertificates,
+						includeAddress, includePhoto, includeIntegrityData,
+						encodedServerCertificate, requireSecureReader);
+				return finishedMessage;
 			}
 			throw new PKCS11NotFoundException();
 		}
@@ -1154,11 +1178,13 @@ public class Controller {
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");
 		}
+		FinishedMessage finishedMessage = (FinishedMessage) responseMessage;
+		return finishedMessage;
 	}
 
-	private void performEidPcscAuthnOperation(byte[] salt, byte[] sessionId,
-			byte[] toBeSigned, boolean logoff, boolean preLogoff,
-			boolean removeCard, boolean includeIdentity,
+	private FinishedMessage performEidPcscAuthnOperation(byte[] salt,
+			byte[] sessionId, byte[] toBeSigned, boolean logoff,
+			boolean preLogoff, boolean removeCard, boolean includeIdentity,
 			boolean includeCertificates, boolean includeAddress,
 			boolean includePhoto, boolean includeIntegrityData,
 			byte[] encodedServerCertificate, boolean requireSecureReader)
@@ -1334,6 +1360,8 @@ public class Controller {
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");
 		}
+		FinishedMessage finishedMessage = (FinishedMessage) responseMessage;
+		return finishedMessage;
 	}
 
 	private void printEnvironment() {

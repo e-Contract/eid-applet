@@ -22,6 +22,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -36,6 +37,8 @@ import org.junit.Test;
 import be.fedict.eid.applet.shared.AbstractProtocolMessage;
 import be.fedict.eid.applet.shared.AppletProtocolMessageCatalog;
 import be.fedict.eid.applet.shared.ClientEnvironmentMessage;
+import be.fedict.eid.applet.shared.ErrorCode;
+import be.fedict.eid.applet.shared.FinishedMessage;
 import be.fedict.eid.applet.shared.IdentificationRequestMessage;
 import be.fedict.eid.applet.shared.IdentityDataMessage;
 import be.fedict.eid.applet.shared.annotation.HttpHeader;
@@ -214,6 +217,84 @@ public class UnmarshallerTest {
 		assertTrue(result instanceof IdentificationRequestMessage);
 		IdentificationRequestMessage message = (IdentificationRequestMessage) result;
 		assertTrue(message.includePhoto);
+	}
+
+	@Test
+	public void receiveFinishedMessage() throws Exception {
+		// setup
+		ProtocolMessageCatalog catalog = new AppletProtocolMessageCatalog();
+		Unmarshaller unmarshaller = new Unmarshaller(catalog);
+
+		HttpReceiver mockHttpReceiver = EasyMock.createMock(HttpReceiver.class);
+
+		// stubs
+		EasyMock.expect(mockHttpReceiver.isSecure()).andStubReturn(true);
+		List<String> testHeaderNames = new LinkedList<String>();
+		testHeaderNames.add("X-AppletProtocol-Version");
+		testHeaderNames.add("X-AppletProtocol-Type");
+		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(
+				testHeaderNames);
+		EasyMock.expect(
+				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version"))
+				.andStubReturn("1");
+		EasyMock.expect(
+				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type"))
+				.andStubReturn("FinishedMessage");
+
+		// prepare
+		EasyMock.replay(mockHttpReceiver);
+
+		// operate
+		Object result = unmarshaller.receive(mockHttpReceiver);
+
+		// verify
+		EasyMock.verify(mockHttpReceiver);
+
+		assertNotNull(result);
+		assertTrue(result instanceof FinishedMessage);
+		FinishedMessage message = (FinishedMessage) result;
+		assertNull(message.errorCode);
+	}
+
+	@Test
+	public void receiveFinishedMessageWithErrorCode() throws Exception {
+		// setup
+		ProtocolMessageCatalog catalog = new AppletProtocolMessageCatalog();
+		Unmarshaller unmarshaller = new Unmarshaller(catalog);
+
+		HttpReceiver mockHttpReceiver = EasyMock.createMock(HttpReceiver.class);
+
+		// stubs
+		EasyMock.expect(mockHttpReceiver.isSecure()).andStubReturn(true);
+		List<String> testHeaderNames = new LinkedList<String>();
+		testHeaderNames.add("X-AppletProtocol-Version");
+		testHeaderNames.add("X-AppletProtocol-Type");
+		testHeaderNames.add("X-AppletProtocol-ErrorCode");
+		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(
+				testHeaderNames);
+		EasyMock.expect(
+				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version"))
+				.andStubReturn("1");
+		EasyMock.expect(
+				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type"))
+				.andStubReturn("FinishedMessage");
+		EasyMock.expect(
+				mockHttpReceiver.getHeaderValue("X-AppletProtocol-ErrorCode"))
+				.andStubReturn(ErrorCode.CERTIFICATE_EXPIRED.name());
+
+		// prepare
+		EasyMock.replay(mockHttpReceiver);
+
+		// operate
+		Object result = unmarshaller.receive(mockHttpReceiver);
+
+		// verify
+		EasyMock.verify(mockHttpReceiver);
+
+		assertNotNull(result);
+		assertTrue(result instanceof FinishedMessage);
+		FinishedMessage message = (FinishedMessage) result;
+		assertEquals(ErrorCode.CERTIFICATE_EXPIRED, message.errorCode);
 	}
 
 	public static final class MyRuntimeException extends RuntimeException {
