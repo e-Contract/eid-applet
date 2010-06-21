@@ -91,3 +91,4 @@ cookie by adding the following Global.asax configuration file:
     }
 </script>
 
+One should also change the connection pool from inherit to classic.
