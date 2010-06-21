@@ -686,6 +686,7 @@
 		</repository>
 	</distributionManagement>
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> 
 		<jboss-seam.version>2.2.1-SNAPSHOT</jboss-seam.version>
 	</properties>
 </project>
