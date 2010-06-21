@@ -132,6 +132,16 @@
 					</prompt>
 				</para>
 			</section>
+			<section>
+				<title>Linux: Firefox 3.6 and Chrome</title>
+				<para>
+					The web browsers Firefox 3.6 and Google Chrome use the next
+					generation Java plugin (libnpjp2.so). So for Firefox you can
+					configure the Java plugin as follows:
+					<prompt>sudo ln -s $JAVA_HOME/jre/lib/i386/libnpjp2.so
+						/usr/lib/mozilla/plugins/</prompt>
+				</para>
+			</section>
 		</section>
 	</section>
 	<section>
@@ -1377,22 +1387,27 @@
 		<section>
 			<title>eID Applet Diagnostic Mode</title>
 			<para>The eID Applet can run in a diagnostic mode. Via this feature
-				web applications can check the client runtime functionality related to eID.</para>
-				<para>
-					The diagnostic mode can be activated by setting the following
-					<code>init-param</code>
-					on the
-					<code>AppletServiceServlet</code>
-					:
-				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				web applications can check the client runtime functionality related
+				to eID.</para>
+			<para>
+				The diagnostic mode can be activated by setting the following
+				<code>init-param</code>
+				on the
+				<code>AppletServiceServlet</code>
+				:
+			</para>
+			<programlisting role="XML"><![CDATA[<init-param>
 	<param-name>DiagnosticMode</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
-				<para>When running in diagnostic mode the eID Applet will communicate the 
-				results of the different tests that it runs via a Javascript callback.
-				The web developer can install the test result callback as
-				follows inside a web page:</para>
+			<para>When running in diagnostic mode the eID Applet will communicate
+				the
+				results of the different tests that it runs via a Javascript
+				callback.
+				The
+				web developer can install the test result callback as
+				follows inside
+				a web page:</para>
 			<programlisting role="XML"><![CDATA[<script src="https://www.java.com/js/deployJava.js"></script>
 <script>
 	var attributes = {
