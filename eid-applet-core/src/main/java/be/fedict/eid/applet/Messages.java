@@ -19,7 +19,10 @@
 package be.fedict.eid.applet;
 
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+
+import javax.swing.UIManager;
 
 /**
  * Util class to manage the i18n messages used within the eID Applet UI.
@@ -28,6 +31,8 @@ import java.util.ResourceBundle;
  * 
  */
 public class Messages {
+
+	public static final String RESOURCE_BUNDLE_NAME = "be.fedict.eid.applet.Messages";
 
 	private final ResourceBundle resourceBundle;
 
@@ -52,7 +57,9 @@ public class Messages {
 				"pinPadModifyOld"), PIN_PAD_MODIFY_NEW("pinPadModifyNew"), PIN_PAD_MODIFY_NEW_AGAIN(
 				"pinPadModifyNewAgain"), DIAGNOSTIC_MODE("diagnosticMode"), CERTIFICATE_EXPIRED_ERROR(
 				"certificateExpiredError"), CERTIFICATE_REVOKED_ERROR(
-				"certificateRevokedError");
+				"certificateRevokedError"), IDENTITY_INFO("identityInfo"), CANCEL_BUTTON(
+				"cancelButtonText"), NO_BUTTON("noButtonText"), OK_BUTTON(
+				"okButtonText"), YES_BUTTON("yesButtonText");
 
 		private final String id;
 
@@ -67,8 +74,28 @@ public class Messages {
 
 	public Messages(Locale locale) {
 		this.locale = locale;
-		this.resourceBundle = ResourceBundle.getBundle(
-				"be.fedict.eid.applet.Messages", this.locale);
+		ResourceBundle bundle;
+		try {
+			bundle = ResourceBundle
+					.getBundle(RESOURCE_BUNDLE_NAME, this.locale);
+		} catch (MissingResourceException e) {
+			/*
+			 * In case the selected locale and default system locale are not
+			 * supported we default to english.
+			 */
+			bundle = ResourceBundle.getBundle(RESOURCE_BUNDLE_NAME,
+					Locale.ENGLISH);
+		}
+		this.resourceBundle = bundle;
+
+		UIManager.put("OptionPane.cancelButtonText",
+				getMessage(MESSAGE_ID.CANCEL_BUTTON));
+		UIManager.put("OptionPane.noButtonText",
+				getMessage(MESSAGE_ID.NO_BUTTON));
+		UIManager.put("OptionPane.okButtonText",
+				getMessage(MESSAGE_ID.OK_BUTTON));
+		UIManager.put("OptionPane.yesButtonText",
+				getMessage(MESSAGE_ID.YES_BUTTON));
 	}
 
 	public String getMessage(MESSAGE_ID messageId) {

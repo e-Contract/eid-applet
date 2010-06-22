@@ -87,11 +87,11 @@ import org.mortbay.jetty.testing.ServletTester;
 
 import be.fedict.eid.applet.Applet;
 import be.fedict.eid.applet.Controller;
+import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.Runtime;
 import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
-import be.fedict.eid.applet.Messages.MESSAGE_ID;
 import be.fedict.eid.applet.service.AppletServiceServlet;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
@@ -316,7 +316,7 @@ public class ControllerTest {
 	private static class TestView implements View {
 
 		private Messages messages = new Messages(Locale.getDefault());
-		
+
 		@Override
 		public void addDetailMessage(String detailMessage) {
 			LOG.debug("detail message: " + detailMessage);
@@ -336,7 +336,8 @@ public class ControllerTest {
 		}
 
 		@Override
-		public void setStatusMessage(Status status, Messages.MESSAGE_ID messageId) {
+		public void setStatusMessage(Status status,
+				Messages.MESSAGE_ID messageId) {
 			String statusMessage = this.messages.getMessage(messageId);
 			LOG.debug("status message: " + status + ": " + statusMessage);
 			if (Status.ERROR == status) {
@@ -345,8 +346,20 @@ public class ControllerTest {
 		}
 
 		@Override
-		public void progressIndication(int max, int current) {
-			LOG.debug("progress: " + current + "/" + max);
+		public void addTestResult(DiagnosticTests diagnosticTest,
+				boolean success, String description) {
+		}
+
+		@Override
+		public void increaseProgress() {
+		}
+
+		@Override
+		public void resetProgress(int max) {
+		}
+
+		@Override
+		public void setProgressIndeterminate() {
 		}
 	}
 
