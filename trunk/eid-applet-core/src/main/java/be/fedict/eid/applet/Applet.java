@@ -616,7 +616,8 @@ public class Applet extends JApplet {
 	private boolean privacyQuestion(boolean includeAddress,
 			boolean includePhoto, String identityDataUsage) {
 		String msg = this.messages.getMessage(MESSAGE_ID.PRIVACY_QUESTION)
-				+ "\n" + "Identity information: identity data";
+				+ "\n" + this.messages.getMessage(MESSAGE_ID.IDENTITY_INFO)
+				+ ": identity";
 		if (includeAddress) {
 			msg += ", address";
 		}

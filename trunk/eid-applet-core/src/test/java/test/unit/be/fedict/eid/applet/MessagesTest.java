@@ -52,11 +52,44 @@ public class MessagesTest {
 		Messages messages = new Messages(locale);
 		String message = messages.getMessage(Messages.MESSAGE_ID.GENERIC_ERROR);
 		LOG.debug("message: " + message);
+		assertEquals("Erreur générale.", message);
+	}
+
+	@Test
+	public void testUnsupportedLanguage() throws Exception {
+		Locale.setDefault(new Locale("nl"));
+		Locale locale = Locale.JAPANESE;
+		Messages messages = new Messages(locale);
+		String message = messages.getMessage(Messages.MESSAGE_ID.GENERIC_ERROR);
+		LOG.debug("message: " + message);
+		assertEquals("Algemene fout.", message);
+	}
+
+	@Test
+	public void testUnsupportedLanguageUnsupportedDefaultLanguage()
+			throws Exception {
+		Locale.setDefault(Locale.CHINESE);
+		Locale locale = Locale.JAPANESE;
+		Messages messages = new Messages(locale);
+		String message = messages.getMessage(Messages.MESSAGE_ID.GENERIC_ERROR);
+		LOG.debug("message: " + message);
+		assertEquals("Generic Error.", message);
+	}
+
+	@Test
+	public void testDefaultLocale() throws Exception {
+		Locale defaultLocale = Locale.FRENCH;
+		Locale.setDefault(defaultLocale);
+		Locale locale = Locale.ENGLISH;
+		Messages messages = new Messages(locale);
+		String message = messages.getMessage(Messages.MESSAGE_ID.GENERIC_ERROR);
+		LOG.debug("message: " + message);
+		assertEquals("Generic Error.", message);
 	}
 
 	@Test
 	public void allStringsAvailable() throws Exception {
-		allStringsAvailable("");
+		allStringsAvailable("en");
 		allStringsAvailable("nl");
 		allStringsAvailable("fr");
 	}
