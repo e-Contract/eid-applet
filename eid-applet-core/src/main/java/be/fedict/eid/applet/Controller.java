@@ -812,12 +812,14 @@ public class Controller {
 		boolean logoff = signRequestMessage.logoff;
 		boolean removeCard = signRequestMessage.removeCard;
 		boolean requireSecureReader = signRequestMessage.requireSecureReader;
+		boolean noPkcs11 = signRequestMessage.noPkcs11;
 		addDetailMessage("logoff: " + logoff);
 		addDetailMessage("remove card: " + removeCard);
 		addDetailMessage("require secure smart card reader: "
 				+ requireSecureReader);
+		addDetailMessage("no PKCS11: " + noPkcs11);
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
-		if (requireSecureReader) {
+		if (requireSecureReader || noPkcs11) {
 			if (null != this.pcscEidSpi) {
 				performEidPcscSignOperation(signRequestMessage,
 						requireSecureReader);
@@ -1017,6 +1019,7 @@ public class Controller {
 		boolean includePhoto = authnRequest.includePhoto;
 		boolean includeIntegrityData = authnRequest.includeIntegrityData;
 		boolean requireSecureReader = authnRequest.requireSecureReader;
+		boolean noPkcs11 = authnRequest.noPkcs11;
 		if (challenge.length < 20) {
 			throw new SecurityException(
 					"challenge should be at least 20 bytes long.");
@@ -1037,6 +1040,7 @@ public class Controller {
 		addDetailMessage("include integrity data: " + includeIntegrityData);
 		addDetailMessage("require secure smart card reader: "
 				+ requireSecureReader);
+		addDetailMessage("no PKCS11: " + noPkcs11);
 
 		SecureRandom secureRandom = new SecureRandom();
 		byte[] salt = new byte[20];
@@ -1086,7 +1090,7 @@ public class Controller {
 
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
 		if (includeIdentity || includeAddress || includePhoto
-				|| includeCertificates || requireSecureReader) {
+				|| includeCertificates || requireSecureReader || noPkcs11) {
 			if (null != this.pcscEidSpi) {
 				FinishedMessage finishedMessage = performEidPcscAuthnOperation(
 						salt, sessionId, toBeSigned, logoff, preLogoff,

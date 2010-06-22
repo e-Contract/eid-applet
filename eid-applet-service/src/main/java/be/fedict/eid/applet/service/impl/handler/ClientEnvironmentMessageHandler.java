@@ -118,6 +118,9 @@ public class ClientEnvironmentMessageHandler implements
 	@InitParam(HelloMessageHandler.SIGNATURE_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<SignatureService> signatureServiceLocator;
 
+	@InitParam(HelloMessageHandler.NO_PKCS11_INIT_PARAM_NAME)
+	private boolean noPkcs11;
+
 	public Object handleMessage(ClientEnvironmentMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
 			HttpSession session) throws ServletException {
@@ -180,7 +183,7 @@ public class ClientEnvironmentMessageHandler implements
 			SignRequestMessage signRequestMessage = new SignRequestMessage(
 					digestInfo.digestValue, digestInfo.digestAlgo,
 					digestInfo.description, this.logoff, this.removeCard,
-					this.requireSecureReader);
+					this.requireSecureReader, this.noPkcs11);
 			return signRequestMessage;
 		}
 		AuthenticationService authenticationService = this.authenticationServiceLocator
@@ -198,7 +201,7 @@ public class ClientEnvironmentMessageHandler implements
 					this.serverCertificateChannelBinding, this.includeIdentity,
 					this.includeCertificates, this.includeAddress,
 					this.includePhoto, includeIntegrityData,
-					this.requireSecureReader);
+					this.requireSecureReader, this.noPkcs11);
 			return authenticationRequestMessage;
 		} else {
 			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator

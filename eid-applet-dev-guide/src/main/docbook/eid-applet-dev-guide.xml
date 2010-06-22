@@ -1703,6 +1703,27 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 						has access to a secure pinpad reader.</para>
 				</warning>
 			</section>
+			<section>
+				<title>Disabling the eID Middleware usage</title>
+				<para>
+					The eID Applet Service can be configured to make the eID Applet to
+					avoid using the eID Middleware for crypto operations
+					(authentication or signing). This feature can be useful for some
+					environments in which the eID Middleware yields unstable eID
+					operations.
+					This feature
+					can be enabled by setting
+					the following
+					<code>init-param</code>
+					on the
+					<code>AppletServiceServlet</code>
+					:
+				</para>
+				<programlisting role="XML"><![CDATA[<init-param>
+	<param-name>NoPKCS11</param-name>
+	<param-value>true</param-value>
+</init-param>]]></programlisting>
+			</section>
 		</section>
 	</section>
 	<section>

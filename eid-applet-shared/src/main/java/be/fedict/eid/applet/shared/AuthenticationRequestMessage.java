@@ -78,6 +78,9 @@ public class AuthenticationRequestMessage extends AbstractProtocolMessage {
 	@HttpHeader(HTTP_HEADER_PREFIX + "RequireSecureReader")
 	public boolean requireSecureReader;
 
+	@HttpHeader(HTTP_HEADER_PREFIX + "NoPKCS11")
+	public boolean noPkcs11;
+
 	@HttpBody
 	@NotNull
 	@Description("The challenge to be signed using the authentication certificate. If IncludeHostname is set, then prefix the challenge with the server hostname before signing.")
@@ -94,7 +97,7 @@ public class AuthenticationRequestMessage extends AbstractProtocolMessage {
 			boolean serverCertificateChannelBinding, boolean includeIdentity,
 			boolean includeCertificates, boolean includeAddress,
 			boolean includePhoto, boolean includeIntegrityData,
-			boolean requireSecureReader) {
+			boolean requireSecureReader, boolean noPkcs11) {
 		this.challenge = challenge;
 		this.includeHostname = includeHostname;
 		this.includeInetAddress = includeInetAddress;
@@ -109,5 +112,6 @@ public class AuthenticationRequestMessage extends AbstractProtocolMessage {
 		this.includePhoto = includePhoto;
 		this.includeIntegrityData = includeIntegrityData;
 		this.requireSecureReader = requireSecureReader;
+		this.noPkcs11 = noPkcs11;
 	}
 }
