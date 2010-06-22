@@ -41,6 +41,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
+import be.fedict.eid.applet.service.AppletServiceServlet;
 import be.fedict.eid.applet.service.EIdData;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
@@ -109,6 +110,8 @@ public class IdentityDataMessageHandlerTest {
 		EasyMock.replay(mockServletConfig, mockHttpSession, mockServletRequest);
 
 		// operate
+		AppletServiceServlet.injectInitParams(mockServletConfig,
+				this.testedInstance);
 		this.testedInstance.init(mockServletConfig);
 		this.testedInstance.handleMessage(message, httpHeaders,
 				mockServletRequest, mockHttpSession);
@@ -188,6 +191,8 @@ public class IdentityDataMessageHandlerTest {
 		EasyMock.replay(mockServletConfig, mockHttpSession, mockServletRequest);
 
 		// operate
+		AppletServiceServlet.injectInitParams(mockServletConfig,
+				this.testedInstance);
 		this.testedInstance.init(mockServletConfig);
 		this.testedInstance.handleMessage(message, httpHeaders,
 				mockServletRequest, mockHttpSession);
@@ -257,6 +262,8 @@ public class IdentityDataMessageHandlerTest {
 		EasyMock.replay(mockServletConfig, mockHttpSession, mockServletRequest);
 
 		// operate
+		AppletServiceServlet.injectInitParams(mockServletConfig,
+				this.testedInstance);
 		this.testedInstance.init(mockServletConfig);
 		try {
 			this.testedInstance.handleMessage(message, httpHeaders,
@@ -327,6 +334,8 @@ public class IdentityDataMessageHandlerTest {
 		EasyMock.replay(mockServletConfig, mockHttpSession, mockServletRequest);
 
 		// operate
+		AppletServiceServlet.injectInitParams(mockServletConfig,
+				this.testedInstance);
 		this.testedInstance.init(mockServletConfig);
 		try {
 			this.testedInstance.handleMessage(message, httpHeaders,

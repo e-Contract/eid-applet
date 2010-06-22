@@ -102,46 +102,64 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	public static final String DIAGNOSTIC_MODE_INIT_PARAM_NAME = "DiagnosticMode";
 
+	@InitParam(INCLUDE_PHOTO_INIT_PARAM_NAME)
 	private boolean includePhoto;
 
+	@InitParam(INCLUDE_ADDRESS_INIT_PARAM_NAME)
 	private boolean includeAddress;
 
+	@InitParam(INCLUDE_IDENTITY_INIT_PARAM_NAME)
 	private boolean includeIdentity;
 
+	@InitParam(REMOVE_CARD_INIT_PARAM_NAME)
 	private boolean removeCard;
 
 	private boolean includeHostname;
 
 	private boolean includeInetAddress;
 
+	@InitParam(CHANGE_PIN_INIT_PARAM_NAME)
 	private boolean changePin;
 
+	@InitParam(UNBLOCK_PIN_INIT_PARAM_NAME)
 	private boolean unblockPin;
 
+	@InitParam(LOGOFF_INIT_PARAM_NAME)
 	private boolean logoff;
 
+	@InitParam(PRE_LOGOFF_INIT_PARAM_NAME)
 	private boolean preLogoff;
 
+	@InitParam(INCLUDE_CERTS_INIT_PARAM_NAME)
 	private boolean includeCertificates;
 
+	@InitParam(KIOSK_INIT_PARAM_NAME)
 	private boolean kiosk;
 
+	@InitParam(SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME)
 	private boolean sessionIdChannelBinding;
 
 	private boolean serverCertificateChannelBinding;
 
+	@InitParam(REQUIRE_SECURE_READER_INIT_PARAM_NAME)
 	private boolean requireSecureReader;
 
+	@InitParam(DIAGNOSTIC_MODE_INIT_PARAM_NAME)
 	private boolean diagnosticMode;
 
+	@InitParam(SECURE_CLIENT_ENV_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<SecureClientEnvironmentService> secureClientEnvServiceLocator;
 
+	@InitParam(IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<IdentityIntegrityService> identityIntegrityServiceLocator;
 
+	@InitParam(AuthenticationDataMessageHandler.AUTHN_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<AuthenticationService> authenticationServiceLocator;
 
+	@InitParam(SIGNATURE_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<SignatureService> signatureServiceLocator;
 
+	@InitParam(PRIVACY_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<PrivacyService> privacyServiceLocator;
 
 	public Object handleMessage(HelloMessage message,
@@ -259,46 +277,6 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 	}
 
 	public void init(ServletConfig config) throws ServletException {
-		String includeAddress = config
-				.getInitParameter(INCLUDE_ADDRESS_INIT_PARAM_NAME);
-		if (null != includeAddress) {
-			this.includeAddress = Boolean.parseBoolean(includeAddress);
-		}
-		String includePhoto = config
-				.getInitParameter(INCLUDE_PHOTO_INIT_PARAM_NAME);
-		if (null != includePhoto) {
-			this.includePhoto = Boolean.parseBoolean(includePhoto);
-		}
-		String includeIdentity = config
-				.getInitParameter(HelloMessageHandler.INCLUDE_IDENTITY_INIT_PARAM_NAME);
-		if (null != includeIdentity) {
-			this.includeIdentity = Boolean.parseBoolean(includeIdentity);
-		}
-		this.secureClientEnvServiceLocator = new ServiceLocator<SecureClientEnvironmentService>(
-				SECURE_CLIENT_ENV_SERVICE_INIT_PARAM_NAME, config);
-		this.identityIntegrityServiceLocator = new ServiceLocator<IdentityIntegrityService>(
-				IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME, config);
-		this.authenticationServiceLocator = new ServiceLocator<AuthenticationService>(
-				AuthenticationDataMessageHandler.AUTHN_SERVICE_INIT_PARAM_NAME,
-				config);
-		this.signatureServiceLocator = new ServiceLocator<SignatureService>(
-				SIGNATURE_SERVICE_INIT_PARAM_NAME, config);
-		this.privacyServiceLocator = new ServiceLocator<PrivacyService>(
-				PRIVACY_SERVICE_INIT_PARAM_NAME, config);
-
-		String removeCard = config
-				.getInitParameter(REMOVE_CARD_INIT_PARAM_NAME);
-		if (null != removeCard) {
-			this.removeCard = Boolean.parseBoolean(removeCard);
-		}
-
-		String includeCertificates = config
-				.getInitParameter(INCLUDE_CERTS_INIT_PARAM_NAME);
-		if (null != includeCertificates) {
-			this.includeCertificates = Boolean
-					.parseBoolean(includeCertificates);
-		}
-
 		String hostname = config.getInitParameter(HOSTNAME_INIT_PARAM_NAME);
 		if (null != hostname) {
 			this.includeHostname = true;
@@ -310,57 +288,12 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 			this.includeInetAddress = true;
 		}
 
-		String changePin = config.getInitParameter(CHANGE_PIN_INIT_PARAM_NAME);
-		if (null != changePin) {
-			this.changePin = Boolean.parseBoolean(changePin);
-		}
-
-		String unblockPin = config
-				.getInitParameter(UNBLOCK_PIN_INIT_PARAM_NAME);
-		if (null != unblockPin) {
-			this.unblockPin = Boolean.parseBoolean(unblockPin);
-		}
-
-		String logoff = config.getInitParameter(LOGOFF_INIT_PARAM_NAME);
-		if (null != logoff) {
-			this.logoff = Boolean.parseBoolean(logoff);
-		}
-
-		String preLogoff = config.getInitParameter(PRE_LOGOFF_INIT_PARAM_NAME);
-		if (null != preLogoff) {
-			this.preLogoff = Boolean.parseBoolean(preLogoff);
-		}
-
-		String kiosk = config.getInitParameter(KIOSK_INIT_PARAM_NAME);
-		if (null != kiosk) {
-			this.kiosk = Boolean.parseBoolean(kiosk);
-		}
-
-		String diagnosticMode = config
-				.getInitParameter(DIAGNOSTIC_MODE_INIT_PARAM_NAME);
-		if (null != diagnosticMode) {
-			this.diagnosticMode = Boolean.parseBoolean(diagnosticMode);
-		}
-
-		String requireSecureReader = config
-				.getInitParameter(REQUIRE_SECURE_READER_INIT_PARAM_NAME);
-		if (null != requireSecureReader) {
-			this.requireSecureReader = Boolean
-					.parseBoolean(requireSecureReader);
-		}
-
-		String sessionIdChannelBinding = config
-				.getInitParameter(SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME);
-		if (null != sessionIdChannelBinding) {
-			this.sessionIdChannelBinding = Boolean
-					.parseBoolean(sessionIdChannelBinding);
-		}
-
 		String channelBindingServerCertificate = config
 				.getInitParameter(CHANNEL_BINDING_SERVER_CERTIFICATE);
 		if (null != channelBindingServerCertificate) {
 			this.serverCertificateChannelBinding = true;
 		}
+
 		String channelBindingService = config
 				.getInitParameter(CHANNEL_BINDING_SERVICE);
 		if (null != channelBindingService) {

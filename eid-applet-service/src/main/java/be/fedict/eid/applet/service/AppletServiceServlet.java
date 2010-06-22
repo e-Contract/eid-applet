@@ -20,6 +20,9 @@ package be.fedict.eid.applet.service;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -39,6 +42,7 @@ import be.fedict.eid.applet.service.impl.CleanSessionProtocolStateListener;
 import be.fedict.eid.applet.service.impl.HttpServletProtocolContext;
 import be.fedict.eid.applet.service.impl.HttpServletRequestHttpReceiver;
 import be.fedict.eid.applet.service.impl.HttpServletResponseHttpTransmitter;
+import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.impl.handler.AuthenticationDataMessageHandler;
 import be.fedict.eid.applet.service.impl.handler.ClientEnvironmentMessageHandler;
 import be.fedict.eid.applet.service.impl.handler.ContinueInsecureMessageHandler;
@@ -46,6 +50,7 @@ import be.fedict.eid.applet.service.impl.handler.FileDigestsDataMessageHandler;
 import be.fedict.eid.applet.service.impl.handler.HandlesMessage;
 import be.fedict.eid.applet.service.impl.handler.HelloMessageHandler;
 import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
+import be.fedict.eid.applet.service.impl.handler.InitParam;
 import be.fedict.eid.applet.service.impl.handler.MessageHandler;
 import be.fedict.eid.applet.service.impl.handler.SignCertificatesDataMessageHandler;
 import be.fedict.eid.applet.service.impl.handler.SignatureDataMessageHandler;
@@ -146,6 +151,13 @@ public class AppletServiceServlet extends HttpServlet {
 		Collection<MessageHandler<?>> messageHandlers = this.messageHandlers
 				.values();
 		for (MessageHandler<?> messageHandler : messageHandlers) {
+			try {
+				injectInitParams(config, messageHandler);
+			} catch (Exception e) {
+				throw new ServletException(
+						"error injecting init-param into message handler field: "
+								+ e.getMessage(), e);
+			}
 			messageHandler.init(config);
 		}
 
@@ -158,6 +170,69 @@ public class AppletServiceServlet extends HttpServlet {
 					.parseBoolean(skipSecureConnectionCheck);
 			LOG.debug("skipping secure connection check: "
 					+ this.skipSecureConnectionCheck);
+		}
+	}
+
+	public static void injectInitParams(ServletConfig config,
+			MessageHandler<?> messageHandler) throws ServletException,
+			IllegalArgumentException, IllegalAccessException {
+		Class<?> messageHandlerClass = messageHandler.getClass();
+		Field[] fields = messageHandlerClass.getDeclaredFields();
+		for (Field field : fields) {
+			InitParam initParamAnnotation = field
+					.getAnnotation(InitParam.class);
+			if (null == initParamAnnotation) {
+				continue;
+			}
+			String initParamName = initParamAnnotation.value();
+			Class<?> fieldType = field.getType();
+			field.setAccessible(true);
+			if (ServiceLocator.class.equals(fieldType)) {
+				/*
+				 * We always inject a service locator.
+				 */
+				ServiceLocator<Object> fieldValue = new ServiceLocator<Object>(
+						initParamName, config);
+				field.set(messageHandler, fieldValue);
+				continue;
+			}
+			String initParamValue = config.getInitParameter(initParamName);
+			if (initParamAnnotation.required() && null == initParamValue) {
+				throw new ServletException("missing required init-param: "
+						+ initParamName + " for message handler:"
+						+ messageHandlerClass.getName());
+			}
+			if (null == initParamValue) {
+				continue;
+			}
+			if (Boolean.TYPE.equals(fieldType)) {
+				LOG.debug("injecting boolean: " + initParamValue);
+				Boolean fieldValue = Boolean.parseBoolean(initParamValue);
+				field.set(messageHandler, fieldValue);
+				continue;
+			}
+			if (String.class.equals(fieldType)) {
+				field.set(messageHandler, initParamValue);
+				continue;
+			}
+			if (InetAddress.class.equals(fieldType)) {
+				InetAddress inetAddress;
+				try {
+					inetAddress = InetAddress.getByName(initParamValue);
+				} catch (UnknownHostException e) {
+					throw new ServletException("unknown host: "
+							+ initParamValue);
+				}
+				field.set(messageHandler, inetAddress);
+				continue;
+			}
+			if (Long.class.equals(fieldType)) {
+				Long fieldValue = Long.parseLong(initParamValue);
+				field.set(messageHandler, fieldValue);
+				continue;
+			}
+			throw new ServletException("unsupported init-param field type: "
+					+ fieldType.getName());
 		}
 	}
 

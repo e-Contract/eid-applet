@@ -44,6 +44,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
+import be.fedict.eid.applet.service.AppletServiceServlet;
 import be.fedict.eid.applet.service.impl.AuthenticationChallenge;
 import be.fedict.eid.applet.service.impl.UserIdentifierUtil;
 import be.fedict.eid.applet.service.impl.handler.AuthenticationDataMessageHandler;
@@ -51,6 +52,7 @@ import be.fedict.eid.applet.service.impl.handler.HelloMessageHandler;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
 import be.fedict.eid.applet.shared.AuthenticationContract;
 import be.fedict.eid.applet.shared.AuthenticationDataMessage;
+import be.fedict.eid.applet.shared.AuthenticationRequestMessage;
 
 public class AuthenticationDataMessageHandlerTest {
 
@@ -193,6 +195,16 @@ public class AuthenticationDataMessageHandlerTest {
 						mockServletConfig
 								.getInitParameter(HelloMessageHandler.CHANNEL_BINDING_SERVICE
 										+ "Class")).andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.NRCID_ORG_ID_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.NRCID_APP_ID_INIT_PARAM_NAME))
+				.andReturn(null);
 
 		EasyMock.expect(
 				mockServletRequest
@@ -203,6 +215,8 @@ public class AuthenticationDataMessageHandlerTest {
 		EasyMock.replay(mockServletRequest, mockServletConfig);
 
 		// operate
+		AppletServiceServlet.injectInitParams(mockServletConfig,
+				this.testedInstance);
 		this.testedInstance.init(mockServletConfig);
 		this.testedInstance.handleMessage(message, httpHeaders,
 				mockServletRequest, testHttpSession);
@@ -367,6 +381,8 @@ public class AuthenticationDataMessageHandlerTest {
 		EasyMock.replay(mockServletRequest, mockServletConfig);
 
 		// operate
+		AppletServiceServlet.injectInitParams(mockServletConfig,
+				this.testedInstance);
 		this.testedInstance.init(mockServletConfig);
 		this.testedInstance.handleMessage(message, httpHeaders,
 				mockServletRequest, testHttpSession);
@@ -521,11 +537,23 @@ public class AuthenticationDataMessageHandlerTest {
 						mockServletConfig
 								.getInitParameter(HelloMessageHandler.CHANNEL_BINDING_SERVICE
 										+ "Class")).andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.NRCID_ORG_ID_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.NRCID_APP_ID_INIT_PARAM_NAME))
+				.andReturn(null);
 
 		// prepare
 		EasyMock.replay(mockServletRequest, mockServletConfig);
 
 		// operate
+		AppletServiceServlet.injectInitParams(mockServletConfig,
+				this.testedInstance);
 		this.testedInstance.init(mockServletConfig);
 		try {
 			this.testedInstance.handleMessage(message, httpHeaders,
@@ -673,6 +701,16 @@ public class AuthenticationDataMessageHandlerTest {
 						mockServletConfig
 								.getInitParameter(HelloMessageHandler.CHANNEL_BINDING_SERVICE
 										+ "Class")).andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.NRCID_ORG_ID_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.NRCID_APP_ID_INIT_PARAM_NAME))
+				.andReturn(null);
 
 		EasyMock.expect(
 				mockServletRequest
@@ -687,6 +725,8 @@ public class AuthenticationDataMessageHandlerTest {
 		EasyMock.replay(mockServletRequest, mockServletConfig);
 
 		// operate
+		AppletServiceServlet.injectInitParams(mockServletConfig,
+				this.testedInstance);
 		this.testedInstance.init(mockServletConfig);
 
 		try {
@@ -835,6 +875,16 @@ public class AuthenticationDataMessageHandlerTest {
 						mockServletConfig
 								.getInitParameter(HelloMessageHandler.CHANNEL_BINDING_SERVICE
 										+ "Class")).andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.NRCID_ORG_ID_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock
+				.expect(
+						mockServletConfig
+								.getInitParameter(AuthenticationDataMessageHandler.NRCID_APP_ID_INIT_PARAM_NAME))
+				.andReturn(null);
 
 		EasyMock.expect(
 				mockServletRequest
@@ -845,6 +895,8 @@ public class AuthenticationDataMessageHandlerTest {
 		EasyMock.replay(mockServletRequest, mockServletConfig);
 
 		// operate
+		AppletServiceServlet.injectInitParams(mockServletConfig,
+				this.testedInstance);
 		this.testedInstance.init(mockServletConfig);
 		this.testedInstance.handleMessage(message, httpHeaders,
 				mockServletRequest, testHttpSession);

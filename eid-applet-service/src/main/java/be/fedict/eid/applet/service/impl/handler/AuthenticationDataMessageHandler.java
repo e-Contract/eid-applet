@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -84,20 +83,27 @@ public class AuthenticationDataMessageHandler implements
 	private static final Log LOG = LogFactory
 			.getLog(AuthenticationDataMessageHandler.class);
 
+	@InitParam(AuthenticationDataMessageHandler.AUTHN_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<AuthenticationService> authenticationServiceLocator;
 
+	@InitParam(AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<AuditService> auditServiceLocator;
 
+	@InitParam(HelloMessageHandler.CHANNEL_BINDING_SERVICE)
 	private ServiceLocator<ChannelBindingService> channelBindingServiceLocator;
 
+	@InitParam(HelloMessageHandler.HOSTNAME_INIT_PARAM_NAME)
 	private String hostname;
 
+	@InitParam(HelloMessageHandler.INET_ADDRESS_INIT_PARAM_NAME)
 	private InetAddress inetAddress;
 
+	@InitParam(CHALLENGE_MAX_MATURITY_INIT_PARAM_NAME)
 	private Long maxMaturity;
 
 	private X509Certificate serverCertificate;
 
+	@InitParam(HelloMessageHandler.SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME)
 	private boolean sessionIdChannelBinding;
 
 	public static final String AUTHN_SERVICE_INIT_PARAM_NAME = "AuthenticationService";
@@ -112,20 +118,28 @@ public class AuthenticationDataMessageHandler implements
 
 	public static final String NRCID_APP_ID_INIT_PARAM_NAME = "NRCIDAppId";
 
+	@InitParam(NRCID_SECRET_INIT_PARAM_NAME)
 	private String nrcidSecret;
 
+	@InitParam(NRCID_ORG_ID_INIT_PARAM_NAME)
 	private String nrcidOrgId;
 
+	@InitParam(NRCID_APP_ID_INIT_PARAM_NAME)
 	private String nrcidAppId;
 
+	@InitParam(HelloMessageHandler.INCLUDE_IDENTITY_INIT_PARAM_NAME)
 	private boolean includeIdentity;
 
+	@InitParam(HelloMessageHandler.INCLUDE_CERTS_INIT_PARAM_NAME)
 	private boolean includeCertificates;
 
+	@InitParam(HelloMessageHandler.INCLUDE_ADDRESS_INIT_PARAM_NAME)
 	private boolean includeAddress;
 
+	@InitParam(HelloMessageHandler.INCLUDE_PHOTO_INIT_PARAM_NAME)
 	private boolean includePhoto;
 
+	@InitParam(HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<IdentityIntegrityService> identityIntegrityServiceLocator;
 
 	public Object handleMessage(AuthenticationDataMessage message,
@@ -552,43 +566,6 @@ public class AuthenticationDataMessageHandler implements
 	}
 
 	public void init(ServletConfig config) throws ServletException {
-		this.authenticationServiceLocator = new ServiceLocator<AuthenticationService>(
-				AuthenticationDataMessageHandler.AUTHN_SERVICE_INIT_PARAM_NAME,
-				config);
-
-		this.auditServiceLocator = new ServiceLocator<AuditService>(
-				AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME,
-				config);
-
-		this.hostname = config
-				.getInitParameter(HelloMessageHandler.HOSTNAME_INIT_PARAM_NAME);
-
-		String inetAddress = config
-				.getInitParameter(HelloMessageHandler.INET_ADDRESS_INIT_PARAM_NAME);
-		if (null != inetAddress) {
-			try {
-				this.inetAddress = InetAddress.getByName(inetAddress);
-			} catch (UnknownHostException e) {
-				throw new ServletException("unknown host: " + inetAddress);
-			}
-		}
-
-		String maxMaturity = config
-				.getInitParameter(CHALLENGE_MAX_MATURITY_INIT_PARAM_NAME);
-		if (null != maxMaturity) {
-			this.maxMaturity = Long.parseLong(maxMaturity);
-			LOG.debug("explicit max maturity: " + this.maxMaturity);
-		} else {
-			this.maxMaturity = null;
-		}
-
-		String sessionIdChannelBinding = config
-				.getInitParameter(HelloMessageHandler.SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME);
-		if (null != sessionIdChannelBinding) {
-			this.sessionIdChannelBinding = Boolean
-					.parseBoolean(sessionIdChannelBinding);
-		}
-
 		String channelBindingServerCertificate = config
 				.getInitParameter(HelloMessageHandler.CHANNEL_BINDING_SERVER_CERTIFICATE);
 		if (null != channelBindingServerCertificate) {
@@ -608,43 +585,6 @@ public class AuthenticationDataMessageHandler implements
 			}
 			this.serverCertificate = getCertificate(encodedServerCertificate);
 		}
-
-		this.channelBindingServiceLocator = new ServiceLocator<ChannelBindingService>(
-				HelloMessageHandler.CHANNEL_BINDING_SERVICE, config);
-
-		this.nrcidSecret = config
-				.getInitParameter(NRCID_SECRET_INIT_PARAM_NAME);
-		if (null != this.nrcidSecret) {
-			this.nrcidAppId = config
-					.getInitParameter(NRCID_APP_ID_INIT_PARAM_NAME);
-			this.nrcidOrgId = config
-					.getInitParameter(NRCID_ORG_ID_INIT_PARAM_NAME);
-		}
-
-		String includeAddress = config
-				.getInitParameter(HelloMessageHandler.INCLUDE_ADDRESS_INIT_PARAM_NAME);
-		if (null != includeAddress) {
-			this.includeAddress = Boolean.parseBoolean(includeAddress);
-		}
-		String includePhoto = config
-				.getInitParameter(HelloMessageHandler.INCLUDE_PHOTO_INIT_PARAM_NAME);
-		if (null != includePhoto) {
-			this.includePhoto = Boolean.parseBoolean(includePhoto);
-		}
-		String includeIdentity = config
-				.getInitParameter(HelloMessageHandler.INCLUDE_IDENTITY_INIT_PARAM_NAME);
-		if (null != includeIdentity) {
-			this.includeIdentity = Boolean.parseBoolean(includeIdentity);
-		}
-		String includeCertificates = config
-				.getInitParameter(HelloMessageHandler.INCLUDE_CERTS_INIT_PARAM_NAME);
-		if (null != includeCertificates) {
-			this.includeCertificates = Boolean
-					.parseBoolean(includeCertificates);
-		}
-		this.identityIntegrityServiceLocator = new ServiceLocator<IdentityIntegrityService>(
-				HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME,
-				config);
 	}
 
 	private X509Certificate getCertificate(byte[] certData) {
