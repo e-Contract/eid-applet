@@ -56,6 +56,9 @@ public class SignCertificatesDataMessageHandler implements
 	@InitParam(HelloMessageHandler.REQUIRE_SECURE_READER_INIT_PARAM_NAME)
 	private boolean requireSecureReader;
 
+	@InitParam(HelloMessageHandler.NO_PKCS11_INIT_PARAM_NAME)
+	private boolean noPkcs11;
+
 	public Object handleMessage(SignCertificatesDataMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
 			HttpSession session) throws ServletException {
@@ -85,7 +88,7 @@ public class SignCertificatesDataMessageHandler implements
 		SignRequestMessage signRequestMessage = new SignRequestMessage(
 				digestInfo.digestValue, digestInfo.digestAlgo,
 				digestInfo.description, this.logoff, this.removeCard,
-				this.requireSecureReader);
+				this.requireSecureReader, this.noPkcs11);
 		return signRequestMessage;
 	}
 

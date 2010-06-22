@@ -111,6 +111,9 @@ public class ContinueInsecureMessageHandler implements
 	@InitParam(HelloMessageHandler.SIGNATURE_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<SignatureService> signatureServiceLocator;
 
+	@InitParam(HelloMessageHandler.NO_PKCS11_INIT_PARAM_NAME)
+	private boolean noPkcs11;
+
 	public Object handleMessage(ContinueInsecureMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
 			HttpSession session) throws ServletException {
@@ -146,7 +149,7 @@ public class ContinueInsecureMessageHandler implements
 			SignRequestMessage signRequestMessage = new SignRequestMessage(
 					digestInfo.digestValue, digestInfo.digestAlgo,
 					digestInfo.description, this.logoff, this.removeCard,
-					this.requireSecureReader);
+					this.requireSecureReader, this.noPkcs11);
 			return signRequestMessage;
 		}
 		AuthenticationService authenticationService = this.authenticationServiceLocator
@@ -164,7 +167,7 @@ public class ContinueInsecureMessageHandler implements
 					this.serverCertificateChannelBinding, this.includeIdentity,
 					this.includeCertificates, this.includeAddress,
 					this.includePhoto, includeIntegrityData,
-					this.requireSecureReader);
+					this.requireSecureReader, this.noPkcs11);
 			return authenticationRequestMessage;
 		} else {
 			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator

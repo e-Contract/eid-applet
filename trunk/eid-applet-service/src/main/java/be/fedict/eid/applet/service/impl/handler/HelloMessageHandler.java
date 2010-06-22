@@ -102,6 +102,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	public static final String DIAGNOSTIC_MODE_INIT_PARAM_NAME = "DiagnosticMode";
 
+	public static final String NO_PKCS11_INIT_PARAM_NAME = "NoPKCS11";
+
 	@InitParam(INCLUDE_PHOTO_INIT_PARAM_NAME)
 	private boolean includePhoto;
 
@@ -161,6 +163,9 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	@InitParam(PRIVACY_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<PrivacyService> privacyServiceLocator;
+
+	@InitParam(NO_PKCS11_INIT_PARAM_NAME)
+	private boolean noPkcs11;
 
 	public Object handleMessage(HelloMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
@@ -222,7 +227,7 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 			SignRequestMessage signRequestMessage = new SignRequestMessage(
 					digestInfo.digestValue, digestInfo.digestAlgo,
 					digestInfo.description, this.logoff, this.removeCard,
-					this.requireSecureReader);
+					this.requireSecureReader, this.noPkcs11);
 			return signRequestMessage;
 		}
 		AuthenticationService authenticationService = this.authenticationServiceLocator
@@ -240,7 +245,7 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 					this.serverCertificateChannelBinding, this.includeIdentity,
 					this.includeCertificates, this.includeAddress,
 					this.includePhoto, includeIntegrityData,
-					this.requireSecureReader);
+					this.requireSecureReader, this.noPkcs11);
 			return authenticationRequestMessage;
 		}
 

@@ -291,6 +291,10 @@
 			<param-name>AuthenticationService</param-name>
 			<param-value>test/eid/applet/model/AuthenticationExpiredServiceBean</param-value>
 		</init-param>
+		<init-param>
+			<param-name>NoPKCS11</param-name>
+			<param-value>true</param-value>
+		</init-param>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>AppletAuthnExpiredServiceServlet</servlet-name>
@@ -468,6 +472,10 @@
 		<init-param>
 			<param-name>SignatureService</param-name>
 			<param-value>test/eid/applet/model/XmlSignatureServiceBean</param-value>
+		</init-param>
+		<init-param>
+			<param-name>NoPKCS11</param-name>
+			<param-value>true</param-value>
 		</init-param>
 	</servlet>
 	<servlet-mapping>
