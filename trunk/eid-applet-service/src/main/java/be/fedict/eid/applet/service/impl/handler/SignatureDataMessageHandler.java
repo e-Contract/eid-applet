@@ -56,8 +56,10 @@ public class SignatureDataMessageHandler implements
 	private static final Log LOG = LogFactory
 			.getLog(SignatureDataMessageHandler.class);
 
+	@InitParam(HelloMessageHandler.SIGNATURE_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<SignatureService> signatureServiceLocator;
 
+	@InitParam(AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<AuditService> auditServiceLocator;
 
 	public static final String DIGEST_VALUE_SESSION_ATTRIBUTE = SignatureDataMessageHandler.class
@@ -127,11 +129,7 @@ public class SignatureDataMessageHandler implements
 	}
 
 	public void init(ServletConfig config) throws ServletException {
-		this.signatureServiceLocator = new ServiceLocator<SignatureService>(
-				HelloMessageHandler.SIGNATURE_SERVICE_INIT_PARAM_NAME, config);
-		this.auditServiceLocator = new ServiceLocator<AuditService>(
-				AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME,
-				config);
+		// empty
 	}
 
 	public static byte[] getDigestValue(HttpSession session) {

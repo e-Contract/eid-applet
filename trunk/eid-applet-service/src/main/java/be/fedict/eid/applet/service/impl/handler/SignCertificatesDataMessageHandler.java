@@ -44,12 +44,16 @@ public class SignCertificatesDataMessageHandler implements
 	private static final Log LOG = LogFactory
 			.getLog(SignCertificatesDataMessageHandler.class);
 
+	@InitParam(HelloMessageHandler.SIGNATURE_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<SignatureService> signatureServiceLocator;
 
+	@InitParam(HelloMessageHandler.REMOVE_CARD_INIT_PARAM_NAME)
 	private boolean removeCard;
 
+	@InitParam(HelloMessageHandler.LOGOFF_INIT_PARAM_NAME)
 	private boolean logoff;
 
+	@InitParam(HelloMessageHandler.REQUIRE_SECURE_READER_INIT_PARAM_NAME)
 	private boolean requireSecureReader;
 
 	public Object handleMessage(SignCertificatesDataMessage message,
@@ -86,26 +90,6 @@ public class SignCertificatesDataMessageHandler implements
 	}
 
 	public void init(ServletConfig config) throws ServletException {
-		this.signatureServiceLocator = new ServiceLocator<SignatureService>(
-				HelloMessageHandler.SIGNATURE_SERVICE_INIT_PARAM_NAME, config);
-
-		String removeCard = config
-				.getInitParameter(HelloMessageHandler.REMOVE_CARD_INIT_PARAM_NAME);
-		if (null != removeCard) {
-			this.removeCard = Boolean.parseBoolean(removeCard);
-		}
-
-		String logoff = config
-				.getInitParameter(HelloMessageHandler.LOGOFF_INIT_PARAM_NAME);
-		if (null != logoff) {
-			this.logoff = Boolean.parseBoolean(logoff);
-		}
-
-		String requireSecureReader = config
-				.getInitParameter(HelloMessageHandler.REQUIRE_SECURE_READER_INIT_PARAM_NAME);
-		if (null != requireSecureReader) {
-			this.requireSecureReader = Boolean
-					.parseBoolean(requireSecureReader);
-		}
+		// empty
 	}
 }

@@ -87,16 +87,22 @@ public class IdentityDataMessageHandler implements
 
 	public static final String SKIP_NATIONAL_NUMBER_CHECK_INIT_PARAM_NAME = "SkipNationalNumberCheck";
 
+	@InitParam(HelloMessageHandler.INCLUDE_PHOTO_INIT_PARAM_NAME)
 	private boolean includePhoto;
 
+	@InitParam(HelloMessageHandler.INCLUDE_ADDRESS_INIT_PARAM_NAME)
 	private boolean includeAddress;
 
+	@InitParam(HelloMessageHandler.INCLUDE_CERTS_INIT_PARAM_NAME)
 	private boolean includeCertificates;
 
+	@InitParam(SKIP_NATIONAL_NUMBER_CHECK_INIT_PARAM_NAME)
 	private boolean skipNationalNumberCheck;
 
+	@InitParam(HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<IdentityIntegrityService> identityIntegrityServiceLocator;
 
+	@InitParam(AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<AuditService> auditServiceLocator;
 
 	public Object handleMessage(IdentityDataMessage message,
@@ -378,37 +384,6 @@ public class IdentityDataMessageHandler implements
 	}
 
 	public void init(ServletConfig config) throws ServletException {
-		String includeAddress = config
-				.getInitParameter(HelloMessageHandler.INCLUDE_ADDRESS_INIT_PARAM_NAME);
-		if (null != includeAddress) {
-			this.includeAddress = Boolean.parseBoolean(includeAddress);
-		}
-
-		String includePhoto = config
-				.getInitParameter(HelloMessageHandler.INCLUDE_PHOTO_INIT_PARAM_NAME);
-		if (null != includePhoto) {
-			this.includePhoto = Boolean.parseBoolean(includePhoto);
-		}
-
-		String includeCertificates = config
-				.getInitParameter(HelloMessageHandler.INCLUDE_CERTS_INIT_PARAM_NAME);
-		if (null != includeCertificates) {
-			this.includeCertificates = Boolean
-					.parseBoolean(includeCertificates);
-		}
-
-		String skipNationalNumberCheck = config
-				.getInitParameter(SKIP_NATIONAL_NUMBER_CHECK_INIT_PARAM_NAME);
-		if (null != skipNationalNumberCheck) {
-			this.skipNationalNumberCheck = Boolean
-					.parseBoolean(skipNationalNumberCheck);
-		}
-
-		this.identityIntegrityServiceLocator = new ServiceLocator<IdentityIntegrityService>(
-				HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME,
-				config);
-		this.auditServiceLocator = new ServiceLocator<AuditService>(
-				AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME,
-				config);
+		// empty
 	}
 }

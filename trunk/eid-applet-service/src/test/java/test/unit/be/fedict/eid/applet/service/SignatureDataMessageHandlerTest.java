@@ -44,6 +44,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
+import be.fedict.eid.applet.service.AppletServiceServlet;
 import be.fedict.eid.applet.service.impl.handler.SignatureDataMessageHandler;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 import be.fedict.eid.applet.service.spi.SignatureService;
@@ -113,6 +114,8 @@ public class SignatureDataMessageHandlerTest {
 		EasyMock.replay(mockServletConfig, mockHttpSession, mockServletRequest);
 
 		// operate
+		AppletServiceServlet.injectInitParams(mockServletConfig,
+				this.testedInstance);
 		this.testedInstance.init(mockServletConfig);
 		this.testedInstance.handleMessage(message, httpHeaders,
 				mockServletRequest, mockHttpSession);
@@ -173,6 +176,8 @@ public class SignatureDataMessageHandlerTest {
 		EasyMock.replay(mockServletConfig, mockHttpSession, mockServletRequest);
 
 		// operate
+		AppletServiceServlet.injectInitParams(mockServletConfig,
+				this.testedInstance);
 		this.testedInstance.init(mockServletConfig);
 		this.testedInstance.handleMessage(message, httpHeaders,
 				mockServletRequest, mockHttpSession);
@@ -237,6 +242,8 @@ public class SignatureDataMessageHandlerTest {
 		EasyMock.replay(mockServletConfig, mockHttpSession, mockServletRequest);
 
 		// operate
+		AppletServiceServlet.injectInitParams(mockServletConfig,
+				this.testedInstance);
 		this.testedInstance.init(mockServletConfig);
 		try {
 			this.testedInstance.handleMessage(message, httpHeaders,
