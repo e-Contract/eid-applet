@@ -159,5 +159,10 @@
 			<artifactId>commons-digester</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 </project>

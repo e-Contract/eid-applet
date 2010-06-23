@@ -20,6 +20,8 @@ package be.fedict.eid.applet.service;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -27,8 +29,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.simple.JSONObject;
 
 /**
  * Servlet to retrieve the eID identity data from the HTTP session context via
@@ -48,57 +52,77 @@ public class JSONServlet extends HttpServlet {
 		LOG.debug("doGet");
 		HttpSession httpSession = request.getSession();
 		EIdData eIdData = (EIdData) httpSession.getAttribute("eid");
-		// we could use the json-lib here
-		PrintWriter writer = response.getWriter();
-		writer.println("{");
-		{
-			Identity identity = eIdData.identity;
-			writer.println("\tidentity: {");
-			{
-				writer.println("\t\tnationalNumber: \""
-						+ identity.nationalNumber + "\",");
-				writer.println("\t\tname: \"" + identity.name + "\",");
-				writer
-						.println("\t\tfirstName: \"" + identity.firstName
-								+ "\",");
-				writer.println("\t\tmiddleName: \"" + identity.middleName
-						+ "\",");
-				writer.println("\t\tdateOfBirth: \""
-						+ identity.dateOfBirth.getTime() + "\",");
-				writer.println("\t\tplaceOfBirth: \"" + identity.placeOfBirth
-						+ "\",");
-				writer.println("\t\tgender: \"" + identity.gender + "\"");
-			}
-			writer.println("\t},");
-
-			writer.println("\tcard: {");
-			{
-				writer.println("\t\tcardNumber: \"" + identity.cardNumber
-						+ "\",");
-				writer.println("\t\tchipNumber: \"" + identity.chipNumber
-						+ "\",");
-				writer.println("\t\tcardDeliveryMunicipality: \""
-						+ identity.cardDeliveryMunicipality + "\",");
-				writer.println("\t\tcardValidityDateBegin: \""
-						+ identity.cardValidityDateBegin.getTime() + "\",");
-				writer.println("\t\tcardValidityDateEnd: \""
-						+ identity.cardValidityDateEnd.getTime() + "\"");
-			}
-			writer.println("\t}");
-
-			Address address = eIdData.address;
-			if (null != address) {
-				writer.println(",\taddress: {");
-				{
-					writer.println("\t\tstreetAndNumber: \""
-							+ address.streetAndNumber + "\",");
-					writer.println("\t\tmunicipality: \""
-							+ address.municipality + "\",");
-					writer.println("\t\tzip: \"" + address.zip + "\"");
-				}
-				writer.println("\t}");
-			}
+		if (null == eIdData) {
+			throw new ServletException("no eID data available");
 		}
-		writer.println("}");
+		PrintWriter writer = response.getWriter();
+		try {
+			outputJSON(eIdData, writer);
+		} catch (CertificateEncodingException e) {
+			throw new ServletException("Certificate encoding error: "
+					+ e.getMessage(), e);
+		}
+	}
+
+	public static void outputJSON(EIdData eIdData, PrintWriter writer)
+			throws IOException, CertificateEncodingException {
+		JSONObject eidJSONObject = new JSONObject();
+
+		JSONObject identityJSONObject = new JSONObject();
+		eidJSONObject.put("identity", identityJSONObject);
+		Identity identity = eIdData.identity;
+		identityJSONObject.put("nationalNumber", identity.nationalNumber);
+		identityJSONObject.put("name", identity.name);
+		identityJSONObject.put("firstName", identity.firstName);
+		identityJSONObject.put("middleName", identity.middleName);
+		identityJSONObject.put("dateOfBirth", identity.dateOfBirth.getTime()
+				.toString());
+		identityJSONObject.put("placeOfBirth", identity.placeOfBirth);
+		identityJSONObject.put("gender", identity.gender);
+
+		JSONObject cardJSONObject = new JSONObject();
+		eidJSONObject.put("card", cardJSONObject);
+		cardJSONObject.put("cardNumber", identity.cardNumber);
+		cardJSONObject.put("chipNumber", identity.chipNumber);
+		cardJSONObject.put("cardDeliveryMunicipality",
+				identity.cardDeliveryMunicipality);
+		cardJSONObject.put("cardValidityDateBegin",
+				identity.cardValidityDateBegin.getTime().toString());
+		cardJSONObject.put("cardValidityDateEnd", identity.cardValidityDateEnd
+				.getTime().toString());
+
+		Address address = eIdData.address;
+		if (null != address) {
+			JSONObject addressJSONObject = new JSONObject();
+			eidJSONObject.put("address", addressJSONObject);
+			addressJSONObject.put("streetAndNumber", address.streetAndNumber);
+			addressJSONObject.put("municipality", address.municipality);
+			addressJSONObject.put("zip", address.zip);
+		}
+
+		EIdCertsData certsData = eIdData.certs;
+		if (null != certsData) {
+			JSONObject certsJSONObject = new JSONObject();
+			eidJSONObject.put("certs", certsJSONObject);
+			X509Certificate authnCertificate = certsData.authn;
+			JSONObject authnCertJSONObject = new JSONObject();
+			certsJSONObject.put("authn", authnCertJSONObject);
+			authnCertJSONObject.put("subject", authnCertificate
+					.getSubjectX500Principal().toString());
+			authnCertJSONObject.put("issuer", authnCertificate
+					.getIssuerX500Principal().toString());
+			authnCertJSONObject.put("serialNumber", authnCertificate
+					.getSerialNumber().toString());
+			authnCertJSONObject.put("notBefore", authnCertificate
+					.getNotBefore().toString());
+			authnCertJSONObject.put("notAfter", authnCertificate.getNotAfter()
+					.toString());
+			authnCertJSONObject.put("signatureAlgo", authnCertificate
+					.getSigAlgName());
+			authnCertJSONObject.put("thumbprint", DigestUtils
+					.shaHex(authnCertificate.getEncoded()));
+		}
+
+		eidJSONObject.writeJSONString(writer);
 	}
 }
