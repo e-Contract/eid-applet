@@ -18,6 +18,12 @@
 
 package be.fedict.eid.applet.service.spi;
 
+/**
+ * Exception thrown in case the incoming eID certificate has been revoked.
+ * 
+ * @author Frank Cornelis
+ * 
+ */
 public class RevokedCertificateSecurityException extends
 		CertificateSecurityException {
 

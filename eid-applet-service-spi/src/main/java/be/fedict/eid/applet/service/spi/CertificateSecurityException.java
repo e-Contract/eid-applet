@@ -18,6 +18,13 @@
 
 package be.fedict.eid.applet.service.spi;
 
+/**
+ * Exception thrown in case there is something wrong with the incoming eID
+ * certificate.
+ * 
+ * @author Frank Cornelis
+ * 
+ */
 public class CertificateSecurityException extends SecurityException {
 
 	private static final long serialVersionUID = 1L;

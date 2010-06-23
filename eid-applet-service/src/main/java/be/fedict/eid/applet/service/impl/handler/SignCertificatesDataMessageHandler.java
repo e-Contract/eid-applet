@@ -37,6 +37,12 @@ import be.fedict.eid.applet.service.spi.SignatureService;
 import be.fedict.eid.applet.shared.SignCertificatesDataMessage;
 import be.fedict.eid.applet.shared.SignRequestMessage;
 
+/**
+ * Sign Certificate Data Message Handler.
+ * 
+ * @author Frank Cornelis
+ * 
+ */
 @HandlesMessage(SignCertificatesDataMessage.class)
 public class SignCertificatesDataMessageHandler implements
 		MessageHandler<SignCertificatesDataMessage> {
