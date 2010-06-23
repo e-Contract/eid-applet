@@ -18,6 +18,12 @@
 
 package be.fedict.eid.applet.service.spi;
 
+/**
+ * Exception thrown in case the incoming eID certificate is expired.
+ * 
+ * @author Frank Cornelis
+ * 
+ */
 public class ExpiredCertificateSecurityException extends
 		CertificateSecurityException {
 
