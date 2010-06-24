@@ -1,3 +1,29 @@
+1.0.1.RC1 - 24 June 2010
+	* fix: UTF-U encoding for Mac OS X compilation
+	* fix: supporting IcedTea JRE under Fedora
+	* XML Signature support for RSA-SHA384 and RSA-SHA512
+	* IncludeCertificates during eID authentication
+	* CMS Signature Service
+	* fix: OOXML signature verification
+	* fix: Ubuntu libpcsclite.so non-standard location
+	* updated the JavaEE application server to JAX-WS RI 2.2.1
+	* secure channel binding via ChannelBindingService SPI
+	* fix: detection of card removal
+	* eID Applet session cookie detection
+	* fix: TLV parser UTF-8 encoding
+	* allow for non-SSL when eID Applet runs on localhost
+	* improved the JSONServlet
+	* fix: ODF signature service signing of manifest and mimetype
+	* MessageCallbackEx to have machine processable message identifiers
+	* RequireSecureReader to enfore usage of secure pinpad readers
+	* CCID i18n in case of a display on the secure reader
+	* CCID improvements for PIN modification
+	* DiagnosticMode to be able to run diagnostic tests at the client-side
+	* improved authn error reporting for expired/revoked certificates
+	* improved i18n on the various dialogs
+	* refactoring of message handlers using @InitParam
+	* NoPKCS11 feature for avoid usage of eID Middleware
+
 1.0.0.GA - 11 January 2010
 	* upgrade to JBoss Application Server 6.0.0.M1
 	* allow for missing authentication certificate
