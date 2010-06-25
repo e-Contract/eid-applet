@@ -557,21 +557,21 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 		ByteArrayOutputStream digestInfo = new ByteArrayOutputStream();
 		if ("SHA-1".equals(digestAlgo) || "SHA1".equals(digestAlgo)) {
-			digestInfo.write(Pkcs11Eid.SHA1_DIGEST_INFO_PREFIX);
+			digestInfo.write(Constants.SHA1_DIGEST_INFO_PREFIX);
 		} else if ("SHA-224".equals(digestAlgo)) {
-			digestInfo.write(Pkcs11Eid.SHA224_DIGEST_INFO_PREFIX);
+			digestInfo.write(Constants.SHA224_DIGEST_INFO_PREFIX);
 		} else if ("SHA-256".equals(digestAlgo)) {
-			digestInfo.write(Pkcs11Eid.SHA256_DIGEST_INFO_PREFIX);
+			digestInfo.write(Constants.SHA256_DIGEST_INFO_PREFIX);
 		} else if ("SHA-384".equals(digestAlgo)) {
-			digestInfo.write(Pkcs11Eid.SHA384_DIGEST_INFO_PREFIX);
+			digestInfo.write(Constants.SHA384_DIGEST_INFO_PREFIX);
 		} else if ("SHA-512".equals(digestAlgo)) {
-			digestInfo.write(Pkcs11Eid.SHA512_DIGEST_INFO_PREFIX);
+			digestInfo.write(Constants.SHA512_DIGEST_INFO_PREFIX);
 		} else if ("RIPEMD160".equals(digestAlgo)) {
-			digestInfo.write(Pkcs11Eid.RIPEMD160_DIGEST_INFO_PREFIX);
+			digestInfo.write(Constants.RIPEMD160_DIGEST_INFO_PREFIX);
 		} else if ("RIPEMD128".equals(digestAlgo)) {
-			digestInfo.write(Pkcs11Eid.RIPEMD128_DIGEST_INFO_PREFIX);
+			digestInfo.write(Constants.RIPEMD128_DIGEST_INFO_PREFIX);
 		} else if ("RIPEMD256".equals(digestAlgo)) {
-			digestInfo.write(Pkcs11Eid.RIPEMD256_DIGEST_INFO_PREFIX);
+			digestInfo.write(Constants.RIPEMD256_DIGEST_INFO_PREFIX);
 		} else {
 			throw new RuntimeException("digest also not supported: "
 					+ digestAlgo);

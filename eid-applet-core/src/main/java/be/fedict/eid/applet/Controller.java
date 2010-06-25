@@ -152,7 +152,23 @@ public class Controller {
 			 */
 			this.pcscEidSpi = null;
 		}
-		this.pkcs11Eid = new Pkcs11Eid(this.view, this.messages);
+		Pkcs11Eid pkcs11Eid;
+		try {
+			pkcs11Eid = new Pkcs11Eid(this.view, this.messages);
+		} catch (NoClassDefFoundError e) {
+			/*
+			 * sun/security/pkcs11/SunPKCS11 is not available on Windows 64 bit
+			 * JRE 1.6.0_20.
+			 */
+			this.view.addDetailMessage("class not found: " + e.getMessage());
+			pkcs11Eid = null;
+		}
+		this.pkcs11Eid = pkcs11Eid;
+		if (null == this.pkcs11Eid && null == this.pcscEidSpi) {
+			String msg = "no PKCS11 nor PCSC interface available";
+			this.view.addDetailMessage(msg);
+			throw new RuntimeException(msg);
+		}
 		ProtocolContext protocolContext = new LocalAppletProtocolContext(
 				this.view);
 		this.protocolStateMachine = new ProtocolStateMachine(protocolContext);
@@ -270,7 +286,7 @@ public class Controller {
 					 */
 					clientEnvMessage.readerList = this.pcscEidSpi
 							.getReaderList();
-				} else {
+				} else if (null != this.pkcs11Eid) {
 					/*
 					 * Get the reader list via the PKCS#11 library.
 					 */
@@ -477,11 +493,13 @@ public class Controller {
 				.diagnosticTests(callbackHandler);
 		this.pcscEidSpi.close();
 
-		this.pkcs11Eid.diagnosticTests(callbackHandler);
-		try {
-			this.pkcs11Eid.close();
-		} catch (Exception e) {
-			addDetailMessage("error closing PKCS#11: " + e.getMessage());
+		if (null != pkcs11Eid) {
+			this.pkcs11Eid.diagnosticTests(callbackHandler);
+			try {
+				this.pkcs11Eid.close();
+			} catch (Exception e) {
+				addDetailMessage("error closing PKCS#11: " + e.getMessage());
+			}
 		}
 
 		mscapiDiagnosticTest(authnCertificate);
@@ -600,6 +618,9 @@ public class Controller {
 	private SignCertificatesDataMessage performSignCertificatesOperation()
 			throws Exception {
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
+		if (null == this.pkcs11Eid) {
+			return performPcscSignCertificatesOperation();
+		}
 		try {
 			if (false == this.pkcs11Eid.isEidPresent()) {
 				setStatusMessage(Status.NORMAL, MESSAGE_ID.INSERT_CARD_QUESTION);
@@ -658,6 +679,9 @@ public class Controller {
 				Messages.MESSAGE_ID.KIOSK_MODE);
 		while (true) {
 			try {
+				if (null == this.pkcs11Eid) {
+					throw new PKCS11NotFoundException();
+				}
 				if (false == this.pkcs11Eid.isEidPresent()) {
 					this.pkcs11Eid.waitForEidPresent();
 				}
@@ -819,7 +843,7 @@ public class Controller {
 				+ requireSecureReader);
 		addDetailMessage("no PKCS11: " + noPkcs11);
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
-		if (requireSecureReader || noPkcs11) {
+		if (requireSecureReader || noPkcs11 || null == this.pkcs11Eid) {
 			if (null != this.pcscEidSpi) {
 				performEidPcscSignOperation(signRequestMessage,
 						requireSecureReader);
@@ -1090,7 +1114,8 @@ public class Controller {
 
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
 		if (includeIdentity || includeAddress || includePhoto
-				|| includeCertificates || requireSecureReader || noPkcs11) {
+				|| includeCertificates || requireSecureReader || noPkcs11
+				|| null == this.pkcs11Eid) {
 			if (null != this.pcscEidSpi) {
 				FinishedMessage finishedMessage = performEidPcscAuthnOperation(
 						salt, sessionId, toBeSigned, logoff, preLogoff,
