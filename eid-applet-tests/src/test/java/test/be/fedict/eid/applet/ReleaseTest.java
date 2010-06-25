@@ -63,10 +63,10 @@ public class ReleaseTest {
 	private static final Log LOG = LogFactory.getLog(ReleaseTest.class);
 
 	// 1.0.0-SNAPSHOT
-	private static final String CURRENT_VERSION = "1.0.0.GA";
+	private static final String CURRENT_VERSION = "1.0.1-SNAPSHOT";
 
 	// 1.0.0-rc-3
-	private static final String NEW_VERSION = "1.0.1-SNAPSHOT";
+	private static final String NEW_VERSION = "1.0.1.RC1";
 
 	@Test
 	public void testVersioning() throws Exception {
@@ -105,8 +105,8 @@ public class ReleaseTest {
 				Node dependencyVersionTextNode = dependencyVersionTextNodeList
 						.item(idx);
 				assertEquals(CURRENT_VERSION, dependencyVersionTextNode
-						.getTextContent());
-				dependencyVersionTextNode.setTextContent(NEW_VERSION);
+						.getNodeValue());
+				dependencyVersionTextNode.setNodeValue(NEW_VERSION);
 			}
 
 			Node projectVersionTextNode = XPathAPI
@@ -116,8 +116,8 @@ public class ReleaseTest {
 							pomDocument.getDocumentElement());
 			if (null != projectVersionTextNode) {
 				assertEquals(CURRENT_VERSION, projectVersionTextNode
-						.getTextContent());
-				projectVersionTextNode.setTextContent(NEW_VERSION);
+						.getNodeValue());
+				projectVersionTextNode.setNodeValue(NEW_VERSION);
 			}
 
 			Node parentVersionTextNode = XPathAPI
@@ -127,8 +127,8 @@ public class ReleaseTest {
 							pomDocument.getDocumentElement());
 			if (null != parentVersionTextNode) {
 				assertEquals(CURRENT_VERSION, parentVersionTextNode
-						.getTextContent());
-				parentVersionTextNode.setTextContent(NEW_VERSION);
+						.getNodeValue());
+				parentVersionTextNode.setNodeValue(NEW_VERSION);
 			}
 
 			NodeList pluginVersionTextNodeList = XPathAPI
@@ -142,8 +142,8 @@ public class ReleaseTest {
 				Node pluginVersionTextNode = pluginVersionTextNodeList
 						.item(idx);
 				assertEquals(CURRENT_VERSION, pluginVersionTextNode
-						.getTextContent());
-				pluginVersionTextNode.setTextContent(NEW_VERSION);
+						.getNodeValue());
+				pluginVersionTextNode.setNodeValue(NEW_VERSION);
 			}
 
 			storeDocument(pomDocument, pomFile);
