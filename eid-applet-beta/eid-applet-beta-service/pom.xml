@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>be.fedict.eid-applet</groupId>
 		<artifactId>eid-applet-beta</artifactId>
-		<version>1.0.1.RC1</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet Beta Service</name>
 	<description>JBoss Service for eID Applet Beta Web Application</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-beta-service</artifactId>
-	<version>1.0.1.RC1</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>jboss-sar</packaging>
 	<build>
 		<plugins>
