@@ -1,5 +1,5 @@
-1.0.1.RC1 - 24 June 2010
-	* fix: UTF-U encoding for Mac OS X compilation
+1.0.1.RC1 - 25 June 2010
+	* fix: UTF-8 encoding for Mac OS X compilation
 	* fix: supporting IcedTea JRE under Fedora
 	* XML Signature support for RSA-SHA384 and RSA-SHA512
 	* IncludeCertificates during eID authentication

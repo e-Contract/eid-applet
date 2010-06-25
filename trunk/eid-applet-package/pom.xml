@@ -1,15 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.1.RC1</version>
 	</parent>
 	<name>FedICT eID Applet Package</name>
 	<description>Packaging of the eID applet.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-package</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1.RC1</version>
 	<packaging>jar</packaging>
 	<build>
 		<plugins>
@@ -36,9 +38,7 @@
 		<profile>
 			<id>token-soft</id>
 			<activation>
-				<file>
-					<missing>target/sign.p12</missing>
-				</file>
+				<activeByDefault>true</activeByDefault>
 			</activation>
 			<build>
 				<plugins>
@@ -65,38 +65,6 @@
 							<verbose>true</verbose>
 						</configuration>
 					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-jar-plugin</artifactId>
-						<executions>
-							<execution>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<archive>
-								<addMavenDescriptor>false</addMavenDescriptor>
-							</archive>
-							<type>PKCS12</type>
-							<keystore>target/sign.p12</keystore>
-							<alias>SIGN</alias>
-							<storepass>secret</storepass>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>token-soft-existing-key</id>
-			<activation>
-				<file>
-					<exists>target/sign.p12</exists>
-				</file>
-			</activation>
-			<build>
-				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-jar-plugin</artifactId>
@@ -167,7 +135,7 @@
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-core</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
+			<version>1.0.1.RC1</version>
 		</dependency>
 	</dependencies>
 </project>

@@ -1,17 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict.eid-applet</groupId>
 		<artifactId>eid-applet-test</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.1.RC1</version>
 	</parent>
 	<name>FedICT eID Applet Test EAR</name>
 	<description>JavaEE 5 EAR for Test eID Applet Web App.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-test-deploy</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1.RC1</version>
 	<packaging>ear</packaging>
 	<build>
 		<plugins>
@@ -44,19 +42,19 @@
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service-spi</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
+			<version>1.0.1.RC1</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-test-model</artifactId>
 			<type>ejb</type>
-			<version>1.0.1-SNAPSHOT</version>
+			<version>1.0.1.RC1</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-test-webapp</artifactId>
 			<type>war</type>
-			<version>1.0.1-SNAPSHOT</version>
+			<version>1.0.1.RC1</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
