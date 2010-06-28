@@ -42,6 +42,7 @@ import org.mortbay.jetty.testing.ServletTester;
 import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.EIdCertsData;
 import be.fedict.eid.applet.service.EIdData;
+import be.fedict.eid.applet.service.Gender;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.JSONServlet;
 
@@ -91,6 +92,7 @@ public class JSONServletTest {
 		eIdData.identity.dateOfBirth = new GregorianCalendar();
 		eIdData.identity.cardValidityDateBegin = new GregorianCalendar();
 		eIdData.identity.cardValidityDateEnd = new GregorianCalendar();
+		eIdData.identity.gender = Gender.FEMALE;
 		eIdData.address = new Address();
 		eIdData.address.streetAndNumber = "test-street-1234";
 
@@ -102,6 +104,9 @@ public class JSONServletTest {
 				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
 				.getPrivate(), false, 0, null, null);
 		eIdData.certs.authn = certificate;
+		eIdData.certs.sign = certificate;
+		eIdData.certs.ca = certificate;
+		eIdData.certs.root = certificate;
 
 		StringWriter stringWriter = new StringWriter();
 		PrintWriter printWriter = new PrintWriter(stringWriter);
