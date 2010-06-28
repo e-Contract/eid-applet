@@ -20,8 +20,10 @@ package be.fedict.eid.applet.service;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -32,6 +34,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMWriter;
 import org.json.simple.JSONObject;
 
 /**
@@ -66,6 +70,8 @@ public class JSONServlet extends HttpServlet {
 
 	public static void outputJSON(EIdData eIdData, PrintWriter writer)
 			throws IOException, CertificateEncodingException {
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+
 		JSONObject eidJSONObject = new JSONObject();
 
 		JSONObject identityJSONObject = new JSONObject();
@@ -75,8 +81,8 @@ public class JSONServlet extends HttpServlet {
 		identityJSONObject.put("name", identity.name);
 		identityJSONObject.put("firstName", identity.firstName);
 		identityJSONObject.put("middleName", identity.middleName);
-		identityJSONObject.put("dateOfBirth", identity.dateOfBirth.getTime()
-				.toString());
+		identityJSONObject.put("dateOfBirth", simpleDateFormat
+				.format(identity.dateOfBirth.getTime()));
 		identityJSONObject.put("placeOfBirth", identity.placeOfBirth);
 		identityJSONObject.put("gender", identity.gender.toString());
 
@@ -86,10 +92,10 @@ public class JSONServlet extends HttpServlet {
 		cardJSONObject.put("chipNumber", identity.chipNumber);
 		cardJSONObject.put("cardDeliveryMunicipality",
 				identity.cardDeliveryMunicipality);
-		cardJSONObject.put("cardValidityDateBegin",
-				identity.cardValidityDateBegin.getTime().toString());
-		cardJSONObject.put("cardValidityDateEnd", identity.cardValidityDateEnd
-				.getTime().toString());
+		cardJSONObject.put("cardValidityDateBegin", simpleDateFormat
+				.format(identity.cardValidityDateBegin.getTime()));
+		cardJSONObject.put("cardValidityDateEnd", simpleDateFormat
+				.format(identity.cardValidityDateEnd.getTime()));
 
 		Address address = eIdData.address;
 		if (null != address) {
@@ -104,25 +110,58 @@ public class JSONServlet extends HttpServlet {
 		if (null != certsData) {
 			JSONObject certsJSONObject = new JSONObject();
 			eidJSONObject.put("certs", certsJSONObject);
+
 			X509Certificate authnCertificate = certsData.authn;
-			JSONObject authnCertJSONObject = new JSONObject();
+			JSONObject authnCertJSONObject = createCertJSONObject(
+					authnCertificate, simpleDateFormat);
 			certsJSONObject.put("authn", authnCertJSONObject);
-			authnCertJSONObject.put("subject", authnCertificate
-					.getSubjectX500Principal().toString());
-			authnCertJSONObject.put("issuer", authnCertificate
-					.getIssuerX500Principal().toString());
-			authnCertJSONObject.put("serialNumber", authnCertificate
-					.getSerialNumber().toString());
-			authnCertJSONObject.put("notBefore", authnCertificate
-					.getNotBefore().toString());
-			authnCertJSONObject.put("notAfter", authnCertificate.getNotAfter()
-					.toString());
-			authnCertJSONObject.put("signatureAlgo", authnCertificate
-					.getSigAlgName());
-			authnCertJSONObject.put("thumbprint", DigestUtils
-					.shaHex(authnCertificate.getEncoded()));
+
+			X509Certificate signCertificate = certsData.sign;
+			JSONObject signCertJSONObject = createCertJSONObject(
+					signCertificate, simpleDateFormat);
+			certsJSONObject.put("sign", signCertJSONObject);
+
+			X509Certificate citizenCACertificate = certsData.ca;
+			JSONObject citizenCACertJSONObject = createCertJSONObject(
+					citizenCACertificate, simpleDateFormat);
+			certsJSONObject.put("citizenCA", citizenCACertJSONObject);
+
+			X509Certificate rootCACertificate = certsData.root;
+			JSONObject rootCACertJSONObject = createCertJSONObject(
+					rootCACertificate, simpleDateFormat);
+			certsJSONObject.put("rootCA", rootCACertJSONObject);
 		}
 
 		eidJSONObject.writeJSONString(writer);
+	}
+
+	private static JSONObject createCertJSONObject(X509Certificate certificate,
+			SimpleDateFormat simpleDateFormat)
+			throws CertificateEncodingException, IOException {
+		JSONObject certJSONObject = new JSONObject();
+		certJSONObject.put("subject", certificate.getSubjectX500Principal()
+				.toString());
+		certJSONObject.put("issuer", certificate.getIssuerX500Principal()
+				.toString());
+		certJSONObject.put("serialNumber", certificate.getSerialNumber()
+				.toString());
+		certJSONObject.put("notBefore", certificate.getNotBefore().toString());
+		certJSONObject.put("notAfter", certificate.getNotAfter().toString());
+		certJSONObject.put("signatureAlgo", certificate.getSigAlgName());
+		certJSONObject.put("thumbprint", DigestUtils.shaHex(certificate
+				.getEncoded()));
+		certJSONObject.put("details", certificate.toString());
+		certJSONObject.put("pem", toPem(certificate));
+
+		return certJSONObject;
+	}
+
+	private static String toPem(X509Certificate certificate) throws IOException {
+		StringWriter stringWriter = new StringWriter();
+		PEMWriter pemWriter = new PEMWriter(stringWriter,
+				BouncyCastleProvider.PROVIDER_NAME);
+		pemWriter.writeObject(certificate);
+		pemWriter.close();
+		return stringWriter.toString();
 	}
 }
