@@ -674,6 +674,12 @@ public class Applet extends JApplet {
 					String.class, Class.forName("[Ljava.lang.Object;") });
 			addDetailMessage("invoking Javascript message callback: "
 					+ this.diagnosticTestCallbackParam);
+			if (null == callMethod) {
+				throw new RuntimeException("no call method available");
+			}
+			if (null == jsObject) {
+				throw new RuntimeException("no jsObject available");
+			}
 			callMethod.invoke(jsObject, this.diagnosticTestCallbackParam,
 					new Object[] { diagnosticTest.name(),
 							diagnosticTest.getDescription(), success,

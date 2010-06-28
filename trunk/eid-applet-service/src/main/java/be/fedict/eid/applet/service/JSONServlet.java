@@ -78,7 +78,7 @@ public class JSONServlet extends HttpServlet {
 		identityJSONObject.put("dateOfBirth", identity.dateOfBirth.getTime()
 				.toString());
 		identityJSONObject.put("placeOfBirth", identity.placeOfBirth);
-		identityJSONObject.put("gender", identity.gender);
+		identityJSONObject.put("gender", identity.gender.toString());
 
 		JSONObject cardJSONObject = new JSONObject();
 		eidJSONObject.put("card", cardJSONObject);
