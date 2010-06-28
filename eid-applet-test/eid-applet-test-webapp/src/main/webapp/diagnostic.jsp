@@ -2,31 +2,29 @@
 	pageEncoding="UTF-8"%>
 <html>
 <head>
+<meta http-equiv="X-UA-Compatible" content="IE=IE7" />
 <title>eID Applet Diagnostic Mode Test</title>
 </head>
 <body>
 <h1>eID Applet Diagnostic Mode Test</h1>
 <p>This page will test the eID Applet in Diagnostic Mode.</p>
 
-<applet code="be.fedict.eid.applet.Applet.class" width="600"
-	height="300" archive="eid-applet.jar" mayscript="true">
-	<param name="TargetPage" value="javascript:diagnoseDone();" />
-	<param name="AppletService" value="applet-diagnostic-service" />
-	<param name="DiagnosticTestCallback" value="diagnosticTestCallback" />
-</applet>
-
+<script src="https://www.java.com/js/deployJava.js"></script>
 <script>
-	function diagnosticTestCallback(testId, testDescription, testResult, testResultDescription) {
-		document.getElementById('testResults').innerHTML += '<tr>' + 
-			'<td>' + testId + '</td>' + 
-			'<td>' + testDescription + '</td>' + 
-			'<td>' + testResult + '</td>' + 
-			'<td>' + testResultDescription + '</td>' +
-			'</tr>';
-	}
-	function diagnoseDone() {
-		document.getElementById('message').innerHTML = 'End of diagnose.';
-	}
+	var attributes = {
+		code :'be.fedict.eid.applet.Applet.class',
+		archive :'eid-applet.jar',
+		width :600,
+		height :300,
+		mayscript :'true'
+	};
+	var parameters = {
+		TargetPage :'javascript:diagnoseDone();',
+		AppletService :'applet-diagnostic-service',
+		DiagnosticTestCallback :'diagnosticTestCallback'
+	};
+	var version = '1.6';
+	deployJava.runApplet(attributes, parameters, version);
 </script>
 <table id="testResults">
 	<tr>
@@ -36,6 +34,22 @@
 		<th>Information</th>
 	</tr>
 </table>
+<div id="currentTestResult"></div>
 <pre id="message"></pre>
+<script>
+	function diagnosticTestCallback(testId, testDescription, testResult, testResultDescription) {
+		document.getElementById('currentTestResult').innerHTML = testId + ': ' + testDescription +
+			' = ' + testResult + ' (' + testResultDescription + ')'; 
+		document.getElementById('testResults').innerHTML += ('<tr>' + 
+			'<td>' + testId + '</td>' + 
+			'<td>' + testDescription + '</td>' + 
+			'<td>' + testResult + '</td>' + 
+			'<td>' + testResultDescription + '</td>' +
+			'</tr>');
+	}
+	function diagnoseDone() {
+		document.getElementById('message').innerHTML = 'End of diagnose.';
+	}
+</script>
 </body>
 </html>
