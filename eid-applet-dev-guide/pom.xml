@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict</groupId>
@@ -27,6 +29,28 @@
 						<configuration>
 							<protocolMessageCatalogClass>be.fedict.eid.applet.shared.AppletProtocolMessageCatalog</protocolMessageCatalogClass>
 							<docbookFile>protocol-messages.xml</docbookFile>
+							<graphFile>graph.png</graphFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-images</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/images</directory>
+								</resource>
+							</resources>
 						</configuration>
 					</execution>
 				</executions>
@@ -60,7 +84,7 @@
 					</formats>
 					<sourceDocumentName>eid-applet-dev-guide.xml</sourceDocumentName>
 					<imageResource>
-						<directory>${basedir}/src/main/images</directory>
+						<directory>${basedir}/target</directory>
 					</imageResource>
 					<options>
 						<xincludeSupported>true</xincludeSupported>
