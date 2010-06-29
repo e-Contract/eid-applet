@@ -18,13 +18,26 @@
 
 package be.fedict.eid.applet.maven;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import javax.imageio.ImageIO;
+
+import org.apache.commons.collections15.Transformer;
+import org.apache.commons.collections15.map.HashedMap;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -39,6 +52,15 @@ import be.fedict.eid.applet.shared.annotation.ResponsesAllowed;
 import be.fedict.eid.applet.shared.annotation.StartRequestMessage;
 import be.fedict.eid.applet.shared.annotation.StateTransition;
 import be.fedict.eid.applet.shared.annotation.StopResponseMessage;
+import be.fedict.eid.applet.shared.protocol.ProtocolState;
+import edu.uci.ics.jung.algorithms.layout.CircleLayout;
+import edu.uci.ics.jung.algorithms.layout.Layout;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.SparseMultigraph;
+import edu.uci.ics.jung.graph.util.EdgeType;
+import edu.uci.ics.jung.visualization.BasicVisualizationServer;
+import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
+import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 
 /**
  * eID Applet Docbook Plugin.
@@ -72,19 +94,40 @@ public class DocbookMojo extends AbstractMojo {
 	 */
 	private String docbookFile;
 
+	/**
+	 * Name of the generated graph PNG.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String graphFile;
+
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		getLog().info("executing...");
 		getLog().info(
 				"Protocol Message Catalog Class: "
 						+ this.protocolMessageCatalogClass);
+
 		File outputFile = new File(this.outputDirectory, this.docbookFile);
 		getLog().info("Output docbook file: " + outputFile.getAbsolutePath());
+
+		File graphFile = new File(this.outputDirectory, this.graphFile);
+		getLog().info("Output graph file: " + graphFile.getAbsolutePath());
+
 		this.outputDirectory.mkdirs();
 		try {
 			generateDocbook(outputFile);
 		} catch (Exception e) {
 			getLog().error("Error generating docbook: " + e.getMessage(), e);
 			throw new MojoExecutionException("Error generating docbook: "
+					+ e.getMessage(), e);
+		}
+
+		try {
+			generateGraph(graphFile);
+		} catch (IOException e) {
+			getLog().error("Error generating graph: " + e.getMessage(), e);
+			throw new MojoExecutionException("Error generating graph: "
 					+ e.getMessage(), e);
 		}
 	}
@@ -259,5 +302,114 @@ public class DocbookMojo extends AbstractMojo {
 		}
 
 		writer.println("</section>");
+	}
+
+	private void generateGraph(File graphFile) throws IOException {
+		BasicVisualizationServer<String, String> visualization = createGraph();
+		graphToFile(visualization, graphFile);
+	}
+
+	private void graphToFile(
+			BasicVisualizationServer<String, String> visualization, File file)
+			throws IOException {
+		Dimension size = visualization.getSize();
+		int width = (int) (size.getWidth() + 1);
+		int height = (int) (size.getHeight() + 1);
+		BufferedImage bufferedImage = new BufferedImage(width, height,
+				BufferedImage.TYPE_INT_ARGB);
+		Graphics2D graphics = bufferedImage.createGraphics();
+		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+		graphics.setColor(Color.WHITE);
+		graphics.fillRect(0, 0, 900, 650);
+		visualization.setBounds(0, 0, 900, 650);
+		visualization.paint(graphics);
+		graphics.dispose();
+		ImageIO.write(bufferedImage, "png", file);
+	}
+
+	private BasicVisualizationServer<String, String> createGraph() {
+		AppletProtocolMessageCatalog catalog = new AppletProtocolMessageCatalog();
+		List<Class<?>> catalogClasses = catalog.getCatalogClasses();
+
+		Map<ProtocolState, List<String>> allowedProtocolStates = new HashedMap<ProtocolState, List<String>>();
+		String startMessage = null;
+		List<String> stopMessages = new LinkedList<String>();
+
+		Graph<String, String> graph = new SparseMultigraph<String, String>();
+		for (Class<?> messageClass : catalogClasses) {
+			StartRequestMessage startRequestMessageAnnotation = messageClass
+					.getAnnotation(StartRequestMessage.class);
+			if (null != startRequestMessageAnnotation) {
+				if (null != startMessage) {
+					throw new RuntimeException(
+							"only one single entry point possible");
+				}
+				startMessage = messageClass.getSimpleName();
+			}
+			StopResponseMessage stopResponseMessageAnnotation = messageClass
+					.getAnnotation(StopResponseMessage.class);
+			if (null != stopResponseMessageAnnotation) {
+				stopMessages.add(messageClass.getSimpleName());
+			}
+			graph.addVertex(messageClass.getSimpleName());
+			ProtocolStateAllowed protocolStateAllowedAnnotation = messageClass
+					.getAnnotation(ProtocolStateAllowed.class);
+			if (null != protocolStateAllowedAnnotation) {
+				ProtocolState protocolState = protocolStateAllowedAnnotation
+						.value();
+				List<String> messages = allowedProtocolStates
+						.get(protocolState);
+				if (null == messages) {
+					messages = new LinkedList<String>();
+					allowedProtocolStates.put(protocolState, messages);
+				}
+				messages.add(messageClass.getSimpleName());
+			}
+		}
+
+		int edgeIdx = 0;
+		for (Class<?> messageClass : catalogClasses) {
+			ResponsesAllowed responsesAllowedAnnotation = messageClass
+					.getAnnotation(ResponsesAllowed.class);
+			if (null != responsesAllowedAnnotation) {
+				Class<?>[] responseClasses = responsesAllowedAnnotation.value();
+				for (Class<?> responseClass : responseClasses) {
+					graph.addEdge("edge-" + edgeIdx, messageClass
+							.getSimpleName(), responseClass.getSimpleName(),
+							EdgeType.DIRECTED);
+					edgeIdx++;
+				}
+			}
+			StateTransition stateTransitionAnnotation = messageClass
+					.getAnnotation(StateTransition.class);
+			if (null != stateTransitionAnnotation) {
+				ProtocolState protocolState = stateTransitionAnnotation.value();
+				List<String> messages = allowedProtocolStates
+						.get(protocolState);
+				for (String message : messages) {
+					graph.addEdge("edge-" + edgeIdx, messageClass
+							.getSimpleName(), message, EdgeType.DIRECTED);
+					edgeIdx++;
+				}
+			}
+		}
+
+		Layout<String, String> layout = new CircleLayout<String, String>(graph);
+		layout.setSize(new Dimension(900, 600));
+
+		BasicVisualizationServer<String, String> visualization = new BasicVisualizationServer<String, String>(
+				layout);
+		visualization.getRenderContext().setVertexLabelTransformer(
+				new ToStringLabeller<String>());
+		Transformer<String, Paint> myVertexTransformer = new MyVertexTransformer(
+				startMessage, stopMessages);
+		visualization.getRenderContext().setVertexFillPaintTransformer(
+				myVertexTransformer);
+		visualization.getRenderer().getVertexLabelRenderer().setPosition(
+				Position.AUTO);
+		visualization.setPreferredSize(new Dimension(900, 700));
+		visualization.setBackground(Color.WHITE);
+		return visualization;
 	}
 }

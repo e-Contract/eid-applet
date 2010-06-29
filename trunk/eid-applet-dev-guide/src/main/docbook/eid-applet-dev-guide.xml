@@ -1837,6 +1837,23 @@ ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlis
 			secure SSL connection.</para>
 		<xi:include href="../../../target/protocol-messages.xml"
 			xmlns:xi="http://www.w3.org/2001/XInclude" />
+		<para>
+			In
+			<xref linkend="eid-applet-protocol-graph" />
+			you find an automatically generated graph representation of the eID
+			Applet protocol.
+		</para>
+		<figure id="eid-applet-protocol-graph">
+			<title>eID Applet Protocol Graph</title>
+			<screenshot>
+				<mediaobject>
+					<imageobject>
+						<imagedata format="PNG" fileref="graph.png" scale="50"
+							align="center" />
+					</imageobject>
+				</mediaobject>
+			</screenshot>
+		</figure>
 	</section>
 	<appendix>
 		<title>eID Applet Developer's Guide License</title>
