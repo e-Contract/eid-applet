@@ -21,6 +21,10 @@ package be.fedict.eid.applet.service;
 import java.io.Serializable;
 import java.util.GregorianCalendar;
 
+import be.fedict.eid.applet.service.dto.GenderToFemaleValueConvertor;
+import be.fedict.eid.applet.service.dto.GenderToMaleValueConvertor;
+import be.fedict.eid.applet.service.dto.Mapping;
+import be.fedict.eid.applet.service.dto.MapsTo;
 import be.fedict.eid.applet.service.impl.tlv.ChipNumberDataConvertor;
 import be.fedict.eid.applet.service.impl.tlv.ConvertData;
 import be.fedict.eid.applet.service.impl.tlv.DateOfBirthDataConvertor;
@@ -29,6 +33,7 @@ import be.fedict.eid.applet.service.impl.tlv.GenderDataConvertor;
 import be.fedict.eid.applet.service.impl.tlv.SpecialStatusConvertor;
 import be.fedict.eid.applet.service.impl.tlv.TlvField;
 import be.fedict.eid.applet.service.impl.tlv.ValidityDateDataConvertor;
+import be.fedict.eid.applet.service.spi.IdentityDTO;
 
 /**
  * Holds all fields within the eID identity file. The annotations are used by
@@ -47,57 +52,72 @@ public class Identity implements Serializable {
 	 * We implement serializable to allow this class to be used in distributed
 	 * containers as defined in the Servlet v2.4 specification.
 	 */
-
 	private static final long serialVersionUID = 1L;
 
 	@TlvField(1)
+	@Mapping(@MapsTo(IdentityDTO.class))
 	public String cardNumber;
 
 	@TlvField(2)
 	@ConvertData(ChipNumberDataConvertor.class)
+	@Mapping(@MapsTo(IdentityDTO.class))
 	public String chipNumber;
 
 	@TlvField(3)
 	@ConvertData(ValidityDateDataConvertor.class)
+	@Mapping(@MapsTo(IdentityDTO.class))
 	public GregorianCalendar cardValidityDateBegin;
 
 	@TlvField(4)
 	@ConvertData(ValidityDateDataConvertor.class)
+	@Mapping(@MapsTo(IdentityDTO.class))
 	public GregorianCalendar cardValidityDateEnd;
 
 	@TlvField(5)
+	@Mapping(@MapsTo(IdentityDTO.class))
 	public String cardDeliveryMunicipality;
 
 	@TlvField(6)
+	@Mapping(@MapsTo(IdentityDTO.class))
 	public String nationalNumber;
 
 	@TlvField(7)
+	@Mapping(@MapsTo(IdentityDTO.class))
 	public String name;
 
 	@TlvField(8)
+	@Mapping(@MapsTo(IdentityDTO.class))
 	public String firstName;
 
 	@TlvField(9)
+	@Mapping(@MapsTo(IdentityDTO.class))
 	public String middleName;
 
 	@TlvField(10)
+	@Mapping(@MapsTo(IdentityDTO.class))
 	public String nationality;
 
 	@TlvField(11)
+	@Mapping(@MapsTo(IdentityDTO.class))
 	public String placeOfBirth;
 
 	@TlvField(12)
 	@ConvertData(DateOfBirthDataConvertor.class)
+	@Mapping(@MapsTo(IdentityDTO.class))
 	public GregorianCalendar dateOfBirth;
 
 	@TlvField(13)
 	@ConvertData(GenderDataConvertor.class)
+	@Mapping( {
+			@MapsTo(value = IdentityDTO.class, field = "male", convertor = GenderToMaleValueConvertor.class),
+			@MapsTo(value = IdentityDTO.class, field = "female", convertor = GenderToFemaleValueConvertor.class) })
 	public Gender gender;
 
 	/**
 	 * Optional Noble Condition.
 	 */
 	@TlvField(14)
+	@Mapping(@MapsTo(IdentityDTO.class))
 	public String nobleCondition;
 
 	@TlvField(15)
@@ -112,6 +132,7 @@ public class Identity implements Serializable {
 	public byte[] photoDigest;
 
 	@TlvField(18)
+	@Mapping(@MapsTo(IdentityDTO.class))
 	public String duplicate;
 
 	/*

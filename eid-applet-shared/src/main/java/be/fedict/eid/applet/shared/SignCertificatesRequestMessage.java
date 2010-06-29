@@ -36,7 +36,28 @@ public class SignCertificatesRequestMessage extends AbstractProtocolMessage {
 	public static final String TYPE = SignCertificatesRequestMessage.class
 			.getSimpleName();
 
+	@HttpHeader(HTTP_HEADER_PREFIX + "IncludeIdentity")
+	public boolean includeIdentity;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "IncludeAddress")
+	public boolean includeAddress;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "IncludePhoto")
+	public boolean includePhoto;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "IncludeIntegrityData")
+	public boolean includeIntegrityData;
+
 	public SignCertificatesRequestMessage() {
 		super();
+	}
+
+	public SignCertificatesRequestMessage(boolean includeIdentity,
+			boolean includeAddress, boolean includePhoto,
+			boolean includeIntegrityData) {
+		this.includeIdentity = includeIdentity;
+		this.includeAddress = includeAddress;
+		this.includePhoto = includePhoto;
+		this.includeIntegrityData = includeIntegrityData;
 	}
 }

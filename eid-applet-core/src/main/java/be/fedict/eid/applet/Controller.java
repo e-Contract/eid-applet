@@ -359,7 +359,8 @@ public class Controller {
 				resultMessage = performFilesDigestOperation(filesDigestRequestMessage.digestAlgo);
 			}
 			if (resultMessage instanceof SignCertificatesRequestMessage) {
-				SignCertificatesDataMessage signCertificatesDataMessage = performSignCertificatesOperation();
+				SignCertificatesRequestMessage signCertificatesRequestMessage = (SignCertificatesRequestMessage) resultMessage;
+				SignCertificatesDataMessage signCertificatesDataMessage = performSignCertificatesOperation(signCertificatesRequestMessage);
 				resultMessage = sendMessage(signCertificatesDataMessage);
 			}
 			if (resultMessage instanceof SignRequestMessage) {
@@ -615,11 +616,17 @@ public class Controller {
 		}
 	}
 
-	private SignCertificatesDataMessage performSignCertificatesOperation()
+	private SignCertificatesDataMessage performSignCertificatesOperation(
+			SignCertificatesRequestMessage signCertificatesRequestMessage)
 			throws Exception {
+		addDetailMessage("performing sign certificates retrieval operation...");
+		boolean includeIdentity = signCertificatesRequestMessage.includeIdentity;
+		boolean includeAddress = signCertificatesRequestMessage.includeAddress;
+		boolean includePhoto = signCertificatesRequestMessage.includePhoto;
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
-		if (null == this.pkcs11Eid) {
-			return performPcscSignCertificatesOperation();
+		if (null == this.pkcs11Eid || includeIdentity || includeAddress
+				|| includePhoto) {
+			return performPcscSignCertificatesOperation(signCertificatesRequestMessage);
 		}
 		try {
 			if (false == this.pkcs11Eid.isEidPresent()) {
@@ -630,7 +637,7 @@ public class Controller {
 			addDetailMessage("eID Middleware PKCS#11 library not found.");
 			if (null != this.pcscEidSpi) {
 				addDetailMessage("fallback to PC/SC signing...");
-				return performPcscSignCertificatesOperation();
+				return performPcscSignCertificatesOperation(signCertificatesRequestMessage);
 			}
 			throw new PKCS11NotFoundException();
 		}
@@ -645,14 +652,38 @@ public class Controller {
 		return signCertificatesDataMessage;
 	}
 
-	private SignCertificatesDataMessage performPcscSignCertificatesOperation()
+	private SignCertificatesDataMessage performPcscSignCertificatesOperation(
+			SignCertificatesRequestMessage signCertificatesRequestMessage)
 			throws Exception {
-		waitForEIdCard();
+		boolean includeIdentity = signCertificatesRequestMessage.includeIdentity;
+		boolean includeAddress = signCertificatesRequestMessage.includeAddress;
+		boolean includePhoto = signCertificatesRequestMessage.includePhoto;
+		boolean includeIntegrityData = signCertificatesRequestMessage.includeIntegrityData;
+
 		byte[] signCertFile;
 		byte[] citizenCaCertFile;
 		byte[] rootCaCertFile;
+		byte[] identityFile = null;
+		byte[] addressFile = null;
+		byte[] photoFile = null;
+		byte[] identitySignFile = null;
+		byte[] addressSignFile = null;
+		byte[] nrnCertFile = null;
+
+		waitForEIdCard();
 		try {
 			setStatusMessage(Status.NORMAL, MESSAGE_ID.READING_IDENTITY);
+
+			if (includeIdentity || includeAddress || includePhoto) {
+				boolean response = this.view.privacyQuestion(includeAddress,
+						includePhoto, null);
+				if (false == response) {
+					this.pcscEidSpi.close();
+					throw new SecurityException(
+							"user did not agree to release eID identity information");
+				}
+			}
+
 			signCertFile = this.pcscEidSpi.readFile(PcscEid.SIGN_CERT_FILE_ID);
 			addDetailMessage("size sign cert file: " + signCertFile.length);
 			citizenCaCertFile = this.pcscEidSpi
@@ -662,11 +693,44 @@ public class Controller {
 			rootCaCertFile = this.pcscEidSpi
 					.readFile(PcscEid.ROOT_CERT_FILE_ID);
 			addDetailMessage("size root CA cert file: " + rootCaCertFile.length);
+			if (includeIdentity || includeAddress || includePhoto) {
+				if (includeIdentity) {
+					addDetailMessage("reading identity file");
+					identityFile = this.pcscEidSpi
+							.readFile(PcscEid.IDENTITY_FILE_ID);
+					if (includeIntegrityData) {
+						addDetailMessage("reading identity sign file");
+						identitySignFile = this.pcscEidSpi
+								.readFile(PcscEid.IDENTITY_SIGN_FILE_ID);
+					}
+				}
+				if (includeAddress) {
+					addDetailMessage("reading address file");
+					addressFile = this.pcscEidSpi
+							.readFile(PcscEid.ADDRESS_FILE_ID);
+					if (includeIntegrityData) {
+						addDetailMessage("reading address sign file");
+						addressSignFile = this.pcscEidSpi
+								.readFile(PcscEid.ADDRESS_SIGN_FILE_ID);
+					}
+				}
+				if (includePhoto) {
+					addDetailMessage("reading photo file");
+					photoFile = this.pcscEidSpi.readFile(PcscEid.PHOTO_FILE_ID);
+				}
+				if (null != identitySignFile || null != addressSignFile) {
+					addDetailMessage("reading NRN certificate file");
+					nrnCertFile = this.pcscEidSpi
+							.readFile(PcscEid.RRN_CERT_FILE_ID);
+				}
+			}
 		} finally {
 			this.pcscEidSpi.close();
 		}
 		SignCertificatesDataMessage signCertificatesDataMessage = new SignCertificatesDataMessage(
-				signCertFile, citizenCaCertFile, rootCaCertFile);
+				signCertFile, citizenCaCertFile, rootCaCertFile, identityFile,
+				addressFile, photoFile, identitySignFile, addressSignFile,
+				nrnCertFile);
 		return signCertificatesDataMessage;
 	}
 
