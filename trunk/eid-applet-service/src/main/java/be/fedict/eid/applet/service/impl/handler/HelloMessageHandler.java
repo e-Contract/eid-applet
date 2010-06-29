@@ -209,7 +209,12 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 			}
 			if (true == this.includeCertificates) {
 				LOG.debug("include signing certificate chain during pre-sign");
-				SignCertificatesRequestMessage signCertificatesRequestMessage = new SignCertificatesRequestMessage();
+				IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
+						.locateService();
+				boolean includeIntegrityData = null != identityIntegrityService;
+				SignCertificatesRequestMessage signCertificatesRequestMessage = new SignCertificatesRequestMessage(
+						this.includeIdentity, this.includeAddress,
+						this.includePhoto, includeIntegrityData);
 				return signCertificatesRequestMessage;
 			}
 

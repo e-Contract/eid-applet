@@ -39,7 +39,7 @@ import be.fedict.eid.applet.shared.annotation.ResponsesAllowed;
 import be.fedict.eid.applet.shared.protocol.ProtocolState;
 
 /**
- * Identity Data Transfer Object.
+ * Signature Certificates/Identity Data Transfer Object.
  * 
  * @author Frank Cornelis
  * 
@@ -65,9 +65,27 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 	@NotNull
 	public Integer rootCertFileSize;
 
+	@HttpHeader(HTTP_HEADER_PREFIX + "IdentityFileSize")
+	public Integer identityFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "AddressFileSize")
+	public Integer addressFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "PhotoFileSize")
+	public Integer photoFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "IdentitySignatureFileSize")
+	public Integer identitySignatureFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "AddressSignatureFileSize")
+	public Integer addressSignatureFileSize;
+
+	@HttpHeader(HTTP_HEADER_PREFIX + "NationalRegistryCertFileSize")
+	public Integer rrnCertFileSize;
+
 	@HttpBody
 	@NotNull
-	@Description("The non-repudiation certificate chain.")
+	@Description("The non-repudiation certificate chain, optional identity files.")
 	public byte[] body;
 
 	/**
@@ -77,23 +95,75 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 		super();
 	}
 
+	/**
+	 * Main Constructor.
+	 * 
+	 * @param signCertFile
+	 * @param citizenCaCertFile
+	 * @param rootCaCertFile
+	 * @param identityFile
+	 *            optional
+	 * @param addressFile
+	 *            optional
+	 * @param photoFile
+	 *            optional
+	 * @param identitySignFile
+	 *            optional
+	 * @param addressSignFile
+	 *            optional
+	 * @param nrnCertFile
+	 *            optional
+	 * @throws IOException
+	 */
 	public SignCertificatesDataMessage(byte[] signCertFile,
-			byte[] citizenCaCertFile, byte[] rootCaCertFile) throws IOException {
+			byte[] citizenCaCertFile, byte[] rootCaCertFile,
+			byte[] identityFile, byte[] addressFile, byte[] photoFile,
+			byte[] identitySignFile, byte[] addressSignFile, byte[] nrnCertFile)
+			throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		baos.write(signCertFile);
-		baos.write(citizenCaCertFile);
-		baos.write(rootCaCertFile);
-		this.body = baos.toByteArray();
 
+		baos.write(signCertFile);
 		this.signCertFileSize = signCertFile.length;
+
+		baos.write(citizenCaCertFile);
 		this.caCertFileSize = citizenCaCertFile.length;
+
+		baos.write(rootCaCertFile);
 		this.rootCertFileSize = rootCaCertFile.length;
+
+		if (null != identityFile) {
+			baos.write(identityFile);
+			this.identityFileSize = identityFile.length;
+		}
+		if (null != addressFile) {
+			baos.write(addressFile);
+			this.addressFileSize = addressFile.length;
+		}
+		if (null != photoFile) {
+			baos.write(photoFile);
+			this.photoFileSize = photoFile.length;
+		}
+		if (null != identitySignFile) {
+			baos.write(identitySignFile);
+			this.identitySignatureFileSize = identitySignFile.length;
+		}
+		if (null != addressSignFile) {
+			baos.write(addressSignFile);
+			this.addressSignatureFileSize = addressSignFile.length;
+		}
+		if (null != nrnCertFile) {
+			baos.write(nrnCertFile);
+			this.rrnCertFileSize = nrnCertFile.length;
+		}
+
+		this.body = baos.toByteArray();
 	}
 
 	public SignCertificatesDataMessage(X509Certificate[] signCertChain)
 			throws IOException, CertificateEncodingException {
 		this(signCertChain[0].getEncoded(), signCertChain[1].getEncoded(),
-				signCertChain[2].getEncoded());
+				signCertChain[2].getEncoded(), null, null, null, null, null,
+				null);
 	}
 
 	private byte[] copy(byte[] source, int idx, int count) {
@@ -121,7 +191,47 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 		this.certificateChain.add(signCert);
 		this.certificateChain.add(citizenCaCert);
 		this.certificateChain.add(rootCaCert);
+
+		if (null != this.identityFileSize) {
+			this.identityData = copy(this.body, idx, this.identityFileSize);
+			idx += this.identityFileSize;
+		}
+		if (null != this.addressFileSize) {
+			this.addressData = copy(this.body, idx, this.addressFileSize);
+			idx += this.addressFileSize;
+		}
+		if (null != this.photoFileSize) {
+			this.photoData = copy(this.body, idx, this.photoFileSize);
+			idx += this.photoFileSize;
+		}
+		if (null != this.identitySignatureFileSize) {
+			this.identitySignatureData = copy(this.body, idx,
+					this.identitySignatureFileSize);
+			idx += this.identitySignatureFileSize;
+		}
+		if (null != this.addressSignatureFileSize) {
+			this.addressSignatureData = copy(this.body, idx,
+					this.addressSignatureFileSize);
+			idx += this.addressSignatureFileSize;
+		}
+		if (null != this.rrnCertFileSize) {
+			byte[] nrnCertData = copy(this.body, idx, this.rrnCertFileSize);
+			idx += this.rrnCertFileSize;
+			this.rrnCertificate = getCertificate(nrnCertData);
+		}
 	}
+
+	public byte[] identityData;
+
+	public byte[] addressData;
+
+	public byte[] photoData;
+
+	public byte[] identitySignatureData;
+
+	public byte[] addressSignatureData;
+
+	public X509Certificate rrnCertificate;
 
 	private X509Certificate getCertificate(byte[] certData) {
 		CertificateFactory certificateFactory;

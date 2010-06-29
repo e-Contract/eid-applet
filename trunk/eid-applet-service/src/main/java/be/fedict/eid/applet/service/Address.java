@@ -20,7 +20,11 @@ package be.fedict.eid.applet.service;
 
 import java.io.Serializable;
 
+import be.fedict.eid.applet.service.dto.Mapping;
+import be.fedict.eid.applet.service.dto.MapsTo;
 import be.fedict.eid.applet.service.impl.tlv.TlvField;
+import be.fedict.eid.applet.service.spi.AddressDTO;
+import be.fedict.eid.applet.service.spi.IdentityDTO;
 
 /**
  * Holds all the fields within the eID address file. The nationality can be
@@ -40,12 +44,15 @@ public class Address implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@TlvField(1)
+	@Mapping(@MapsTo(AddressDTO.class))
 	public String streetAndNumber;
 
 	@TlvField(2)
+	@Mapping(@MapsTo(AddressDTO.class))
 	public String zip;
 
 	@TlvField(3)
+	@Mapping(@MapsTo(value = AddressDTO.class, field = "city"))
 	public String municipality;
 
 	/*
