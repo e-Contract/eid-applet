@@ -20,6 +20,8 @@ package be.fedict.eid.applet.service.signer.cms;
 
 import java.security.Provider;
 
+import be.fedict.eid.applet.service.signer.SHA1WithRSAProxySignature;
+
 /**
  * Security Provider for proxy signature implementation.
  * 

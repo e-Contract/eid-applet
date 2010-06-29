@@ -35,6 +35,8 @@ import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 
+import be.fedict.eid.applet.service.signer.DummyPrivateKey;
+import be.fedict.eid.applet.service.signer.SHA1WithRSAProxySignature;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 import be.fedict.eid.applet.service.spi.SignatureService;
 
