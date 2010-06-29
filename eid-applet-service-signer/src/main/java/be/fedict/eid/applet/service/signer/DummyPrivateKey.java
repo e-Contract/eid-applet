@@ -16,7 +16,7 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.service.signer.cms;
+package be.fedict.eid.applet.service.signer;
 
 import java.security.PrivateKey;
 
