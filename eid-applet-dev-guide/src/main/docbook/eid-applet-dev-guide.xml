@@ -298,10 +298,24 @@
 							Via this parameter a web developer can configure a
 							Javascript
 							callback. This callback function will be invoked
-							everytime the eID
+							every time the
+							eID
 							Applet displays an info message. The function signature looks
 							like:
 							<code>function messageCallback(status, messageId, message)</code>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<code>DiagnosticTestCallback</code>
+						</entry>
+						<entry>optional</entry>
+						<entry>
+							Via this parameter a web developer can configure a
+							Javascript callback for eID Applets that run in diagnostic mode.
+							This callback function will be invoked every time the eID
+							Applet
+							performed an eID diagnostic test.
 						</entry>
 					</row>
 				</tbody>
@@ -385,13 +399,18 @@
 				Depending on the success of the eID Applet SDK, we
 				will also provide
 				backends for other web application
-				frameworks. We
+				frameworks.
+				Although we
 				already have
 				initial support for
 				the ASP.NET web
 				application
 				environment and for
-				the PHP environment.</para>
+				the PHP environment we strongly advise
+				to use the eID Identity Provider and eID Digital Signature Service
+				products to integrate eID within ASP.NET and PHP based web
+				applications.
+			</para>
 		</note>
 		<tip>
 			<title>eID Applet Service HTTP session</title>
@@ -412,7 +431,7 @@
 				to make it perform an eID identification. This is also known as data
 				capture. Via this eID operation your web application is capable of
 				reading out the identity data (i.e. name, first name, date of birth,
-				...) of the user his eID card.</para>
+				address, ...) of the user his eID card.</para>
 			<para>
 				The eID Applet Service Servlet can be configured via your
 				<code>web.xml</code>
@@ -426,21 +445,18 @@
 	<servlet-name>AppletServiceServlet</servlet-name>
 	<url-pattern>/applet-service</url-pattern>
 </servlet-mapping>]]></programlisting>
-			<note>
-				<title>eID Applet Service dependencies</title>
-				<para>
-					The eID Applet Service, which can be found in the
-					<code>eid-applet-service-x.x.x.jar
+			<para>
+				The eID Applet Service, which can be found in the
+				<code>eid-applet-service-x.x.x.jar
 					</code>
-					artifact, has some 3rd party dependencies. These artifacts are
-					located under the
-					<code>lib/</code>
-					directory inside the eID Applet SDK package. Depending on your Java
-					EE runtime environment you should place these JAR files under the
-					<code>META-INF/lib</code>
-					directory of your web application.
-				</para>
-			</note>
+				artifact, has some 3rd party dependencies. These artifacts are
+				located under the
+				<code>lib/</code>
+				directory inside the eID Applet SDK package. Depending on your Java
+				EE runtime environment you should place these JAR files under the
+				<code>META-INF/lib</code>
+				directory of your web application.
+			</para>
 			<tip>
 				<title>eID Applet Service availability</title>
 				<para>
@@ -465,6 +481,8 @@
 				</code>
 				. More information on the exposed attributes can be found in the
 				Javadoc API documentation of the eID Applet Service artifact.
+				The
+				Javadoc documentation is part of the eID Applet SDK package.
 			</para>
 			<tip>
 				<title>eID Session Attributes</title>
@@ -511,7 +529,10 @@
 					session attribute is of Java type
 					<code>be.fedict.eid.applet.service.Address
 					</code>
-					.
+					. The available fields and functions of the
+					<code>Address</code>
+					class are described within the Javadoc API documentation which is
+					part of the eID Applet SDK package.
 				</para>
 			</section>
 			<section>
@@ -536,7 +557,7 @@
 					session attribute within the servlet container session context. The
 					eID photo is of Java type
 					<code>byte[]</code>
-					and in JPEG image format.
+					and uses a JPEG image format.
 				</para>
 				<para>
 					We provide a
@@ -584,7 +605,8 @@
 					session attribute. The non-repudiation (i.e. signature) certificate
 					will be available as
 					<code>eid.certs.sign</code>
-					session attribute. The Citizen CA certificate will be available as
+					session attribute. The intermediate Citizen CA certificate will be
+					available as
 					<code>eid.certs.ca</code>
 					session attribute. The Root CA certificate will be available as
 					<code>eid.certs.root</code>
@@ -661,7 +683,8 @@
 	<servlet-name>JSONServlet</servlet-name>
 	<url-pattern>/identity.js</url-pattern>
 </servlet-mapping>]]></programlisting>
-				<para>The retrieved JSON data object has the following structure:
+				<para>The retrieved JSON data object has a structure similar to the
+					following example:
 				</para>
 				<programlisting><![CDATA[{
 	identity: {
@@ -706,6 +729,11 @@
 	<param-name>IdentityIntegrityService</param-name>
 	<param-value>your/location/in/jndi/IdentityIntegrityServiceBean</param-value>
 </init-param>]]></programlisting>
+				<para>
+					The Javadoc documentation of the
+					<code>IdentityIntegrityService</code>
+					SPI is part of the eID Applet SDK package.
+				</para>
 				<tip>
 					<title>Java EE Application Classpath</title>
 					<para>
@@ -728,9 +756,11 @@
 				<note>
 					<title>Java EE 6 Web Profile support</title>
 					<para>
-						To support the coming Java EE 6 Web Profile we already foresee the
-						usage of two types of service component lookups. The first one is
-						JNDI based. This type of service lookup allows you to utilize EJB3
+						To support the Java EE 6 Web Profile we have foreseen the
+						usage of
+						two types of service component lookups. The first one is
+						JNDI
+						based. This type of service lookup allows you to utilize EJB3
 						session beans as service provider interface implementation. The
 						second type is via simple Java class name references. This type of
 						service lookup is meant for lightweight servlet container
@@ -783,11 +813,14 @@
 				<title>Privacy Service</title>
 				<para>
 					The application can define an identity data usage description
-					by
+					at
+					runtime by
 					means of a privacy service component.
-					To enable this functionality
+					To enable this
+					functionality
 					as part of an eID identification
-					operation, you need to implement
+					operation, you need to
+					implement
 					the
 					<code>PrivacyService</code>
 					interface. This service provider interface (SPI) can be found in
@@ -806,6 +839,11 @@
 	<param-name>PrivacyService</param-name>
 	<param-value>your/location/in/jndi/PrivacyServiceBean</param-value>
 </init-param>]]></programlisting>
+				<para>
+					The Javadoc documentation of the
+					<code>PrivacyService</code>
+					SPI is part of the eID Applet SDK package.
+				</para>
 			</section>
 		</section>
 		<section>
@@ -846,6 +884,11 @@
 	<param-value>your/location/in/jndi/AuthenticationServiceBean</param-value>
 </init-param>]]></programlisting>
 			<para>
+				The Javadoc documentation of the
+				<code>AuthenticationService</code>
+				SPI is part of the eID Applet SDK package.
+			</para>
+			<para>
 				After a successful authentication the
 				<code>eid.identifier</code>
 				session attribute will contain a unique identifier (the national
@@ -853,10 +896,20 @@
 				<code>eid.identifier</code>
 				session attribute is of Java type
 				<code>java.lang.String</code>
-				. To respect the citizen's privacy, the national registration number
-				should not be abuse for linking identity data. Profiling based on
-				eID data linking is forbidden by law.
+				.
 			</para>
+			<warning>
+				<title>Usage of the national registration number</title>
+				<para>To respect the citizen's privacy, the national registration
+					number
+					should not be abuse for linking identity data. Profiling
+					based on
+					eID data linking is forbidden by law. Hence one cannot save
+					the national
+					registration number within a database as primary key
+					without proper
+					authorization.</para>
+			</warning>
 			<note>
 				<title>Mac OS X</title>
 				<para>Because not every version of Mac OS X supports the Java 6
@@ -875,7 +928,7 @@
 					<code>SunPKCS11</code>
 					security provider we need the Sun JRE as browser applet runtime for
 					eID authentication (and eID signature) via the eID Applet. These
-					days the OpenJDK JRE also comes with an (almost working)
+					days the OpenJDK JRE also comes with an
 					<code>SunPKCS11</code>
 					security provider.
 				</para>
@@ -1026,7 +1079,7 @@
 				<para>
 					The server certificate used to verify the secure channel
 					binding can
-					also be provided by implementing an SPI component.
+					also be provided at runtime by implementing an SPI component.
 					This
 					option can be
 					activated via the following
@@ -1039,6 +1092,11 @@
 	<param-name>ChannelBindingService</param-name>
 	<param-value>your/location/in/jndi/ChannelBindingServiceBean</param-value>
 </init-param>]]></programlisting>
+				<para>
+					The Javadoc documentation of the
+					<code>ChannelBindingService</code>
+					SPI is part of the eID Applet SDK package.
+				</para>
 				<para>
 					Besides server certificate channel binding the eID Applet also
 					supports unique channel binding using the TLS session identifier.
@@ -1107,6 +1165,9 @@
 	<param-name>IncludeIdentity</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
+				<para>As was the case for eID identification this will make the eID
+					identity available as attributes within the HTTP servlet session
+					context.</para>
 				<para>
 					Also include the eID address via the following
 					<code>init-param</code>
@@ -1129,8 +1190,13 @@
 	<param-name>IncludePhoto</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
-				<para>The identity integrity service can also be activated when
-					combining eID authentication with eID identification.</para>
+				<para>
+					The identity integrity service can also be activated when
+					combining
+					eID authentication with eID identification by configuring an
+					<code>IdentityIntegrityService</code>
+					SPI implementation.
+				</para>
 			</section>
 			<section>
 				<title>eID Certificates</title>
@@ -1156,7 +1222,8 @@
 					session attribute. The non-repudiation (i.e. signature) certificate
 					will be available as
 					<code>eid.certs.sign</code>
-					session attribute. The Citizen CA certificate will be available as
+					session attribute. The intermediate Citizen CA certificate will be
+					available as
 					<code>eid.certs.ca</code>
 					session attribute. The Root CA certificate will be available as
 					<code>eid.certs.root</code>
@@ -1215,6 +1282,30 @@
 	<param-name>SignatureService</param-name>
 	<param-value>your/location/in/jndi/SignatureServiceBean</param-value>
 </init-param>]]></programlisting>
+			<para>
+				The Javadoc documentation of the
+				<code>SignatureService</code>
+				SPI is part of the eID Applet SDK package.
+			</para>
+			<para>During pre-sign phase you can receive the non-repudiation
+				certificate chain via:</para>
+			<programlisting role="XML"><![CDATA[<init-param>
+	<param-name>IncludeCertificates</param-name>
+	<param-value>true</param-value>
+</init-param>]]></programlisting>
+			<para>
+				You can even receive the signing identity by means of the
+				<code>IncludeIdentity</code>
+				,
+				<code>IncludeAddress</code>
+				and
+				<code>IncludePhoto</code>
+				init-params. Doing so you need to implement the
+				<code>SignatureServiceEx</code>
+				SPI instead of the
+				<code>SignatureService</code>
+				SPI.
+			</para>
 			<para>The eID Applet Service can be configured to perform two
 				basic
 				types of digital signatures:</para>
@@ -1270,6 +1361,9 @@
 				<listitem>
 					<para>Office OpenXML (supported by Microsoft Office 2007)</para>
 				</listitem>
+				<listitem>
+					<para>CMS signatures (PKCS#7)</para>
+				</listitem>
 			</itemizedlist>
 			<note>
 				<title>PKI Validation</title>
@@ -1288,6 +1382,9 @@
 					<ulink url="http://code.google.com/p/jtrust/">jTrust Google Code</ulink>
 					site.
 				</para>
+				<para>Besides the jTrust Java library we also offer an eID Trust
+					Service SOA product to perform eID PKI validations via an XKMS2
+					based web service.</para>
 			</note>
 		</section>
 		<section>
@@ -1456,6 +1553,19 @@
 					Javascripts inside the browser window.
 				</para>
 			</tip>
+			<warning>
+				<title>Internet Explorer 8</title>
+				<para>
+					Because Microsoft changed the behaviour of Javascript within
+					Internet Explorer 8 you have to pay special attention when
+					implementing your Javascript callbacks. For example, the
+					<code>innerHTML</code>
+					attribute of an HTML
+					<code>table</code>
+					has been made read only causing the above example to fail on
+					Internet Explorer 8.
+				</para>
+			</warning>
 		</section>
 		<section>
 			<title>Generic eID Applet Service settings</title>
@@ -1501,6 +1611,11 @@
 	<param-name>SecureClientEnvironmentService</param-name>
 	<param-value>your/location/in/jndi/SecureClientEnvironmentServiceBean</param-value>
 </init-param>]]></programlisting>
+				<para>
+					The Javadoc documentation of the
+					<code>SecureClientEnvironmentService</code>
+					SPI is part of the eID Applet SDK package.
+				</para>
 				<para>Additional client environment information can be
 					pushed to the
 					eID Applet Service by adding the following eID Applet
@@ -1599,6 +1714,11 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 	<param-name>AuditService</param-name>
 	<param-value>your/location/in/jndi/AuditServiceBean</param-value>
 </init-param>]]></programlisting>
+				<para>
+					The Javadoc documentation of the
+					<code>AuditService</code>
+					SPI is part of the eID Applet SDK package.
+				</para>
 			</section>
 			<section>
 				<title>Alternative UI</title>
@@ -1835,13 +1955,16 @@ ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlis
 			POST method. Parameters are passed as HTTP headers and for binary
 			data the HTTP body is used. The messages should be transported over a
 			secure SSL connection.</para>
-		<xi:include href="../../../target/protocol-messages.xml"
-			xmlns:xi="http://www.w3.org/2001/XInclude" />
 		<para>
 			In
 			<xref linkend="eid-applet-protocol-graph" />
 			you find an automatically generated graph representation of the eID
-			Applet protocol.
+			Applet protocol. A protocol run starts with the
+			<code>HelloMessage</code>
+			message sent by the eID Applet to the eID Applet Service, which has
+			been marked by the green vertex. Depending on the eID Applet Service
+			configuration different paths will be followed ending in some red
+			vertex.
 		</para>
 		<figure id="eid-applet-protocol-graph">
 			<title>eID Applet Protocol Graph</title>
@@ -1854,6 +1977,20 @@ ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlis
 				</mediaobject>
 			</screenshot>
 		</figure>
+		<warning>
+			<title>eID Applet Service implementations</title>
+			<para>Instead of implementing your own eID Applet Service for ASP.NET
+				or PHP it might be easier to integrate the eID within your web
+				applications by using FedICT products like the eID Identity Provider
+				and the eID Digital Signature Service. As these products implement
+				services based on open standards like OpenID you already have
+				various implementations available for integrating via these open
+				protocols. Once the eID IdP product has been finalized we will most
+				likely drop the existing proof-of-concept code for ASP.NET and PHP.
+			</para>
+		</warning>
+		<xi:include href="../../../target/protocol-messages.xml"
+			xmlns:xi="http://www.w3.org/2001/XInclude" />
 	</section>
 	<appendix>
 		<title>eID Applet Developer's Guide License</title>
