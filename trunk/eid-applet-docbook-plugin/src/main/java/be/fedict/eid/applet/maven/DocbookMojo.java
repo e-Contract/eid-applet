@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2008-2010 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -304,12 +304,12 @@ public class DocbookMojo extends AbstractMojo {
 		writer.println("</section>");
 	}
 
-	private void generateGraph(File graphFile) throws IOException {
+	public static void generateGraph(File graphFile) throws IOException {
 		BasicVisualizationServer<String, String> visualization = createGraph();
 		graphToFile(visualization, graphFile);
 	}
 
-	private void graphToFile(
+	private static void graphToFile(
 			BasicVisualizationServer<String, String> visualization, File file)
 			throws IOException {
 		Dimension size = visualization.getSize();
@@ -328,7 +328,7 @@ public class DocbookMojo extends AbstractMojo {
 		ImageIO.write(bufferedImage, "png", file);
 	}
 
-	private BasicVisualizationServer<String, String> createGraph() {
+	private static BasicVisualizationServer<String, String> createGraph() {
 		AppletProtocolMessageCatalog catalog = new AppletProtocolMessageCatalog();
 		List<Class<?>> catalogClasses = catalog.getCatalogClasses();
 
@@ -375,9 +375,9 @@ public class DocbookMojo extends AbstractMojo {
 			if (null != responsesAllowedAnnotation) {
 				Class<?>[] responseClasses = responsesAllowedAnnotation.value();
 				for (Class<?> responseClass : responseClasses) {
-					graph.addEdge("edge-" + edgeIdx, messageClass
-							.getSimpleName(), responseClass.getSimpleName(),
-							EdgeType.DIRECTED);
+					String edgeName = "edge-" + edgeIdx;
+					graph.addEdge(edgeName, messageClass.getSimpleName(),
+							responseClass.getSimpleName(), EdgeType.DIRECTED);
 					edgeIdx++;
 				}
 			}
@@ -406,9 +406,12 @@ public class DocbookMojo extends AbstractMojo {
 				startMessage, stopMessages);
 		visualization.getRenderContext().setVertexFillPaintTransformer(
 				myVertexTransformer);
+		Transformer<String, Paint> myEdgeTransformer = new MyEdgeTransformer();
+		visualization.getRenderContext().setEdgeDrawPaintTransformer(
+				myEdgeTransformer);
 		visualization.getRenderer().getVertexLabelRenderer().setPosition(
 				Position.AUTO);
-		visualization.setPreferredSize(new Dimension(900, 700));
+		visualization.setPreferredSize(new Dimension(900, 650));
 		visualization.setBackground(Color.WHITE);
 		return visualization;
 	}
