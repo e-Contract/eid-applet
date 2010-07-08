@@ -5,7 +5,8 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:a4j="http://richfaces.org/a4j"
-	xmlns:s="http://jboss.com/products/seam/taglib">
+	xmlns:s="http://jboss.com/products/seam/taglib"
+        lang="en" xml:lang="en">
 <body>
 <ui:composition template="/WEB-INF/template.xhtml">
 	<ui:param name="activeMenu" value="test" />
@@ -13,9 +14,9 @@
 		<h2>eID Applet Signature Test</h2>
 		<p>Via this page you can test the eID Applet Signature
 		functionality. This test will demo the creation and verification of
-		ODF signatures. ODF signatures are also supported by <a
-			href="http://www.openoffice.org/" target="_blank">OpenOffice.org</a>
-		version 3.1.</p>
+		ODF document signatures.<br/>
+                ODF documents signatures are part of the <a href="http://docs.oasis-open.org/office/v1.2/part1/cd04/OpenDocument-v1.2-part1-cd04.html#a_3_16_Document_and_Macro_Signatures" target="_blank">upcoming ODF 1.2 specification</a>,
+                and are also supported by <a href="http://www.openoffice.org/" target="_blank">OpenOffice.org</a> (please use OOo v3.2 or higher).</p>
 		<h:form enctype="multipart/form-data">
 			<h:panelGrid columns="2">
 				<s:fileUpload data="#{odfUploader.uploadedFile}"
