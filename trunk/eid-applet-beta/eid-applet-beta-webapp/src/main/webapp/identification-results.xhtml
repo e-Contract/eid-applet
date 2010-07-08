@@ -3,7 +3,8 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:rich="http://richfaces.org/rich">
+	xmlns:rich="http://richfaces.org/rich"
+        lang="en" xml:lang="en">
 <body>
 <ui:composition template="/WEB-INF/template.xhtml">
 	<ui:param name="activeMenu" value="test" />
@@ -13,19 +14,27 @@
 		<rich:tabPanel switchType="client">
 			<rich:tab label="Identity">
 				<h:panelGrid columns="2">
-					<img src="photo" />
+                                    <h:graphicImage alt="photo from eID card" url="photo"/>
 					<h:panelGroup>
 						<h:panelGrid columns="2">
-							<h:outputText value="National Number" />
+                                                        <f:facet name="header">
+                                                            <h:outputText value="National Number" />
+                                                        </f:facet>
 							<h:outputText value="#{eid.identity.nationalNumber}" />
 
-							<h:outputText value="Name" />
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Name" />
+                                                        </f:facet>
 							<h:outputText value="#{eid.identity.name}" />
 
-							<h:outputText value="First Name" />
+                                                        <f:facet name="header">
+                                                            <h:outputText value="First Name" />
+                                                        </f:facet>
 							<h:outputText value="#{eid.identity.firstName}" />
 
-							<h:outputText value="Middle Name" />
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Middle Name" />
+                                                        </f:facet>
 							<h:outputText value="#{eid.identity.middleName}" />
 
 							<h:outputText value="Nationality" />

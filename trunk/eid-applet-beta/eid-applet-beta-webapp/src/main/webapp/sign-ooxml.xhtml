@@ -1,7 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:h="http://java.sun.com/jsf/html">
+	xmlns:h="http://java.sun.com/jsf/html"
+        lang="en" xml:lang="en">
 <body>
 <ui:composition template="/WEB-INF/template.xhtml">
 	<ui:param name="activeMenu" value="test" />
@@ -10,8 +11,8 @@
 		<p>Via this page you can test the eID Applet Signature
 		functionality. You will be signing the uploaded OOXML document.</p>
 		<!-- https://www.java.com/js/deployJava.js -->
-		<script src="deployJava.js"></script>
-		<script>
+		<script type="text/javascript" src="deployJava.js"></script>
+                <script type="text/javascript">
 	var attributes = {
 		code :'be.fedict.eid.applet.Applet.class',
 		archive :'eid-applet.jar',
