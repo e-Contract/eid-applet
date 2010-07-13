@@ -98,11 +98,15 @@ public class Applet extends JApplet {
 			SwingUtilities.invokeAndWait(new Runnable() {
 				public void run() {
 					Applet.this.statusLabel.setText(statusMessage);
+                                        /* this helps screen readers, simply using setText() does not seem to work,
+                                           at least not with Win2003 + JAB 2 + JSE6u20 + JAWS 10 */
+                                        Applet.this.statusLabel.getAccessibleContext().setAccessibleName(statusMessage);
+
 					if (Status.ERROR == status) {
 						Applet.this.statusLabel.setForeground(Color.RED);
 						Applet.this.progressBar.setIndeterminate(false);
 					}
-					Applet.this.statusLabel.invalidate();
+                                        Applet.this.statusLabel.invalidate();
 					Applet.this.detailMessages.append(statusMessage + "\n");
 					Applet.this.detailMessages
 							.setCaretPosition(Applet.this.detailMessages
@@ -318,6 +322,8 @@ public class Applet extends JApplet {
 			final CardLayout cardLayout) {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JButton detailButton = new JButton("Details >>");
+                detailButton.getAccessibleContext().setAccessibleName("Details");
+
 		detailButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
 				cardLayout.next(container);
@@ -360,8 +366,11 @@ public class Applet extends JApplet {
 	private void initStatusPanel(Container container) {
 		JPanel statusPanel = new JPanel();
 		statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.LINE_AXIS));
-		this.statusLabel = new JLabel(this.messages
-				.getMessage(MESSAGE_ID.LOADING));
+
+                String msg = this.messages.getMessage(MESSAGE_ID.LOADING);
+		this.statusLabel = new JLabel(msg);
+                this.statusLabel.getAccessibleContext().setAccessibleDescription(msg);
+
 		Font font = this.statusLabel.getFont();
 		font = font.deriveFont((float) font.getSize() * 2);
 		font = font.deriveFont(Font.BOLD);
