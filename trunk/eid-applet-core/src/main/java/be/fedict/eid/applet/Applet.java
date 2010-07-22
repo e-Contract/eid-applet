@@ -321,8 +321,9 @@ public class Applet extends JApplet {
 	private void initDetailButton(final Container container,
 			final CardLayout cardLayout) {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		JButton detailButton = new JButton("Details >>");
-                detailButton.getAccessibleContext().setAccessibleName("Details");
+                String msg = "Details";
+		JButton detailButton = new JButton(msg + " >>");
+                detailButton.getAccessibleContext().setAccessibleName(msg);
 
 		detailButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
@@ -369,7 +370,8 @@ public class Applet extends JApplet {
 
                 String msg = this.messages.getMessage(MESSAGE_ID.LOADING);
 		this.statusLabel = new JLabel(msg);
-                this.statusLabel.getAccessibleContext().setAccessibleDescription(msg);
+               // might be redundant
+                this.statusLabel.getAccessibleContext().setAccessibleName(msg);
 
 		Font font = this.statusLabel.getFont();
 		font = font.deriveFont((float) font.getSize() * 2);
