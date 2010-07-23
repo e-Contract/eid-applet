@@ -60,10 +60,10 @@ import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
+import be.fedict.eid.applet.sc.Constants;
 import be.fedict.eid.applet.sc.DiagnosticCallbackHandler;
 import be.fedict.eid.applet.sc.PcscEid;
 import be.fedict.eid.applet.sc.PcscEidSpi;
-import be.fedict.eid.applet.sc.Pkcs11Eid;
 import be.fedict.eid.applet.sc.Task;
 import be.fedict.eid.applet.sc.TaskRunner;
 import be.fedict.eid.applet.service.Identity;
@@ -162,7 +162,8 @@ public class PcscTest {
 		byte[] signatureValue;
 		List<X509Certificate> authnCertChain;
 		try {
-			pcscEid.logoff();
+			//pcscEid.logoff();
+			//pcscEid.selectBelpicJavaCardApplet();
 			signatureValue = pcscEid.signAuthn(challenge);
 			authnCertChain = pcscEid.getAuthnCertificateChain();
 			// pcscEid.logoff();
@@ -227,7 +228,7 @@ public class PcscTest {
 			byte[] digestValue = messageDigest.digest(message);
 
 			ByteArrayOutputStream digestInfo = new ByteArrayOutputStream();
-			digestInfo.write(Pkcs11Eid.SHA1_DIGEST_INFO_PREFIX);
+			digestInfo.write(Constants.SHA1_DIGEST_INFO_PREFIX);
 			digestInfo.write(digestValue);
 			CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00,
 					0x2A, 0x9E, 0x9A, digestInfo.toByteArray());
@@ -319,6 +320,7 @@ public class PcscTest {
 		}
 
 		long t0 = System.currentTimeMillis();
+		//pcscEidSpi.selectBelpicJavaCardApplet();
 		byte[] photo = pcscEidSpi.readFile(PcscEid.PHOTO_FILE_ID);
 		long t1 = System.currentTimeMillis();
 		LOG.debug("image size: " + photo.length);
@@ -341,6 +343,7 @@ public class PcscTest {
 
 		pcscEidSpi.readFile(PcscEid.IDENTITY_FILE_ID);
 		pcscEidSpi.readFile(PcscEid.ADDRESS_FILE_ID);
+		pcscEidSpi.selectBelpicJavaCardApplet();
 
 		pcscEidSpi.close();
 	}

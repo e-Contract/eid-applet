@@ -633,7 +633,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		this.view.addDetailMessage("computing digital signature...");
 		responseApdu = cardChannel.transmit(computeDigitalSignatureApdu);
 		if (0x9000 != responseApdu.getSW()) {
-			throw new RuntimeException("compute digital signature error");
+			throw new RuntimeException("compute digital signature error: "
+					+ Integer.toHexString(responseApdu.getSW()));
 		}
 
 		byte[] signatureValue = responseApdu.getData();
