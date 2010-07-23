@@ -167,5 +167,10 @@
 			<artifactId>jung-visualization</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>jgroups</groupId>
+			<artifactId>jgroups</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>

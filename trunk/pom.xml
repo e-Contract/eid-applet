@@ -442,6 +442,47 @@
 				<artifactId>jung-visualization</artifactId>
 				<version>2.0.1</version>
 			</dependency>
+			<dependency>
+				<groupId>jgroups</groupId>
+				<artifactId>jgroups</artifactId>
+				<version>2.9.0.GA</version>
+				<!-- <version>2.6.14.GA</version> -->
+			</dependency>
+			<dependency>
+				<groupId>org.hornetq</groupId>
+				<artifactId>hornetq-bootstrap</artifactId>
+				<version>${hornetq.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hornetq</groupId>
+				<artifactId>hornetq-jms</artifactId>
+				<version>${hornetq.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hornetq</groupId>
+				<artifactId>hornetq-jboss-as-integration</artifactId>
+				<version>${hornetq.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hornetq</groupId>
+				<artifactId>hornetq-core</artifactId>
+				<version>${hornetq.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hornetq</groupId>
+				<artifactId>hornetq-logging</artifactId>
+				<version>${hornetq.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hornetq</groupId>
+				<artifactId>hornetq-ra</artifactId>
+				<version>${hornetq.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.netty</groupId>
+				<artifactId>netty</artifactId>
+				<version>3.2.0.Final</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<build>
@@ -707,6 +748,17 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>jboss-brew</id>
+			<name>JBoss Maven2 Brew repository</name>
+			<url>http://repository.jboss.com/maven2-brew/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
 	</repositories>
 	<distributionManagement>
 		<repository>
@@ -719,5 +771,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jboss-seam.version>2.2.1-SNAPSHOT</jboss-seam.version>
 		<jaxws.version>2.2.1</jaxws.version>
+		<hornetq.version>2.1.1.Final</hornetq.version>
 	</properties>
 </project>
