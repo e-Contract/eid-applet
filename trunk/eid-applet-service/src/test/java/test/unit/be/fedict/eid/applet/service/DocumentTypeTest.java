@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2010 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -16,34 +16,30 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.service.impl.tlv;
+package test.unit.be.fedict.eid.applet.service;
+
+import static org.junit.Assert.assertEquals;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 import be.fedict.eid.applet.service.DocumentType;
 
-/**
- * Data Convertor for eID document type.
- * 
- * @author Frank Cornelis
- * 
- */
-public class DocumentTypeConvertor implements DataConvertor<DocumentType> {
+public class DocumentTypeTest {
 
-	private static final Log LOG = LogFactory
-			.getLog(DocumentTypeConvertor.class);
+	private static final Log LOG = LogFactory.getLog(DocumentTypeTest.class);
 
-	public DocumentType convert(byte[] value) throws DataConvertorException {
-		LOG.debug("# bytes for document type field: " + value.length);
-		/*
-		 * More recent eID cards use 2 bytes per default for the document type
-		 * field.
-		 */
-		DocumentType documentType = DocumentType.toDocumentType(value);
-		if (null == documentType) {
-			LOG.debug("unknown document type: " + DocumentType.toString(value));
+	@Test
+	public void testkeys() throws Exception {
+		for (DocumentType documentType : DocumentType.values()) {
+			LOG.debug("document type: " + documentType + ", key: "
+					+ documentType.getKey());
 		}
-		return documentType;
+		assertEquals(1, DocumentType.BELGIAN_CITIZEN.getKey());
+		assertEquals(6, DocumentType.KIDS_CARD.getKey());
+		assertEquals(16, DocumentType.FOREIGNER_E_PLUS.getKey());
+		assertEquals("1", DocumentType.toString(new byte[] { '1' }));
+		assertEquals("16", DocumentType.toString(new byte[] { '1', '6' }));
 	}
 }
