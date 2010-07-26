@@ -165,7 +165,7 @@ public class AbstractODFSignatureServiceTest {
 		sign("/hello-world.odt", 1);
 	}
 
-	//@Test
+	@Test
 	public void testMathMLWithDTDReference() throws Exception {
 		sign("/mathml-dtd.odt", 1);
 	}
