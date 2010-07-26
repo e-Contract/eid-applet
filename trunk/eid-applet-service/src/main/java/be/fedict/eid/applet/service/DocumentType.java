@@ -31,9 +31,49 @@ import java.util.Map;
 public enum DocumentType implements Serializable {
 
 	BELGIAN_CITIZEN("1"), KIDS_CARD("6"), BOOTSTRAP_CARD("7"), HABILITATION_CARD(
-			"8"), FOREIGNER_A("11"), FOREIGNER_B("12"), FOREIGNER_C("13"), FOREIGNER_D(
-			"14"), FOREIGNER_E("15"), FOREIGNER_E_PLUS("16"), FOREIGNER_F("17"), FOREIGNER_F_PLUS(
-			"18");
+			"8"),
+
+	/**
+	 * Bewijs van inschrijving in het vreemdelingenregister – Tijdelijk verblijf
+	 */
+	FOREIGNER_A("11"),
+
+	/**
+	 * Bewijs van inschrijving in het vreemdelingenregister
+	 */
+	FOREIGNER_B("12"),
+
+	/**
+	 * Identiteitskaart voor vreemdeling
+	 */
+	FOREIGNER_C("13"),
+
+	/**
+	 * EG-Langdurig ingezetene
+	 */
+	FOREIGNER_D("14"),
+
+	/**
+	 * (Verblijfs)kaart van een onderdaan van een lidstaat der EEG Verklaring
+	 * van inschrijving
+	 */
+	FOREIGNER_E("15"),
+
+	/**
+	 * Document ter staving van duurzaam verblijf van een EU onderdaan
+	 */
+	FOREIGNER_E_PLUS("16"),
+
+	/**
+	 * Kaart voor niet-EU familieleden van een EU-onderdaan of van een Belg
+	 * Verblijfskaart van een familielid van een burger van de Unie
+	 */
+	FOREIGNER_F("17"),
+
+	/**
+	 * Duurzame verblijfskaart van een familielid van een burger van de Unie
+	 */
+	FOREIGNER_F_PLUS("18");
 
 	private final int key;
 
