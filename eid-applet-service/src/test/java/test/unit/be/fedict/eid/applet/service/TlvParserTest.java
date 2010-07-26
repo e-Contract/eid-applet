@@ -28,12 +28,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.GregorianCalendar;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
 import be.fedict.eid.applet.service.Address;
+import be.fedict.eid.applet.service.DocumentType;
 import be.fedict.eid.applet.service.Gender;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.SpecialStatus;
@@ -285,4 +287,60 @@ public class TlvParserTest {
 		assertEquals("71715100070", identity.nationalNumber);
 		LOG.debug("special status: " + identity.specialStatus);
 	}
+
+	@Test
+	public void testForeignerIdentityFile() throws Exception {
+		// setup
+		InputStream inputStream = TlvParserTest.class
+				.getResourceAsStream("/id-foreigner.tlv");
+		byte[] identityData = IOUtils.toByteArray(inputStream);
+
+		// operate
+		Identity identity = TlvParser.parse(identityData, Identity.class);
+
+		// verify
+		LOG.debug("document type: " + identity.getDocumentType());
+		assertEquals(DocumentType.FOREIGNER_E_PLUS, identity.getDocumentType());
+	}
+
+	@Test
+	public void testParseOldIdentityFile() throws Exception {
+		// setup
+		InputStream inputStream = TlvParserTest.class
+				.getResourceAsStream("/old-eid.txt");
+		byte[] base64IdentityData = IOUtils.toByteArray(inputStream);
+		byte[] identityData = Base64.decodeBase64(base64IdentityData);
+
+		// operate
+		Identity identity = TlvParser.parse(identityData, Identity.class);
+
+		// verify
+		LOG.debug("name: " + identity.getName());
+		LOG.debug("first name: " + identity.getFirstName());
+		LOG.debug("document type: " + identity.getDocumentType());
+		LOG.debug("card validity date begin: "
+				+ identity.getCardValidityDateBegin().getTime());
+		assertEquals(DocumentType.BELGIAN_CITIZEN, identity.getDocumentType());
+	}
+
+	@Test
+	public void testParseNewIdentityFile() throws Exception {
+		// setup
+		InputStream inputStream = TlvParserTest.class
+				.getResourceAsStream("/new-eid.txt");
+		byte[] base64IdentityData = IOUtils.toByteArray(inputStream);
+		byte[] identityData = Base64.decodeBase64(base64IdentityData);
+
+		// operate
+		Identity identity = TlvParser.parse(identityData, Identity.class);
+
+		// verify
+		LOG.debug("name: " + identity.getName());
+		LOG.debug("first name: " + identity.getFirstName());
+		LOG.debug("card validity date begin: "
+				+ identity.getCardValidityDateBegin().getTime());
+		LOG.debug("document type: " + identity.getDocumentType());
+		assertEquals(DocumentType.BELGIAN_CITIZEN, identity.getDocumentType());
+	}
+
 }
