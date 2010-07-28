@@ -14,6 +14,8 @@
 		<script type="text/javascript" src="deployJava.js"></script>
                 <script type="text/javascript">
 	var attributes = {
+                name : 'beidapplet',
+                alt : 'eID applet',
 		code :'be.fedict.eid.applet.Applet.class',
 		archive :'eid-applet.jar',
 		width :600,
@@ -30,6 +32,7 @@
 	var version = '1.5';
 	deployJava.runApplet(attributes, parameters, version);
 </script>
+                <noscript>Error: your browser does not support Javascript, or Javascript has been disabled.</noscript>
 	</ui:define>
 </ui:composition>
 </body>
