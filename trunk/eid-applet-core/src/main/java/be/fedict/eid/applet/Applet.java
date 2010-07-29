@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2008-2010 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -24,7 +24,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -45,7 +44,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JApplet;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -69,7 +67,7 @@ public class Applet extends JApplet {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String TARGET_PAGE_PARAM = "TargetPage";
+ 	public static final String TARGET_PAGE_PARAM = "TargetPage";
 
 	public static final String BACKGROUND_COLOR_PARAM = "BackgroundColor";
 
@@ -83,7 +81,7 @@ public class Applet extends JApplet {
 
 	public static final String DIAGNOSTIC_TEST_CALLBACK_PARAM = "DiagnosticTestCallback";
 
-	private JLabel statusLabel;
+	private JStatusLabel statusLabel;
 
 	private JTextArea detailMessages;
 
@@ -101,7 +99,7 @@ public class Applet extends JApplet {
                                         /* this helps screen readers, simply using setText() does not seem to work,
                                            at least not with Win2003 + JAB 2 + JSE6u20 + JAWS 10 */
                                         Applet.this.statusLabel.getAccessibleContext().setAccessibleName(statusMessage);
-
+                                 
 					if (Status.ERROR == status) {
 						Applet.this.statusLabel.setForeground(Color.RED);
 						Applet.this.progressBar.setIndeterminate(false);
@@ -337,6 +335,9 @@ public class Applet extends JApplet {
 	private void initDetailMessages(Container container) {
 		this.detailMessages = new JTextArea(10, 80);
 		this.detailMessages.setEditable(false);
+                this.detailMessages.getAccessibleContext()
+                        .setAccessibleDescription("Detailed log messages");
+                
 		JPopupMenu popupMenu = new JPopupMenu();
 		JMenuItem copyMenuItem = new JMenuItem(this.messages
 				.getMessage(MESSAGE_ID.COPY_ALL));
@@ -369,14 +370,9 @@ public class Applet extends JApplet {
 		statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.LINE_AXIS));
 
                 String msg = this.messages.getMessage(MESSAGE_ID.LOADING);
-		this.statusLabel = new JLabel(msg);
-               // might be redundant
+		this.statusLabel = new JStatusLabel(msg);
                 this.statusLabel.getAccessibleContext().setAccessibleName(msg);
 
-		Font font = this.statusLabel.getFont();
-		font = font.deriveFont((float) font.getSize() * 2);
-		font = font.deriveFont(Font.BOLD);
-		this.statusLabel.setFont(font);
 		statusPanel.add(this.statusLabel);
 		statusPanel.add(Box.createHorizontalGlue());
 		container.add(statusPanel);
@@ -456,7 +452,7 @@ public class Applet extends JApplet {
 	private class AppletThread implements Runnable {
 		@SuppressWarnings("unchecked")
 		public void run() {
-			addDetailMessage("eID Applet - Copyright (C) 2008-2010 FedICT.");
+			addDetailMessage("eID Applet - Copyright (C) 2008-2010 FedICT.");  
 			addDetailMessage("Released under GNU LGPL version 3.0 license.");
 			addDetailMessage("More info: http://code.google.com/p/eid-applet/");
 			/*
@@ -628,12 +624,12 @@ public class Applet extends JApplet {
 			boolean includePhoto, String identityDataUsage) {
 		String msg = this.messages.getMessage(MESSAGE_ID.PRIVACY_QUESTION)
 				+ "\n" + this.messages.getMessage(MESSAGE_ID.IDENTITY_INFO)
-				+ ": identity";
+				+ ": " + this.messages.getMessage(MESSAGE_ID.IDENTITY_IDENTITY);
 		if (includeAddress) {
-			msg += ", address";
-		}
+			msg += ", " + this.messages.getMessage(MESSAGE_ID.IDENTITY_ADDRESS);
+                }
 		if (includePhoto) {
-			msg += ", photo";
+			msg += ", " + this.messages.getMessage(MESSAGE_ID.IDENTITY_PHOTO);
 		}
 		if (null != identityDataUsage) {
 			msg += "\n" + "Usage: " + identityDataUsage;
