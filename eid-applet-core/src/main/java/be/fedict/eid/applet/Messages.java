@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2008-2010 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -57,7 +57,9 @@ public class Messages {
 				"pinPadModifyOld"), PIN_PAD_MODIFY_NEW("pinPadModifyNew"), PIN_PAD_MODIFY_NEW_AGAIN(
 				"pinPadModifyNewAgain"), DIAGNOSTIC_MODE("diagnosticMode"), CERTIFICATE_EXPIRED_ERROR(
 				"certificateExpiredError"), CERTIFICATE_REVOKED_ERROR(
-				"certificateRevokedError"), IDENTITY_INFO("identityInfo"), CANCEL_BUTTON(
+				"certificateRevokedError"), IDENTITY_INFO("identityInfo"),  IDENTITY_IDENTITY(
+                                "identityIdentity"), IDENTITY_ADDRESS("identityAddress"), IDENTITY_PHOTO(
+                                "identityPhoto"),CANCEL_BUTTON(
 				"cancelButtonText"), NO_BUTTON("noButtonText"), OK_BUTTON(
 				"okButtonText"), YES_BUTTON("yesButtonText");
 
