@@ -59,7 +59,7 @@ public class Messages {
 				"certificateExpiredError"), CERTIFICATE_REVOKED_ERROR(
 				"certificateRevokedError"), IDENTITY_INFO("identityInfo"),  IDENTITY_IDENTITY(
                                 "identityIdentity"), IDENTITY_ADDRESS("identityAddress"), IDENTITY_PHOTO(
-                                "identityPhoto"),CANCEL_BUTTON(
+                                "identityPhoto"), DETAILS_BUTTON("detailsButtonText"), CANCEL_BUTTON(
 				"cancelButtonText"), NO_BUTTON("noButtonText"), OK_BUTTON(
 				"okButtonText"), YES_BUTTON("yesButtonText");
 
