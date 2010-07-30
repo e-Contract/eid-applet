@@ -49,6 +49,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
@@ -81,7 +82,7 @@ public class Applet extends JApplet {
 
 	public static final String DIAGNOSTIC_TEST_CALLBACK_PARAM = "DiagnosticTestCallback";
 
-	private JStatusLabel statusLabel;
+        private JStatusLabel statusLabel;
 
 	private JTextArea detailMessages;
 
@@ -299,12 +300,14 @@ public class Applet extends JApplet {
 		 * super.getParameter to get around the security check.
 		 */
 		String languageParam = super.getParameter(LANGUAGE_PARAM);
-		Locale locale;
+                Locale locale;
 		if (null != languageParam) {
 			locale = new Locale(languageParam);
 		} else {
 			locale = this.getLocale();
 		}
+                /* for screen readers */
+                JRootPane.setDefaultLocale(locale);
 		this.messages = new Messages(locale);
 	}
 
@@ -319,7 +322,7 @@ public class Applet extends JApplet {
 	private void initDetailButton(final Container container,
 			final CardLayout cardLayout) {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                String msg = "Details";
+                String msg = this.messages.getMessage(MESSAGE_ID.DETAILS_BUTTON);
 		JButton detailButton = new JButton(msg + " >>");
                 detailButton.getAccessibleContext().setAccessibleName(msg);
 
@@ -335,6 +338,8 @@ public class Applet extends JApplet {
 	private void initDetailMessages(Container container) {
 		this.detailMessages = new JTextArea(10, 80);
 		this.detailMessages.setEditable(false);
+                /* Detailed messages are only available in English */
+                this.detailMessages.setLocale(Locale.ENGLISH);
                 this.detailMessages.getAccessibleContext()
                         .setAccessibleDescription("Detailed log messages");
                 
