@@ -84,7 +84,15 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.xml.security.Init;
+import org.apache.xml.security.exceptions.Base64DecodingException;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.signature.Manifest;
+import org.apache.xml.security.signature.ReferenceNotInitializedException;
+import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.signature.XMLSignatureInput;
+import org.apache.xml.security.transforms.Transforms;
+import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xpath.XPathAPI;
 import org.bouncycastle.asn1.x509.KeyUsage;
@@ -92,8 +100,10 @@ import org.jcp.xml.dsig.internal.dom.DOMReference;
 import org.jcp.xml.dsig.internal.dom.DOMXMLSignature;
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.EntityResolver;
@@ -1115,4 +1125,239 @@ public class AbstractXmlSignatureServiceTest {
 		}
 	}
 
+	@Test
+	public void testCheckDigestedNode() throws Exception {
+		// setup
+		Init.init();
+		KeyPair keyPair = PkiTestUtils.generateKeyPair();
+
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
+				.newInstance();
+		documentBuilderFactory.setNamespaceAware(true);
+		DocumentBuilder documentBuilder = documentBuilderFactory
+				.newDocumentBuilder();
+		Document document = documentBuilder.newDocument();
+		Element rootElement = document.createElementNS("urn:test", "tns:root");
+		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
+				"urn:test");
+		document.appendChild(rootElement);
+		Element dataElement = document.createElementNS("urn:test", "tns:data");
+		dataElement.setAttributeNS(null, "Id", "id-1234");
+		dataElement.setTextContent("data to be signed");
+		rootElement.appendChild(dataElement);
+
+		Element data2Element = document
+				.createElementNS("urn:test", "tns:data2");
+		rootElement.appendChild(data2Element);
+		data2Element.setTextContent("hello world");
+		data2Element.setAttribute("name", "value");
+		Element data3Element = document
+				.createElementNS("urn:test", "tns:data3");
+		data2Element.appendChild(data3Element);
+		data3Element.setTextContent("data 3");
+		data3Element.appendChild(document.createComment("some comments"));
+
+		Element emptyElement = document
+				.createElementNS("urn:test", "tns:empty");
+		rootElement.appendChild(emptyElement);
+
+		org.apache.xml.security.signature.XMLSignature xmlSignature = new org.apache.xml.security.signature.XMLSignature(
+				document,
+				"",
+				org.apache.xml.security.signature.XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1);
+		rootElement.appendChild(xmlSignature.getElement());
+
+		Transforms transforms = new Transforms(document);
+		transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
+		transforms.addTransform(Transforms.TRANSFORM_C14N_WITH_COMMENTS);
+		xmlSignature.addDocument("", transforms, Constants.ALGO_ID_DIGEST_SHA1);
+
+		xmlSignature.addKeyInfo(keyPair.getPublic());
+		xmlSignature.sign(keyPair.getPrivate());
+
+		NodeList signatureNodeList = document.getDocumentElement()
+				.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#",
+						"Signature");
+		Element signatureElement = (Element) signatureNodeList.item(0);
+
+		// operate & verify
+		assertTrue(isDigested(dataElement, signatureElement));
+		assertTrue(isDigested(data2Element, signatureElement));
+		assertTrue(isDigested(emptyElement, signatureElement));
+	}
+
+	@Test
+	public void testCheckDigestedNode2() throws Exception {
+		// setup
+		Init.init();
+		KeyPair keyPair = PkiTestUtils.generateKeyPair();
+
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
+				.newInstance();
+		documentBuilderFactory.setNamespaceAware(true);
+		DocumentBuilder documentBuilder = documentBuilderFactory
+				.newDocumentBuilder();
+		Document document = documentBuilder.newDocument();
+		Element rootElement = document.createElementNS("urn:test", "tns:root");
+		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
+				"urn:test");
+		document.appendChild(rootElement);
+		Element dataElement = document.createElementNS("urn:test", "tns:data");
+		dataElement.setAttributeNS(null, "Id", "id-1234");
+		dataElement.setIdAttributeNS(null, "Id", true);
+		dataElement.setTextContent("data to be signed");
+		rootElement.appendChild(dataElement);
+
+		Element data2Element = document
+				.createElementNS("urn:test", "tns:data2");
+		rootElement.appendChild(data2Element);
+		data2Element.setTextContent("hello world");
+		data2Element.setAttributeNS(null, "name", "value");
+		Element data3Element = document
+				.createElementNS("urn:test", "tns:data3");
+		data2Element.appendChild(data3Element);
+		data3Element.setTextContent("data 3");
+		data3Element.appendChild(document.createComment("some comments"));
+
+		Element emptyElement = document
+				.createElementNS("urn:test", "tns:empty");
+		rootElement.appendChild(emptyElement);
+
+		org.apache.xml.security.signature.XMLSignature xmlSignature = new org.apache.xml.security.signature.XMLSignature(
+				document,
+				"",
+				org.apache.xml.security.signature.XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1);
+		rootElement.appendChild(xmlSignature.getElement());
+
+		Transforms transforms = new Transforms(document);
+		transforms.addTransform(Transforms.TRANSFORM_C14N_WITH_COMMENTS);
+		xmlSignature.addDocument("#id-1234", transforms,
+				Constants.ALGO_ID_DIGEST_SHA1);
+
+		xmlSignature.addKeyInfo(keyPair.getPublic());
+		xmlSignature.sign(keyPair.getPrivate());
+
+		NodeList signatureNodeList = document.getDocumentElement()
+				.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#",
+						"Signature");
+		Element signatureElement = (Element) signatureNodeList.item(0);
+
+		// operate & verify
+		assertTrue(isDigested(dataElement, signatureElement));
+		assertFalse(isDigested(data2Element, signatureElement));
+	}
+
+	private static class VerifyReference extends
+			org.apache.xml.security.signature.Reference {
+
+		private static final Log LOG = LogFactory.getLog(VerifyReference.class);
+
+		public VerifyReference(Element element, Manifest manifest)
+				throws XMLSecurityException {
+			super(element, "", manifest);
+		}
+
+		public void init() throws Base64DecodingException, XMLSecurityException {
+			generateDigestValue();
+			LOG.debug("original digest: " + Base64.encode(getDigestValue()));
+		}
+
+		public boolean hasChanged() {
+			try {
+				return false == verify();
+			} catch (ReferenceNotInitializedException e) {
+				return false;
+			} catch (XMLSecurityException e) {
+				return false;
+			}
+		}
+	}
+
+	private boolean isDigested(Element dataElement, Element signatureElement)
+			throws XMLSignatureException, XMLSecurityException {
+		NodeList referenceNodeList = signatureElement.getElementsByTagNameNS(
+				"http://www.w3.org/2000/09/xmldsig#", "Reference");
+		Manifest manifest = new Manifest(dataElement.getOwnerDocument());
+		VerifyReference[] references = new VerifyReference[referenceNodeList
+				.getLength()];
+		for (int referenceIdx = 0; referenceIdx < referenceNodeList.getLength(); referenceIdx++) {
+			Element referenceElement = (Element) referenceNodeList
+					.item(referenceIdx);
+			VerifyReference reference = new VerifyReference(referenceElement,
+					manifest);
+			reference.init();
+			references[referenceIdx] = reference;
+		}
+
+		NodeList nodeList = new SingletonNodeList(dataElement);
+		return isDigested(nodeList, references);
+	}
+
+	private static class SingletonNodeList implements NodeList {
+
+		private final Node node;
+
+		public SingletonNodeList(Node node) {
+			this.node = node;
+		}
+
+		public int getLength() {
+			return 1;
+		}
+
+		public Node item(int index) {
+			return this.node;
+		}
+	}
+
+	private boolean isDigested(NodeList nodes, VerifyReference[] references) {
+		for (int idx = 0; idx < nodes.getLength(); idx++) {
+			Node node = nodes.item(idx);
+			LOG.debug("node name: " + node.getLocalName());
+			boolean changed = false;
+			if (node.getNodeType() == Node.TEXT_NODE) {
+				String originalTextValue = node.getNodeValue();
+				String changedTextValue = originalTextValue + "foobar";
+				node.setNodeValue(changedTextValue);
+				changed = false; // need to have impact anyway
+				for (int referenceIdx = 0; referenceIdx < references.length; referenceIdx++) {
+					VerifyReference reference = references[referenceIdx];
+					changed |= reference.hasChanged();
+				}
+				if (false == changed) {
+					return false;
+				}
+				node.setNodeValue(originalTextValue);
+			} else if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Element element = (Element) node;
+
+				NamedNodeMap attributes = element.getAttributes();
+				for (int attributeIdx = 0; attributeIdx < attributes
+						.getLength(); attributeIdx++) {
+					Node attributeNode = attributes.item(attributeIdx);
+					String originalAttributeValue = attributeNode
+							.getNodeValue();
+					String changedAttributeValue = originalAttributeValue
+							+ "foobar";
+					attributeNode.setNodeValue(changedAttributeValue);
+					for (int referenceIdx = 0; referenceIdx < references.length; referenceIdx++) {
+						VerifyReference reference = references[referenceIdx];
+						changed |= reference.hasChanged();
+					}
+
+					attributeNode.setNodeValue(originalAttributeValue);
+				}
+				changed |= isDigested(element.getChildNodes(), references);
+			} else if (node.getNodeType() == Node.COMMENT_NODE) {
+				// not always digested
+			} else {
+				throw new RuntimeException("unsupported node type: "
+						+ node.getNodeType());
+			}
+			if (false == changed) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
