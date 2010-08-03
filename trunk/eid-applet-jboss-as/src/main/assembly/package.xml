@@ -42,17 +42,14 @@
 				<exclude>common/lib/jsr181-api.jar</exclude>
 				<exclude>common/lib/saaj-api.jar</exclude>
 				<exclude>lib/endorsed/jbossws-native-factories.jar</exclude>
+				<exclude>lib/endorsed/jboss-jaxb-api_2.2_spec.jar</exclude>
+				<exclude>lib/endorsed/jboss-jaxws-api_2.2_spec.jar</exclude>
+				<exclude>lib/endorsed/jbossws-cxf-factories.jar</exclude>
+				<exclude>common/deploy/jbossws-console.war/**</exclude>
+				<exclude>common/lib/cxf-*</exclude>
 				<!-- chmod+x on the UNIX scripts -->
 				<exclude>bin/run.sh</exclude>
 				<exclude>bin/shutdown.sh</exclude>
-				<!-- HornetQ -->
-				<exclude>common/lib/hornetq-bootstrap.jar</exclude>
-				<exclude>common/lib/hornetq-jms.jar</exclude>
-				<exclude>common/lib/hornetq-jboss-as-integration.jar</exclude>
-				<exclude>common/lib/hornetq-core.jar</exclude>
-				<exclude>common/lib/hornetq-logging.jar	</exclude>
-				<exclude>common/lib/netty.jar</exclude>
-				<exclude>server/all/deploy/jms-ra.rar/hornetq-ra.jar</exclude>
 			</excludes>
 		</fileSet>
 		<fileSet>
@@ -101,30 +98,12 @@
 				<exclude>woodstox:wstx-asl</exclude>
 				<exclude>javax.xml.stream:stax-api</exclude>
 				<exclude>org.apache.xalan:xalan</exclude>
-				<exclude>org.hornetq:*</exclude>
-				<exclude>org.jboss.netty:netty</exclude>
 			</excludes>
 		</dependencySet>
 		<dependencySet>
 			<outputDirectory>lib/endorsed</outputDirectory>
 			<includes>
 				<include>org.apache.xerces:serializer</include>
-			</includes>
-		</dependencySet>
-		<dependencySet>
-			<outputDirectory>common/lib</outputDirectory>
-			<includes>
-				<include>org.hornetq:*</include>
-				<include>org.jboss.netty:netty</include>
-			</includes>
-			<excludes>
-				<exclude>org.hornetq:hornetq-ra</exclude>
-			</excludes>
-		</dependencySet>
-		<dependencySet>
-			<outputDirectory>server/all/deploy</outputDirectory>
-			<includes>
-				<include>org.hornetq:hornetq-ra</include>
 			</includes>
 		</dependencySet>
 	</dependencySets>
