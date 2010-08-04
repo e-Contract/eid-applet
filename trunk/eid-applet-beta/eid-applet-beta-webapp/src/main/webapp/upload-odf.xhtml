@@ -19,7 +19,8 @@
                 and are also supported by <a href="http://www.openoffice.org/" target="_blank">OpenOffice.org</a> (please use OOo v3.2 or higher).</p>
 		<h:form enctype="multipart/form-data">
 			<h:panelGrid columns="2">
-				<s:fileUpload data="#{odfUploader.uploadedFile}"
+				<s:fileUpload alt="ODF file"
+                                        data="#{odfUploader.uploadedFile}"
 					fileName="#{odfUploader.fileName}"
 					fileSize="#{odfUploader.fileSize}" size="60" required="true" />
 			</h:panelGrid>
