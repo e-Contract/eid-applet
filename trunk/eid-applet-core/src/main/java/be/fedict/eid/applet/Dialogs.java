@@ -301,7 +301,8 @@ public class Dialogs {
 		}
 
 		Box passwordPanel = Box.createHorizontalBox();
-		JLabel promptLabel = new JLabel("eID PIN:");
+		JLabel promptLabel = new JLabel(
+                        this.messages.getMessage(MESSAGE_ID.LABEL_PIN) + ": ");
 		passwordPanel.add(promptLabel);
 		passwordPanel.add(Box.createHorizontalStrut(5));
 		final JPasswordField passwordField = new JPasswordField(MAX_PIN_SIZE);
@@ -327,7 +328,8 @@ public class Dialogs {
 		buttonPanel.add(cancelButton);
 
 		// dialog box
-		final JDialog dialog = new JDialog((Frame) null, "eID PIN?", true);
+		final JDialog dialog = new JDialog((Frame) null, 
+                        this.messages.getMessage(MESSAGE_ID.ENTER_PIN), true);
 		dialog.setLayout(new BorderLayout());
 		dialog.getContentPane().add(mainPanel, BorderLayout.CENTER);
 		dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
