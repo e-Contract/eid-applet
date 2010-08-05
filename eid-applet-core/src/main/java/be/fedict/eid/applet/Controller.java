@@ -200,9 +200,10 @@ public class Controller {
 
 		this.protocolStateMachine.checkRequestMessage(message);
 
+		String userAgent = this.runtime.getParameter("UserAgent");
 		HttpURLConnection connection = getServerConnection();
 		HttpURLConnectionHttpTransmitter httpTransmitter = new HttpURLConnectionHttpTransmitter(
-				connection);
+				connection, userAgent);
 		Transport.transfer(message, httpTransmitter);
 		int responseCode = connection.getResponseCode();
 		if (HttpURLConnection.HTTP_OK != responseCode) {
@@ -681,10 +682,11 @@ public class Controller {
 					this.pcscEidSpi.close();
 					throw new SecurityException(
 							"user did not agree to release eID identity information");
-                                }
-                                // FIXME: repeat for screen reader, perhaps we neea pre- and post-approval msg
-                                setStatusMessage(Status.NORMAL, MESSAGE_ID.OK);
-                                setStatusMessage(Status.NORMAL, MESSAGE_ID.READING_IDENTITY);
+				}
+				// FIXME: repeat for screen reader, perhaps we neea pre- and
+				// post-approval msg
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.OK);
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.READING_IDENTITY);
 			}
 
 			signCertFile = this.pcscEidSpi.readFile(PcscEid.SIGN_CERT_FILE_ID);

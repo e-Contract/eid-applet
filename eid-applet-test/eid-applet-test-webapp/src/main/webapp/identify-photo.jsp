@@ -18,7 +18,8 @@
 		TargetPage :'identity-photo-result.jsp',
 		AppletService :'applet-service-photo',
 		BackgroundColor :'#ffffff',
-		Language : 'fr'
+		Language : 'fr',
+		UserAgent : navigator.userAgent
 	};
 	var version = '1.6';
 	deployJava.runApplet(attributes, parameters, version);

@@ -318,6 +318,18 @@
 							performed an eID diagnostic test.
 						</entry>
 					</row>
+					<row>
+						<entry>
+							<code>UserAgent</code>
+						</entry>
+						<entry>optional</entry>
+						<entry>
+							Via this parameter you can let the eID Applet to use the
+							given
+							User-Agent HTTP header. Example value:
+							<code>navigator.userAgent</code>
+						</entry>
+					</row>
 				</tbody>
 			</tgroup>
 		</table>
@@ -639,13 +651,17 @@
 			<section>
 				<title>Output to KML (Google Earth)</title>
 				<para>
-					The eID Applet Service also comes with a servlet for exporting 
+					The eID Applet Service also comes with a servlet for exporting
 					the eID identity data to (zipped) KML. This can be useful if you
 					want to visualize the eID identity data on a map.
 				</para>
-				<para>Please note that the eID applet does not provide geocoding services,
-					i.e., addresses are not automatically converted to geographic
-					coordinates. However, the KMZ file can be opened in applications
+				<para>
+					Please note that the eID applet does not provide geocoding
+					services,
+					i.e., addresses are not automatically converted to
+					geographic
+					coordinates. However, the KMZ file can be opened in
+					applications
 					that do provide geocoding services, like Google Earth.
 					<xref linkend="eid-applet-google-earth" />
 					shows a screenshot of an eID identity visualized via Google Earth.
@@ -1935,11 +1951,79 @@ ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlis
 </init-param>]]></programlisting>
 			<para>
 				It is furthermore important to have a servlet container
-				session cookie without the
+				session
+				cookie without the
 				<code>HttpOnly</code>
 				flag set. Else the eID Applet Service will push the eID identity
 				credentials in the wrong Application Server HTTP session.
 			</para>
+		</section>
+	</section>
+	<section>
+		<title>Accessibility</title>
+		<section>
+			<title>Java Accessibility Bridge</title>
+			<para>The Java Accessibility Bridge provides a bridge between the
+				accessibility
+				features of Java desktop applications - including
+				applets - running
+				inside the JVM, and the native assistive
+				technologies of the operating
+				system. This is not eID-specific, by
+				the way, the JAB is part of the
+				Java SE desktop platform.
+			</para>
+			<para>There is no configuration required on the server side to enable
+				the
+				accessibility features of the eID applet. On the client side,
+				however,
+				users should verify that the JAB is installed on their
+				computer and
+				is supported by the assistive software of their choice.
+			</para>
+			<section>
+				<title>Mac OS X</title>
+				<para>
+					The bridging code is built-in on Mac OS X, no additional
+					installation is required. Starting with v10.4, Mac OS X
+					includes the
+					screen reader Voice Over.
+				</para>
+				<para>
+					See also the
+					<ulink
+						url="http://developer.apple.com/mac/library/documentation/Java/Conceptual/Java14Development/04-JavaUIToolkits/JavaUIToolkits.html">Java Development Guide for Mac OS X.</ulink>
+				</para>
+			</section>
+			<section>
+				<title>Windows</title>
+				<para>
+					Windows users should install the latest version of the JAB
+					for
+					Windows, available for free from
+					<ulink
+						url="http://www.oracle.com/technetwork/java/javase/tech/index-jsp-136191.html">
+						Oracle's website.</ulink>
+				</para>
+			</section>
+			<section>
+				<title>Linux</title>
+				<para>
+					Ubuntu users should install the libaccess-bridge-java-jni
+					package.
+				</para>
+				<para>
+					See also the documentation on the current and future
+					accessibility
+					architecture of
+					<ulink url="http://live.gnome.org/Accessibility/BonoboDeprecation">
+						GNOME</ulink>
+					and
+					<ulink url="http://accessibility.kde.org/developer/bridge.php">
+						KDE</ulink>
+					.
+				</para>
+			</section>
 		</section>
 	</section>
 	<section>
@@ -1997,58 +2081,6 @@ ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlis
 		<xi:include href="../../../target/protocol-messages.xml"
 			xmlns:xi="http://www.w3.org/2001/XInclude" />
 	</section>
-        <section>
-		<title>Accessibility</title>
-		<section>
-			<title>Java Accessibility Bridge</title>
-			<para>The Java Accessibility Bridge provides a bridge between the accessibility
-				features of Java desktop applications - including applets - running
-				inside the JVM, and the native assistive technologies of the operating
-				system. This is not eID-specific, by the way, the JAB is part of the
-				Java SE desktop platform.
-			</para>
-			<para>There is no configuration required on the server side to enable the
-				accessibility features of the eID applet. On the client side, however,
-				users should verify that the JAB is installed on their computer and
-				is supported by the assistive software of their choice.
-			</para>
-			<section>
-				<title>Mac OS X</title>
-				<para>
-					The bridging code is built-in on Mac OS X, no additional
-					installation is required. Starting with v10.4, Mac OS X
-					includes the screen reader Voice Over.
-				</para>
-				<para>
-					See also the
-					<ulink url="http://developer.apple.com/mac/library/documentation/Java/Conceptual/Java14Development/04-JavaUIToolkits/JavaUIToolkits.html">Java Development Guide for Mac OS X.</ulink>
-				</para>
-			</section>
-			<section>
-				<title>Windows</title>
-				<para>
-					Windows users should install the latest version of the JAB
-					for Windows, available for free from
-					<ulink url="http://www.oracle.com/technetwork/java/javase/tech/index-jsp-136191.html">
-					Oracle's website.</ulink>
-				</para>
-			</section>
-			<section>
-				<title>Linux</title>
-				<para>
-					Ubuntu users should install the libaccess-bridge-java-jni package.
-				</para>
-				<para>
-					See also the documentation on the current and future
-					accessibility architecture of 
-					<ulink url="http://live.gnome.org/Accessibility/BonoboDeprecation">
-					GNOME</ulink> and 
-					<ulink url="http://accessibility.kde.org/developer/bridge.php">
-					KDE</ulink>.
-				</para>
-			</section>	
-		</section>
-        </section>
 	<appendix>
 		<title>eID Applet Developer's Guide License</title>
 		<para>
@@ -2184,6 +2216,11 @@ ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlis
 						<entry>25 June 2010</entry>
 						<entry>Frank Cornelis</entry>
 						<entry>1.0.1.RC1</entry>
+					</row>
+					<row>
+						<entry>5 Aug 2010</entry>
+						<entry>Frank Cornelis</entry>
+						<entry>1.0.1.RC2</entry>
 					</row>
 				</tbody>
 			</tgroup>
