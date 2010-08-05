@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.1.RC2</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet Demo</name>
 	<description>Demo for eID Applet.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-demo</artifactId>
-	<version>1.0.1.RC2</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<build>
 		<plugins>
@@ -60,20 +60,20 @@
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-jboss-as</artifactId>
 			<type>zip</type>
-			<version>1.0.1.RC2</version>
+			<version>1.0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-test-deploy</artifactId>
 			<type>ear</type>
-			<version>1.0.1.RC2</version>
+			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-beta-deploy</artifactId>
 			<type>ear</type>
-			<version>1.0.1.RC2</version>
+			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>

@@ -63,10 +63,10 @@ public class ReleaseTest {
 	private static final Log LOG = LogFactory.getLog(ReleaseTest.class);
 
 	// 1.0.1.RC2
-	private static final String CURRENT_VERSION = "1.0.1-SNAPSHOT";
+	private static final String CURRENT_VERSION = "1.0.1.RC2";
 
 	// 1.0.1-SNAPSHOT
-	private static final String NEW_VERSION = "1.0.1.RC2";
+	private static final String NEW_VERSION = "1.0.1-SNAPSHOT";
 
 	@Test
 	public void testVersioning() throws Exception {
