@@ -670,7 +670,7 @@ public class Controller {
 		byte[] addressSignFile = null;
 		byte[] nrnCertFile = null;
 
-		waitForEIdCard();
+		waitForEIdCardPcsc();
 		try {
 			setStatusMessage(Status.NORMAL, MESSAGE_ID.READING_IDENTITY);
 
@@ -1005,7 +1005,7 @@ public class Controller {
 	private void performEidPcscSignOperation(
 			SignRequestMessage signRequestMessage, boolean requireSecureReader)
 			throws Exception {
-		waitForEIdCard();
+		waitForEIdCardPcsc();
 
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.SIGNING);
 		byte[] signatureValue;
@@ -1068,7 +1068,7 @@ public class Controller {
 	private void administration(boolean unblockPin, boolean changePin,
 			boolean logoff, boolean removeCard, boolean requireSecureReader)
 			throws Exception {
-		waitForEIdCard();
+		waitForEIdCardPcsc();
 		try {
 			if (unblockPin) {
 				setStatusMessage(Status.NORMAL, Messages.MESSAGE_ID.PIN_UNBLOCK);
@@ -1285,7 +1285,7 @@ public class Controller {
 			boolean includePhoto, boolean includeIntegrityData,
 			byte[] encodedServerCertificate, boolean requireSecureReader)
 			throws Exception {
-		waitForEIdCard();
+		waitForEIdCardPcsc();
 
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.AUTHENTICATING);
 
@@ -1513,7 +1513,7 @@ public class Controller {
 			boolean includePhoto, boolean includeIntegrityData,
 			boolean includeCertificates, boolean removeCard,
 			String identityDataUsage) throws Exception {
-		waitForEIdCard();
+		waitForEIdCardPcsc();
 
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.READING_IDENTITY);
 
@@ -1694,8 +1694,12 @@ public class Controller {
 		sendMessage(identityData, FinishedMessage.class);
 	}
 
-	private void waitForEIdCard() throws Exception {
+	private void waitForEIdCardPcsc() throws Exception {
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
+		if (null == this.pcscEidSpi) {
+			addDetailMessage("no PC/SC interface available");
+			throw new RuntimeException("no PC/SC interface available");
+		}
 		if (false == this.pcscEidSpi.hasCardReader()) {
 			setStatusMessage(Status.NORMAL, MESSAGE_ID.CONNECT_READER);
 			this.pcscEidSpi.waitForCardReader();
