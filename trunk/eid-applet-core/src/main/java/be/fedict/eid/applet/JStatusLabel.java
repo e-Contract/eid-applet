@@ -26,39 +26,42 @@ import javax.accessibility.AccessibleRole;
 import javax.swing.JLabel;
 
 /**
- * JLabel with accessible role "alert", used by the applet to provide feedback like
- * "Insert eid card"
- *
+ * JLabel with accessible role "alert", used by the applet to provide feedback
+ * like "Insert eid card"
+ * 
  * @author Bart Hanssens
  */
 public class JStatusLabel extends JLabel {
-     public JStatusLabel(String msg) {
-        super(msg);
-        Font font = this.getFont();
-	font = font.deriveFont((float) font.getSize() * 2);
-	font = font.deriveFont(Font.BOLD);
-	this.setFont(font);
-     }
-     
-     @Override
-     public AccessibleContext getAccessibleContext() {
-         if (accessibleContext == null) {
-             accessibleContext = new AccessibleJStatusLabel();
-         }
-         return accessibleContext;
-     }
-    
-    protected class AccessibleJStatusLabel extends AccessibleJLabel {
-         /**
-         * Get the accessible role of this object.
-         *
-         * @return an instance of AccessibleRole describing the role
-         * @see AccessibleRole
-         */
-        @Override
-        public AccessibleRole getAccessibleRole() {
-            return AccessibleRole.ALERT;
-        }
-    }
+	private static final long serialVersionUID = 1L;
 
+	public JStatusLabel(String msg) {
+		super(msg);
+		Font font = this.getFont();
+		font = font.deriveFont((float) font.getSize() * 2);
+		font = font.deriveFont(Font.BOLD);
+		this.setFont(font);
+	}
+
+	@Override
+	public AccessibleContext getAccessibleContext() {
+		if (accessibleContext == null) {
+			accessibleContext = new AccessibleJStatusLabel();
+		}
+		return accessibleContext;
+	}
+
+	protected class AccessibleJStatusLabel extends AccessibleJLabel {
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Get the accessible role of this object.
+		 * 
+		 * @return an instance of AccessibleRole describing the role
+		 * @see AccessibleRole
+		 */
+		@Override
+		public AccessibleRole getAccessibleRole() {
+			return AccessibleRole.ALERT;
+		}
+	}
 }
