@@ -39,8 +39,11 @@ public class HttpURLConnectionHttpTransmitter implements HttpTransmitter {
 	 * Main constructor.
 	 * 
 	 * @param connection
+	 * @param userAgent
+	 *            the optional User-Agent value.
 	 */
-	public HttpURLConnectionHttpTransmitter(HttpURLConnection connection) {
+	public HttpURLConnectionHttpTransmitter(HttpURLConnection connection,
+			String userAgent) {
 		this.connection = connection;
 		this.connection.setUseCaches(false);
 		this.connection.setAllowUserInteraction(false);
@@ -52,6 +55,9 @@ public class HttpURLConnectionHttpTransmitter implements HttpTransmitter {
 			this.connection.setRequestMethod("POST");
 		} catch (ProtocolException e) {
 			throw new RuntimeException("protocol error: " + e.getMessage(), e);
+		}
+		if (userAgent != null) {
+			this.connection.setRequestProperty("User-Agent", userAgent);
 		}
 	}
 
