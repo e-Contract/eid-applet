@@ -1,3 +1,15 @@
+1.0.1.RC2 - 5 Aug 2010
+	* fix: 64 bit Windows where sunpkcs11.jar is not available
+	* JSON servlet improvements
+	* identity retrieval during pre-sign phase
+	* protocol graph generator
+	* accessibility by Bart Hanssens
+	* fix: TLV document type parsing
+	* fix: ODT MathML DTD resolver
+	* upgraded the JBoss AS to 6.0.0.M4
+	* fix: NPE on Mac OS X 10.5
+	* UserAgent applet parameter
+
 1.0.1.RC1 - 25 June 2010
 	* fix: UTF-8 encoding for Mac OS X compilation
 	* fix: supporting IcedTea JRE under Fedora
