@@ -2025,6 +2025,21 @@ ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlis
 				</para>
 			</section>
 		</section>
+                <section>
+                        <title>Screen Reader Support</title>
+                        <para>Please note that, although recent screen readers should
+                            be able to read out the dialog boxes and status messages of
+                            the eID applet, the exact behavior depends on operating system,
+                            screen reader software and browser version.
+                        </para>
+                        <para>For instance, some configurations do not automatically
+                            read out non-focusable text inside dialog boxes. However,
+                            it is often possible to read out the dialog boxes by using a
+                            keyboard command (JAWS and NVDA users may want to try
+                        <keycombo><keycap>Insert</keycap><keycap>B</keycap></keycombo>).
+                            Please consult your screen reader's manual for more information.
+                        </para>
+                </section>
 	</section>
 	<section>
 		<title>eID Applet Protocol</title>
