@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2010 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -18,27 +18,17 @@
 
 package be.fedict.eid.applet.service.signer.facets;
 
-import javax.xml.crypto.dsig.XMLSignature;
-
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import java.util.Date;
 
 /**
- * JAXB RI namespace prefix mapper for XAdES.
+ * Implementation of a clock using the local system time.
  * 
  * @author Frank Cornelis
  * 
  */
-public class XAdESNamespacePrefixMapper extends NamespacePrefixMapper {
+public class LocalClock implements Clock {
 
-	@Override
-	public String getPreferredPrefix(String namespaceUri, String suggestion,
-			boolean requirePrefix) {
-		if (XMLSignature.XMLNS.equals(namespaceUri)) {
-			return "ds";
-		}
-		if (XAdESXLSignatureFacet.XADES_NAMESPACE.equals(namespaceUri)) {
-			return "xades";
-		}
-		return suggestion;
+	public Date getTime() {
+		return new Date();
 	}
 }

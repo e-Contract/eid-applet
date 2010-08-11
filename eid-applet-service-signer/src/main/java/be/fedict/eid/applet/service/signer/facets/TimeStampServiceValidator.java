@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2010 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -18,27 +18,22 @@
 
 package be.fedict.eid.applet.service.signer.facets;
 
-import javax.xml.crypto.dsig.XMLSignature;
-
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import java.security.cert.X509Certificate;
+import java.util.List;
 
 /**
- * JAXB RI namespace prefix mapper for XAdES.
+ * Interface for trust validator of a TSP.
  * 
  * @author Frank Cornelis
  * 
  */
-public class XAdESNamespacePrefixMapper extends NamespacePrefixMapper {
+public interface TimeStampServiceValidator {
 
-	@Override
-	public String getPreferredPrefix(String namespaceUri, String suggestion,
-			boolean requirePrefix) {
-		if (XMLSignature.XMLNS.equals(namespaceUri)) {
-			return "ds";
-		}
-		if (XAdESXLSignatureFacet.XADES_NAMESPACE.equals(namespaceUri)) {
-			return "xades";
-		}
-		return suggestion;
-	}
+	/**
+	 * Validates the given certificate chain.
+	 * 
+	 * @param certificateChain
+	 * @throws Exception
+	 */
+	void validate(List<X509Certificate> certificateChain) throws Exception;
 }

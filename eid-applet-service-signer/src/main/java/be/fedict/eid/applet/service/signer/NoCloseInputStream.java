@@ -45,7 +45,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Input Stream proxy that doesn't close the underlying input stream.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class NoCloseInputStream extends ProxyInputStream {

@@ -1,5 +1,5 @@
 /*
- * eID Digital Signature Service Project.
+ * eID Applet Project.
  * Copyright (C) 2009 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
