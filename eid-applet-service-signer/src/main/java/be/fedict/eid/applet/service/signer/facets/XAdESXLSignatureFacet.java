@@ -24,6 +24,7 @@ import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CRLException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
@@ -76,8 +77,10 @@ import be.fedict.eid.applet.service.signer.SignatureFacet;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.CRLIdentifierType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.CRLRefType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.CRLRefsType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.CRLValuesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.CertIDListType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.CertIDType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.CertificateValuesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.CompleteCertificateRefsType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.CompleteRevocationRefsType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.DigestAlgAndValueType;
@@ -85,8 +88,10 @@ import be.fedict.eid.applet.service.signer.jaxb.xades132.EncapsulatedPKIDataType
 import be.fedict.eid.applet.service.signer.jaxb.xades132.OCSPIdentifierType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.OCSPRefType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.OCSPRefsType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.OCSPValuesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.ObjectFactory;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.ResponderIDType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.RevocationValuesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.UnsignedPropertiesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.UnsignedSignaturePropertiesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.XAdESTimeStampType;
@@ -408,6 +413,65 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		try {
 			this.marshaller.marshal(this.objectFactory
 					.createSigAndRefsTimeStamp(timeStampXadesX1),
+					unsignedSignaturePropertiesNode);
+		} catch (JAXBException e) {
+			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
+		}
+
+		// XAdES-X-L
+		CertificateValuesType certificateValues = this.objectFactory
+				.createCertificateValuesType();
+		List<Object> certificateValuesList = certificateValues
+				.getEncapsulatedX509CertificateOrOtherCertificate();
+		for (X509Certificate certificate : signingCertificateChain) {
+			EncapsulatedPKIDataType encapsulatedPKIDataType = this.objectFactory
+					.createEncapsulatedPKIDataType();
+			try {
+				encapsulatedPKIDataType.setValue(certificate.getEncoded());
+			} catch (CertificateEncodingException e) {
+				throw new RuntimeException("certificate encoding error: "
+						+ e.getMessage(), e);
+			}
+			certificateValuesList.add(encapsulatedPKIDataType);
+		}
+
+		RevocationValuesType revocationValues = this.objectFactory
+				.createRevocationValuesType();
+		if (revocationData.hasCRLs()) {
+			CRLValuesType crlValues = this.objectFactory.createCRLValuesType();
+			revocationValues.setCRLValues(crlValues);
+			List<EncapsulatedPKIDataType> encapsulatedCrlValues = crlValues
+					.getEncapsulatedCRLValue();
+			List<byte[]> crls = revocationData.getCRLs();
+			for (byte[] crl : crls) {
+				EncapsulatedPKIDataType encapsulatedCrlValue = this.objectFactory
+						.createEncapsulatedPKIDataType();
+				encapsulatedCrlValue.setValue(crl);
+				encapsulatedCrlValues.add(encapsulatedCrlValue);
+			}
+		}
+		if (revocationData.hasOCSPs()) {
+			OCSPValuesType ocspValues = this.objectFactory
+					.createOCSPValuesType();
+			revocationValues.setOCSPValues(ocspValues);
+			List<EncapsulatedPKIDataType> encapsulatedOcspValues = ocspValues
+					.getEncapsulatedOCSPValue();
+			List<byte[]> ocsps = revocationData.getOCSPs();
+			for (byte[] ocsp : ocsps) {
+				EncapsulatedPKIDataType encapsulatedOcspValue = this.objectFactory
+						.createEncapsulatedPKIDataType();
+				encapsulatedOcspValue.setValue(ocsp);
+				encapsulatedOcspValues.add(encapsulatedOcspValue);
+			}
+		}
+
+		// marshal XAdES-X-L
+		try {
+			this.marshaller.marshal(this.objectFactory
+					.createCertificateValues(certificateValues),
+					unsignedSignaturePropertiesNode);
+			this.marshaller.marshal(this.objectFactory
+					.createRevocationValues(revocationValues),
 					unsignedSignaturePropertiesNode);
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
