@@ -28,7 +28,9 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -222,6 +224,12 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 					"xades:UnsignedProperties already present");
 		}
 
+		// create the XAdES-T time-stamp
+		Node signatureValueNode = findSingleNode(signatureElement,
+				"ds:SignatureValue");
+		XAdESTimeStampType signatureTimeStamp = createXAdESTimeStamp(Collections
+				.singletonList(signatureValueNode));
+
 		// xades:UnsignedProperties/xades:UnsignedSignatureProperties/xades:SignatureTimeStamp
 		UnsignedPropertiesType unsignedProperties = this.objectFactory
 				.createUnsignedPropertiesType();
@@ -229,41 +237,10 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 				.createUnsignedSignaturePropertiesType();
 		unsignedProperties
 				.setUnsignedSignatureProperties(unsignedSignatureProperties);
-		XAdESTimeStampType signatureTimeStamp = this.objectFactory
-				.createXAdESTimeStampType();
 		List<Object> unsignedSignaturePropertiesContent = unsignedSignatureProperties
 				.getCounterSignatureOrSignatureTimeStampOrCompleteCertificateRefs();
 		unsignedSignaturePropertiesContent.add(this.objectFactory
 				.createSignatureTimeStamp(signatureTimeStamp));
-		CanonicalizationMethodType c14nMethod = this.xmldsigObjectFactory
-				.createCanonicalizationMethodType();
-		c14nMethod.setAlgorithm(this.c14nAlgoId);
-		signatureTimeStamp.setCanonicalizationMethod(c14nMethod);
-		signatureTimeStamp.setId("signature-time-stamp-"
-				+ UUID.randomUUID().toString());
-		List<Object> signatureTimeStampContent = signatureTimeStamp
-				.getEncapsulatedTimeStampOrXMLTimeStamp();
-
-		// create the timestamp
-		NodeList signatureValueNodeList = getNodes(signatureElement,
-				"ds:SignatureValue");
-		byte[] c14nSignatureValueElement = getC14nValue(signatureValueNodeList);
-		byte[] timeStampToken;
-		try {
-			timeStampToken = this.timeStampService
-					.timeStamp(c14nSignatureValueElement);
-		} catch (Exception e) {
-			throw new RuntimeException("error while creating a time-stamp: "
-					+ e.getMessage(), e);
-		}
-
-		// embed the timestamp
-		EncapsulatedPKIDataType encapsulatedTimeStamp = this.objectFactory
-				.createEncapsulatedPKIDataType();
-		encapsulatedTimeStamp.setValue(timeStampToken);
-		encapsulatedTimeStamp.setId("time-stamp-token-"
-				+ UUID.randomUUID().toString());
-		signatureTimeStampContent.add(encapsulatedTimeStamp);
 
 		// marshal the XAdES-T extension
 		try {
@@ -410,13 +387,37 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
 		}
+
+		// XAdES-X Type 1 timestamp
+		List<Node> timeStampNodesXadesX1 = new LinkedList<Node>();
+		timeStampNodesXadesX1.add(signatureValueNode);
+		Node signatureTimeStampNode = findSingleNode(
+				unsignedSignaturePropertiesNode, "xades:SignatureTimeStamp");
+		timeStampNodesXadesX1.add(signatureTimeStampNode);
+		Node completeCertificateRefsNode = findSingleNode(
+				unsignedSignaturePropertiesNode,
+				"xades:CompleteCertificateRefs");
+		timeStampNodesXadesX1.add(completeCertificateRefsNode);
+		Node completeRevocationRefsNode = findSingleNode(
+				unsignedSignaturePropertiesNode, "xades:CompleteRevocationRefs");
+		timeStampNodesXadesX1.add(completeRevocationRefsNode);
+
+		XAdESTimeStampType timeStampXadesX1 = createXAdESTimeStamp(timeStampNodesXadesX1);
+
+		// marshal XAdES-X
+		try {
+			this.marshaller.marshal(this.objectFactory
+					.createSigAndRefsTimeStamp(timeStampXadesX1),
+					unsignedSignaturePropertiesNode);
+		} catch (JAXBException e) {
+			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
+		}
 	}
 
-	private byte[] getC14nValue(NodeList nodeList) {
+	private byte[] getC14nValue(List<Node> nodeList) {
 		byte[] c14nValue = null;
 		try {
-			for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
-				Node node = nodeList.item(nodeIdx);
+			for (Node node : nodeList) {
 				/*
 				 * Re-initialize the c14n else the namespaces will get cached
 				 * and will be missing from the c14n resulting nodes.
@@ -474,5 +475,39 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		} catch (IOException e) {
 			throw new RuntimeException("I/O error: " + e.getMessage(), e);
 		}
+	}
+
+	private XAdESTimeStampType createXAdESTimeStamp(List<Node> nodeList) {
+		// create the time-stamp
+		byte[] c14nSignatureValueElement = getC14nValue(nodeList);
+		byte[] timeStampToken;
+		try {
+			timeStampToken = this.timeStampService
+					.timeStamp(c14nSignatureValueElement);
+		} catch (Exception e) {
+			throw new RuntimeException("error while creating a time-stamp: "
+					+ e.getMessage(), e);
+		}
+
+		// create a XAdES time-stamp container
+		XAdESTimeStampType xadesTimeStamp = this.objectFactory
+				.createXAdESTimeStampType();
+		CanonicalizationMethodType c14nMethod = this.xmldsigObjectFactory
+				.createCanonicalizationMethodType();
+		c14nMethod.setAlgorithm(this.c14nAlgoId);
+		xadesTimeStamp.setCanonicalizationMethod(c14nMethod);
+		xadesTimeStamp.setId("time-stamp-" + UUID.randomUUID().toString());
+
+		// embed the time-stamp
+		EncapsulatedPKIDataType encapsulatedTimeStamp = this.objectFactory
+				.createEncapsulatedPKIDataType();
+		encapsulatedTimeStamp.setValue(timeStampToken);
+		encapsulatedTimeStamp.setId("time-stamp-token-"
+				+ UUID.randomUUID().toString());
+		List<Object> timeStampContent = xadesTimeStamp
+				.getEncapsulatedTimeStampOrXMLTimeStamp();
+		timeStampContent.add(encapsulatedTimeStamp);
+
+		return xadesTimeStamp;
 	}
 }
