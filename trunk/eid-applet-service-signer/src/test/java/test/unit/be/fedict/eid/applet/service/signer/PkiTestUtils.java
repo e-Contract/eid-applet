@@ -48,10 +48,13 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.SignatureException;
+import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.security.spec.RSAKeyGenParameterSpec;
+import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -72,6 +75,8 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.CRLNumber;
+import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.asn1.x509.DistributionPoint;
 import org.bouncycastle.asn1.x509.DistributionPointName;
 import org.bouncycastle.asn1.x509.GeneralName;
@@ -82,6 +87,18 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.jce.X509Principal;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.ocsp.BasicOCSPResp;
+import org.bouncycastle.ocsp.BasicOCSPRespGenerator;
+import org.bouncycastle.ocsp.CertificateID;
+import org.bouncycastle.ocsp.CertificateStatus;
+import org.bouncycastle.ocsp.OCSPReq;
+import org.bouncycastle.ocsp.OCSPReqGenerator;
+import org.bouncycastle.ocsp.OCSPResp;
+import org.bouncycastle.ocsp.OCSPRespGenerator;
+import org.bouncycastle.ocsp.Req;
+import org.bouncycastle.ocsp.RevokedStatus;
+import org.bouncycastle.x509.X509V2CRLGenerator;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.joda.time.DateTime;
 import org.w3c.dom.Document;
@@ -244,5 +261,70 @@ public class PkiTestUtils {
 		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		transformer.transform(source, result);
 		return stringWriter.getBuffer().toString();
+	}
+
+	public static X509CRL generateCrl(X509Certificate issuer,
+			PrivateKey issuerPrivateKey) throws InvalidKeyException,
+			CRLException, IllegalStateException, NoSuchAlgorithmException,
+			SignatureException {
+		X509V2CRLGenerator crlGenerator = new X509V2CRLGenerator();
+		crlGenerator.setIssuerDN(issuer.getSubjectX500Principal());
+		Date now = new Date();
+		crlGenerator.setThisUpdate(now);
+		crlGenerator.setNextUpdate(new Date(now.getTime() + 100000));
+		crlGenerator.setSignatureAlgorithm("SHA1withRSA");
+		crlGenerator.addExtension(X509Extensions.CRLNumber, false,
+				new CRLNumber(new BigInteger("1234")));
+		X509CRL x509Crl = crlGenerator.generate(issuerPrivateKey);
+		return x509Crl;
+	}
+
+	public static OCSPResp createOcspResp(X509Certificate certificate,
+			boolean revoked, X509Certificate issuerCertificate,
+			X509Certificate ocspResponderCertificate,
+			PrivateKey ocspResponderPrivateKey, String signatureAlgorithm)
+			throws Exception {
+		// request
+		OCSPReqGenerator ocspReqGenerator = new OCSPReqGenerator();
+		CertificateID certId = new CertificateID(CertificateID.HASH_SHA1,
+				issuerCertificate, certificate.getSerialNumber());
+		ocspReqGenerator.addRequest(certId);
+		OCSPReq ocspReq = ocspReqGenerator.generate();
+
+		BasicOCSPRespGenerator basicOCSPRespGenerator = new BasicOCSPRespGenerator(
+				ocspResponderCertificate.getPublicKey());
+
+		// request processing
+		Req[] requestList = ocspReq.getRequestList();
+		for (Req ocspRequest : requestList) {
+			CertificateID certificateID = ocspRequest.getCertID();
+			CertificateStatus certificateStatus;
+			if (revoked) {
+				certificateStatus = new RevokedStatus(new Date(),
+						CRLReason.unspecified);
+			} else {
+				certificateStatus = CertificateStatus.GOOD;
+			}
+			basicOCSPRespGenerator
+					.addResponse(certificateID, certificateStatus);
+		}
+
+		// basic response generation
+		X509Certificate[] chain = null;
+		if (!ocspResponderCertificate.equals(issuerCertificate)) {
+			chain = new X509Certificate[] { ocspResponderCertificate,
+					issuerCertificate };
+		}
+
+		BasicOCSPResp basicOCSPResp = basicOCSPRespGenerator.generate(
+				signatureAlgorithm, ocspResponderPrivateKey, chain, new Date(),
+				BouncyCastleProvider.PROVIDER_NAME);
+
+		// response generation
+		OCSPRespGenerator ocspRespGenerator = new OCSPRespGenerator();
+		OCSPResp ocspResp = ocspRespGenerator.generate(
+				OCSPRespGenerator.SUCCESSFUL, basicOCSPResp);
+
+		return ocspResp;
 	}
 }

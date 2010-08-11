@@ -160,40 +160,15 @@ public class XAdESSignatureFacet implements SignatureFacet {
 				.newXMLGregorianCalendar(signingTime));
 
 		// SigningCertificate
-		CertIDListType signingCertificates = this.xadesObjectFactory
-				.createCertIDListType();
-		CertIDType signingCertificateId = this.xadesObjectFactory
-				.createCertIDType();
-
-		X509IssuerSerialType issuerSerial = this.xmldsigObjectFactory
-				.createX509IssuerSerialType();
 		if (null == signingCertificateChain
 				|| signingCertificateChain.isEmpty()) {
 			throw new RuntimeException("no signing certificate chain available");
 		}
 		X509Certificate signingCertificate = signingCertificateChain.get(0);
-		issuerSerial.setX509IssuerName(signingCertificate
-				.getIssuerX500Principal().toString());
-		issuerSerial.setX509SerialNumber(signingCertificate.getSerialNumber());
-		signingCertificateId.setIssuerSerial(issuerSerial);
-
-		DigestAlgAndValueType certDigest = this.xadesObjectFactory
-				.createDigestAlgAndValueType();
-		DigestMethodType jaxbDigestMethod = xmldsigObjectFactory
-				.createDigestMethodType();
-		jaxbDigestMethod.setAlgorithm(DigestMethod.SHA1);
-		certDigest.setDigestMethod(jaxbDigestMethod);
-		MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
-		byte[] digestValue;
-		try {
-			digestValue = messageDigest.digest(signingCertificate.getEncoded());
-		} catch (CertificateEncodingException e) {
-			throw new RuntimeException("certificate encoding error: "
-					+ e.getMessage(), e);
-		}
-		certDigest.setDigestValue(digestValue);
-		signingCertificateId.setCertDigest(certDigest);
-
+		CertIDType signingCertificateId = getCertID(signingCertificate,
+				this.xadesObjectFactory, this.xmldsigObjectFactory);
+		CertIDListType signingCertificates = this.xadesObjectFactory
+				.createCertIDListType();
 		signingCertificates.getCert().add(signingCertificateId);
 		signedSignatureProperties.setSigningCertificate(signingCertificates);
 
@@ -235,5 +210,57 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		}
 		Node qualifyingPropertiesNode = marshallNode.getFirstChild();
 		return qualifyingPropertiesNode;
+	}
+
+	public static DigestAlgAndValueType getDigestAlgAndValue(
+			byte[] data,
+			ObjectFactory xadesObjectFactory,
+			be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory xmldsigObjectFactory) {
+		DigestAlgAndValueType digestAlgAndValue = xadesObjectFactory
+				.createDigestAlgAndValueType();
+
+		DigestMethodType digestMethod = xmldsigObjectFactory
+				.createDigestMethodType();
+		digestAlgAndValue.setDigestMethod(digestMethod);
+		digestMethod.setAlgorithm(DigestMethod.SHA1);
+
+		MessageDigest messageDigest;
+		try {
+			messageDigest = MessageDigest.getInstance("SHA1");
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException("message digest algo error: "
+					+ e.getMessage(), e);
+		}
+		byte[] digestValue = messageDigest.digest(data);
+		digestAlgAndValue.setDigestValue(digestValue);
+
+		return digestAlgAndValue;
+	}
+
+	public static CertIDType getCertID(
+			X509Certificate certificate,
+			ObjectFactory xadesObjectFactory,
+			be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory xmldsigObjectFactory) {
+		CertIDType certId = xadesObjectFactory.createCertIDType();
+
+		X509IssuerSerialType issuerSerial = xmldsigObjectFactory
+				.createX509IssuerSerialType();
+		certId.setIssuerSerial(issuerSerial);
+		issuerSerial.setX509IssuerName(certificate.getIssuerX500Principal()
+				.toString());
+		issuerSerial.setX509SerialNumber(certificate.getSerialNumber());
+
+		byte[] encodedCertificate;
+		try {
+			encodedCertificate = certificate.getEncoded();
+		} catch (CertificateEncodingException e) {
+			throw new RuntimeException("certificate encoding error: "
+					+ e.getMessage(), e);
+		}
+		DigestAlgAndValueType certDigest = getDigestAlgAndValue(
+				encodedCertificate, xadesObjectFactory, xmldsigObjectFactory);
+		certId.setCertDigest(certDigest);
+
+		return certId;
 	}
 }

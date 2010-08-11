@@ -18,12 +18,21 @@
 
 package be.fedict.eid.applet.service.signer.facets;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CRLException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import javax.security.auth.x500.X500Principal;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -31,6 +40,8 @@ import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -42,14 +53,38 @@ import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xpath.XPathAPI;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.DERInteger;
+import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.ocsp.ResponderID;
+import org.bouncycastle.asn1.x509.X509Extensions;
+import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.ocsp.BasicOCSPResp;
+import org.bouncycastle.ocsp.OCSPException;
+import org.bouncycastle.ocsp.OCSPResp;
+import org.bouncycastle.ocsp.RespID;
+import org.joda.time.DateTime;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import be.fedict.eid.applet.service.signer.SignatureFacet;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.CRLIdentifierType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.CRLRefType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.CRLRefsType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.CertIDListType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.CertIDType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.CompleteCertificateRefsType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.CompleteRevocationRefsType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.DigestAlgAndValueType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.EncapsulatedPKIDataType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.OCSPIdentifierType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.OCSPRefType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.OCSPRefsType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.ObjectFactory;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.ResponderIDType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.UnsignedPropertiesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.UnsignedSignaturePropertiesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.XAdESTimeStampType;
@@ -85,14 +120,32 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 
 	private final Marshaller marshaller;
 
+	private final RevocationDataService revocationDataService;
+
+	private final CertificateFactory certificateFactory;
+
+	private final DatatypeFactory datatypeFactory;
+
 	static {
 		Init.init();
 	}
 
-	public XAdESXLSignatureFacet(TimeStampService timeStampService) {
+	/**
+	 * Main constructor.
+	 * 
+	 * @param timeStampService
+	 *            the time-stamp service used for XAdES-T and XAdES-X.
+	 * @param revocationDataService
+	 *            the optional revocation data service used for XAdES-C. When
+	 *            <code>null</code> the signature will be limited to XAdES-T
+	 *            only.
+	 */
+	public XAdESXLSignatureFacet(TimeStampService timeStampService,
+			RevocationDataService revocationDataService) {
 		this.objectFactory = new ObjectFactory();
 		this.c14nAlgoId = CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS;
 		this.timeStampService = timeStampService;
+		this.revocationDataService = revocationDataService;
 		this.xmldsigObjectFactory = new be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory();
 
 		try {
@@ -104,6 +157,19 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 					new XAdESNamespacePrefixMapper());
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
+		}
+
+		try {
+			this.certificateFactory = CertificateFactory.getInstance("X.509");
+		} catch (CertificateException e) {
+			throw new RuntimeException("X509 JCA error: " + e.getMessage(), e);
+		}
+
+		try {
+			this.datatypeFactory = DatatypeFactory.newInstance();
+		} catch (DatatypeConfigurationException e) {
+			throw new RuntimeException("datatype config error: "
+					+ e.getMessage(), e);
 		}
 	}
 
@@ -191,6 +257,7 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 					+ e.getMessage(), e);
 		}
 
+		// embed the timestamp
 		EncapsulatedPKIDataType encapsulatedTimeStamp = this.objectFactory
 				.createEncapsulatedPKIDataType();
 		encapsulatedTimeStamp.setValue(timeStampToken);
@@ -203,6 +270,143 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 			this.marshaller.marshal(this.objectFactory
 					.createUnsignedProperties(unsignedProperties),
 					qualifyingPropertiesNode);
+		} catch (JAXBException e) {
+			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
+		}
+
+		if (null == this.revocationDataService) {
+			/*
+			 * Without revocation data service we cannot construct the XAdES-C
+			 * extension.
+			 */
+			return;
+		}
+
+		// XAdES-C: complete certificate refs
+		CompleteCertificateRefsType completeCertificateRefs = this.objectFactory
+				.createCompleteCertificateRefsType();
+		CertIDListType certIdList = this.objectFactory.createCertIDListType();
+		completeCertificateRefs.setCertRefs(certIdList);
+		List<CertIDType> certIds = certIdList.getCert();
+		for (int certIdx = 1; certIdx < signingCertificateChain.size(); certIdx++) {
+			/*
+			 * We skip the signing certificate itself according to section
+			 * 4.4.3.2 of the XAdES 1.3.2 specs.
+			 */
+			X509Certificate certificate = signingCertificateChain.get(certIdx);
+			CertIDType certId = XAdESSignatureFacet.getCertID(certificate,
+					this.objectFactory, xmldsigObjectFactory);
+			certIds.add(certId);
+		}
+
+		// XAdES-C: complete revocation refs
+		CompleteRevocationRefsType completeRevocationRefs = this.objectFactory
+				.createCompleteRevocationRefsType();
+		RevocationData revocationData = this.revocationDataService
+				.getRevocationData(signingCertificateChain);
+		if (revocationData.hasCRLs()) {
+			CRLRefsType crlRefs = this.objectFactory.createCRLRefsType();
+			completeRevocationRefs.setCRLRefs(crlRefs);
+			List<CRLRefType> crlRefList = crlRefs.getCRLRef();
+
+			List<byte[]> crls = revocationData.getCRLs();
+			for (byte[] encodedCrl : crls) {
+				CRLRefType crlRef = this.objectFactory.createCRLRefType();
+				crlRefList.add(crlRef);
+				X509CRL crl;
+				try {
+					crl = (X509CRL) this.certificateFactory
+							.generateCRL(new ByteArrayInputStream(encodedCrl));
+				} catch (CRLException e) {
+					throw new RuntimeException("CRL parse error: "
+							+ e.getMessage(), e);
+				}
+
+				CRLIdentifierType crlIdentifier = this.objectFactory
+						.createCRLIdentifierType();
+				crlRef.setCRLIdentifier(crlIdentifier);
+				crlIdentifier.setIssuer(crl.getIssuerX500Principal().getName(
+						X500Principal.RFC1779));
+				crlIdentifier.setIssueTime(this.datatypeFactory
+						.newXMLGregorianCalendar(new DateTime(crl
+								.getThisUpdate()).toGregorianCalendar()));
+				crlIdentifier.setNumber(getCrlNumber(crl));
+
+				DigestAlgAndValueType digestAlgAndValue = XAdESSignatureFacet
+						.getDigestAlgAndValue(encodedCrl, this.objectFactory,
+								this.xmldsigObjectFactory);
+				crlRef.setDigestAlgAndValue(digestAlgAndValue);
+			}
+		}
+		if (revocationData.hasOCSPs()) {
+			OCSPRefsType ocspRefs = this.objectFactory.createOCSPRefsType();
+			completeRevocationRefs.setOCSPRefs(ocspRefs);
+			List<OCSPRefType> ocspRefList = ocspRefs.getOCSPRef();
+			List<byte[]> ocsps = revocationData.getOCSPs();
+			for (byte[] ocsp : ocsps) {
+				OCSPRefType ocspRef = this.objectFactory.createOCSPRefType();
+				ocspRefList.add(ocspRef);
+
+				DigestAlgAndValueType digestAlgAndValue = XAdESSignatureFacet
+						.getDigestAlgAndValue(ocsp, this.objectFactory,
+								this.xmldsigObjectFactory);
+				ocspRef.setDigestAlgAndValue(digestAlgAndValue);
+
+				OCSPIdentifierType ocspIdentifier = this.objectFactory
+						.createOCSPIdentifierType();
+				ocspRef.setOCSPIdentifier(ocspIdentifier);
+				OCSPResp ocspResp;
+				try {
+					ocspResp = new OCSPResp(ocsp);
+				} catch (IOException e) {
+					throw new RuntimeException("OCSP decoding error: "
+							+ e.getMessage(), e);
+				}
+				Object ocspResponseObject;
+				try {
+					ocspResponseObject = ocspResp.getResponseObject();
+				} catch (OCSPException e) {
+					throw new RuntimeException("OCSP error: " + e.getMessage(),
+							e);
+				}
+				BasicOCSPResp basicOcspResp = (BasicOCSPResp) ocspResponseObject;
+				Date producedAt = basicOcspResp.getProducedAt();
+				ocspIdentifier.setProducedAt(this.datatypeFactory
+						.newXMLGregorianCalendar(new DateTime(producedAt)
+								.toGregorianCalendar()));
+
+				ResponderIDType responderId = this.objectFactory
+						.createResponderIDType();
+				ocspIdentifier.setResponderID(responderId);
+				RespID respId = basicOcspResp.getResponderId();
+				ResponderID ocspResponderId = respId.toASN1Object();
+				DERTaggedObject derTaggedObject = (DERTaggedObject) ocspResponderId
+						.toASN1Object();
+				if (2 == derTaggedObject.getTagNo()) {
+					ASN1OctetString keyHashOctetString = (ASN1OctetString) derTaggedObject
+							.getObject();
+					responderId.setByKey(keyHashOctetString.getOctets());
+				} else {
+					X509Name name = X509Name.getInstance(derTaggedObject
+							.getObject());
+					responderId.setByName(name.toString());
+				}
+			}
+		}
+
+		// marshal XAdES-C
+		NodeList unsignedSignaturePropertiesNodeList = ((Element) qualifyingPropertiesNode)
+				.getElementsByTagNameNS(XADES_NAMESPACE,
+						"UnsignedSignatureProperties");
+		Node unsignedSignaturePropertiesNode = unsignedSignaturePropertiesNodeList
+				.item(0);
+		try {
+			this.marshaller.marshal(this.objectFactory
+					.createCompleteCertificateRefs(completeCertificateRefs),
+					unsignedSignaturePropertiesNode);
+			this.marshaller.marshal(this.objectFactory
+					.createCompleteRevocationRefs(completeRevocationRefs),
+					unsignedSignaturePropertiesNode);
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
 		}
@@ -249,5 +453,26 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 			List<Reference> references, List<XMLObject> objects)
 			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		// nothing to do here
+	}
+
+	private BigInteger getCrlNumber(X509CRL crl) {
+		byte[] crlNumberExtensionValue = crl
+				.getExtensionValue(X509Extensions.CRLNumber.getId());
+		if (null == crlNumberExtensionValue) {
+			return null;
+		}
+		try {
+			ASN1InputStream asn1InputStream = new ASN1InputStream(
+					crlNumberExtensionValue);
+			ASN1OctetString octetString = (ASN1OctetString) asn1InputStream
+					.readObject();
+			byte[] octets = octetString.getOctets();
+			DERInteger integer = (DERInteger) new ASN1InputStream(octets)
+					.readObject();
+			BigInteger crlNumber = integer.getPositiveValue();
+			return crlNumber;
+		} catch (IOException e) {
+			throw new RuntimeException("I/O error: " + e.getMessage(), e);
+		}
 	}
 }

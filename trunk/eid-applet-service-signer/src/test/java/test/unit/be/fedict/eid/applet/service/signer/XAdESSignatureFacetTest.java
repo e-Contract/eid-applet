@@ -33,8 +33,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.security.KeyPair;
+import java.security.Security;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.crypto.Cipher;
 import javax.xml.crypto.KeySelector;
@@ -57,8 +60,11 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xpath.XPathAPI;
 import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.ocsp.OCSPResp;
 import org.easymock.EasyMock;
 import org.joda.time.DateTime;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -72,6 +78,8 @@ import be.fedict.eid.applet.service.signer.SignatureFacet;
 import be.fedict.eid.applet.service.signer.TemporaryDataStorage;
 import be.fedict.eid.applet.service.signer.facets.EnvelopedSignatureFacet;
 import be.fedict.eid.applet.service.signer.facets.KeyInfoSignatureFacet;
+import be.fedict.eid.applet.service.signer.facets.RevocationData;
+import be.fedict.eid.applet.service.signer.facets.RevocationDataService;
 import be.fedict.eid.applet.service.signer.facets.TimeStampService;
 import be.fedict.eid.applet.service.signer.facets.XAdESSignatureFacet;
 import be.fedict.eid.applet.service.signer.facets.XAdESXLSignatureFacet;
@@ -118,6 +126,13 @@ public class XAdESSignatureFacetTest {
 		}
 	}
 
+	@BeforeClass
+	public static void beforeClass() {
+		if (null == Security.getProvider(BouncyCastleProvider.PROVIDER_NAME)) {
+			Security.addProvider(new BouncyCastleProvider());
+		}
+	}
+
 	@Test
 	public void testSignEnvelopingDocument() throws Exception {
 		// setup
@@ -127,8 +142,10 @@ public class XAdESSignatureFacetTest {
 		XAdESSignatureFacet xadesSignatureFacet = new XAdESSignatureFacet();
 		TimeStampService mockTimeStampService = EasyMock
 				.createMock(TimeStampService.class);
+		RevocationDataService mockRevocationDataService = EasyMock
+				.createMock(RevocationDataService.class);
 		XAdESXLSignatureFacet xadesTSignatureFacet = new XAdESXLSignatureFacet(
-				mockTimeStampService);
+				mockTimeStampService, mockRevocationDataService);
 		XmlSignatureTestService testedInstance = new XmlSignatureTestService(
 				envelopedSignatureFacet, keyInfoSignatureFacet,
 				xadesSignatureFacet, xadesTSignatureFacet);
@@ -140,19 +157,36 @@ public class XAdESSignatureFacetTest {
 				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
 				.getPrivate(), true, 0, null, null, new KeyUsage(
 				KeyUsage.nonRepudiation));
+		List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
+		/*
+		 * We need at least 2 certificates for the XAdES-C complete certificate
+		 * refs construction.
+		 */
+		certificateChain.add(certificate);
+		certificateChain.add(certificate);
+
+		RevocationData revocationData = new RevocationData();
+		X509CRL crl = PkiTestUtils.generateCrl(certificate, keyPair
+				.getPrivate());
+		revocationData.addCRL(crl);
+		OCSPResp ocspResp = PkiTestUtils.createOcspResp(certificate, false,
+				certificate, certificate, keyPair.getPrivate(), "SHA1withRSA");
+		revocationData.addOCSP(ocspResp.getEncoded());
 
 		// expectations
 		EasyMock.expect(
 				mockTimeStampService
 						.timeStamp(EasyMock.anyObject(byte[].class)))
 				.andStubReturn("test-time-stamp-token".getBytes());
+		EasyMock.expect(
+				mockRevocationDataService.getRevocationData(EasyMock
+						.eq(certificateChain))).andStubReturn(revocationData);
 
 		// prepare
-		EasyMock.replay(mockTimeStampService);
+		EasyMock.replay(mockTimeStampService, mockRevocationDataService);
 
 		// operate
-		DigestInfo digestInfo = testedInstance.preSign(null, Collections
-				.singletonList(certificate));
+		DigestInfo digestInfo = testedInstance.preSign(null, certificateChain);
 
 		// verify
 		assertNotNull(digestInfo);
@@ -191,11 +225,10 @@ public class XAdESSignatureFacetTest {
 		/*
 		 * Operate: postSign
 		 */
-		testedInstance.postSign(signatureValue, Collections
-				.singletonList(certificate));
+		testedInstance.postSign(signatureValue, certificateChain);
 
 		// verify
-		EasyMock.verify(mockTimeStampService);
+		EasyMock.verify(mockTimeStampService, mockRevocationDataService);
 		byte[] signedDocumentData = testedInstance.getSignedDocumentData();
 		assertNotNull(signedDocumentData);
 		Document signedDocument = PkiTestUtils
