@@ -68,7 +68,7 @@ import be.fedict.eid.applet.service.signer.SignatureFacet;
 /**
  * Signature Facet implementation that adds ds:KeyInfo to the XML signature.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class KeyInfoSignatureFacet implements SignatureFacet {
@@ -99,6 +99,9 @@ public class KeyInfoSignatureFacet implements SignatureFacet {
 	public void postSign(Element signatureElement,
 			List<X509Certificate> signingCertificateChain) {
 		LOG.debug("postSign");
+
+		String signatureNamespacePrefix = signatureElement.getPrefix();
+
 		/*
 		 * Make sure we insert right after the ds:SignatureValue element, just
 		 * before the first ds:Object element.
@@ -173,10 +176,9 @@ public class KeyInfoSignatureFacet implements SignatureFacet {
 		XMLSignContext xmlSignContext = new DOMSignContext(key,
 				signatureElement);
 		DOMCryptoContext domCryptoContext = (DOMCryptoContext) xmlSignContext;
-		String dsPrefix = null;
 		try {
-			domKeyInfo.marshal(signatureElement, nextSibling, dsPrefix,
-					domCryptoContext);
+			domKeyInfo.marshal(signatureElement, nextSibling,
+					signatureNamespacePrefix, domCryptoContext);
 		} catch (MarshalException e) {
 			throw new RuntimeException("marshall error: " + e.getMessage(), e);
 		}

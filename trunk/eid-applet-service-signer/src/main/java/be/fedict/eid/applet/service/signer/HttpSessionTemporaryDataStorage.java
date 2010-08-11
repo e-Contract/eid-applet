@@ -55,7 +55,7 @@ import org.apache.commons.logging.LogFactory;
  * Implementation of a temporary data storage using the HTTP session as
  * temporary repository.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class HttpSessionTemporaryDataStorage implements TemporaryDataStorage {

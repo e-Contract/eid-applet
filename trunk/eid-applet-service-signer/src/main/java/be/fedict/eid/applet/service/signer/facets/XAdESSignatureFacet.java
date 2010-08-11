@@ -1,5 +1,5 @@
 /*
- * eID Digital Signature Service Project.
+ * eID Applet Project.
  * Copyright (C) 2009 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -23,6 +23,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,20 +46,20 @@ import javax.xml.datatype.DatatypeFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.etsi.uri._01903.v1_3.CertIDListType;
-import org.etsi.uri._01903.v1_3.CertIDType;
-import org.etsi.uri._01903.v1_3.DigestAlgAndValueType;
-import org.etsi.uri._01903.v1_3.ObjectFactory;
-import org.etsi.uri._01903.v1_3.QualifyingPropertiesType;
-import org.etsi.uri._01903.v1_3.SignedPropertiesType;
-import org.etsi.uri._01903.v1_3.SignedSignaturePropertiesType;
-import org.w3._2000._09.xmldsig_.DigestMethodType;
-import org.w3._2000._09.xmldsig_.X509IssuerSerialType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import be.fedict.eid.applet.service.signer.SignatureFacet;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.CertIDListType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.CertIDType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.DigestAlgAndValueType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.ObjectFactory;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.QualifyingPropertiesType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.SignedPropertiesType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.SignedSignaturePropertiesType;
+import be.fedict.eid.applet.service.signer.jaxb.xmldsig.DigestMethodType;
+import be.fedict.eid.applet.service.signer.jaxb.xmldsig.X509IssuerSerialType;
 
 /**
  * XAdES Signature Facet. Implements XAdES v1.4.1 which is compatible with XAdES
@@ -79,11 +80,27 @@ public class XAdESSignatureFacet implements SignatureFacet {
 
 	private final ObjectFactory xadesObjectFactory;
 
-	private final org.w3._2000._09.xmldsig_.ObjectFactory xmldsigObjectFactory;
+	private final be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory xmldsigObjectFactory;
 
 	private final Marshaller marshaller;
 
+	private final Clock clock;
+
+	/**
+	 * Default constructor. Will use a local clock.
+	 */
 	public XAdESSignatureFacet() {
+		this(new LocalClock());
+	}
+
+	/**
+	 * Main constructor.
+	 * 
+	 * @param clock
+	 *            the clock to be used for determining the xades:SigningTime
+	 */
+	public XAdESSignatureFacet(Clock clock) {
+		this.clock = clock;
 		try {
 			this.datatypeFactory = DatatypeFactory.newInstance();
 		} catch (DatatypeConfigurationException e) {
@@ -91,7 +108,7 @@ public class XAdESSignatureFacet implements SignatureFacet {
 					+ e.getMessage(), e);
 		}
 		this.xadesObjectFactory = new ObjectFactory();
-		this.xmldsigObjectFactory = new org.w3._2000._09.xmldsig_.ObjectFactory();
+		this.xmldsigObjectFactory = new be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory();
 		try {
 			JAXBContext jaxbContext = JAXBContext
 					.newInstance(ObjectFactory.class);
@@ -135,8 +152,10 @@ public class XAdESSignatureFacet implements SignatureFacet {
 				.setSignedSignatureProperties(signedSignatureProperties);
 
 		// SigningTime
-		GregorianCalendar signingTime = new GregorianCalendar();
-		signingTime.setTimeZone(TimeZone.getTimeZone("Z"));
+		GregorianCalendar signingTime = new GregorianCalendar(TimeZone
+				.getTimeZone("Z"));
+		Date currentClockValue = this.clock.getTime();
+		signingTime.setTime(currentClockValue);
 		signedSignatureProperties.setSigningTime(this.datatypeFactory
 				.newXMLGregorianCalendar(signingTime));
 

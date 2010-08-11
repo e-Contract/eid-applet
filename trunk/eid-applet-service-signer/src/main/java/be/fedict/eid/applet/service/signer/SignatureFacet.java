@@ -50,7 +50,7 @@ import org.w3c.dom.Element;
 /**
  * JSR105 Signature Facet interface.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public interface SignatureFacet {

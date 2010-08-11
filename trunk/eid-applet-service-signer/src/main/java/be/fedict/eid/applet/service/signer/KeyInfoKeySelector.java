@@ -55,7 +55,7 @@ import org.apache.commons.logging.LogFactory;
  * JSR105 key selector implementation using the ds:KeyInfo data of the signature
  * itself.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class KeyInfoKeySelector extends KeySelector implements

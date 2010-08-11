@@ -102,7 +102,7 @@ import be.fedict.eid.applet.service.spi.SignatureService;
 /**
  * Abstract base class for an XML Signature Service implementation.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public abstract class AbstractXmlSignatureService implements SignatureService {
@@ -113,11 +113,24 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
 	private final List<SignatureFacet> signatureFacets;
 
+	private String signatureNamespacePrefix;
+
 	/**
 	 * Main constructor.
 	 */
 	public AbstractXmlSignatureService() {
 		this.signatureFacets = new LinkedList<SignatureFacet>();
+		this.signatureNamespacePrefix = null;
+	}
+
+	/**
+	 * Sets the XML Signature namespace prefix to be used for signature
+	 * creation. A <code>null</code> value will omit the prefixing.
+	 * 
+	 * @param signatureNamespacePrefix
+	 */
+	protected void setSignatureNamespacePrefix(String signatureNamespacePrefix) {
+		this.signatureNamespacePrefix = signatureNamespacePrefix;
 	}
 
 	/**
@@ -336,9 +349,14 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			xmlSignContext.setURIDereferencer(uriDereferencer);
 		}
 
-		// OOo doesn't like ds namespaces.
-		// xmlSignContext.putNamespacePrefix(
-		// javax.xml.crypto.dsig.XMLSignature.XMLNS, "ds");
+		if (null != this.signatureNamespacePrefix) {
+			/*
+			 * OOo doesn't like ds namespaces so per default prefixing is off.
+			 */
+			xmlSignContext.putNamespacePrefix(
+					javax.xml.crypto.dsig.XMLSignature.XMLNS,
+					this.signatureNamespacePrefix);
+		}
 
 		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
 				"DOM", new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
@@ -391,9 +409,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			 */
 			documentNode = document;
 		}
-		String dsPrefix = null;
-		// String dsPrefix = "ds";
-		domXmlSignature.marshal(documentNode, dsPrefix,
+		domXmlSignature.marshal(documentNode, this.signatureNamespacePrefix,
 				(DOMCryptoContext) xmlSignContext);
 
 		/*

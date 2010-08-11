@@ -42,7 +42,7 @@ import java.io.Serializable;
 /**
  * Interface for temporary data storage.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public interface TemporaryDataStorage {
