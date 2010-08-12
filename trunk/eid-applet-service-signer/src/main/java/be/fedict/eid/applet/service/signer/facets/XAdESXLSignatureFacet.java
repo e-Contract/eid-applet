@@ -95,6 +95,7 @@ import be.fedict.eid.applet.service.signer.jaxb.xades132.RevocationValuesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.UnsignedPropertiesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.UnsignedSignaturePropertiesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.XAdESTimeStampType;
+import be.fedict.eid.applet.service.signer.jaxb.xades141.ValidationDataType;
 import be.fedict.eid.applet.service.signer.jaxb.xmldsig.CanonicalizationMethodType;
 
 /**
@@ -115,9 +116,13 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 
 	public static final String XADES_NAMESPACE = "http://uri.etsi.org/01903/v1.3.2#";
 
+	public static final String XADES141_NAMESPACE = "http://uri.etsi.org/01903/v1.4.1#";
+
 	private Element nsElement;
 
 	private final ObjectFactory objectFactory;
+
+	private final be.fedict.eid.applet.service.signer.jaxb.xades141.ObjectFactory xades141ObjectFactory;
 
 	private final be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory xmldsigObjectFactory;
 
@@ -154,9 +159,11 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		this.timeStampService = timeStampService;
 		this.revocationDataService = revocationDataService;
 		this.xmldsigObjectFactory = new be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory();
+		this.xades141ObjectFactory = new be.fedict.eid.applet.service.signer.jaxb.xades141.ObjectFactory();
 
 		try {
-			JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
+			JAXBContext context = JAXBContext
+					.newInstance(be.fedict.eid.applet.service.signer.jaxb.xades141.ObjectFactory.class);
 			this.marshaller = context.createMarshaller();
 			this.marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			this.marshaller.setProperty(
@@ -197,19 +204,6 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		}
 	}
 
-	private NodeList getNodes(Node baseNode, String xpathExpression) {
-		if (null == this.nsElement) {
-			this.nsElement = createNamespaceElement(baseNode);
-		}
-		try {
-			NodeList nodeList = XPathAPI.selectNodeList(baseNode,
-					xpathExpression, this.nsElement);
-			return nodeList;
-		} catch (TransformerException e) {
-			throw new RuntimeException("XPath error: " + e.getMessage(), e);
-		}
-	}
-
 	public void postSign(Element signatureElement,
 			List<X509Certificate> signingCertificateChain) {
 		LOG.debug("XAdES-T post sign phase");
@@ -232,8 +226,10 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		// create the XAdES-T time-stamp
 		Node signatureValueNode = findSingleNode(signatureElement,
 				"ds:SignatureValue");
-		XAdESTimeStampType signatureTimeStamp = createXAdESTimeStamp(Collections
-				.singletonList(signatureValueNode));
+		RevocationData tsaRevocationDataXadesT = new RevocationData();
+		XAdESTimeStampType signatureTimeStamp = createXAdESTimeStamp(
+				Collections.singletonList(signatureValueNode),
+				tsaRevocationDataXadesT);
 
 		// xades:UnsignedProperties/xades:UnsignedSignatureProperties/xades:SignatureTimeStamp
 		UnsignedPropertiesType unsignedProperties = this.objectFactory
@@ -246,6 +242,13 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 				.getCounterSignatureOrSignatureTimeStampOrCompleteCertificateRefs();
 		unsignedSignaturePropertiesContent.add(this.objectFactory
 				.createSignatureTimeStamp(signatureTimeStamp));
+
+		// xadesv141::TimeStampValidationData
+		if (tsaRevocationDataXadesT.hasRevocationDataEntries()) {
+			ValidationDataType validationData = createValidationData(tsaRevocationDataXadesT);
+			unsignedSignaturePropertiesContent.add(this.xades141ObjectFactory
+					.createTimeStampValidationData(validationData));
+		}
 
 		// marshal the XAdES-T extension
 		try {
@@ -273,7 +276,7 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		for (int certIdx = 1; certIdx < signingCertificateChain.size(); certIdx++) {
 			/*
 			 * We skip the signing certificate itself according to section
-			 * 4.4.3.2 of the XAdES 1.3.2 specs.
+			 * 4.4.3.2 of the XAdES 1.4.1 specification.
 			 */
 			X509Certificate certificate = signingCertificateChain.get(certIdx);
 			CertIDType certId = XAdESSignatureFacet.getCertID(certificate,
@@ -407,13 +410,28 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 				unsignedSignaturePropertiesNode, "xades:CompleteRevocationRefs");
 		timeStampNodesXadesX1.add(completeRevocationRefsNode);
 
-		XAdESTimeStampType timeStampXadesX1 = createXAdESTimeStamp(timeStampNodesXadesX1);
+		RevocationData tsaRevocationDataXadesX1 = new RevocationData();
+		XAdESTimeStampType timeStampXadesX1 = createXAdESTimeStamp(
+				timeStampNodesXadesX1, tsaRevocationDataXadesX1);
+		ValidationDataType timeStampXadesX1ValidationData;
+		if (tsaRevocationDataXadesX1.hasRevocationDataEntries()) {
+			timeStampXadesX1ValidationData = createValidationData(tsaRevocationDataXadesX1);
+		} else {
+			timeStampXadesX1ValidationData = null;
+		}
 
 		// marshal XAdES-X
 		try {
 			this.marshaller.marshal(this.objectFactory
 					.createSigAndRefsTimeStamp(timeStampXadesX1),
 					unsignedSignaturePropertiesNode);
+			if (null != timeStampXadesX1ValidationData) {
+				this.marshaller
+						.marshal(
+								this.xades141ObjectFactory
+										.createTimeStampValidationData(timeStampXadesX1ValidationData),
+								unsignedSignaturePropertiesNode);
+			}
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
 		}
@@ -434,36 +452,7 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 			}
 			certificateValuesList.add(encapsulatedPKIDataType);
 		}
-
-		RevocationValuesType revocationValues = this.objectFactory
-				.createRevocationValuesType();
-		if (revocationData.hasCRLs()) {
-			CRLValuesType crlValues = this.objectFactory.createCRLValuesType();
-			revocationValues.setCRLValues(crlValues);
-			List<EncapsulatedPKIDataType> encapsulatedCrlValues = crlValues
-					.getEncapsulatedCRLValue();
-			List<byte[]> crls = revocationData.getCRLs();
-			for (byte[] crl : crls) {
-				EncapsulatedPKIDataType encapsulatedCrlValue = this.objectFactory
-						.createEncapsulatedPKIDataType();
-				encapsulatedCrlValue.setValue(crl);
-				encapsulatedCrlValues.add(encapsulatedCrlValue);
-			}
-		}
-		if (revocationData.hasOCSPs()) {
-			OCSPValuesType ocspValues = this.objectFactory
-					.createOCSPValuesType();
-			revocationValues.setOCSPValues(ocspValues);
-			List<EncapsulatedPKIDataType> encapsulatedOcspValues = ocspValues
-					.getEncapsulatedOCSPValue();
-			List<byte[]> ocsps = revocationData.getOCSPs();
-			for (byte[] ocsp : ocsps) {
-				EncapsulatedPKIDataType encapsulatedOcspValue = this.objectFactory
-						.createEncapsulatedPKIDataType();
-				encapsulatedOcspValue.setValue(ocsp);
-				encapsulatedOcspValues.add(encapsulatedOcspValue);
-			}
-		}
+		RevocationValuesType revocationValues = createRevocationValues(revocationData);
 
 		// marshal XAdES-X-L
 		try {
@@ -541,13 +530,14 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		}
 	}
 
-	private XAdESTimeStampType createXAdESTimeStamp(List<Node> nodeList) {
+	private XAdESTimeStampType createXAdESTimeStamp(List<Node> nodeList,
+			RevocationData revocationData) {
 		// create the time-stamp
 		byte[] c14nSignatureValueElement = getC14nValue(nodeList);
 		byte[] timeStampToken;
 		try {
-			timeStampToken = this.timeStampService
-					.timeStamp(c14nSignatureValueElement);
+			timeStampToken = this.timeStampService.timeStamp(
+					c14nSignatureValueElement, revocationData);
 		} catch (Exception e) {
 			throw new RuntimeException("error while creating a time-stamp: "
 					+ e.getMessage(), e);
@@ -573,5 +563,48 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		timeStampContent.add(encapsulatedTimeStamp);
 
 		return xadesTimeStamp;
+	}
+
+	private ValidationDataType createValidationData(
+			RevocationData revocationData) {
+		ValidationDataType validationData = this.xades141ObjectFactory
+				.createValidationDataType();
+		RevocationValuesType revocationValues = createRevocationValues(revocationData);
+		validationData.setRevocationValues(revocationValues);
+		return validationData;
+	}
+
+	private RevocationValuesType createRevocationValues(
+			RevocationData revocationData) {
+		RevocationValuesType revocationValues = this.objectFactory
+				.createRevocationValuesType();
+		if (revocationData.hasCRLs()) {
+			CRLValuesType crlValues = this.objectFactory.createCRLValuesType();
+			revocationValues.setCRLValues(crlValues);
+			List<EncapsulatedPKIDataType> encapsulatedCrlValues = crlValues
+					.getEncapsulatedCRLValue();
+			List<byte[]> crls = revocationData.getCRLs();
+			for (byte[] crl : crls) {
+				EncapsulatedPKIDataType encapsulatedCrlValue = this.objectFactory
+						.createEncapsulatedPKIDataType();
+				encapsulatedCrlValue.setValue(crl);
+				encapsulatedCrlValues.add(encapsulatedCrlValue);
+			}
+		}
+		if (revocationData.hasOCSPs()) {
+			OCSPValuesType ocspValues = this.objectFactory
+					.createOCSPValuesType();
+			revocationValues.setOCSPValues(ocspValues);
+			List<EncapsulatedPKIDataType> encapsulatedOcspValues = ocspValues
+					.getEncapsulatedOCSPValue();
+			List<byte[]> ocsps = revocationData.getOCSPs();
+			for (byte[] ocsp : ocsps) {
+				EncapsulatedPKIDataType encapsulatedOcspValue = this.objectFactory
+						.createEncapsulatedPKIDataType();
+				encapsulatedOcspValue.setValue(ocsp);
+				encapsulatedOcspValues.add(encapsulatedOcspValue);
+			}
+		}
+		return revocationValues;
 	}
 }

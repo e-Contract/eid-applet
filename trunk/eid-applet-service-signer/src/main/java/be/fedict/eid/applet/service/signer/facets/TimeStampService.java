@@ -28,13 +28,18 @@ public interface TimeStampService {
 
 	/**
 	 * Gives back the encoded time-stamp token for the given array of data
-	 * bytes.
+	 * bytes. We assume that the time-stamp token itself contains its full
+	 * certificate chain required for proper validation.
 	 * 
 	 * @param data
 	 *            the data to be time-stamped.
-	 * @return
+	 * @param revocationData
+	 *            the optional container that needs to be filled up with the
+	 *            revocation data used to validate the TSA certificate chain.
+	 * @return the DER encoded time-stamp token.
 	 * @throws Exception
 	 *             in case something went wrong.
 	 */
-	byte[] timeStamp(byte[] data) throws Exception;
+	byte[] timeStamp(byte[] data, RevocationData revocationData)
+			throws Exception;
 }

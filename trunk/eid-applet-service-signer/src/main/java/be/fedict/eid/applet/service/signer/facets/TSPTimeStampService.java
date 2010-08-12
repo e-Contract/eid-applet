@@ -201,7 +201,8 @@ public class TSPTimeStampService implements TimeStampService {
 		this.proxyPort = 0;
 	}
 
-	public byte[] timeStamp(byte[] data) throws Exception {
+	public byte[] timeStamp(byte[] data, RevocationData revocationData)
+			throws Exception {
 		// digest the message
 		MessageDigest messageDigest = MessageDigest
 				.getInstance(this.digestAlgo);
@@ -330,7 +331,7 @@ public class TSPTimeStampService implements TimeStampService {
 				BouncyCastleProvider.PROVIDER_NAME);
 
 		// verify TSP signer certificate
-		this.validator.validate(tspCertificateChain);
+		this.validator.validate(tspCertificateChain, revocationData);
 
 		LOG.debug("time-stamp token time: "
 				+ timeStampToken.getTimeStampInfo().getGenTime());

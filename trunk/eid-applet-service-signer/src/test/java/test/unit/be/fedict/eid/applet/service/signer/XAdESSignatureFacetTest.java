@@ -63,6 +63,7 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.ocsp.OCSPResp;
 import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.joda.time.DateTime;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -166,7 +167,7 @@ public class XAdESSignatureFacetTest {
 		certificateChain.add(certificate);
 
 		RevocationData revocationData = new RevocationData();
-		X509CRL crl = PkiTestUtils.generateCrl(certificate, keyPair
+		final X509CRL crl = PkiTestUtils.generateCrl(certificate, keyPair
 				.getPrivate());
 		revocationData.addCRL(crl);
 		OCSPResp ocspResp = PkiTestUtils.createOcspResp(certificate, false,
@@ -175,9 +176,17 @@ public class XAdESSignatureFacetTest {
 
 		// expectations
 		EasyMock.expect(
-				mockTimeStampService
-						.timeStamp(EasyMock.anyObject(byte[].class)))
-				.andStubReturn("test-time-stamp-token".getBytes());
+				mockTimeStampService.timeStamp(
+						EasyMock.anyObject(byte[].class), EasyMock
+								.anyObject(RevocationData.class)))
+				.andStubAnswer(new IAnswer<byte[]>() {
+					public byte[] answer() throws Throwable {
+						Object[] arguments = EasyMock.getCurrentArguments();
+						RevocationData revocationData = (RevocationData) arguments[1];
+						revocationData.addCRL(crl);
+						return "time-stamp-token".getBytes();
+					}
+				});
 		EasyMock.expect(
 				mockRevocationDataService.getRevocationData(EasyMock
 						.eq(certificateChain))).andStubReturn(revocationData);
