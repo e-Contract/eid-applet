@@ -51,6 +51,7 @@ import org.junit.Test;
 
 import sun.security.pkcs11.wrapper.PKCS11;
 import sun.security.pkcs11.wrapper.PKCS11Exception;
+import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
@@ -99,7 +100,20 @@ public class Pkcs11Test {
 		}
 
 		@Override
-		public void progressIndication(int max, int current) {
+		public void addTestResult(DiagnosticTests diagnosticTest,
+				boolean success, String description) {
+		}
+
+		@Override
+		public void increaseProgress() {
+		}
+
+		@Override
+		public void resetProgress(int max) {
+		}
+
+		@Override
+		public void setProgressIndeterminate() {
 		}
 	}
 
