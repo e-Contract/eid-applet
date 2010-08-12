@@ -84,6 +84,7 @@ import org.junit.Test;
 import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.testing.ServletTester;
 
+import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
@@ -280,16 +281,29 @@ public class SslTest {
 		}
 
 		@Override
-		public void progressIndication(int max, int current) {
-		}
-
-		@Override
 		public void setStatusMessage(Status status, Messages.MESSAGE_ID messageId) {
 			String statusMessage = this.messages.getMessage(messageId);
 			LOG.debug("status message: " + status + ": " + statusMessage);
 			if (Status.ERROR == status) {
 				throw new RuntimeException("status ERROR received");
 			}
+		}
+
+		@Override
+		public void addTestResult(DiagnosticTests diagnosticTest,
+				boolean success, String description) {
+		}
+
+		@Override
+		public void increaseProgress() {
+		}
+
+		@Override
+		public void resetProgress(int max) {
+		}
+
+		@Override
+		public void setProgressIndeterminate() {
 		}
 	}
 

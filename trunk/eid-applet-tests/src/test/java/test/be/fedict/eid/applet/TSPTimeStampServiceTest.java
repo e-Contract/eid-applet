@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Test;
 
+import be.fedict.eid.applet.service.signer.facets.RevocationData;
 import be.fedict.eid.applet.service.signer.facets.TSPTimeStampService;
 import be.fedict.eid.applet.service.signer.facets.TimeStampServiceValidator;
 import be.fedict.trust.BelgianTrustValidatorFactory;
@@ -68,7 +69,7 @@ public class TSPTimeStampServiceTest {
 		byte[] data = "hello world".getBytes();
 
 		// operate
-		byte[] result = service.timeStamp(data);
+		byte[] result = service.timeStamp(data, null);
 
 		// verify
 		assertNotNull(result);
@@ -87,7 +88,7 @@ public class TSPTimeStampServiceTest {
 		byte[] data = "hello world".getBytes();
 
 		// operate
-		byte[] result = service.timeStamp(data);
+		byte[] result = service.timeStamp(data, null);
 
 		// verify
 		assertNotNull(result);
@@ -106,7 +107,7 @@ public class TSPTimeStampServiceTest {
 		byte[] data = "hello world".getBytes();
 
 		// operate
-		byte[] result = service.timeStamp(data);
+		byte[] result = service.timeStamp(data, null);
 
 		// verify
 		assertNotNull(result);
@@ -125,7 +126,7 @@ public class TSPTimeStampServiceTest {
 		byte[] data = "hello world".getBytes();
 
 		// operate
-		byte[] result = service.timeStamp(data);
+		byte[] result = service.timeStamp(data, null);
 
 		// verify
 		assertNotNull(result);
@@ -144,7 +145,7 @@ public class TSPTimeStampServiceTest {
 		byte[] data = "hello world".getBytes();
 
 		// operate
-		byte[] result = service.timeStamp(data);
+		byte[] result = service.timeStamp(data, null);
 
 		// verify
 		assertNotNull(result);
@@ -170,8 +171,8 @@ public class TSPTimeStampServiceTest {
 		}
 
 		@Override
-		public void validate(List<X509Certificate> certificateChain)
-				throws Exception {
+		public void validate(List<X509Certificate> certificateChain,
+				RevocationData revocationData) throws Exception {
 			for (X509Certificate certificate : certificateChain) {
 				LOG.debug("certificate: "
 						+ certificate.getSubjectX500Principal());

@@ -138,8 +138,25 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 
 	private final DatatypeFactory datatypeFactory;
 
+	private final String digestAlgorithm;
+
 	static {
 		Init.init();
+	}
+
+	/**
+	 * Convenience constructor.
+	 * 
+	 * @param timeStampService
+	 *            the time-stamp service used for XAdES-T and XAdES-X.
+	 * @param revocationDataService
+	 *            the optional revocation data service used for XAdES-C and
+	 *            XAdES-X-L. When <code>null</code> the signature will be
+	 *            limited to XAdES-T only.
+	 */
+	public XAdESXLSignatureFacet(TimeStampService timeStampService,
+			RevocationDataService revocationDataService) {
+		this(timeStampService, revocationDataService, "SHA-1");
 	}
 
 	/**
@@ -148,14 +165,18 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 	 * @param timeStampService
 	 *            the time-stamp service used for XAdES-T and XAdES-X.
 	 * @param revocationDataService
-	 *            the optional revocation data service used for XAdES-C. When
-	 *            <code>null</code> the signature will be limited to XAdES-T
-	 *            only.
+	 *            the optional revocation data service used for XAdES-C and
+	 *            XAdES-X-L. When <code>null</code> the signature will be
+	 *            limited to XAdES-T only.
+	 * @param digestAlgorithm
+	 *            the digest algorithm to be used for construction of the
+	 *            XAdES-X-L elements.
 	 */
 	public XAdESXLSignatureFacet(TimeStampService timeStampService,
-			RevocationDataService revocationDataService) {
+			RevocationDataService revocationDataService, String digestAlgorithm) {
 		this.objectFactory = new ObjectFactory();
 		this.c14nAlgoId = CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS;
+		this.digestAlgorithm = digestAlgorithm;
 		this.timeStampService = timeStampService;
 		this.revocationDataService = revocationDataService;
 		this.xmldsigObjectFactory = new be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory();
@@ -280,7 +301,8 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 			 */
 			X509Certificate certificate = signingCertificateChain.get(certIdx);
 			CertIDType certId = XAdESSignatureFacet.getCertID(certificate,
-					this.objectFactory, xmldsigObjectFactory);
+					this.objectFactory, this.xmldsigObjectFactory,
+					this.digestAlgorithm);
 			certIds.add(certId);
 		}
 
@@ -319,7 +341,7 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 
 				DigestAlgAndValueType digestAlgAndValue = XAdESSignatureFacet
 						.getDigestAlgAndValue(encodedCrl, this.objectFactory,
-								this.xmldsigObjectFactory);
+								this.xmldsigObjectFactory, this.digestAlgorithm);
 				crlRef.setDigestAlgAndValue(digestAlgAndValue);
 			}
 		}
@@ -334,7 +356,7 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 
 				DigestAlgAndValueType digestAlgAndValue = XAdESSignatureFacet
 						.getDigestAlgAndValue(ocsp, this.objectFactory,
-								this.xmldsigObjectFactory);
+								this.xmldsigObjectFactory, this.digestAlgorithm);
 				ocspRef.setDigestAlgAndValue(digestAlgAndValue);
 
 				OCSPIdentifierType ocspIdentifier = this.objectFactory

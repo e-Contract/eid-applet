@@ -45,6 +45,26 @@ import be.fedict.eid.applet.service.signer.SignatureFacet;
  */
 public class EnvelopedSignatureFacet implements SignatureFacet {
 
+	private final String xmlDigestAlgorithm;
+
+	/**
+	 * Default constructor. Digest algorithm will be SHA-1.
+	 */
+	public EnvelopedSignatureFacet() {
+		this("SHA-1");
+	}
+
+	/**
+	 * Main constructor.
+	 * 
+	 * @param digestAlgorithm
+	 *            the digest algorithm to be used within the ds:Reference
+	 *            element. Possible values: "SHA-1", "SHA-256, or "SHA-512".
+	 */
+	public EnvelopedSignatureFacet(String digestAlgorithm) {
+		this.xmlDigestAlgorithm = getXmlDigestAlgo(digestAlgorithm);
+	}
+
 	public void postSign(Element signatureElement,
 			List<X509Certificate> signingCertificateChain) {
 		// empty
@@ -56,7 +76,7 @@ public class EnvelopedSignatureFacet implements SignatureFacet {
 			List<Reference> references, List<XMLObject> objects)
 			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				DigestMethod.SHA1, null);
+				this.xmlDigestAlgorithm, null);
 
 		List<Transform> transforms = new LinkedList<Transform>();
 		Transform envelopedTransform = signatureFactory
@@ -72,5 +92,18 @@ public class EnvelopedSignatureFacet implements SignatureFacet {
 				transforms, null, null);
 
 		references.add(reference);
+	}
+
+	private String getXmlDigestAlgo(String digestAlgo) {
+		if ("SHA-1".equals(digestAlgo)) {
+			return DigestMethod.SHA1;
+		}
+		if ("SHA-256".equals(digestAlgo)) {
+			return DigestMethod.SHA256;
+		}
+		if ("SHA-512".equals(digestAlgo)) {
+			return DigestMethod.SHA512;
+		}
+		throw new RuntimeException("unsupported digest algo: " + digestAlgo);
 	}
 }

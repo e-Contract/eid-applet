@@ -86,11 +86,37 @@ public class XAdESSignatureFacet implements SignatureFacet {
 
 	private final Clock clock;
 
+	private final String digestAlgorithm;
+
+	private final String xmlDigestAlgorithm;
+
 	/**
-	 * Default constructor. Will use a local clock.
+	 * Default constructor. Will use a local clock and "SHA-1" for digest
+	 * algorithm.
 	 */
 	public XAdESSignatureFacet() {
 		this(new LocalClock());
+	}
+
+	/**
+	 * Convenience constructor. Will use "SHA-1" for digest algorithm.
+	 * 
+	 * @param clock
+	 *            the clock to be used for determining the xades:SigningTime
+	 */
+	public XAdESSignatureFacet(Clock clock) {
+		this(clock, "SHA-1");
+	}
+
+	/**
+	 * Convenience constructor. Will use a local clock.
+	 * 
+	 * @param digestAlgorithm
+	 *            the digest algorithm to be used for all required XAdES digest
+	 *            operations. Possible values: "SHA-1", "SHA-256", or "SHA-512".
+	 */
+	public XAdESSignatureFacet(String digestAlgorithm) {
+		this(new LocalClock(), digestAlgorithm);
 	}
 
 	/**
@@ -98,9 +124,15 @@ public class XAdESSignatureFacet implements SignatureFacet {
 	 * 
 	 * @param clock
 	 *            the clock to be used for determining the xades:SigningTime
+	 * @param digestAlgorithm
+	 *            the digest algorithm to be used for all required XAdES digest
+	 *            operations. Possible values: "SHA-1", "SHA-256", or "SHA-512".
 	 */
-	public XAdESSignatureFacet(Clock clock) {
+	public XAdESSignatureFacet(Clock clock, String digestAlgorithm) {
 		this.clock = clock;
+		this.digestAlgorithm = digestAlgorithm;
+		this.xmlDigestAlgorithm = getXmlDigestAlgo(this.digestAlgorithm);
+
 		try {
 			this.datatypeFactory = DatatypeFactory.newInstance();
 		} catch (DatatypeConfigurationException e) {
@@ -166,7 +198,8 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		}
 		X509Certificate signingCertificate = signingCertificateChain.get(0);
 		CertIDType signingCertificateId = getCertID(signingCertificate,
-				this.xadesObjectFactory, this.xmldsigObjectFactory);
+				this.xadesObjectFactory, this.xmldsigObjectFactory,
+				this.digestAlgorithm);
 		CertIDListType signingCertificates = this.xadesObjectFactory
 				.createCertIDListType();
 		signingCertificates.getCert().add(signingCertificateId);
@@ -185,7 +218,7 @@ public class XAdESSignatureFacet implements SignatureFacet {
 
 		// add XAdES ds:Reference
 		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				DigestMethod.SHA1, null);
+				this.xmlDigestAlgorithm, null);
 		List<Transform> transforms = new LinkedList<Transform>();
 		Transform exclusiveTransform = signatureFactory
 				.newTransform(CanonicalizationMethod.EXCLUSIVE,
@@ -195,6 +228,19 @@ public class XAdESSignatureFacet implements SignatureFacet {
 				+ signedPropertiesId, digestMethod, transforms, XADES_TYPE,
 				null);
 		references.add(reference);
+	}
+
+	private static String getXmlDigestAlgo(String digestAlgo) {
+		if ("SHA-1".equals(digestAlgo)) {
+			return DigestMethod.SHA1;
+		}
+		if ("SHA-256".equals(digestAlgo)) {
+			return DigestMethod.SHA256;
+		}
+		if ("SHA-512".equals(digestAlgo)) {
+			return DigestMethod.SHA512;
+		}
+		throw new RuntimeException("unsupported digest algo: " + digestAlgo);
 	}
 
 	private Node marshallQualifyingProperties(Document document,
@@ -215,18 +261,20 @@ public class XAdESSignatureFacet implements SignatureFacet {
 	public static DigestAlgAndValueType getDigestAlgAndValue(
 			byte[] data,
 			ObjectFactory xadesObjectFactory,
-			be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory xmldsigObjectFactory) {
+			be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory xmldsigObjectFactory,
+			String digestAlgorithm) {
 		DigestAlgAndValueType digestAlgAndValue = xadesObjectFactory
 				.createDigestAlgAndValueType();
 
 		DigestMethodType digestMethod = xmldsigObjectFactory
 				.createDigestMethodType();
 		digestAlgAndValue.setDigestMethod(digestMethod);
-		digestMethod.setAlgorithm(DigestMethod.SHA1);
+		String xmlDigestAlgorithm = getXmlDigestAlgo(digestAlgorithm);
+		digestMethod.setAlgorithm(xmlDigestAlgorithm);
 
 		MessageDigest messageDigest;
 		try {
-			messageDigest = MessageDigest.getInstance("SHA1");
+			messageDigest = MessageDigest.getInstance(digestAlgorithm);
 		} catch (NoSuchAlgorithmException e) {
 			throw new RuntimeException("message digest algo error: "
 					+ e.getMessage(), e);
@@ -240,7 +288,8 @@ public class XAdESSignatureFacet implements SignatureFacet {
 	public static CertIDType getCertID(
 			X509Certificate certificate,
 			ObjectFactory xadesObjectFactory,
-			be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory xmldsigObjectFactory) {
+			be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory xmldsigObjectFactory,
+			String digestAlgorithm) {
 		CertIDType certId = xadesObjectFactory.createCertIDType();
 
 		X509IssuerSerialType issuerSerial = xmldsigObjectFactory
@@ -258,7 +307,8 @@ public class XAdESSignatureFacet implements SignatureFacet {
 					+ e.getMessage(), e);
 		}
 		DigestAlgAndValueType certDigest = getDigestAlgAndValue(
-				encodedCertificate, xadesObjectFactory, xmldsigObjectFactory);
+				encodedCertificate, xadesObjectFactory, xmldsigObjectFactory,
+				digestAlgorithm);
 		certId.setCertDigest(certDigest);
 
 		return certId;
