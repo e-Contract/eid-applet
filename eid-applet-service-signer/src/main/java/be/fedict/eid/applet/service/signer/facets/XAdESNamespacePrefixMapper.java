@@ -39,6 +39,9 @@ public class XAdESNamespacePrefixMapper extends NamespacePrefixMapper {
 		if (XAdESXLSignatureFacet.XADES_NAMESPACE.equals(namespaceUri)) {
 			return "xades";
 		}
+		if (XAdESXLSignatureFacet.XADES141_NAMESPACE.equals(namespaceUri)) {
+			return "xadesv141";
+		}
 		return suggestion;
 	}
 }

@@ -74,4 +74,8 @@ public class RevocationData {
 	public boolean hasCRLs() {
 		return false == this.crls.isEmpty();
 	}
+
+	public boolean hasRevocationDataEntries() {
+		return hasOCSPs() || hasCRLs();
+	}
 }
