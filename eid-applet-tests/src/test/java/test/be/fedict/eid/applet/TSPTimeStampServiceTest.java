@@ -76,6 +76,31 @@ public class TSPTimeStampServiceTest {
 	}
 
 	@Test
+	public void testGetTimeStampVerisign() throws Exception {
+		// setup
+		TimeStampServiceValidator validator = new TimeStampServiceTestValidator(
+				PROXY_HOST, PROXY_PORT);
+		// NOK: http://timestamp.verisign.com/scripts/timstamp.dll
+		// NOK: http://timestamp.verisign.com/scripts/timestamp.dll
+		// OK: http://timestamp.globalsign.com/scripts/timstamp.dll
+		// NOK: http://www.trustcenter.de/codesigning/timestamp
+		// http://timestamp.comodoca.com/authenticode
+		TSPTimeStampService service = new TSPTimeStampService(
+				"http://timestamp.comodoca.com/authenticode",
+				validator, null, null);
+		service.setProxy(PROXY_HOST, PROXY_PORT);
+		service.setDigestAlgo("SHA-1");
+
+		byte[] data = "hello world".getBytes();
+
+		// operate
+		byte[] result = service.timeStamp(data, null);
+
+		// verify
+		assertNotNull(result);
+	}
+
+	@Test
 	public void testGetTimeStampSHA256() throws Exception {
 		// setup
 		TimeStampServiceValidator validator = new TimeStampServiceTestValidator(
