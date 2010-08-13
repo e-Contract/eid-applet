@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.crypto.XMLStructure;
@@ -51,11 +52,17 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import be.fedict.eid.applet.service.signer.SignatureFacet;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.AnyType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.CertIDListType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.CertIDType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.DigestAlgAndValueType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.IdentifierType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.ObjectFactory;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.ObjectIdentifierType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.QualifyingPropertiesType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.SigPolicyQualifiersListType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.SignaturePolicyIdType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.SignaturePolicyIdentifierType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.SignedPropertiesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.SignedSignaturePropertiesType;
 import be.fedict.eid.applet.service.signer.jaxb.xmldsig.DigestMethodType;
@@ -90,6 +97,8 @@ public class XAdESSignatureFacet implements SignatureFacet {
 
 	private final String xmlDigestAlgorithm;
 
+	private final SignaturePolicyService signaturePolicyService;
+
 	/**
 	 * Default constructor. Will use a local clock and "SHA-1" for digest
 	 * algorithm.
@@ -120,7 +129,32 @@ public class XAdESSignatureFacet implements SignatureFacet {
 	}
 
 	/**
-	 * Main constructor.
+	 * Convenience constructor. Will use a local clock.
+	 * 
+	 * @param digestAlgorithm
+	 *            the digest algorithm to be used for all required XAdES digest
+	 *            operations. Possible values: "SHA-1", "SHA-256", or "SHA-512".
+	 * @param signaturePolicyService
+	 *            the optional signature policy service used for XAdES-EPES.
+	 */
+	public XAdESSignatureFacet(String digestAlgorithm,
+			SignaturePolicyService signaturePolicyService) {
+		this(new LocalClock(), digestAlgorithm, signaturePolicyService);
+	}
+
+	/**
+	 * Convenience constructor. Will use a local clock and "SHA-1" as digest
+	 * algorithm.
+	 * 
+	 * @param signaturePolicyService
+	 *            the optional signature policy service used for XAdES-EPES.
+	 */
+	public XAdESSignatureFacet(SignaturePolicyService signaturePolicyService) {
+		this(new LocalClock(), "SHA-1", signaturePolicyService);
+	}
+
+	/**
+	 * Convenience constructor.
 	 * 
 	 * @param clock
 	 *            the clock to be used for determining the xades:SigningTime
@@ -129,9 +163,26 @@ public class XAdESSignatureFacet implements SignatureFacet {
 	 *            operations. Possible values: "SHA-1", "SHA-256", or "SHA-512".
 	 */
 	public XAdESSignatureFacet(Clock clock, String digestAlgorithm) {
+		this(clock, digestAlgorithm, null);
+	}
+
+	/**
+	 * Main constructor.
+	 * 
+	 * @param clock
+	 *            the clock to be used for determining the xades:SigningTime
+	 * @param digestAlgorithm
+	 *            the digest algorithm to be used for all required XAdES digest
+	 *            operations. Possible values: "SHA-1", "SHA-256", or "SHA-512".
+	 * @param signaturePolicyService
+	 *            the optional signature policy service used for XAdES-EPES.
+	 */
+	public XAdESSignatureFacet(Clock clock, String digestAlgorithm,
+			SignaturePolicyService signaturePolicyService) {
 		this.clock = clock;
 		this.digestAlgorithm = digestAlgorithm;
 		this.xmlDigestAlgorithm = getXmlDigestAlgo(this.digestAlgorithm);
+		this.signaturePolicyService = signaturePolicyService;
 
 		try {
 			this.datatypeFactory = DatatypeFactory.newInstance();
@@ -204,6 +255,53 @@ public class XAdESSignatureFacet implements SignatureFacet {
 				.createCertIDListType();
 		signingCertificates.getCert().add(signingCertificateId);
 		signedSignatureProperties.setSigningCertificate(signingCertificates);
+
+		// XAdES-EPES
+		if (null != this.signaturePolicyService) {
+			SignaturePolicyIdentifierType signaturePolicyIdentifier = this.xadesObjectFactory
+					.createSignaturePolicyIdentifierType();
+			signedSignatureProperties
+					.setSignaturePolicyIdentifier(signaturePolicyIdentifier);
+
+			SignaturePolicyIdType signaturePolicyId = this.xadesObjectFactory
+					.createSignaturePolicyIdType();
+			signaturePolicyIdentifier.setSignaturePolicyId(signaturePolicyId);
+
+			ObjectIdentifierType objectIdentifier = this.xadesObjectFactory
+					.createObjectIdentifierType();
+			signaturePolicyId.setSigPolicyId(objectIdentifier);
+			IdentifierType identifier = this.xadesObjectFactory
+					.createIdentifierType();
+			objectIdentifier.setIdentifier(identifier);
+			identifier.setValue(this.signaturePolicyService
+					.getSignaturePolicyIdentifier());
+			objectIdentifier.setDescription(this.signaturePolicyService
+					.getSignaturePolicyDescription());
+
+			byte[] signaturePolicyDocumentData = this.signaturePolicyService
+					.getSignaturePolicyDocument();
+			DigestAlgAndValueType sigPolicyHash = getDigestAlgAndValue(
+					signaturePolicyDocumentData, this.xadesObjectFactory,
+					this.xmldsigObjectFactory, this.digestAlgorithm);
+			signaturePolicyId.setSigPolicyHash(sigPolicyHash);
+
+			String signaturePolicyDownloadUrl = this.signaturePolicyService
+					.getSignaturePolicyDownloadUrl();
+			if (null != signaturePolicyDownloadUrl) {
+				SigPolicyQualifiersListType sigPolicyQualifiers = this.xadesObjectFactory
+						.createSigPolicyQualifiersListType();
+				signaturePolicyId.setSigPolicyQualifiers(sigPolicyQualifiers);
+
+				AnyType sigPolicyQualifier = this.xadesObjectFactory
+						.createAnyType();
+				sigPolicyQualifiers.getSigPolicyQualifier().add(
+						sigPolicyQualifier);
+
+				JAXBElement<String> spUriElement = this.xadesObjectFactory
+						.createSPURI(signaturePolicyDownloadUrl);
+				sigPolicyQualifier.getContent().add(spUriElement);
+			}
+		}
 
 		// marshall XAdES QualifyingProperties
 		Node qualifyingPropertiesNode = marshallQualifyingProperties(document,

@@ -77,10 +77,13 @@ import org.w3c.dom.ls.LSResourceResolver;
 import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
 import be.fedict.eid.applet.service.signer.SignatureFacet;
 import be.fedict.eid.applet.service.signer.TemporaryDataStorage;
+import be.fedict.eid.applet.service.signer.facets.Clock;
 import be.fedict.eid.applet.service.signer.facets.EnvelopedSignatureFacet;
+import be.fedict.eid.applet.service.signer.facets.ExplicitSignaturePolicyService;
 import be.fedict.eid.applet.service.signer.facets.KeyInfoSignatureFacet;
 import be.fedict.eid.applet.service.signer.facets.RevocationData;
 import be.fedict.eid.applet.service.signer.facets.RevocationDataService;
+import be.fedict.eid.applet.service.signer.facets.SignaturePolicyService;
 import be.fedict.eid.applet.service.signer.facets.TimeStampService;
 import be.fedict.eid.applet.service.signer.facets.XAdESSignatureFacet;
 import be.fedict.eid.applet.service.signer.facets.XAdESXLSignatureFacet;
@@ -140,7 +143,11 @@ public class XAdESSignatureFacetTest {
 		EnvelopedSignatureFacet envelopedSignatureFacet = new EnvelopedSignatureFacet();
 		KeyInfoSignatureFacet keyInfoSignatureFacet = new KeyInfoSignatureFacet(
 				true, false, false);
-		XAdESSignatureFacet xadesSignatureFacet = new XAdESSignatureFacet();
+		SignaturePolicyService signaturePolicyService = new ExplicitSignaturePolicyService(
+				"urn:test", "hello world".getBytes(), "description",
+				"http://here.com");
+		XAdESSignatureFacet xadesSignatureFacet = new XAdESSignatureFacet(
+				signaturePolicyService);
 		TimeStampService mockTimeStampService = EasyMock
 				.createMock(TimeStampService.class);
 		RevocationDataService mockRevocationDataService = EasyMock
