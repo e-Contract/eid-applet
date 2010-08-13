@@ -328,7 +328,7 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		references.add(reference);
 	}
 
-	private static String getXmlDigestAlgo(String digestAlgo) {
+	public static String getXmlDigestAlgo(String digestAlgo) {
 		if ("SHA-1".equals(digestAlgo)) {
 			return DigestMethod.SHA1;
 		}

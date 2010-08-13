@@ -77,7 +77,6 @@ import org.w3c.dom.ls.LSResourceResolver;
 import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
 import be.fedict.eid.applet.service.signer.SignatureFacet;
 import be.fedict.eid.applet.service.signer.TemporaryDataStorage;
-import be.fedict.eid.applet.service.signer.facets.Clock;
 import be.fedict.eid.applet.service.signer.facets.EnvelopedSignatureFacet;
 import be.fedict.eid.applet.service.signer.facets.ExplicitSignaturePolicyService;
 import be.fedict.eid.applet.service.signer.facets.KeyInfoSignatureFacet;
@@ -152,11 +151,11 @@ public class XAdESSignatureFacetTest {
 				.createMock(TimeStampService.class);
 		RevocationDataService mockRevocationDataService = EasyMock
 				.createMock(RevocationDataService.class);
-		XAdESXLSignatureFacet xadesTSignatureFacet = new XAdESXLSignatureFacet(
+		XAdESXLSignatureFacet xadesXLSignatureFacet = new XAdESXLSignatureFacet(
 				mockTimeStampService, mockRevocationDataService);
 		XmlSignatureTestService testedInstance = new XmlSignatureTestService(
 				envelopedSignatureFacet, keyInfoSignatureFacet,
-				xadesSignatureFacet, xadesTSignatureFacet);
+				xadesSignatureFacet, xadesXLSignatureFacet);
 
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();

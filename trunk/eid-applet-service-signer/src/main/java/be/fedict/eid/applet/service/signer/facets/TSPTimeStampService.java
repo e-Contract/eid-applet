@@ -254,6 +254,8 @@ public class TSPTimeStampService implements TimeStampService {
 		}
 		String contentType = responseContentTypeHeader.getValue();
 		if (!contentType.startsWith("application/timestamp-reply")) {
+			LOG.debug("response content: "
+					+ postMethod.getResponseBodyAsString());
 			throw new RuntimeException("invalid Content-Type: " + contentType);
 		}
 		if (0 == postMethod.getResponseContentLength()) {

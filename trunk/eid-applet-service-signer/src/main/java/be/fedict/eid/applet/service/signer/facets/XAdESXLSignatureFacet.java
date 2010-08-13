@@ -216,10 +216,26 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		if (null == this.nsElement) {
 			this.nsElement = createNamespaceElement(baseNode);
 		}
+		return findSingleNode(baseNode, xpathExpression, this.nsElement);
+	}
+
+	public static Node findSingleNode(Node baseNode, String xpathExpression,
+			Element nsElement) {
 		try {
 			Node node = XPathAPI.selectSingleNode(baseNode, xpathExpression,
-					this.nsElement);
+					nsElement);
 			return node;
+		} catch (TransformerException e) {
+			throw new RuntimeException("XPath error: " + e.getMessage(), e);
+		}
+	}
+
+	public static NodeList getNodes(Node baseNode, String xpathExpression,
+			Element nsElement) {
+		try {
+			NodeList nodeList = XPathAPI.selectNodeList(baseNode,
+					xpathExpression, nsElement);
+			return nodeList;
 		} catch (TransformerException e) {
 			throw new RuntimeException("XPath error: " + e.getMessage(), e);
 		}
@@ -227,7 +243,7 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 
 	public void postSign(Element signatureElement,
 			List<X509Certificate> signingCertificateChain) {
-		LOG.debug("XAdES-T post sign phase");
+		LOG.debug("XAdES-X-L post sign phase");
 
 		// check for XAdES-BES
 		Node qualifyingPropertiesNode = findSingleNode(signatureElement,
@@ -250,7 +266,9 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		RevocationData tsaRevocationDataXadesT = new RevocationData();
 		XAdESTimeStampType signatureTimeStamp = createXAdESTimeStamp(
 				Collections.singletonList(signatureValueNode),
-				tsaRevocationDataXadesT);
+				tsaRevocationDataXadesT, this.c14nAlgoId,
+				this.timeStampService, this.objectFactory,
+				this.xmldsigObjectFactory);
 
 		// xades:UnsignedProperties/xades:UnsignedSignatureProperties/xades:SignatureTimeStamp
 		UnsignedPropertiesType unsignedProperties = this.objectFactory
@@ -434,7 +452,9 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 
 		RevocationData tsaRevocationDataXadesX1 = new RevocationData();
 		XAdESTimeStampType timeStampXadesX1 = createXAdESTimeStamp(
-				timeStampNodesXadesX1, tsaRevocationDataXadesX1);
+				timeStampNodesXadesX1, tsaRevocationDataXadesX1,
+				this.c14nAlgoId, this.timeStampService, this.objectFactory,
+				this.xmldsigObjectFactory);
 		ValidationDataType timeStampXadesX1ValidationData;
 		if (tsaRevocationDataXadesX1.hasRevocationDataEntries()) {
 			timeStampXadesX1ValidationData = createValidationData(tsaRevocationDataXadesX1);
@@ -489,7 +509,7 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		}
 	}
 
-	private byte[] getC14nValue(List<Node> nodeList) {
+	public static byte[] getC14nValue(List<Node> nodeList, String c14nAlgoId) {
 		byte[] c14nValue = null;
 		try {
 			for (Node node : nodeList) {
@@ -499,7 +519,7 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 				 */
 				Canonicalizer c14n;
 				try {
-					c14n = Canonicalizer.getInstance(this.c14nAlgoId);
+					c14n = Canonicalizer.getInstance(c14nAlgoId);
 				} catch (InvalidCanonicalizerException e) {
 					throw new RuntimeException("c14n algo error: "
 							+ e.getMessage(), e);
@@ -513,7 +533,7 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		return c14nValue;
 	}
 
-	private Element createNamespaceElement(Node documentNode) {
+	public static Element createNamespaceElement(Node documentNode) {
 		Document document = documentNode.getOwnerDocument();
 		Element nsElement = document.createElement("nsElement");
 		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds",
@@ -552,30 +572,47 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		}
 	}
 
-	private XAdESTimeStampType createXAdESTimeStamp(List<Node> nodeList,
-			RevocationData revocationData) {
+	public static XAdESTimeStampType createXAdESTimeStamp(
+			List<Node> nodeList,
+			RevocationData revocationData,
+			String c14nAlgoId,
+			TimeStampService timeStampService,
+			ObjectFactory objectFactory,
+			be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory xmldsigObjectFactory) {
+		byte[] c14nSignatureValueElement = getC14nValue(nodeList, c14nAlgoId);
+
+		return createXAdESTimeStamp(c14nSignatureValueElement, revocationData,
+				c14nAlgoId, timeStampService, objectFactory,
+				xmldsigObjectFactory);
+	}
+
+	public static XAdESTimeStampType createXAdESTimeStamp(
+			byte[] data,
+			RevocationData revocationData,
+			String c14nAlgoId,
+			TimeStampService timeStampService,
+			ObjectFactory objectFactory,
+			be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory xmldsigObjectFactory) {
 		// create the time-stamp
-		byte[] c14nSignatureValueElement = getC14nValue(nodeList);
 		byte[] timeStampToken;
 		try {
-			timeStampToken = this.timeStampService.timeStamp(
-					c14nSignatureValueElement, revocationData);
+			timeStampToken = timeStampService.timeStamp(data, revocationData);
 		} catch (Exception e) {
 			throw new RuntimeException("error while creating a time-stamp: "
 					+ e.getMessage(), e);
 		}
 
 		// create a XAdES time-stamp container
-		XAdESTimeStampType xadesTimeStamp = this.objectFactory
+		XAdESTimeStampType xadesTimeStamp = objectFactory
 				.createXAdESTimeStampType();
-		CanonicalizationMethodType c14nMethod = this.xmldsigObjectFactory
+		CanonicalizationMethodType c14nMethod = xmldsigObjectFactory
 				.createCanonicalizationMethodType();
-		c14nMethod.setAlgorithm(this.c14nAlgoId);
+		c14nMethod.setAlgorithm(c14nAlgoId);
 		xadesTimeStamp.setCanonicalizationMethod(c14nMethod);
 		xadesTimeStamp.setId("time-stamp-" + UUID.randomUUID().toString());
 
 		// embed the time-stamp
-		EncapsulatedPKIDataType encapsulatedTimeStamp = this.objectFactory
+		EncapsulatedPKIDataType encapsulatedTimeStamp = objectFactory
 				.createEncapsulatedPKIDataType();
 		encapsulatedTimeStamp.setValue(timeStampToken);
 		encapsulatedTimeStamp.setId("time-stamp-token-"
