@@ -81,29 +81,6 @@ public class PdfSpikeTest {
 		LOG.debug("tmp file: " + tmpFile.getAbsolutePath());
 		FileUtils.writeByteArrayToFile(tmpFile, baos.toByteArray());
 
-		// first we add an extra page
-		PdfReader reader = new PdfReader(new FileInputStream(tmpFile));
-		File preparedPdfFile = File.createTempFile("test-prepared-", ".pdf");
-		PdfStamper extraPagePdfStamper = new PdfStamper(reader,
-				new FileOutputStream(preparedPdfFile));
-		Rectangle pageSize = reader.getPageSize(1);
-		int pageCount = reader.getNumberOfPages();
-		int extraPageIndex = pageCount + 1;
-		extraPagePdfStamper.insertPage(extraPageIndex, pageSize);
-
-		int signatureNameIndex = 1;
-		String signatureName;
-		AcroFields existingAcroFields = reader.getAcroFields();
-		List<String> existingSignatureNames = existingAcroFields
-				.getSignatureNames();
-		do {
-			signatureName = "Signature" + signatureNameIndex;
-			signatureNameIndex++;
-		} while (existingSignatureNames.contains(signatureName));
-		LOG.debug("new unique signature name: " + signatureName);
-
-		extraPagePdfStamper.close();
-
 		// eID
 		PcscEid pcscEid = new PcscEid(new TestView(), new Messages(Locale
 				.getDefault()));
@@ -119,13 +96,31 @@ public class PdfSpikeTest {
 			certs[idx] = signCertificateChain.get(idx);
 		}
 
-		FileInputStream pdfInputStream = new FileInputStream(preparedPdfFile);
+		// open the pdf
+		FileInputStream pdfInputStream = new FileInputStream(tmpFile);
 		File signedTmpFile = File.createTempFile("test-signed-", ".pdf");
-		reader = new PdfReader(pdfInputStream);
-
+		PdfReader reader = new PdfReader(pdfInputStream);
 		FileOutputStream pdfOutputStream = new FileOutputStream(signedTmpFile);
 		PdfStamper stamper = PdfStamper.createSignature(reader,
 				pdfOutputStream, '\0', null, true);
+
+		// add extra page
+		Rectangle pageSize = reader.getPageSize(1);
+		int pageCount = reader.getNumberOfPages();
+		int extraPageIndex = pageCount + 1;
+		stamper.insertPage(extraPageIndex, pageSize);
+
+		// calculate unique signature field name
+		int signatureNameIndex = 1;
+		String signatureName;
+		AcroFields existingAcroFields = reader.getAcroFields();
+		List<String> existingSignatureNames = existingAcroFields
+				.getSignatureNames();
+		do {
+			signatureName = "Signature" + signatureNameIndex;
+			signatureNameIndex++;
+		} while (existingSignatureNames.contains(signatureName));
+		LOG.debug("new unique signature name: " + signatureName);
 
 		PdfSignatureAppearance signatureAppearance = stamper
 				.getSignatureAppearance();
