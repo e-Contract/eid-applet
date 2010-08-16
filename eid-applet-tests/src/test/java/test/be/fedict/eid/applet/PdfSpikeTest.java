@@ -25,6 +25,8 @@ import java.io.FileOutputStream;
 import java.security.MessageDigest;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -40,11 +42,13 @@ import be.fedict.eid.applet.sc.PcscEid;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.AcroFields;
 import com.lowagie.text.pdf.PdfAcroForm;
 import com.lowagie.text.pdf.PdfDictionary;
 import com.lowagie.text.pdf.PdfName;
 import com.lowagie.text.pdf.PdfPKCS7;
 import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfSigGenericPKCS;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.PdfString;
@@ -67,9 +71,13 @@ public class PdfSpikeTest {
 		titleParagraph.setAlignment(Paragraph.ALIGN_CENTER);
 		document.add(titleParagraph);
 
-		PdfAcroForm acroform = writer.getAcroForm();
+		document.newPage();
+		Paragraph textParagraph = new Paragraph("Hello world.");
+		document.add(textParagraph);
+
+		PdfAcroForm acroForm = writer.getAcroForm();
 		String signatureName = "Signature1";
-		acroform.addSignature(signatureName, 54, 440, 234, 566);
+		acroForm.addSignature(signatureName, 54, 440, 234, 566);
 
 		document.close();
 
@@ -96,21 +104,23 @@ public class PdfSpikeTest {
 		FileInputStream pdfInputStream = new FileInputStream(tmpFile);
 		File signedTmpFile = File.createTempFile("test-signed-", ".pdf");
 		PdfReader reader = new PdfReader(pdfInputStream);
+
 		FileOutputStream pdfOutputStream = new FileOutputStream(signedTmpFile);
 		PdfStamper stamper = PdfStamper.createSignature(reader,
-				pdfOutputStream, '\0');
+				pdfOutputStream, '\0', null, true);
 
 		PdfSignatureAppearance signatureAppearance = stamper
 				.getSignatureAppearance();
 		signatureAppearance.setCrypto(null, certs, null,
 				PdfSignatureAppearance.SELF_SIGNED);
+		signatureAppearance
+				.setCertificationLevel(PdfSignatureAppearance.CERTIFIED_NO_CHANGES_ALLOWED);
 		signatureAppearance.setReason("PDF Signature Test");
 		signatureAppearance.setLocation("Belgium");
 		signatureAppearance.setVisibleSignature(signatureName);
 		signatureAppearance.setExternalDigest(new byte[128], new byte[20],
 				"RSA");
 		signatureAppearance.preClose();
-		PdfPKCS7 signature = signatureAppearance.getSigStandard().getSigner();
 
 		byte[] content = IOUtils.toByteArray(signatureAppearance
 				.getRangeStream());
@@ -118,13 +128,38 @@ public class PdfSpikeTest {
 		byte[] signatureBytes = pcscEid.sign(hash, "SHA-1");
 		pcscEid.close();
 
-		signature.setExternalDigest(signatureBytes, null, "RSA");
-
-		PdfDictionary dic = new PdfDictionary();
-		dic.put(PdfName.CONTENTS, new PdfString(signature.getEncodedPKCS1())
-				.setHexWriting(true));
-		signatureAppearance.close(dic);
+		PdfSigGenericPKCS sigStandard = signatureAppearance.getSigStandard();
+		PdfPKCS7 signature = sigStandard.getSigner();
+		signature.setExternalDigest(signatureBytes, hash, "RSA");
+		PdfDictionary dictionary = new PdfDictionary();
+		dictionary.put(PdfName.CONTENTS, new PdfString(signature
+				.getEncodedPKCS1()).setHexWriting(true));
+		signatureAppearance.close(dictionary);
 
 		LOG.debug("signed tmp file: " + signedTmpFile.getAbsolutePath());
+
+		// verify the signature
+		reader = new PdfReader(new FileInputStream(signedTmpFile));
+		AcroFields acroFields = reader.getAcroFields();
+		ArrayList<String> signatureNames = acroFields.getSignatureNames();
+		for (String signName : signatureNames) {
+			LOG.debug("signature name: " + signName);
+			LOG.debug("signature covers whole document: "
+					+ acroFields.signatureCoversWholeDocument(signName));
+			LOG.debug("document revision " + acroFields.getRevision(signName)
+					+ " of " + acroFields.getTotalRevisions());
+			PdfPKCS7 pkcs7 = acroFields.verifySignature(signName);
+			Calendar signDate = pkcs7.getSignDate();
+			LOG.debug("signing date: " + signDate.getTime());
+			LOG.debug("Subject: "
+					+ PdfPKCS7.getSubjectFields(pkcs7.getSigningCertificate()));
+			LOG.debug("Document modified: " + !pkcs7.verify());
+			Certificate[] verifyCerts = pkcs7.getCertificates();
+			for (Certificate certificate : verifyCerts) {
+				X509Certificate x509Certificate = (X509Certificate) certificate;
+				LOG.debug("cert subject: "
+						+ x509Certificate.getSubjectX500Principal());
+			}
+		}
 	}
 }
