@@ -42,8 +42,8 @@ import be.fedict.eid.applet.sc.PcscEid;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
+import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.AcroFields;
-import com.lowagie.text.pdf.PdfAcroForm;
 import com.lowagie.text.pdf.PdfDictionary;
 import com.lowagie.text.pdf.PdfName;
 import com.lowagie.text.pdf.PdfPKCS7;
@@ -63,7 +63,7 @@ public class PdfSpikeTest {
 		// create a sample PDF file
 		Document document = new Document();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		PdfWriter writer = PdfWriter.getInstance(document, baos);
+		PdfWriter.getInstance(document, baos);
 
 		document.open();
 
@@ -75,15 +75,34 @@ public class PdfSpikeTest {
 		Paragraph textParagraph = new Paragraph("Hello world.");
 		document.add(textParagraph);
 
-		PdfAcroForm acroForm = writer.getAcroForm();
-		String signatureName = "Signature1";
-		acroForm.addSignature(signatureName, 54, 440, 234, 566);
-
 		document.close();
 
 		File tmpFile = File.createTempFile("test-", ".pdf");
 		LOG.debug("tmp file: " + tmpFile.getAbsolutePath());
 		FileUtils.writeByteArrayToFile(tmpFile, baos.toByteArray());
+
+		// first we add an extra page
+		PdfReader reader = new PdfReader(new FileInputStream(tmpFile));
+		File preparedPdfFile = File.createTempFile("test-prepared-", ".pdf");
+		PdfStamper extraPagePdfStamper = new PdfStamper(reader,
+				new FileOutputStream(preparedPdfFile));
+		Rectangle pageSize = reader.getPageSize(1);
+		int pageCount = reader.getNumberOfPages();
+		int extraPageIndex = pageCount + 1;
+		extraPagePdfStamper.insertPage(extraPageIndex, pageSize);
+
+		int signatureNameIndex = 1;
+		String signatureName;
+		AcroFields existingAcroFields = reader.getAcroFields();
+		List<String> existingSignatureNames = existingAcroFields
+				.getSignatureNames();
+		do {
+			signatureName = "Signature" + signatureNameIndex;
+			signatureNameIndex++;
+		} while (existingSignatureNames.contains(signatureName));
+		LOG.debug("new unique signature name: " + signatureName);
+
+		extraPagePdfStamper.close();
 
 		// eID
 		PcscEid pcscEid = new PcscEid(new TestView(), new Messages(Locale
@@ -100,10 +119,9 @@ public class PdfSpikeTest {
 			certs[idx] = signCertificateChain.get(idx);
 		}
 
-		// http://itext.ugent.be/articles/eid-pdf/index.php?page=3#start
-		FileInputStream pdfInputStream = new FileInputStream(tmpFile);
+		FileInputStream pdfInputStream = new FileInputStream(preparedPdfFile);
 		File signedTmpFile = File.createTempFile("test-signed-", ".pdf");
-		PdfReader reader = new PdfReader(pdfInputStream);
+		reader = new PdfReader(pdfInputStream);
 
 		FileOutputStream pdfOutputStream = new FileOutputStream(signedTmpFile);
 		PdfStamper stamper = PdfStamper.createSignature(reader,
@@ -117,7 +135,9 @@ public class PdfSpikeTest {
 				.setCertificationLevel(PdfSignatureAppearance.CERTIFIED_NO_CHANGES_ALLOWED);
 		signatureAppearance.setReason("PDF Signature Test");
 		signatureAppearance.setLocation("Belgium");
-		signatureAppearance.setVisibleSignature(signatureName);
+		signatureAppearance
+				.setVisibleSignature(new Rectangle(54, 440, 234, 566),
+						extraPageIndex, signatureName);
 		signatureAppearance.setExternalDigest(new byte[128], new byte[20],
 				"RSA");
 		signatureAppearance.preClose();
