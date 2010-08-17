@@ -97,6 +97,7 @@ import be.fedict.eid.applet.service.signer.jaxb.xades132.UnsignedSignatureProper
 import be.fedict.eid.applet.service.signer.jaxb.xades132.XAdESTimeStampType;
 import be.fedict.eid.applet.service.signer.jaxb.xades141.ValidationDataType;
 import be.fedict.eid.applet.service.signer.jaxb.xmldsig.CanonicalizationMethodType;
+import be.fedict.eid.applet.service.signer.time.TimeStampService;
 
 /**
  * XAdES-X-L v1.4.1 signature facet. This signature facet implementation will
@@ -105,6 +106,9 @@ import be.fedict.eid.applet.service.signer.jaxb.xmldsig.CanonicalizationMethodTy
  * We don't inherit from XAdESSignatureFacet as we also want to be able to use
  * this facet out of the context of a signature creation. This signature facet
  * assumes that the signature is already XAdES-BES compliant.
+ * 
+ * This implementation has been tested against an implementation that
+ * participated multiple ETSI XAdES plugtests.
  * 
  * @author Frank Cornelis
  * @see XAdESSignatureFacet

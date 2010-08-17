@@ -29,14 +29,14 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * ODT Entity Resolver for MathML DTD.
+ * ODF Entity Resolver for MathML DTD.
  * 
  * @author Frank Cornelis
  * 
  */
-public class ODTEntityResolver implements EntityResolver {
+public class ODFEntityResolver implements EntityResolver {
 
-	private static final Log LOG = LogFactory.getLog(ODTEntityResolver.class);
+	private static final Log LOG = LogFactory.getLog(ODFEntityResolver.class);
 
 	public InputSource resolveEntity(String publicId, String systemId)
 			throws SAXException, IOException {
@@ -45,7 +45,7 @@ public class ODTEntityResolver implements EntityResolver {
 		LOG.debug("systemId: " + systemId);
 		if ("-//OpenOffice.org//DTD Modified W3C MathML 1.01//EN"
 				.equals(publicId)) {
-			InputStream mathmlDtdInputStream = ODTEntityResolver.class
+			InputStream mathmlDtdInputStream = ODFEntityResolver.class
 					.getResourceAsStream("/mmlents/mathml.dtd");
 			InputSource inputSource = new InputSource(mathmlDtdInputStream);
 			return inputSource;
@@ -53,7 +53,7 @@ public class ODTEntityResolver implements EntityResolver {
 		if (systemId.endsWith(".ent")) {
 			String filename = FilenameUtils.getBaseName(systemId);
 			LOG.debug("ent filename: " + filename);
-			InputStream entInputStream = ODTEntityResolver.class
+			InputStream entInputStream = ODFEntityResolver.class
 					.getResourceAsStream("/mmlents/" + filename + ".ent");
 			InputSource inputSource = new InputSource(entInputStream);
 			return inputSource;

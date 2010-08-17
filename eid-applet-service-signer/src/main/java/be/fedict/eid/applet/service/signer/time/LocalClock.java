@@ -16,22 +16,20 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.service.signer.facets;
+package be.fedict.eid.applet.service.signer.time;
 
 import java.util.Date;
 
+
 /**
- * Interface for a clock.
+ * Implementation of a clock using the local system time.
  * 
  * @author Frank Cornelis
  * 
  */
-public interface Clock {
+public class LocalClock implements Clock {
 
-	/**
-	 * Gives back the current time.
-	 * 
-	 * @return
-	 */
-	Date getTime();
+	public Date getTime() {
+		return new Date();
+	}
 }

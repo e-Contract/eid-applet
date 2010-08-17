@@ -90,7 +90,7 @@ public class ODFURIDereferencer implements URIDereferencer {
 			throw new RuntimeException(
 					"parser config error: " + e.getMessage(), e);
 		}
-		EntityResolver entityResolver = new ODTEntityResolver();
+		EntityResolver entityResolver = new ODFEntityResolver();
 		this.documentBuilder.setEntityResolver(entityResolver);
 	}
 

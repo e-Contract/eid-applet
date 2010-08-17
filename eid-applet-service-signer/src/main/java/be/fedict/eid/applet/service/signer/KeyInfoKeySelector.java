@@ -65,6 +65,7 @@ public class KeyInfoKeySelector extends KeySelector implements
 
 	private X509Certificate certificate;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public KeySelectorResult select(KeyInfo keyInfo, Purpose purpose,
 			AlgorithmMethod method, XMLCryptoContext context)
