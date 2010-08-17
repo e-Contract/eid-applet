@@ -29,9 +29,6 @@ import java.util.Date;
 
 import org.apache.commons.codec.binary.Base64;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * A light implementation of VCard 3.0
  *
@@ -39,7 +36,6 @@ import org.apache.commons.logging.LogFactory;
  * @author Bart Hanssens
  */
 public class VcardLight {
-    private static final Log LOG = LogFactory.getLog(VcardLight.class);
 
     /* correct MIME type, not text/x-vcard */
     public static final String MIME_TYPE = "text/directory;profile=vCard";

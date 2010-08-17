@@ -42,6 +42,7 @@ import be.fedict.eid.applet.service.impl.CleanSessionProtocolStateListener;
 import be.fedict.eid.applet.service.impl.HttpServletProtocolContext;
 import be.fedict.eid.applet.service.impl.HttpServletRequestHttpReceiver;
 import be.fedict.eid.applet.service.impl.HttpServletResponseHttpTransmitter;
+import be.fedict.eid.applet.service.impl.RequestContext;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.impl.handler.AuthenticationDataMessageHandler;
 import be.fedict.eid.applet.service.impl.handler.ClientEnvironmentMessageHandler;
@@ -128,7 +129,7 @@ public class AppletServiceServlet extends HttpServlet {
 		LOG.debug("init");
 
 		this.messageHandlers = new HashMap<Class<?>, MessageHandler<?>>();
-		for (Class<? extends MessageHandler> messageHandlerClass : MESSAGE_HANDLER_CLASSES) {
+		for (Class<? extends MessageHandler<?>> messageHandlerClass : MESSAGE_HANDLER_CLASSES) {
 			HandlesMessage handlesMessageAnnotation = messageHandlerClass
 					.getAnnotation(HandlesMessage.class);
 			if (null == handlesMessageAnnotation) {
@@ -293,6 +294,8 @@ public class AppletServiceServlet extends HttpServlet {
 				request);
 		protocolStateMachine
 				.addProtocolStateListener(cleanSessionProtocolStateListener);
+		RequestContext requestContext = new RequestContext(request);
+		protocolStateMachine.addProtocolStateListener(requestContext);
 		protocolStateMachine.checkRequestMessage(transferObject);
 
 		/*

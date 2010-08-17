@@ -44,6 +44,7 @@ import org.junit.Test;
 import be.fedict.eid.applet.service.AppletServiceServlet;
 import be.fedict.eid.applet.service.EIdData;
 import be.fedict.eid.applet.service.Identity;
+import be.fedict.eid.applet.service.impl.RequestContext;
 import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
 import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
 import be.fedict.eid.applet.shared.IdentityDataMessage;
@@ -72,13 +73,6 @@ public class IdentityDataMessageHandlerTest {
 		HttpServletRequest mockServletRequest = EasyMock
 				.createMock(HttpServletRequest.class);
 
-		EasyMock.expect(mockServletConfig.getInitParameter("IncludeAddress"))
-				.andStubReturn(null);
-		EasyMock.expect(mockServletConfig.getInitParameter("IncludePhoto"))
-				.andStubReturn(null);
-		EasyMock.expect(
-				mockServletConfig.getInitParameter("IncludeCertificates"))
-				.andStubReturn(null);
 		EasyMock.expect(
 				mockServletConfig.getInitParameter("IdentityIntegrityService"))
 				.andStubReturn(null);
@@ -101,6 +95,22 @@ public class IdentityDataMessageHandlerTest {
 				.andStubReturn(null);
 		mockHttpSession.setAttribute(EasyMock.eq("eid"), EasyMock
 				.isA(EIdData.class));
+
+		EasyMock
+				.expect(
+						mockHttpSession
+								.getAttribute(RequestContext.INCLUDE_ADDRESS_SESSION_ATTRIBUTE))
+				.andStubReturn(false);
+		EasyMock
+				.expect(
+						mockHttpSession
+								.getAttribute(RequestContext.INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE))
+				.andStubReturn(false);
+		EasyMock
+				.expect(
+						mockHttpSession
+								.getAttribute(RequestContext.INCLUDE_PHOTO_SESSION_ATTRIBUTE))
+				.andStubReturn(false);
 
 		byte[] idFile = "foobar-id-file".getBytes();
 		IdentityDataMessage message = new IdentityDataMessage();
@@ -142,13 +152,6 @@ public class IdentityDataMessageHandlerTest {
 		HttpServletRequest mockServletRequest = EasyMock
 				.createMock(HttpServletRequest.class);
 
-		EasyMock.expect(mockServletConfig.getInitParameter("IncludeAddress"))
-				.andStubReturn(null);
-		EasyMock.expect(mockServletConfig.getInitParameter("IncludePhoto"))
-				.andStubReturn(null);
-		EasyMock.expect(
-				mockServletConfig.getInitParameter("IncludeCertificates"))
-				.andStubReturn(null);
 		EasyMock.expect(
 				mockServletConfig.getInitParameter("IdentityIntegrityService"))
 				.andStubReturn(null);
@@ -174,6 +177,22 @@ public class IdentityDataMessageHandlerTest {
 				.andStubReturn(null);
 		mockHttpSession.setAttribute(EasyMock.eq("eid"), EasyMock
 				.isA(EIdData.class));
+
+		EasyMock
+				.expect(
+						mockHttpSession
+								.getAttribute(RequestContext.INCLUDE_ADDRESS_SESSION_ATTRIBUTE))
+				.andStubReturn(false);
+		EasyMock
+				.expect(
+						mockHttpSession
+								.getAttribute(RequestContext.INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE))
+				.andStubReturn(false);
+		EasyMock
+				.expect(
+						mockHttpSession
+								.getAttribute(RequestContext.INCLUDE_PHOTO_SESSION_ATTRIBUTE))
+				.andStubReturn(false);
 
 		byte[] idFile = "foobar-id-file".getBytes();
 		IdentityDataMessage message = new IdentityDataMessage();
@@ -220,13 +239,6 @@ public class IdentityDataMessageHandlerTest {
 		HttpServletRequest mockServletRequest = EasyMock
 				.createMock(HttpServletRequest.class);
 
-		EasyMock.expect(mockServletConfig.getInitParameter("IncludeAddress"))
-				.andStubReturn(null);
-		EasyMock.expect(mockServletConfig.getInitParameter("IncludePhoto"))
-				.andStubReturn(null);
-		EasyMock.expect(
-				mockServletConfig.getInitParameter("IncludeCertificates"))
-				.andStubReturn(null);
 		EasyMock.expect(
 				mockServletConfig.getInitParameter("IdentityIntegrityService"))
 				.andStubReturn(null);
@@ -245,6 +257,22 @@ public class IdentityDataMessageHandlerTest {
 
 		EasyMock.expect(mockServletRequest.getRemoteAddr()).andStubReturn(
 				"remote-address");
+
+		EasyMock
+				.expect(
+						mockHttpSession
+								.getAttribute(RequestContext.INCLUDE_ADDRESS_SESSION_ATTRIBUTE))
+				.andStubReturn(false);
+		EasyMock
+				.expect(
+						mockHttpSession
+								.getAttribute(RequestContext.INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE))
+				.andStubReturn(false);
+		EasyMock
+				.expect(
+						mockHttpSession
+								.getAttribute(RequestContext.INCLUDE_PHOTO_SESSION_ATTRIBUTE))
+				.andStubReturn(false);
 
 		byte[] idFile = "foobar-id-file".getBytes();
 		IdentityDataMessage message = new IdentityDataMessage();
@@ -297,13 +325,6 @@ public class IdentityDataMessageHandlerTest {
 		HttpServletRequest mockServletRequest = EasyMock
 				.createMock(HttpServletRequest.class);
 
-		EasyMock.expect(mockServletConfig.getInitParameter("IncludeAddress"))
-				.andStubReturn(null);
-		EasyMock.expect(mockServletConfig.getInitParameter("IncludePhoto"))
-				.andStubReturn(null);
-		EasyMock.expect(
-				mockServletConfig.getInitParameter("IncludeCertificates"))
-				.andStubReturn(null);
 		EasyMock.expect(
 				mockServletConfig.getInitParameter("IdentityIntegrityService"))
 				.andStubReturn(null);
@@ -319,6 +340,22 @@ public class IdentityDataMessageHandlerTest {
 		EasyMock.expect(
 				mockServletConfig.getInitParameter("SkipNationalNumberCheck"))
 				.andStubReturn(null);
+
+		EasyMock
+				.expect(
+						mockHttpSession
+								.getAttribute(RequestContext.INCLUDE_ADDRESS_SESSION_ATTRIBUTE))
+				.andStubReturn(false);
+		EasyMock
+				.expect(
+						mockHttpSession
+								.getAttribute(RequestContext.INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE))
+				.andStubReturn(false);
+		EasyMock
+				.expect(
+						mockHttpSession
+								.getAttribute(RequestContext.INCLUDE_PHOTO_SESSION_ATTRIBUTE))
+				.andStubReturn(false);
 
 		EasyMock.expect(mockServletRequest.getRemoteAddr()).andStubReturn(
 				"remote-address");

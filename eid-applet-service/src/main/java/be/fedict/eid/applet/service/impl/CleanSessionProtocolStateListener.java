@@ -106,4 +106,10 @@ public class CleanSessionProtocolStateListener implements ProtocolStateListener 
 		}
 		}
 	}
+
+	public void startProtocolRun() {
+	}
+
+	public void stopProtocolRun() {
+	}
 }

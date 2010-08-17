@@ -25,9 +25,6 @@ import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * A "light" implementation of OGC standard KML 2.2
  * This class merely creates the KMZ zip package
@@ -36,7 +33,6 @@ import org.apache.commons.logging.LogFactory;
  * @author Bart Hanssens
  */
 public class KmlLight {
-    private static final Log LOG = LogFactory.getLog(KmlLight.class);
 
     /* yes, this is the correct MIME TYPE used by OGC standard */
     public static final String MIME_TYPE = "application/vnd.google-earth.kmz";

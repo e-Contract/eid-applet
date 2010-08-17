@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2010 FedICT.
+ * Copyright (C) 2010 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -18,27 +18,20 @@
 
 package be.fedict.eid.applet.service.spi;
 
-import java.io.Serializable;
-
 /**
- * Address Data Transfer Object.
+ * Interface for identity services. An identity service allows for run-time
+ * selected of required identity data like address, photo.
  * 
  * @author Frank Cornelis
- * @see Identity
  * 
  */
-public class AddressDTO implements Serializable {
+public interface IdentityService {
 
-	/*
-	 * We implement serializable to allow this class to be used in distributed
-	 * containers as defined in the Servlet v2.4 specification.
+	/**
+	 * Gives back an identity request object that indicates what eID identity
+	 * data we exactly want to retrieve from the user.
+	 * 
+	 * @return
 	 */
-
-	private static final long serialVersionUID = 1L;
-
-	public String streetAndNumber;
-
-	public String zip;
-
-	public String city;
+	IdentityRequest getIdentityRequest();
 }
