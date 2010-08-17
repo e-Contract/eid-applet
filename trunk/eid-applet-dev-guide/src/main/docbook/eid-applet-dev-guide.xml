@@ -75,6 +75,17 @@
 				.
 			</para>
 		</tip>
+		<warning>
+			<title>eID Applet Source Code Branching</title>
+			<para>
+				While some might feel very tempted to branch the eID Applet,
+				given the open source nature of this project, (for example for
+				branding reasons) one needs to take all aspects of branching into
+				consideration. If you branch you will lose all official bug fixes
+				unless you back-port them manually which can be quite time
+				consuming.  
+			</para>
+		</warning>
 		<tip>
 			<title>eID Applet Support</title>
 			<para>
@@ -324,10 +335,26 @@
 						</entry>
 						<entry>optional</entry>
 						<entry>
-							Via this parameter you can let the eID Applet to use the
-							given
-							User-Agent HTTP header. Example value:
+							Via this parameter you can let the eID Applet to use the given
+							User-Agent HTTP header. Some servers might require that the
+							User-Agent reported by the eID Applet is the same as the one
+							reported by the web browser to be able to use the same HTTP
+							session context. Example value:
 							<code>navigator.userAgent</code>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<code>HideDetailsButton</code>
+						</entry>
+						<entry>optional</entry>
+						<entry>
+							When this parameter is set to
+							<code>true</code>
+							the eID Applet will hide the details button. To compensate for
+							this, the eID Applet will use the Java Console to output detailed
+							logging. Please note that the Java Console is not available on
+							every platform.
 						</entry>
 					</row>
 				</tbody>
