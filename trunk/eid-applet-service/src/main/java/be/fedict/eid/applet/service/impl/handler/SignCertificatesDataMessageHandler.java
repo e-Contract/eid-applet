@@ -40,6 +40,7 @@ import org.apache.commons.logging.LogFactory;
 import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.dto.DTOMapper;
+import be.fedict.eid.applet.service.impl.RequestContext;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
 import be.fedict.eid.applet.service.spi.AddressDTO;
@@ -80,15 +81,6 @@ public class SignCertificatesDataMessageHandler implements
 	@InitParam(HelloMessageHandler.NO_PKCS11_INIT_PARAM_NAME)
 	private boolean noPkcs11;
 
-	@InitParam(HelloMessageHandler.INCLUDE_PHOTO_INIT_PARAM_NAME)
-	private boolean includePhoto;
-
-	@InitParam(HelloMessageHandler.INCLUDE_ADDRESS_INIT_PARAM_NAME)
-	private boolean includeAddress;
-
-	@InitParam(HelloMessageHandler.INCLUDE_IDENTITY_INIT_PARAM_NAME)
-	private boolean includeIdentity;
-
 	@InitParam(HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<IdentityIntegrityService> identityIntegrityServiceLocator;
 
@@ -109,14 +101,18 @@ public class SignCertificatesDataMessageHandler implements
 		LOG.debug("signing certificate: "
 				+ signingCertificateChain.get(0).getSubjectX500Principal());
 
+		RequestContext requestContext = new RequestContext(session);
+		boolean includeIdentity = requestContext.includeIdentity();
+		boolean includeAddress = requestContext.includeAddress();
+		boolean includePhoto = requestContext.includePhoto();
+
 		Identity identity = null;
 		Address address = null;
-		byte[] photo = null;
-		if (this.includeIdentity || this.includeAddress || this.includePhoto) {
+		if (includeIdentity || includeAddress || includePhoto) {
 			/*
 			 * Pre-sign phase including identity data.
 			 */
-			if (this.includeIdentity) {
+			if (includeIdentity) {
 				if (null == message.identityData) {
 					throw new ServletException("identity data missing");
 				}
@@ -124,14 +120,14 @@ public class SignCertificatesDataMessageHandler implements
 						.parse(message.identityData, Identity.class);
 			}
 
-			if (this.includeAddress) {
+			if (includeAddress) {
 				if (null == message.addressData) {
 					throw new ServletException("address data missing");
 				}
 				address = TlvParser.parse(message.addressData, Address.class);
 			}
 
-			if (this.includePhoto) {
+			if (includePhoto) {
 				if (null == message.photoData) {
 					throw new ServletException("photo data missing");
 				}
@@ -143,7 +139,6 @@ public class SignCertificatesDataMessageHandler implements
 						throw new ServletException("photo digest incorrect");
 					}
 				}
-				photo = message.photoData;
 			}
 
 			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator

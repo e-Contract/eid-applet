@@ -18,8 +18,6 @@
 
 package be.fedict.eid.applet.shared.protocol;
 
-
-
 /**
  * Interface for protocol state listeners.
  * 
@@ -34,4 +32,14 @@ public interface ProtocolStateListener {
 	 * @param newProtocolState
 	 */
 	void protocolStateTransition(ProtocolState newProtocolState);
+
+	/**
+	 * Called when a protocol run starts.
+	 */
+	void startProtocolRun();
+
+	/**
+	 * Called when a protocol run ends.
+	 */
+	void stopProtocolRun();
 }

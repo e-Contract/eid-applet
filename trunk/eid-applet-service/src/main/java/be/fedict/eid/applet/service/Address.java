@@ -24,7 +24,6 @@ import be.fedict.eid.applet.service.dto.Mapping;
 import be.fedict.eid.applet.service.dto.MapsTo;
 import be.fedict.eid.applet.service.impl.tlv.TlvField;
 import be.fedict.eid.applet.service.spi.AddressDTO;
-import be.fedict.eid.applet.service.spi.IdentityDTO;
 
 /**
  * Holds all the fields within the eID address file. The nationality can be

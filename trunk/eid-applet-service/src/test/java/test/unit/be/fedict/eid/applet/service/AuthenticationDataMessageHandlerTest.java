@@ -52,7 +52,6 @@ import be.fedict.eid.applet.service.impl.handler.HelloMessageHandler;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
 import be.fedict.eid.applet.shared.AuthenticationContract;
 import be.fedict.eid.applet.shared.AuthenticationDataMessage;
-import be.fedict.eid.applet.shared.AuthenticationRequestMessage;
 
 public class AuthenticationDataMessageHandlerTest {
 

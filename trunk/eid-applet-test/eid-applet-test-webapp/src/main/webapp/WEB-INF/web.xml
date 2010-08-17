@@ -229,16 +229,8 @@
 			<param-value>test/eid/applet/model/SecureClientEnvironmentCheckerBean</param-value>
 		</init-param>
 		<init-param>
-			<param-name>IncludeAddress</param-name>
-			<param-value>true</param-value>
-		</init-param>
-		<init-param>
-			<param-name>IncludePhoto</param-name>
-			<param-value>true</param-value>
-		</init-param>
-		<init-param>
-			<param-name>IncludeCertificates</param-name>
-			<param-value>true</param-value>
+			<param-name>IdentityService</param-name>
+			<param-value>test/eid/applet/model/IdentityServiceBean</param-value>
 		</init-param>
 		<init-param>
 			<param-name>IdentityIntegrityService</param-name>

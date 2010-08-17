@@ -12,7 +12,7 @@
 			<year>2008-2010</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>03 August 2010</releaseinfo>
+		<releaseinfo>17 August 2010</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -1377,15 +1377,22 @@
 			</para>
 			<itemizedlist>
 				<listitem>
-					<para>ODF 1.2 signatures (supported by OpenOffice.org 3.1)</para>
+					<para>ODF 1.2 signatures (supported by OpenOffice.org 3.1/3.2)
+					</para>
 				</listitem>
 				<listitem>
-					<para>Office OpenXML (supported by Microsoft Office 2007)</para>
+					<para>Office OpenXML (supported by Microsoft Office 2007/2010)
+					</para>
 				</listitem>
 				<listitem>
 					<para>CMS signatures (PKCS#7)</para>
 				</listitem>
 			</itemizedlist>
+			<para>
+				Besides different signature service implementations we also
+				provide a XAdES-X-L v1.4.1 implementation as an XML signature
+				service facet.
+			</para>
 			<note>
 				<title>PKI Validation</title>
 				<para>The eID Applet Service does not perform any PKI validation.
@@ -1865,6 +1872,43 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
 			</section>
+			<section>
+				<title>Run-time selection of required eID identity data</title>
+				<para>
+					Places where you can use
+					<code>IncludeIdentity</code>
+					,
+					<code>IncludeAddress</code>
+					,
+					<code>IncludePhoto</code>
+					or
+					<code>IncludeCertificates</code>
+					one can also use the
+					<code>IdentityService</code>
+					SPI to have run-time selection of the eID identity data objects
+					that have to be retrieved from the eID card. To activate this
+					functionality you need to implement the
+					<code>IdentityService</code>
+					interface. This interface can be found in the
+					<code>eid-applet-service-spi</code>
+					artifact. This service component (EJB3) session bean should be
+					registered somewhere in JNDI. The JNDI location of this service
+					component needs to be set via the following
+					<code>init-param</code>
+					on the
+					<code>IdentityService</code>
+					:
+				</para>
+				<programlisting role="XML"><![CDATA[<init-param>
+	<param-name>IdentityService</param-name>
+	<param-value>your/location/in/jndi/IdentityServiceBean</param-value>
+</init-param>]]></programlisting>
+				<para>
+					The Javadoc documentation of the
+					<code>IdentityService</code>
+					SPI is part of the eID Applet SDK package.
+				</para>
+			</section>
 		</section>
 	</section>
 	<section>
@@ -2025,21 +2069,32 @@ ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlis
 				</para>
 			</section>
 		</section>
-                <section>
-                        <title>Screen Reader Support</title>
-                        <para>Please note that, although recent screen readers should
-                            be able to read out the dialog boxes and status messages of
-                            the eID applet, the exact behavior depends on operating system,
-                            screen reader software and browser version.
+		<section>
+			<title>Screen Reader Support</title>
+			<para>Please note that, although recent screen readers should
+				be able
+				to read out the dialog boxes and status messages of
+				the eID applet,
+				the exact behavior depends on operating system,
+				screen reader
+				software and browser version.
                         </para>
-                        <para>For instance, some configurations do not automatically
-                            read out non-focusable text inside dialog boxes. However,
-                            it is often possible to read out the dialog boxes by using a
-                            keyboard command (JAWS and NVDA users may want to try
-                        <keycombo><keycap>Insert</keycap><keycap>B</keycap></keycombo>).
-                            Please consult your screen reader's manual for more information.
-                        </para>
-                </section>
+			<para>
+				For instance, some configurations do not automatically
+				read out
+				non-focusable text inside dialog boxes. However,
+				it is often possible
+				to read out the dialog boxes by using a
+				keyboard command (JAWS and
+				NVDA users may want to try
+				<keycombo>
+					<keycap>Insert</keycap>
+					<keycap>B</keycap>
+				</keycombo>
+				).
+				Please consult your screen reader's manual for more information.
+			</para>
+		</section>
 	</section>
 	<section>
 		<title>eID Applet Protocol</title>

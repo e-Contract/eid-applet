@@ -39,6 +39,7 @@ public class DTOMapper {
 	 *            the class to map to.
 	 * @return the mapped object.
 	 */
+	@SuppressWarnings("unchecked")
 	public <T> T map(Object from, Class<T> toClass) {
 		if (null == from) {
 			return null;

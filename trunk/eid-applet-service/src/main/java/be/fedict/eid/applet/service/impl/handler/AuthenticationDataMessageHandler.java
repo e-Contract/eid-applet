@@ -53,6 +53,7 @@ import be.fedict.eid.applet.service.EIdCertsData;
 import be.fedict.eid.applet.service.EIdData;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.impl.AuthenticationChallenge;
+import be.fedict.eid.applet.service.impl.RequestContext;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.impl.UserIdentifierUtil;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
@@ -126,18 +127,6 @@ public class AuthenticationDataMessageHandler implements
 
 	@InitParam(NRCID_APP_ID_INIT_PARAM_NAME)
 	private String nrcidAppId;
-
-	@InitParam(HelloMessageHandler.INCLUDE_IDENTITY_INIT_PARAM_NAME)
-	private boolean includeIdentity;
-
-	@InitParam(HelloMessageHandler.INCLUDE_CERTS_INIT_PARAM_NAME)
-	private boolean includeCertificates;
-
-	@InitParam(HelloMessageHandler.INCLUDE_ADDRESS_INIT_PARAM_NAME)
-	private boolean includeAddress;
-
-	@InitParam(HelloMessageHandler.INCLUDE_PHOTO_INIT_PARAM_NAME)
-	private boolean includePhoto;
 
 	@InitParam(HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<IdentityIntegrityService> identityIntegrityServiceLocator;
@@ -365,22 +354,28 @@ public class AuthenticationDataMessageHandler implements
 			auditService.authenticated(userId);
 		}
 
+		RequestContext requestContext = new RequestContext(session);
+		boolean includeIdentity = requestContext.includeIdentity();
+		boolean includeAddress = requestContext.includeAddress();
+		boolean includeCertificates = requestContext.includeCertificates();
+		boolean includePhoto = requestContext.includePhoto();
+
 		/*
 		 * Also process the identity data in case it was requested.
 		 */
-		if (this.includeIdentity) {
+		if (includeIdentity) {
 			if (null == message.identityData) {
 				throw new ServletException(
 						"identity data not included while requested");
 			}
 		}
-		if (this.includeAddress) {
+		if (includeAddress) {
 			if (null == message.addressData) {
 				throw new ServletException(
 						"address data not included while requested");
 			}
 		}
-		if (this.includePhoto) {
+		if (includePhoto) {
 			if (null == message.photoData) {
 				throw new ServletException(
 						"photo data not included while requested");
@@ -399,7 +394,7 @@ public class AuthenticationDataMessageHandler implements
 			identityIntegrityService
 					.checkNationalRegistrationCertificate(rrnCertificateChain);
 			PublicKey rrnPublicKey = message.rrnCertificate.getPublicKey();
-			if (this.includeIdentity) {
+			if (includeIdentity) {
 				if (null == message.identitySignatureData) {
 					throw new ServletException(
 							"identity signature data not included while requested");
@@ -407,7 +402,7 @@ public class AuthenticationDataMessageHandler implements
 				verifySignature(message.identitySignatureData, rrnPublicKey,
 						request, message.identityData);
 			}
-			if (this.includeAddress) {
+			if (includeAddress) {
 				if (null == message.addressSignatureData) {
 					throw new ServletException(
 							"address signature data not included while requested");
@@ -417,7 +412,7 @@ public class AuthenticationDataMessageHandler implements
 						request, addressFile, message.identitySignatureData);
 			}
 		}
-		if (this.includeIdentity) {
+		if (includeIdentity) {
 			Identity identity = TlvParser.parse(message.identityData,
 					Identity.class);
 			if (false == UserIdentifierUtil.getUserId(message.authnCert)
@@ -433,7 +428,7 @@ public class AuthenticationDataMessageHandler implements
 				auditService.identified(identity.nationalNumber);
 			}
 		}
-		if (this.includeAddress) {
+		if (includeAddress) {
 			Address address = TlvParser.parse(message.addressData,
 					Address.class);
 			session.setAttribute(
@@ -441,8 +436,8 @@ public class AuthenticationDataMessageHandler implements
 					address);
 			eidData.address = address;
 		}
-		if (this.includePhoto) {
-			if (this.includeIdentity) {
+		if (includePhoto) {
+			if (includeIdentity) {
 				byte[] expectedPhotoDigest = eidData.identity.photoDigest;
 				byte[] actualPhotoDigest = digestPhoto(message.photoData);
 				if (false == Arrays.equals(expectedPhotoDigest,
@@ -455,8 +450,8 @@ public class AuthenticationDataMessageHandler implements
 					message.photoData);
 			eidData.photo = message.photoData;
 		}
-		if (this.includeCertificates) {
-			if (this.includeIdentity) {
+		if (includeCertificates) {
+			if (includeIdentity) {
 				eidData.certs = new EIdCertsData();
 				eidData.certs.authn = message.authnCert;
 				eidData.certs.ca = message.citizenCaCert;

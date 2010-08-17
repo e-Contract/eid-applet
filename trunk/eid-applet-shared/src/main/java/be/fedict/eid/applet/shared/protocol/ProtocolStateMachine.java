@@ -73,6 +73,7 @@ public class ProtocolStateMachine {
 		StopResponseMessage stopResponseMessageAnnotation = responseMessageClass
 				.getAnnotation(StopResponseMessage.class);
 		if (null != stopResponseMessageAnnotation) {
+			notifyProtocolListenersStopProtocolRun();
 			this.protocolContext.removeProtocolState();
 		}
 		StateTransition stateTransitionAnnotation = responseMessageClass
@@ -80,13 +81,26 @@ public class ProtocolStateMachine {
 		if (null != stateTransitionAnnotation) {
 			ProtocolState newProtocolState = stateTransitionAnnotation.value();
 			this.protocolContext.setProtocolState(newProtocolState);
-			notifyProtocolListeners(newProtocolState);
+			notifyProtocolListenersProtocolStateTransition(newProtocolState);
 		}
 	}
 
-	private void notifyProtocolListeners(ProtocolState newProtocolState) {
+	private void notifyProtocolListenersProtocolStateTransition(
+			ProtocolState newProtocolState) {
 		for (ProtocolStateListener protocolStateListener : this.protocolStateListeners) {
 			protocolStateListener.protocolStateTransition(newProtocolState);
+		}
+	}
+
+	private void notifyProtocolListenersStartProtocolRun() {
+		for (ProtocolStateListener protocolStateListener : this.protocolStateListeners) {
+			protocolStateListener.startProtocolRun();
+		}
+	}
+
+	private void notifyProtocolListenersStopProtocolRun() {
+		for (ProtocolStateListener protocolStateListener : this.protocolStateListeners) {
+			protocolStateListener.stopProtocolRun();
 		}
 	}
 
@@ -131,7 +145,8 @@ public class ProtocolStateMachine {
 			}
 			ProtocolState initialState = startRequestMessageAnnotation.value();
 			this.protocolContext.setProtocolState(initialState);
-			notifyProtocolListeners(initialState);
+			notifyProtocolListenersStartProtocolRun();
+			notifyProtocolListenersProtocolStateTransition(initialState);
 		}
 	}
 }

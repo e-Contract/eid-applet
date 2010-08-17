@@ -32,10 +32,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import be.fedict.eid.applet.service.impl.AuthenticationChallenge;
+import be.fedict.eid.applet.service.impl.RequestContext;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
+import be.fedict.eid.applet.service.spi.IdentityRequest;
+import be.fedict.eid.applet.service.spi.IdentityService;
 import be.fedict.eid.applet.service.spi.PrivacyService;
 import be.fedict.eid.applet.service.spi.SignatureService;
 import be.fedict.eid.applet.shared.AdministrationMessage;
@@ -114,6 +117,9 @@ public class ContinueInsecureMessageHandler implements
 	@InitParam(HelloMessageHandler.NO_PKCS11_INIT_PARAM_NAME)
 	private boolean noPkcs11;
 
+	@InitParam(HelloMessageHandler.IDENTITY_SERVICE_INIT_PARAM_NAME)
+	private ServiceLocator<IdentityService> identityServiceLocator;
+
 	public Object handleMessage(ContinueInsecureMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
 			HttpSession session) throws ServletException {
@@ -160,14 +166,38 @@ public class ContinueInsecureMessageHandler implements
 			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
 					.locateService();
 			boolean includeIntegrityData = null != identityIntegrityService;
+			boolean includeIdentity;
+			boolean includeAddress;
+			boolean includePhoto;
+			boolean includeCertificates;
+			IdentityService identityService = this.identityServiceLocator
+					.locateService();
+			if (null != identityService) {
+				IdentityRequest identityRequest = identityService
+						.getIdentityRequest();
+				includeIdentity = identityRequest.includeIdentity();
+				includeAddress = identityRequest.includeAddress();
+				includePhoto = identityRequest.includePhoto();
+				includeCertificates = identityRequest.includeCertificates();
+			} else {
+				includeIdentity = this.includeIdentity;
+				includeAddress = this.includeAddress;
+				includePhoto = this.includePhoto;
+				includeCertificates = this.includeCertificates;
+			}
+			RequestContext requestContext = new RequestContext(session);
+			requestContext.setIncludeIdentity(includeIdentity);
+			requestContext.setIncludeAddress(includeAddress);
+			requestContext.setIncludePhoto(includePhoto);
+			requestContext.setIncludeCertificates(includeCertificates);
 			AuthenticationRequestMessage authenticationRequestMessage = new AuthenticationRequestMessage(
 					challenge, this.includeHostname, this.includeInetAddress,
 					this.logoff, this.preLogoff, this.removeCard,
 					this.sessionIdChannelBinding,
-					this.serverCertificateChannelBinding, this.includeIdentity,
-					this.includeCertificates, this.includeAddress,
-					this.includePhoto, includeIntegrityData,
-					this.requireSecureReader, this.noPkcs11);
+					this.serverCertificateChannelBinding, includeIdentity,
+					includeCertificates, includeAddress, includePhoto,
+					includeIntegrityData, this.requireSecureReader,
+					this.noPkcs11);
 			return authenticationRequestMessage;
 		} else {
 			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
@@ -184,10 +214,29 @@ public class ContinueInsecureMessageHandler implements
 			} else {
 				identityDataUsage = null;
 			}
+			boolean includeAddress;
+			boolean includePhoto;
+			boolean includeCertificates;
+			IdentityService identityService = this.identityServiceLocator
+					.locateService();
+			if (null != identityService) {
+				IdentityRequest identityRequest = identityService
+						.getIdentityRequest();
+				includeAddress = identityRequest.includeAddress();
+				includePhoto = identityRequest.includePhoto();
+				includeCertificates = identityRequest.includeCertificates();
+			} else {
+				includeAddress = this.includeAddress;
+				includePhoto = this.includePhoto;
+				includeCertificates = this.includeCertificates;
+			}
+			RequestContext requestContext = new RequestContext(session);
+			requestContext.setIncludeAddress(includeAddress);
+			requestContext.setIncludePhoto(includePhoto);
+			requestContext.setIncludeCertificates(includeCertificates);
 			IdentificationRequestMessage responseMessage = new IdentificationRequestMessage(
-					this.includeAddress, this.includePhoto,
-					includeIntegrityData, this.includeCertificates,
-					this.removeCard, identityDataUsage);
+					includeAddress, includePhoto, includeIntegrityData,
+					includeCertificates, this.removeCard, identityDataUsage);
 			return responseMessage;
 		}
 	}

@@ -47,6 +47,7 @@ import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.EIdCertsData;
 import be.fedict.eid.applet.service.EIdData;
 import be.fedict.eid.applet.service.Identity;
+import be.fedict.eid.applet.service.impl.RequestContext;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
 import be.fedict.eid.applet.service.spi.AuditService;
@@ -87,15 +88,6 @@ public class IdentityDataMessageHandler implements
 
 	public static final String SKIP_NATIONAL_NUMBER_CHECK_INIT_PARAM_NAME = "SkipNationalNumberCheck";
 
-	@InitParam(HelloMessageHandler.INCLUDE_PHOTO_INIT_PARAM_NAME)
-	private boolean includePhoto;
-
-	@InitParam(HelloMessageHandler.INCLUDE_ADDRESS_INIT_PARAM_NAME)
-	private boolean includeAddress;
-
-	@InitParam(HelloMessageHandler.INCLUDE_CERTS_INIT_PARAM_NAME)
-	private boolean includeCertificates;
-
 	@InitParam(SKIP_NATIONAL_NUMBER_CHECK_INIT_PARAM_NAME)
 	private boolean skipNationalNumberCheck;
 
@@ -114,13 +106,18 @@ public class IdentityDataMessageHandler implements
 		// parse the identity files
 		Identity identity = TlvParser.parse(message.idFile, Identity.class);
 
+		RequestContext requestContext = new RequestContext(session);
+		boolean includeAddress = requestContext.includeAddress();
+		boolean includeCertificates = requestContext.includeCertificates();
+		boolean includePhoto = requestContext.includePhoto();
+
 		/*
 		 * Check whether the answer is in-line with what we expected.
 		 */
 		Address address;
 		if (null != message.addressFile) {
 			LOG.debug("address file size: " + message.addressFile.length);
-			if (false == this.includeAddress) {
+			if (false == includeAddress) {
 				throw new ServletException(
 						"Address included while not requested");
 			}
@@ -129,7 +126,7 @@ public class IdentityDataMessageHandler implements
 			 */
 			address = TlvParser.parse(message.addressFile, Address.class);
 		} else {
-			if (true == this.includeAddress) {
+			if (true == includeAddress) {
 				throw new ServletException(
 						"Address not included while requested");
 			}
@@ -140,7 +137,7 @@ public class IdentityDataMessageHandler implements
 		X509Certificate signCert = null;
 		X509Certificate caCert = null;
 		X509Certificate rootCert = null;
-		if (this.includeCertificates) {
+		if (includeCertificates) {
 			if (null == message.authnCertFile) {
 				throw new ServletException(
 						"authn cert not included while requested");
@@ -175,7 +172,7 @@ public class IdentityDataMessageHandler implements
 			}
 			LOG.debug("identity signature file size: "
 					+ message.identitySignatureFile.length);
-			if (this.includeAddress) {
+			if (includeAddress) {
 				if (null == message.addressSignatureFile) {
 					throw new ServletException(
 							"address signature data not included while requested");
@@ -205,7 +202,7 @@ public class IdentityDataMessageHandler implements
 					}
 				}
 			}
-			if (this.includeAddress) {
+			if (includeAddress) {
 				byte[] addressFile = trimRight(message.addressFile);
 				verifySignature(message.addressSignatureFile, rrnPublicKey,
 						request, addressFile, message.identitySignatureFile);
@@ -222,7 +219,7 @@ public class IdentityDataMessageHandler implements
 
 		if (null != message.photoFile) {
 			LOG.debug("photo file size: " + message.photoFile.length);
-			if (false == this.includePhoto) {
+			if (false == includePhoto) {
 				throw new ServletException("photo include while not requested");
 			}
 			/*
@@ -234,7 +231,7 @@ public class IdentityDataMessageHandler implements
 				throw new ServletException("photo digest incorrect");
 			}
 		} else {
-			if (true == this.includePhoto) {
+			if (true == includePhoto) {
 				throw new ServletException("photo not included while requested");
 			}
 		}
@@ -248,7 +245,7 @@ public class IdentityDataMessageHandler implements
 			session.setAttribute(PHOTO_SESSION_ATTRIBUTE, message.photoFile);
 		}
 
-		if (this.includeCertificates) {
+		if (includeCertificates) {
 			session.setAttribute(AUTHN_CERT_SESSION_ATTRIBUTE, authnCert);
 			session.setAttribute(SIGN_CERT_SESSION_ATTRIBUTE, signCert);
 			session.setAttribute(CA_CERT_SESSION_ATTRIBUTE, caCert);
@@ -263,7 +260,7 @@ public class IdentityDataMessageHandler implements
 		eidData.identity = identity;
 		eidData.address = address;
 		eidData.photo = message.photoFile;
-		if (this.includeCertificates) {
+		if (includeCertificates) {
 			EIdCertsData eidCertsData = new EIdCertsData();
 			session.setAttribute(EID_CERTS_SESSION_ATTRIBUTE, eidCertsData);
 			eidData.certs = eidCertsData;
