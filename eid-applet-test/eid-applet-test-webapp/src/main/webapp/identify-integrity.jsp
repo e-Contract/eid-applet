@@ -18,7 +18,8 @@
 		TargetPage :'identity-integrity-result.jsp',
 		AppletService :'applet-service-integrity',
 		BackgroundColor :'#ffffff',
-		Language : 'fr'
+		Language : 'fr',
+		HideDetailsButton : 'true'
 	};
 	var version = '1.6';
 	deployJava.runApplet(attributes, parameters, version);

@@ -68,7 +68,7 @@ public class Applet extends JApplet {
 
 	private static final long serialVersionUID = 1L;
 
- 	public static final String TARGET_PAGE_PARAM = "TargetPage";
+	public static final String TARGET_PAGE_PARAM = "TargetPage";
 
 	public static final String BACKGROUND_COLOR_PARAM = "BackgroundColor";
 
@@ -82,7 +82,9 @@ public class Applet extends JApplet {
 
 	public static final String DIAGNOSTIC_TEST_CALLBACK_PARAM = "DiagnosticTestCallback";
 
-        private JStatusLabel statusLabel;
+	public static final String HIDE_DETAILS_BUTTON_PARAM = "HideDetailsButton";
+
+	private JStatusLabel statusLabel;
 
 	private JTextArea detailMessages;
 
@@ -97,19 +99,27 @@ public class Applet extends JApplet {
 			SwingUtilities.invokeAndWait(new Runnable() {
 				public void run() {
 					Applet.this.statusLabel.setText(statusMessage);
-                                        /* this helps screen readers, simply using setText() does not seem to work,
-                                           at least not with Win2003 + JAB 2 + JSE6u20 + JAWS 10 */
-                                        Applet.this.statusLabel.getAccessibleContext().setAccessibleName(statusMessage);
-                                 
+					/*
+					 * this helps screen readers, simply using setText() does
+					 * not seem to work, at least not with Win2003 + JAB 2 +
+					 * JSE6u20 + JAWS 10
+					 */
+					Applet.this.statusLabel.getAccessibleContext()
+							.setAccessibleName(statusMessage);
+
 					if (Status.ERROR == status) {
 						Applet.this.statusLabel.setForeground(Color.RED);
 						Applet.this.progressBar.setIndeterminate(false);
 					}
-                                        Applet.this.statusLabel.invalidate();
-					Applet.this.detailMessages.append(statusMessage + "\n");
-					Applet.this.detailMessages
-							.setCaretPosition(Applet.this.detailMessages
-									.getDocument().getLength());
+					Applet.this.statusLabel.invalidate();
+					if (false == Applet.this.hideDetailsButtonParam) {
+						Applet.this.detailMessages.append(statusMessage + "\n");
+						Applet.this.detailMessages
+								.setCaretPosition(Applet.this.detailMessages
+										.getDocument().getLength());
+					} else {
+						System.out.println(statusMessage);
+					}
 				}
 			});
 			Applet.this.invokeMessageCallback(status, messageId);
@@ -130,9 +140,14 @@ public class Applet extends JApplet {
 			jsObjectClass = classLoader
 					.loadClass("netscape.javascript.JSObject");
 		} catch (ClassNotFoundException e) {
-			this.detailMessages.append("JSObject class not found" + "\n");
-			this.detailMessages.setCaretPosition(Applet.this.detailMessages
-					.getDocument().getLength());
+			String msg = "JSObject class not found";
+			if (false == this.hideDetailsButtonParam) {
+				this.detailMessages.append(msg + "\n");
+				this.detailMessages.setCaretPosition(Applet.this.detailMessages
+						.getDocument().getLength());
+			} else {
+				System.out.println(msg);
+			}
 			return;
 		}
 		try {
@@ -157,11 +172,15 @@ public class Applet extends JApplet {
 								statusMessage });
 			}
 		} catch (Exception e) {
-			this.detailMessages
-					.append("error locating: JSObject.getWindow().call: "
-							+ e.getMessage() + "\n");
-			this.detailMessages.setCaretPosition(Applet.this.detailMessages
-					.getDocument().getLength());
+			String msg = "error locating: JSObject.getWindow().call: "
+					+ e.getMessage();
+			if (false == this.hideDetailsButtonParam) {
+				this.detailMessages.append(msg + "\n");
+				this.detailMessages.setCaretPosition(Applet.this.detailMessages
+						.getDocument().getLength());
+			} else {
+				System.out.println(msg);
+			}
 			return;
 		}
 	}
@@ -221,10 +240,14 @@ public class Applet extends JApplet {
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
 				public void run() {
-					Applet.this.detailMessages.append(detailMessage + "\n");
-					Applet.this.detailMessages
-							.setCaretPosition(Applet.this.detailMessages
-									.getDocument().getLength());
+					if (false == Applet.this.hideDetailsButtonParam) {
+						Applet.this.detailMessages.append(detailMessage + "\n");
+						Applet.this.detailMessages
+								.setCaretPosition(Applet.this.detailMessages
+										.getDocument().getLength());
+					} else {
+						System.out.println(detailMessage);
+					}
 				}
 			});
 		} catch (Exception e) {
@@ -266,6 +289,8 @@ public class Applet extends JApplet {
 
 	private String diagnosticTestCallbackParam;
 
+	private boolean hideDetailsButtonParam;
+
 	private void initUI() {
 		loadMessages();
 		initStyle();
@@ -273,16 +298,28 @@ public class Applet extends JApplet {
 		this.messageCallbackParam = super.getParameter(MESSAGE_CALLBACK_PARAM);
 		this.messageCallbackExParam = super
 				.getParameter(MESSAGE_CALLBACK_EX_PARAM);
+
 		this.diagnosticTestCallbackParam = super
 				.getParameter(DIAGNOSTIC_TEST_CALLBACK_PARAM);
+
+		String hideDetailsButtonParam = super
+				.getParameter(HIDE_DETAILS_BUTTON_PARAM);
+		if (null != hideDetailsButtonParam) {
+			this.hideDetailsButtonParam = Boolean
+					.parseBoolean(hideDetailsButtonParam);
+		} else {
+			this.hideDetailsButtonParam = false;
+		}
 
 		Container contentPane = this.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 		initStatusPanel(contentPane);
 		contentPane.add(Box.createVerticalStrut(10));
 		initProgressBar(contentPane);
-		contentPane.add(Box.createVerticalStrut(10));
-		initDetailPanel(contentPane);
+		if (false == this.hideDetailsButtonParam) {
+			contentPane.add(Box.createVerticalStrut(10));
+			initDetailPanel(contentPane);
+		}
 
 		setupColors(contentPane);
 	}
@@ -300,14 +337,14 @@ public class Applet extends JApplet {
 		 * super.getParameter to get around the security check.
 		 */
 		String languageParam = super.getParameter(LANGUAGE_PARAM);
-                Locale locale;
+		Locale locale;
 		if (null != languageParam) {
 			locale = new Locale(languageParam);
 		} else {
 			locale = this.getLocale();
 		}
-                /* for screen readers */
-                JRootPane.setDefaultLocale(locale);
+		/* for screen readers */
+		JRootPane.setDefaultLocale(locale);
 		this.messages = new Messages(locale);
 	}
 
@@ -322,9 +359,9 @@ public class Applet extends JApplet {
 	private void initDetailButton(final Container container,
 			final CardLayout cardLayout) {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                String msg = this.messages.getMessage(MESSAGE_ID.DETAILS_BUTTON);
+		String msg = this.messages.getMessage(MESSAGE_ID.DETAILS_BUTTON);
 		JButton detailButton = new JButton(msg + " >>");
-                detailButton.getAccessibleContext().setAccessibleName(msg);
+		detailButton.getAccessibleContext().setAccessibleName(msg);
 
 		detailButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
@@ -338,11 +375,11 @@ public class Applet extends JApplet {
 	private void initDetailMessages(Container container) {
 		this.detailMessages = new JTextArea(10, 80);
 		this.detailMessages.setEditable(false);
-                /* Detailed messages are only available in English */
-                this.detailMessages.setLocale(Locale.ENGLISH);
-                this.detailMessages.getAccessibleContext()
-                        .setAccessibleDescription("Detailed log messages");
-                
+		/* Detailed messages are only available in English */
+		this.detailMessages.setLocale(Locale.ENGLISH);
+		this.detailMessages.getAccessibleContext().setAccessibleDescription(
+				"Detailed log messages");
+
 		JPopupMenu popupMenu = new JPopupMenu();
 		JMenuItem copyMenuItem = new JMenuItem(this.messages
 				.getMessage(MESSAGE_ID.COPY_ALL));
@@ -374,9 +411,9 @@ public class Applet extends JApplet {
 		JPanel statusPanel = new JPanel();
 		statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.LINE_AXIS));
 
-                String msg = this.messages.getMessage(MESSAGE_ID.LOADING);
+		String msg = this.messages.getMessage(MESSAGE_ID.LOADING);
 		this.statusLabel = new JStatusLabel(msg);
-                this.statusLabel.getAccessibleContext().setAccessibleName(msg);
+		this.statusLabel.getAccessibleContext().setAccessibleName(msg);
 
 		statusPanel.add(this.statusLabel);
 		statusPanel.add(Box.createHorizontalGlue());
@@ -399,7 +436,9 @@ public class Applet extends JApplet {
 		if (null != foregroundColorParam) {
 			Color foregroundColor = Color.decode(foregroundColorParam);
 			this.statusLabel.setForeground(foregroundColor);
-			this.detailMessages.setForeground(foregroundColor);
+			if (false == this.hideDetailsButtonParam) {
+				this.detailMessages.setForeground(foregroundColor);
+			}
 		}
 	}
 
@@ -457,7 +496,7 @@ public class Applet extends JApplet {
 	private class AppletThread implements Runnable {
 		@SuppressWarnings("unchecked")
 		public void run() {
-			addDetailMessage("eID Applet - Copyright (C) 2008-2010 FedICT.");  
+			addDetailMessage("eID Applet - Copyright (C) 2008-2010 FedICT.");
 			addDetailMessage("Released under GNU LGPL version 3.0 license.");
 			addDetailMessage("More info: http://code.google.com/p/eid-applet/");
 			/*
@@ -632,7 +671,7 @@ public class Applet extends JApplet {
 				+ ": " + this.messages.getMessage(MESSAGE_ID.IDENTITY_IDENTITY);
 		if (includeAddress) {
 			msg += ", " + this.messages.getMessage(MESSAGE_ID.IDENTITY_ADDRESS);
-                }
+		}
 		if (includePhoto) {
 			msg += ", " + this.messages.getMessage(MESSAGE_ID.IDENTITY_PHOTO);
 		}
