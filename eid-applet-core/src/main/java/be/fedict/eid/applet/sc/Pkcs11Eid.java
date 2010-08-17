@@ -117,11 +117,14 @@ public class Pkcs11Eid {
 			}
 			/*
 			 * Final fallback is OpenSC. Note that OpenSC PKCS#11 cannot create
-			 * non-rep signatures.
+			 * non-rep signatures. One might need to configure the OpenSC layer
+			 * as follows:
 			 * 
 			 * /etc/opensc.conf:
 			 * 
 			 * card_drivers = belpic, ...
+			 * 
+			 * reader_drivers = pcsc;
 			 * 
 			 * reader_driver pcsc {}
 			 */
