@@ -83,9 +83,9 @@ import be.fedict.eid.applet.service.signer.facets.KeyInfoSignatureFacet;
 import be.fedict.eid.applet.service.signer.facets.RevocationData;
 import be.fedict.eid.applet.service.signer.facets.RevocationDataService;
 import be.fedict.eid.applet.service.signer.facets.SignaturePolicyService;
-import be.fedict.eid.applet.service.signer.facets.TimeStampService;
 import be.fedict.eid.applet.service.signer.facets.XAdESSignatureFacet;
 import be.fedict.eid.applet.service.signer.facets.XAdESXLSignatureFacet;
+import be.fedict.eid.applet.service.signer.time.TimeStampService;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 
 public class XAdESSignatureFacetTest {

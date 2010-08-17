@@ -16,10 +16,12 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.service.signer.facets;
+package be.fedict.eid.applet.service.signer.time;
 
 import java.security.cert.X509Certificate;
 import java.util.List;
+
+import be.fedict.eid.applet.service.signer.facets.RevocationData;
 
 /**
  * Interface for trust validator of a TSP.

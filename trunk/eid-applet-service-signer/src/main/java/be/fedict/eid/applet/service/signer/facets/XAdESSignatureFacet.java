@@ -67,11 +67,16 @@ import be.fedict.eid.applet.service.signer.jaxb.xades132.SignedPropertiesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.SignedSignaturePropertiesType;
 import be.fedict.eid.applet.service.signer.jaxb.xmldsig.DigestMethodType;
 import be.fedict.eid.applet.service.signer.jaxb.xmldsig.X509IssuerSerialType;
+import be.fedict.eid.applet.service.signer.time.Clock;
+import be.fedict.eid.applet.service.signer.time.LocalClock;
 
 /**
  * XAdES Signature Facet. Implements XAdES v1.4.1 which is compatible with XAdES
- * v1.3.2. The implemented XAdES format is XAdES-BES. It's up to another part of
- * the signature service to upgrade the XAdES-BES to a XAdES-X-L.
+ * v1.3.2. The implemented XAdES format is XAdES-BES/EPES. It's up to another
+ * part of the signature service to upgrade the XAdES-BES to a XAdES-X-L.
+ * 
+ * This implementation has been tested against an implementation that
+ * participated multiple ETSI XAdES plugtests.
  * 
  * @author Frank Cornelis
  * @see http://en.wikipedia.org/wiki/XAdES

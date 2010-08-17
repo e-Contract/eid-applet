@@ -16,7 +16,9 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.service.signer.facets;
+package be.fedict.eid.applet.service.signer.time;
+
+import be.fedict.eid.applet.service.signer.facets.RevocationData;
 
 /**
  * Interface for a time-stamp service.

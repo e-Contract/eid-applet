@@ -304,6 +304,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		return CanonicalizationMethod.EXCLUSIVE;
 	}
 
+	@SuppressWarnings("unchecked")
 	private byte[] getXmlSignatureDigestValue(String digestAlgo,
 			List<DigestInfo> digestInfos,
 			List<X509Certificate> signingCertificateChain)

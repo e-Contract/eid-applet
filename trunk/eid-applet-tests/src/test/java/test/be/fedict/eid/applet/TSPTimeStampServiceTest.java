@@ -30,8 +30,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Test;
 
 import be.fedict.eid.applet.service.signer.facets.RevocationData;
-import be.fedict.eid.applet.service.signer.facets.TSPTimeStampService;
-import be.fedict.eid.applet.service.signer.facets.TimeStampServiceValidator;
+import be.fedict.eid.applet.service.signer.time.TSPTimeStampService;
+import be.fedict.eid.applet.service.signer.time.TimeStampServiceValidator;
 import be.fedict.trust.BelgianTrustValidatorFactory;
 import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.TrustValidator;

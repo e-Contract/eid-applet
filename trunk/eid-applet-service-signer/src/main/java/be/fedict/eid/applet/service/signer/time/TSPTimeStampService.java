@@ -16,7 +16,7 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.service.signer.facets;
+package be.fedict.eid.applet.service.signer.time;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -63,6 +63,8 @@ import org.bouncycastle.tsp.TimeStampRequest;
 import org.bouncycastle.tsp.TimeStampRequestGenerator;
 import org.bouncycastle.tsp.TimeStampResponse;
 import org.bouncycastle.tsp.TimeStampToken;
+
+import be.fedict.eid.applet.service.signer.facets.RevocationData;
 
 /**
  * A TSP time-stamp service implementation.
