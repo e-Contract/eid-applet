@@ -3,20 +3,20 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.1.RC3</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet Developers' Guide</name>
 	<description>Developers' Guide for the eID applet.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-dev-guide</artifactId>
-	<version>1.0.1.RC3</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>be.fedict.eid-applet</groupId>
 				<artifactId>eid-applet-docbook-plugin</artifactId>
-				<version>1.0.1.RC3</version>
+				<version>1.0.1-SNAPSHOT</version>
 				<executions>
 					<execution>
 						<id>generate-docbook</id>
