@@ -2251,6 +2251,11 @@ ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlis
 						<entry>Frank Cornelis</entry>
 						<entry>1.0.1.RC2</entry>
 					</row>
+					<row>
+						<entry>18 Aug 2010</entry>
+						<entry>Frank Cornelis</entry>
+						<entry>1.0.1.RC3</entry>
+					</row>
 				</tbody>
 			</tgroup>
 		</table>

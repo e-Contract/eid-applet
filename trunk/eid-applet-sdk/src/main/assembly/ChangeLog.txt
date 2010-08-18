@@ -1,3 +1,9 @@
+1.0.1.RC3 - 18 Aug 2010
+	* XAdES-X-L v1.4.1 support
+	* XAdES-EPES support
+	* IdentityService SPI to allow run-time eID data selection
+	* HideDetailsButton eID Applet parameter
+
 1.0.1.RC2 - 5 Aug 2010
 	* fix: 64 bit Windows where sunpkcs11.jar is not available
 	* JSON servlet improvements

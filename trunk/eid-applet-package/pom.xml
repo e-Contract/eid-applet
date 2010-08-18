@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.1.RC3</version>
 	</parent>
 	<name>FedICT eID Applet Package</name>
 	<description>Packaging of the eID applet.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-package</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1.RC3</version>
 	<packaging>jar</packaging>
 	<build>
 		<plugins>
@@ -133,7 +133,7 @@
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-core</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
+			<version>1.0.1.RC3</version>
 		</dependency>
 	</dependencies>
 </project>
