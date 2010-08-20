@@ -333,6 +333,13 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		references.add(reference);
 	}
 
+	/**
+	 * Gives back the XML digest algorithm identifier given the Java digest
+	 * algorithm name.
+	 * 
+	 * @param digestAlgo
+	 * @return
+	 */
 	public static String getXmlDigestAlgo(String digestAlgo) {
 		if ("SHA-1".equals(digestAlgo)) {
 			return DigestMethod.SHA1;
@@ -361,6 +368,15 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		return qualifyingPropertiesNode;
 	}
 
+	/**
+	 * Gives back the JAXB DigestAlgAndValue data structure.
+	 * 
+	 * @param data
+	 * @param xadesObjectFactory
+	 * @param xmldsigObjectFactory
+	 * @param digestAlgorithm
+	 * @return
+	 */
 	public static DigestAlgAndValueType getDigestAlgAndValue(
 			byte[] data,
 			ObjectFactory xadesObjectFactory,
@@ -388,6 +404,15 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		return digestAlgAndValue;
 	}
 
+	/**
+	 * Gives back the JAXB CertID data structure.
+	 * 
+	 * @param certificate
+	 * @param xadesObjectFactory
+	 * @param xmldsigObjectFactory
+	 * @param digestAlgorithm
+	 * @return
+	 */
 	public static CertIDType getCertID(
 			X509Certificate certificate,
 			ObjectFactory xadesObjectFactory,
