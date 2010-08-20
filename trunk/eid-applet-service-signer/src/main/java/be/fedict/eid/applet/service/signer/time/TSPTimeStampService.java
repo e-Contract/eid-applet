@@ -159,6 +159,9 @@ public class TSPTimeStampService implements TimeStampService {
 		this.password = password;
 	}
 
+	/**
+	 * Resets the authentication credentials.
+	 */
 	public void resetAuthenticationCredentials() {
 		this.username = null;
 		this.password = null;
@@ -198,6 +201,9 @@ public class TSPTimeStampService implements TimeStampService {
 		this.proxyPort = proxyPort;
 	}
 
+	/**
+	 * Resets the HTTP proxy settings.
+	 */
 	public void resetProxy() {
 		this.proxyHost = null;
 		this.proxyPort = 0;
