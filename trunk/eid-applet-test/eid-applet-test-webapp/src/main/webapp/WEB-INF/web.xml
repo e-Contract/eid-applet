@@ -552,6 +552,19 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>AppletSignUntrustedServiceServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+		<init-param>
+			<param-name>SignatureService</param-name>
+			<param-value>test/eid/applet/model/UntrustedSignatureServiceBean</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AppletSignUntrustedServiceServlet</servlet-name>
+		<url-pattern>/applet-service-sign-untrusted</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>AppletKioskServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
 		<init-param>

@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2008-2010 FedICT.
  * Copyright (C) 2009 Frank Cornelis.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -366,7 +366,7 @@ public class Controller {
 			}
 			if (resultMessage instanceof SignRequestMessage) {
 				SignRequestMessage signRequestMessage = (SignRequestMessage) resultMessage;
-				performEidSignOperation(signRequestMessage);
+				resultMessage = performEidSignOperation(signRequestMessage);
 			}
 			if (resultMessage instanceof AuthenticationRequestMessage) {
 				AuthenticationRequestMessage authnRequest = (AuthenticationRequestMessage) resultMessage;
@@ -905,8 +905,8 @@ public class Controller {
 
 	}
 
-	private void performEidSignOperation(SignRequestMessage signRequestMessage)
-			throws Exception {
+	private FinishedMessage performEidSignOperation(
+			SignRequestMessage signRequestMessage) throws Exception {
 		boolean logoff = signRequestMessage.logoff;
 		boolean removeCard = signRequestMessage.removeCard;
 		boolean requireSecureReader = signRequestMessage.requireSecureReader;
@@ -919,9 +919,8 @@ public class Controller {
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
 		if (requireSecureReader || noPkcs11 || null == this.pkcs11Eid) {
 			if (null != this.pcscEidSpi) {
-				performEidPcscSignOperation(signRequestMessage,
+				return performEidPcscSignOperation(signRequestMessage,
 						requireSecureReader);
-				return;
 			}
 		}
 		try {
@@ -933,9 +932,8 @@ public class Controller {
 			addDetailMessage("eID Middleware PKCS#11 library not found.");
 			if (null != this.pcscEidSpi) {
 				addDetailMessage("fallback to PC/SC signing...");
-				performEidPcscSignOperation(signRequestMessage,
+				return performEidPcscSignOperation(signRequestMessage,
 						requireSecureReader);
-				return;
 			}
 			throw new PKCS11NotFoundException();
 		}
@@ -1007,9 +1005,11 @@ public class Controller {
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");
 		}
+		FinishedMessage finishedMessage = (FinishedMessage) responseMessage;
+		return finishedMessage;
 	}
 
-	private void performEidPcscSignOperation(
+	private FinishedMessage performEidPcscSignOperation(
 			SignRequestMessage signRequestMessage, boolean requireSecureReader)
 			throws Exception {
 		waitForEIdCardPcsc();
@@ -1070,6 +1070,8 @@ public class Controller {
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");
 		}
+		FinishedMessage finishedMessage = (FinishedMessage) responseMessage;
+		return finishedMessage;
 	}
 
 	private void administration(boolean unblockPin, boolean changePin,
