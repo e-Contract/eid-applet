@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2008-2010 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -64,6 +64,7 @@ import be.fedict.eid.applet.service.spi.ChannelBindingService;
 import be.fedict.eid.applet.service.spi.ExpiredCertificateSecurityException;
 import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
 import be.fedict.eid.applet.service.spi.RevokedCertificateSecurityException;
+import be.fedict.eid.applet.service.spi.TrustCertificateSecurityException;
 import be.fedict.eid.applet.shared.AuthenticationContract;
 import be.fedict.eid.applet.shared.AuthenticationDataMessage;
 import be.fedict.eid.applet.shared.ErrorCode;
@@ -287,6 +288,8 @@ public class AuthenticationDataMessageHandler implements
 			return new FinishedMessage(ErrorCode.CERTIFICATE_EXPIRED);
 		} catch (RevokedCertificateSecurityException e) {
 			return new FinishedMessage(ErrorCode.CERTIFICATE_REVOKED);
+		} catch (TrustCertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE_NOT_TRUSTED);
 		} catch (CertificateSecurityException e) {
 			return new FinishedMessage(ErrorCode.CERTIFICATE);
 		} catch (Exception e) {
@@ -312,6 +315,10 @@ public class AuthenticationDataMessageHandler implements
 				}
 				if (exception instanceof RevokedCertificateSecurityException) {
 					return new FinishedMessage(ErrorCode.CERTIFICATE_REVOKED);
+				}
+				if (exception instanceof TrustCertificateSecurityException) {
+					return new FinishedMessage(
+							ErrorCode.CERTIFICATE_NOT_TRUSTED);
 				}
 				if (exception instanceof CertificateSecurityException) {
 					return new FinishedMessage(ErrorCode.CERTIFICATE);

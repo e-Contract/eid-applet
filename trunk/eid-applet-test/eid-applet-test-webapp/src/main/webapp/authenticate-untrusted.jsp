@@ -6,7 +6,7 @@
 </head>
 <body>
 <h1>eID Applet Authentication Demo</h1>
-<p>Simulates revoked eID certificates.</p>
+<p>Simulates untrusted eID certificates.</p>
 <script src="https://www.java.com/js/deployJava.js"></script>
 <script>
 	var attributes = {
@@ -17,11 +17,11 @@
 	};
 	var parameters = {
 		TargetPage :'authn-result.jsp',
-		AppletService :'applet-service-authn-revoke',
+		AppletService :'applet-service-authn-untrusted',
 		BackgroundColor :'#ffffff',
 		Language : 'en'
 	};
-	var version = '1.5';
+	var version = '1.6';
 	deployJava.runApplet(attributes, parameters, version);
 </script>
 </body>

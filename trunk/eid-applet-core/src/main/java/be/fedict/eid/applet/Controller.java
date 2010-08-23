@@ -400,6 +400,7 @@ public class Controller {
 				if (null != finishedMessage.errorCode) {
 					switch (finishedMessage.errorCode) {
 					case CERTIFICATE:
+						addDetailMessage("something wrong with your certificate");
 						setStatusMessage(Status.ERROR,
 								MESSAGE_ID.SECURITY_ERROR);
 						return null;
@@ -410,6 +411,10 @@ public class Controller {
 					case CERTIFICATE_REVOKED:
 						setStatusMessage(Status.ERROR,
 								MESSAGE_ID.CERTIFICATE_REVOKED_ERROR);
+						return null;
+					case CERTIFICATE_NOT_TRUSTED:
+						setStatusMessage(Status.ERROR,
+								MESSAGE_ID.CERTIFICATE_NOT_TRUSTED);
 						return null;
 					default:
 					}

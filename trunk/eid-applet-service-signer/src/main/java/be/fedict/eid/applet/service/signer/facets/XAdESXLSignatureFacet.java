@@ -101,11 +101,11 @@ import be.fedict.eid.applet.service.signer.time.TimeStampService;
 
 /**
  * XAdES-X-L v1.4.1 signature facet. This signature facet implementation will
- * upgrade a given XAdES-BES signature to XAdES-X-L.
+ * upgrade a given XAdES-BES/EPES signature to XAdES-X-L.
  * 
  * We don't inherit from XAdESSignatureFacet as we also want to be able to use
  * this facet out of the context of a signature creation. This signature facet
- * assumes that the signature is already XAdES-BES compliant.
+ * assumes that the signature is already XAdES-BES/EPES compliant.
  * 
  * This implementation has been tested against an implementation that
  * participated multiple ETSI XAdES plugtests.
