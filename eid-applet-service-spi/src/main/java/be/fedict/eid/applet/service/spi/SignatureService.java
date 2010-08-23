@@ -64,14 +64,14 @@ public interface SignatureService {
 	 * Post-sign callback method. Received the signature value. Depending on the
 	 * configuration the signing certificate chain is also obtained.
 	 * 
-	 * <p>
-	 * TODO: service must be able to throw some exception on failure.
-	 * </p>
-	 * 
 	 * @param signatureValue
 	 * @param signingCertificateChain
 	 *            the optional chain of signing certificates.
 	 */
 	void postSign(byte[] signatureValue,
-			List<X509Certificate> signingCertificateChain);
+			List<X509Certificate> signingCertificateChain)
+			throws ExpiredCertificateSecurityException,
+			RevokedCertificateSecurityException,
+			TrustCertificateSecurityException, CertificateSecurityException,
+			SecurityException;
 }

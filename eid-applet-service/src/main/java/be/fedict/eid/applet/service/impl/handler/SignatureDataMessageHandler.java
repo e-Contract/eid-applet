@@ -18,6 +18,7 @@
 
 package be.fedict.eid.applet.service.impl.handler;
 
+import java.lang.reflect.Method;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -39,7 +40,12 @@ import org.bouncycastle.util.Arrays;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.impl.UserIdentifierUtil;
 import be.fedict.eid.applet.service.spi.AuditService;
+import be.fedict.eid.applet.service.spi.CertificateSecurityException;
+import be.fedict.eid.applet.service.spi.ExpiredCertificateSecurityException;
+import be.fedict.eid.applet.service.spi.RevokedCertificateSecurityException;
 import be.fedict.eid.applet.service.spi.SignatureService;
+import be.fedict.eid.applet.service.spi.TrustCertificateSecurityException;
+import be.fedict.eid.applet.shared.ErrorCode;
 import be.fedict.eid.applet.shared.FinishedMessage;
 import be.fedict.eid.applet.shared.SignatureDataMessage;
 
@@ -123,7 +129,51 @@ public class SignatureDataMessageHandler implements
 
 		SignatureService signatureService = this.signatureServiceLocator
 				.locateService();
-		signatureService.postSign(signatureValue, certificateChain);
+		try {
+			signatureService.postSign(signatureValue, certificateChain);
+		} catch (ExpiredCertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE_EXPIRED);
+		} catch (RevokedCertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE_REVOKED);
+		} catch (TrustCertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE_NOT_TRUSTED);
+		} catch (CertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE);
+		} catch (Exception e) {
+			/*
+			 * We don't want to depend on the full JavaEE profile in this
+			 * artifact.
+			 */
+			if ("javax.ejb.EJBException".equals(e.getClass().getName())) {
+				Exception exception;
+				try {
+					Method getCausedByExceptionMethod = e.getClass().getMethod(
+							"getCausedByException", new Class[] {});
+					exception = (Exception) getCausedByExceptionMethod.invoke(
+							e, new Object[] {});
+				} catch (Exception e2) {
+					LOG.debug("error: " + e.getMessage(), e);
+					throw new SecurityException(
+							"error retrieving the root cause: "
+									+ e2.getMessage());
+				}
+				if (exception instanceof ExpiredCertificateSecurityException) {
+					return new FinishedMessage(ErrorCode.CERTIFICATE_EXPIRED);
+				}
+				if (exception instanceof RevokedCertificateSecurityException) {
+					return new FinishedMessage(ErrorCode.CERTIFICATE_REVOKED);
+				}
+				if (exception instanceof TrustCertificateSecurityException) {
+					return new FinishedMessage(
+							ErrorCode.CERTIFICATE_NOT_TRUSTED);
+				}
+				if (exception instanceof CertificateSecurityException) {
+					return new FinishedMessage(ErrorCode.CERTIFICATE);
+				}
+				throw new SecurityException("signature service error: "
+						+ e.getMessage(), e);
+			}
+		}
 
 		return new FinishedMessage();
 	}
