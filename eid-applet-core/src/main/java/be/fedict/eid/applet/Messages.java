@@ -53,15 +53,16 @@ public class Messages {
 				"connectReader"), PIN_PAD("pinPad"), CURRENT_PIN("currentPin"), NEW_PIN(
 				"newPin"), OK("ok"), CANCEL("cancel"), PUK_PAD("pukPad"), PIN_PAD_CHANGE(
 				"pinPadChange"), KIOSK_MODE("kioskMode"), ENTER_PIN("enterPin"), LABEL_PIN(
-                                "labelPin"),PIN_CHANGE("pinChange"), PIN_UNBLOCK("pinUnblock"), PIN_PAD_MODIFY_OLD(
+				"labelPin"), PIN_CHANGE("pinChange"), PIN_UNBLOCK("pinUnblock"), PIN_PAD_MODIFY_OLD(
 				"pinPadModifyOld"), PIN_PAD_MODIFY_NEW("pinPadModifyNew"), PIN_PAD_MODIFY_NEW_AGAIN(
 				"pinPadModifyNewAgain"), DIAGNOSTIC_MODE("diagnosticMode"), CERTIFICATE_EXPIRED_ERROR(
 				"certificateExpiredError"), CERTIFICATE_REVOKED_ERROR(
-				"certificateRevokedError"), IDENTITY_INFO("identityInfo"),  IDENTITY_IDENTITY(
-                                "identityIdentity"), IDENTITY_ADDRESS("identityAddress"), IDENTITY_PHOTO(
-                                "identityPhoto"), DETAILS_BUTTON("detailsButtonText"), CANCEL_BUTTON(
+				"certificateRevokedError"), IDENTITY_INFO("identityInfo"), IDENTITY_IDENTITY(
+				"identityIdentity"), IDENTITY_ADDRESS("identityAddress"), IDENTITY_PHOTO(
+				"identityPhoto"), DETAILS_BUTTON("detailsButtonText"), CANCEL_BUTTON(
 				"cancelButtonText"), NO_BUTTON("noButtonText"), OK_BUTTON(
-				"okButtonText"), YES_BUTTON("yesButtonText");
+				"okButtonText"), YES_BUTTON("yesButtonText"), CERTIFICATE_NOT_TRUSTED(
+				"certificateNotTrusted");
 
 		private final String id;
 

@@ -6,7 +6,7 @@
 </head>
 <body>
 <h1>eID Applet Authentication Demo</h1>
-<p>Simulated expired eID certificates.</p>
+<p>Simulates expired eID certificates.</p>
 <script src="https://www.java.com/js/deployJava.js"></script>
 <script>
 	var attributes = {

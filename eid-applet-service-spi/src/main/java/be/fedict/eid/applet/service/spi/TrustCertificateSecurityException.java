@@ -16,33 +16,17 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.shared;
+package be.fedict.eid.applet.service.spi;
 
 /**
- * Error enumeration.
+ * Exception thrown in case the incoming eID certificate is not trusted.
  * 
  * @author Frank Cornelis
  * 
  */
-public enum ErrorCode {
+public class TrustCertificateSecurityException extends
+		CertificateSecurityException {
 
-	/**
-	 * Error code for expired certificates.
-	 */
-	CERTIFICATE_EXPIRED,
+	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Error code for revoked certificates.
-	 */
-	CERTIFICATE_REVOKED,
-
-	/**
-	 * Generic error code for invalid certificates.
-	 */
-	CERTIFICATE,
-
-	/**
-	 * Error code for untrusted certificates.
-	 */
-	CERTIFICATE_NOT_TRUSTED;
 }
