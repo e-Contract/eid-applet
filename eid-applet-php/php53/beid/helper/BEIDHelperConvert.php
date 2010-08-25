@@ -64,8 +64,8 @@ class BEIDHelperConvert {
      * @return hexadecimal string
      */
     public static function bytesAsHexString($byte) {
-        $arr = strtoupper(unpack('H*', $byte));
-        return $arr[1];
+        $arr = unpack('H*', $byte);
+        return strtoupper("".$arr[1]);
     }
 
     /**

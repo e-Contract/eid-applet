@@ -68,7 +68,7 @@ class BEIDIdentity {
      */
     public function setCardNumber($cardNumber) {
         if (! is_string($cardNumber)) {
-            return new BEIDException('Card number must be a string');
+            return new BEIDIdentityException('Card number must be a string');
         }
         $this->cardNumber = $cardNumber;
     }
@@ -88,7 +88,7 @@ class BEIDIdentity {
      */
     public function setChipNumber($chipNumber) {
         if (! is_string($chipNumber)) {
-            return new BEIDException('Chip number must be a string');
+            return new BEIDIdentityException('Chip number must be a string');
         }
         $this->chipNumber = $chipNumber;
     }
@@ -154,7 +154,7 @@ class BEIDIdentity {
      */
     public function setCardDeliveryMunicipality($municipality) {
         if (! is_string($municipality)) {
-            return new BEIDException('Municipality must be a string');
+            return new BEIDIdentityException('Municipality must be a string');
         }
         $this->cardDeliveryMuncipality = $municipality;
     }
@@ -176,7 +176,7 @@ class BEIDIdentity {
      */
     public function setNationalNumber($nationalNumber) {
         if (! is_string($nationalNumber)) {
-            return new BEIDException('National number must be a string');
+            return new BEIDIdentityException('National number must be a string');
         }
         $this->nationalNumber = $nationalNumber;
     }
@@ -197,7 +197,7 @@ class BEIDIdentity {
      */
     public function setFirstName($firstName) {
         if (! is_string($firstName)) {
-            return new BEIDException('First name must be a string');
+            return new BEIDIdentityException('First name must be a string');
         }
         $this->firstName = $firstName;
     }
@@ -217,7 +217,7 @@ class BEIDIdentity {
      */
     public function setName($name) {
         if (! is_string($name)) {
-            return new BEIDException('Name must be a string');
+            return new BEIDIdentityException('Name must be a string');
         }
         $this->name = $name;
     }
@@ -237,7 +237,7 @@ class BEIDIdentity {
      */
     public function setMiddleName($middleName) {
         if (! is_string($middleName)) {
-            return new BEIDException('Middle name must be a string');
+            return new BEIDIdentityException('Middle name must be a string');
         }
         $this->middleName = $middleName;
     }
@@ -257,7 +257,7 @@ class BEIDIdentity {
      */
     public function setNationality($nationality) {
         if (! is_string($nationality)) {
-            return new BEIDException('Nationality must be a string');
+            return new BEIDIdentityException('Nationality must be a string');
         }
         $this->nationality = $nationality;
     }
@@ -277,7 +277,7 @@ class BEIDIdentity {
      */
     public function setPlaceOfBirth($placeOfBirth) {
         if (! is_string($placeOfBirth)) {
-            return new BEIDException('Place of birth must be a string');
+            return new BEIDIdentityException('Place of birth must be a string');
         }
         $this->placeOfBirth = $placeOfBirth;
     }
@@ -315,7 +315,7 @@ class BEIDIdentity {
      */
     public function setGender($gender) {
         if (! is_string($gender)) {
-            return new BEIDException('Gender must be a string');
+            return new BEIDIdentityException('Gender must be a string');
         }
         $this->gender = $gender;
     }
