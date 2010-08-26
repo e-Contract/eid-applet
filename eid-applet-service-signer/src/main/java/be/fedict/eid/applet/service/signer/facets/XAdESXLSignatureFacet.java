@@ -268,6 +268,7 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		Node signatureValueNode = findSingleNode(signatureElement,
 				"ds:SignatureValue");
 		RevocationData tsaRevocationDataXadesT = new RevocationData();
+		LOG.debug("creating XAdES-T time-stamp");
 		XAdESTimeStampType signatureTimeStamp = createXAdESTimeStamp(
 				Collections.singletonList(signatureValueNode),
 				tsaRevocationDataXadesT, this.c14nAlgoId,
@@ -455,6 +456,7 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		timeStampNodesXadesX1.add(completeRevocationRefsNode);
 
 		RevocationData tsaRevocationDataXadesX1 = new RevocationData();
+		LOG.debug("creating XAdES-X time-stamp");
 		XAdESTimeStampType timeStampXadesX1 = createXAdESTimeStamp(
 				timeStampNodesXadesX1, tsaRevocationDataXadesX1,
 				this.c14nAlgoId, this.timeStampService, this.objectFactory,
@@ -505,9 +507,10 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 			this.marshaller.marshal(this.objectFactory
 					.createCertificateValues(certificateValues),
 					unsignedSignaturePropertiesNode);
-			this.marshaller.marshal(this.objectFactory
-					.createRevocationValues(revocationValues),
-					unsignedSignaturePropertiesNode);
+			this.marshaller
+					.marshal(this.objectFactory
+							.createRevocationValues(revocationValues),
+							unsignedSignaturePropertiesNode);
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
 		}
@@ -528,8 +531,8 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 					throw new RuntimeException("c14n algo error: "
 							+ e.getMessage(), e);
 				}
-				c14nValue = ArrayUtils.addAll(c14nValue, c14n
-						.canonicalizeSubtree(node));
+				c14nValue = ArrayUtils.addAll(c14nValue,
+						c14n.canonicalizeSubtree(node));
 			}
 		} catch (CanonicalizationException e) {
 			throw new RuntimeException("c14n error: " + e.getMessage(), e);
