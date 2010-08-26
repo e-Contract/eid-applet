@@ -86,7 +86,7 @@ public class TSPTimeStampService implements TimeStampService {
 
 	private final String tspServiceUrl;
 
-	private final String requestPolicy;
+	private String requestPolicy;
 
 	private final String userAgent;
 
@@ -145,6 +145,15 @@ public class TSPTimeStampService implements TimeStampService {
 
 		this.digestAlgo = "SHA-1";
 		this.digestAlgoOid = TSPAlgorithms.SHA1;
+	}
+
+	/**
+	 * Sets the request policy OID.
+	 * 
+	 * @param policyOid
+	 */
+	public void setRequestPolicy(String policyOid) {
+		this.requestPolicy = policyOid;
 	}
 
 	/**
@@ -374,8 +383,8 @@ public class TSPTimeStampService implements TimeStampService {
 		DEROctetString oct = (DEROctetString) (new ASN1InputStream(
 				new ByteArrayInputStream(extvalue)).readObject());
 		AuthorityKeyIdentifier keyId = new AuthorityKeyIdentifier(
-				(ASN1Sequence) new ASN1InputStream(new ByteArrayInputStream(oct
-						.getOctets())).readObject());
+				(ASN1Sequence) new ASN1InputStream(new ByteArrayInputStream(
+						oct.getOctets())).readObject());
 		return keyId.getKeyIdentifier();
 	}
 }
