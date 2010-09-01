@@ -29,6 +29,10 @@ Deploy the test web application to a local running JBoss AS 6.0.x via:
 	cd eid-applet-test/eid-applet-test-deploy
 	mvn jboss:undeploy jboss:deploy
 
+Please notice that the JavaEE applications will not run on a vanilla JBoss
+Application Server. You'll need to use the JBoss AS distribution that comes
+with this project.
+
 We provide a JBoss AS 6.0.x package artifact named:
 	eid-applet-jboss-as
 
