@@ -17,24 +17,16 @@
                                     <h:graphicImage alt="photo from eID card" url="photo"/>
 					<h:panelGroup>
 						<h:panelGrid columns="2">
-                                                        <f:facet name="header">
-                                                            <h:outputText value="National Number" />
-                                                        </f:facet>
+                            <h:outputText value="National Number" />
 							<h:outputText value="#{eid.identity.nationalNumber}" />
 
-                                                        <f:facet name="header">
-                                                            <h:outputText value="Name" />
-                                                        </f:facet>
+							<h:outputText value="Name" />
 							<h:outputText value="#{eid.identity.name}" />
 
-                                                        <f:facet name="header">
-                                                            <h:outputText value="First Name" />
-                                                        </f:facet>
+							<h:outputText value="First Name" />
 							<h:outputText value="#{eid.identity.firstName}" />
 
-                                                        <f:facet name="header">
-                                                            <h:outputText value="Middle Name" />
-                                                        </f:facet>
+							<h:outputText value="Middle Name" />
 							<h:outputText value="#{eid.identity.middleName}" />
 
 							<h:outputText value="Nationality" />
