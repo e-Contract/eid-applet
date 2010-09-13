@@ -50,6 +50,7 @@
   * [http://homes.esat.kuleuven.be/~decockd/wiki/bin/view.cgi eID Site of Danny De Cock]
   * [https://env.dev.eid.belgium.be/ eID Test Environment]
   * http://www.foo.be/eID/opensc-belgium/
+  * [http://code.google.com/p/seek-for-android/ eID on Android]
 
 
 == Legal ==
