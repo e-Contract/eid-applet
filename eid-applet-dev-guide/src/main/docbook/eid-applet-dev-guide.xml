@@ -12,7 +12,7 @@
 			<year>2008-2010</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>17 August 2010</releaseinfo>
+		<releaseinfo>15 September 2010</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -83,7 +83,7 @@
 				given the open source nature of this project, (for example for
 				branding reasons) one needs to take all aspects of branching into
 				consideration. If you branch you will lose all official bug fixes
-				unless you back-port them manually which can be quite times
+				unless you back-port them manually which can be quite time
 				consuming.  
 			</para>
 		</warning>
@@ -2255,6 +2255,11 @@ ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlis
 						<entry>18 Aug 2010</entry>
 						<entry>Frank Cornelis</entry>
 						<entry>1.0.1.RC3</entry>
+					</row>
+					<row>
+						<entry>15 Sep 2010</entry>
+						<entry>Frank Cornelis</entry>
+						<entry>1.0.1.GA</entry>
 					</row>
 				</tbody>
 			</tgroup>
