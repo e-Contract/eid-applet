@@ -1,3 +1,13 @@
+1.0.1.GA - 15 Sep 2010
+	* fix: no javadoc for JAXB generated classes
+	* fix for EJBTHREE-2152
+	* proper error reporting for untrusted certificates during eID authn
+	* proper error reporting on invalid signing certificates for postSign
+	* fix: xerces run-time issue
+	* set request policy OID on TSP client
+	* fix: codehaus moved to nexus maven repository
+	* fixed eID Applet beta site identity result page
+
 1.0.1.RC3 - 18 Aug 2010
 	* XAdES-X-L v1.4.1 support
 	* XAdES-EPES support
