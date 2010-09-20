@@ -20,6 +20,7 @@ package test.be.fedict.eid.applet;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.awt.Component;
 import java.awt.image.BufferedImage;
@@ -162,8 +163,8 @@ public class PcscTest {
 		byte[] signatureValue;
 		List<X509Certificate> authnCertChain;
 		try {
-			//pcscEid.logoff();
-			//pcscEid.selectBelpicJavaCardApplet();
+			// pcscEid.logoff();
+			// pcscEid.selectBelpicJavaCardApplet();
 			signatureValue = pcscEid.signAuthn(challenge);
 			authnCertChain = pcscEid.getAuthnCertificateChain();
 			// pcscEid.logoff();
@@ -320,7 +321,7 @@ public class PcscTest {
 		}
 
 		long t0 = System.currentTimeMillis();
-		//pcscEidSpi.selectBelpicJavaCardApplet();
+		// pcscEidSpi.selectBelpicJavaCardApplet();
 		byte[] photo = pcscEidSpi.readFile(PcscEid.PHOTO_FILE_ID);
 		long t1 = System.currentTimeMillis();
 		LOG.debug("image size: " + photo.length);
@@ -567,6 +568,32 @@ public class PcscTest {
 	}
 
 	@Test
+	public void testCardDataFile() throws Exception {
+		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEid.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEid.waitForEidPresent();
+		}
+
+		try {
+			CardChannel cardChannel = pcscEid.getCardChannel();
+
+			while (true) {
+				CommandAPDU getCardApdu = new CommandAPDU(0x80, 0xe4, 0x00,
+						0x00, 0x1c); // Le = 0x1c
+				ResponseAPDU responseApdu = cardChannel.transmit(getCardApdu);
+				if (0x9000 != responseApdu.getSW()) {
+					fail("SW error: "
+							+ Integer.toHexString(responseApdu.getSW()));
+				}
+				LOG.debug(Hex.encodeHexString(responseApdu.getData()));
+			}
+		} finally {
+			pcscEid.close();
+		}
+	}
+
+	@Test
 	public void testCcid() throws Exception {
 		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEid.isEidPresent()) {
@@ -776,8 +803,8 @@ public class PcscTest {
 			LOG.debug("end-entity certificate: " + certChain.get(0));
 
 			MemoryCertificateRepository certificateRepository = new MemoryCertificateRepository();
-			certificateRepository.addTrustPoint(certChain
-					.get(certChain.size() - 1));
+			certificateRepository
+					.addTrustPoint(certChain.get(certChain.size() - 1));
 
 			TrustValidator trustValidator = new TrustValidator(
 					certificateRepository);
