@@ -71,7 +71,7 @@
 		<td><%=((Identity) session.getAttribute("eid.identity")).gender%></td>
 	</tr>
 </table>
-<a href="identify.jsp">Again</a>
+<a href="identify.html">Again</a>
 |
 <a href=".">Main Page</a>
 </body>

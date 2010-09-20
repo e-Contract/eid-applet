@@ -346,8 +346,11 @@
 							<code>true</code>
 							the eID Applet will hide the details button. To compensate for
 							this, the eID Applet will use the Java Console to output detailed
-							logging. Please note that the Java Console is not available on
-							every platform.
+							logging. Please note that the Java Console is not enabled per
+							default on every platform. The Java Console can be enabled via
+							the
+							<code>jcontrol</code>
+							JVM tool.
 						</entry>
 					</row>
 				</tbody>
@@ -1898,11 +1901,27 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 			<title>AJP proxy</title>
 			<para>
 				Another option is to use an AJP proxy. An example of how to
-				configure the Apache HTTPD AJP proxy is given below:
+				configure the Apache HTTPD AJP proxy is given below. In
+				<code>/etc/httpd/conf.d/proxy_ajp.conf</code>
+				you put:
 			</para>
-			<programlisting><![CDATA[LoadModule proxy_ajp_module modules/mod_proxy_ajp.so
-ProxyPass /eid-applet-test/ ajp://localhost:8009/eid-applet-test/
-ProxyPass /eid-applet-beta/ ajp://localhost:8009/eid-applet-beta/]]></programlisting>
+			<programlisting><![CDATA[LoadModule proxy_ajp_module modules/mod_proxy_ajp.so]]></programlisting>
+			<para>
+				Now you can configure (in some site specific
+				<code>httpd</code>
+				config
+				file) the following:
+			</para>
+			<programlisting><![CDATA[<IfModule mod_proxy_ajp.c>
+	ProxyRequests On
+	ProxyVia On
+
+	<Location /eid-applet-test>
+		Order allow,deny
+		Allow from all
+		ProxyPass ajp://localhost:8009/eid-applet-test
+	</Location>
+</IfModule>]]></programlisting>
 			<para>
 				This AJP proxy can then terminate the SSL in a transparent way
 				towards the Application Service.
