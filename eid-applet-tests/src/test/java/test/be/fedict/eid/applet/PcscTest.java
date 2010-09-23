@@ -258,6 +258,23 @@ public class PcscTest {
 	}
 
 	@Test
+	public void logoffAndDie() throws Exception {
+		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEidSpi.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEidSpi.waitForEidPresent();
+		}
+
+		try {
+			while (true) {
+				pcscEidSpi.logoff();
+			}
+		} finally {
+			pcscEidSpi.close();
+		}
+	}
+
+	@Test
 	public void pcscChangePin() throws Exception {
 		this.messages = new Messages(Locale.GERMAN);
 		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
