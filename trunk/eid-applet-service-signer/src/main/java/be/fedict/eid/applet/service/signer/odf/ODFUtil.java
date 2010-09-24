@@ -112,7 +112,7 @@ public class ODFUtil {
 	 * @return inputstream for the file / zip entry
 	 * @throws IOException
 	 */
-	protected static InputStream findDataInputStream(InputStream inputStream,
+	public static InputStream findDataInputStream(InputStream inputStream,
 			String uri) throws IOException {
 		ZipInputStream zipInputStream = new ZipInputStream(inputStream);
 		ZipEntry zipEntry;
@@ -130,7 +130,7 @@ public class ODFUtil {
 	 * @param zipEntry
 	 * @return true if zip entry is a content file
 	 */
-	protected static boolean isContentFile(ZipEntry zipEntry) {
+	public static boolean isContentFile(ZipEntry zipEntry) {
 		/*
 		 * should be enough for most simple ODF files and ODF embedded into
 		 * another ODF file (e.g. chart in spreadsheet)
@@ -144,7 +144,7 @@ public class ODFUtil {
 	 * @param zipEntry
 	 * @return true if zip entry is a signature file
 	 */
-	protected static boolean isSignatureFile(ZipEntry zipEntry) {
+	public static boolean isSignatureFile(ZipEntry zipEntry) {
 		/*
 		 * for now, only check for document signatures, not the other macro
 		 * signatures or application specific signatures
@@ -158,7 +158,7 @@ public class ODFUtil {
 	 * @param zipEntry
 	 * @return true if zip entry is to be signed
 	 */
-	protected static boolean isToBeSigned(ZipEntry zipEntry) {
+	public static boolean isToBeSigned(ZipEntry zipEntry) {
 		String name = zipEntry.getName();
 
 		/* OOo 3.0/3.1 bug: don't sign mimetype stream nor the manifest */
@@ -181,7 +181,7 @@ public class ODFUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	protected static List getZipEntriesAsList(InputStream odfInputStream)
+	public static List getZipEntriesAsList(InputStream odfInputStream)
 			throws IOException {
 		ArrayList list = new ArrayList();
 
@@ -238,7 +238,7 @@ public class ODFUtil {
 		return true;
 	}
 
-	protected static boolean checkNodes(NodeList nodes, List zipEntries) {
+	public static boolean checkNodes(NodeList nodes, List zipEntries) {
 		for (int i = 0; i < nodes.getLength(); i++) {
 			String url = nodes.item(i).getNodeValue();
 			if ("".equals(url)) {
