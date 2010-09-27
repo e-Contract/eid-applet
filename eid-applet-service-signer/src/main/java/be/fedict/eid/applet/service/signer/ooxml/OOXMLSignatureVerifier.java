@@ -151,7 +151,13 @@ public class OOXMLSignatureVerifier {
 	public static Document getSignatureDocument(URL url,
 			String signatureResourceName) throws IOException,
 			ParserConfigurationException, SAXException {
-		ZipInputStream zipInputStream = new ZipInputStream(url.openStream());
+		return getSignatureDocument(url.openStream(), signatureResourceName);
+	}
+
+	public static Document getSignatureDocument(
+			InputStream documentInputStream, String signatureResourceName)
+			throws IOException, ParserConfigurationException, SAXException {
+		ZipInputStream zipInputStream = new ZipInputStream(documentInputStream);
 		ZipEntry zipEntry;
 		while (null != (zipEntry = zipInputStream.getNextEntry())) {
 			if (false == signatureResourceName.equals(zipEntry.getName())) {
@@ -166,8 +172,13 @@ public class OOXMLSignatureVerifier {
 	public static List<String> getSignatureResourceNames(URL url)
 			throws IOException, ParserConfigurationException, SAXException,
 			TransformerException {
+		return getSignatureResourceNames(url.openStream());
+	}
+
+	public static List<String> getSignatureResourceNames(InputStream inputStream)
+			throws IOException, ParserConfigurationException, SAXException,
+			TransformerException {
 		List<String> signatureResourceNames = new LinkedList<String>();
-		InputStream inputStream = url.openStream();
 		ZipInputStream zipInputStream = new ZipInputStream(inputStream);
 		ZipEntry zipEntry;
 		while (null != (zipEntry = zipInputStream.getNextEntry())) {
