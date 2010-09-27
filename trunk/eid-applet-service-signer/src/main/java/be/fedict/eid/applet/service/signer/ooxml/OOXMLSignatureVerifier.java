@@ -148,7 +148,7 @@ public class OOXMLSignatureVerifier {
 		return signers;
 	}
 
-	private static Document getSignatureDocument(URL url,
+	public static Document getSignatureDocument(URL url,
 			String signatureResourceName) throws IOException,
 			ParserConfigurationException, SAXException {
 		ZipInputStream zipInputStream = new ZipInputStream(url.openStream());
@@ -163,7 +163,7 @@ public class OOXMLSignatureVerifier {
 		return null;
 	}
 
-	private static List<String> getSignatureResourceNames(URL url)
+	public static List<String> getSignatureResourceNames(URL url)
 			throws IOException, ParserConfigurationException, SAXException,
 			TransformerException {
 		List<String> signatureResourceNames = new LinkedList<String>();
