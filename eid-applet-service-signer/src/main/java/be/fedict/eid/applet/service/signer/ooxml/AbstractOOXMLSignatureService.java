@@ -66,6 +66,8 @@ import org.xml.sax.SAXException;
 
 import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
 import be.fedict.eid.applet.service.signer.facets.KeyInfoSignatureFacet;
+import be.fedict.eid.applet.service.signer.facets.XAdESSignatureFacet;
+import be.fedict.eid.applet.service.signer.time.ConstantLocalClock;
 
 /**
  * Signature Service implementation for Office OpenXML document format XML
@@ -81,8 +83,17 @@ public abstract class AbstractOOXMLSignatureService extends
 			.getLog(AbstractOOXMLSignatureService.class);
 
 	protected AbstractOOXMLSignatureService() {
-		addSignatureFacet(new OOXMLSignatureFacet(this));
+		ConstantLocalClock clock = new ConstantLocalClock();
+		addSignatureFacet(new OOXMLSignatureFacet(this, clock));
 		addSignatureFacet(new KeyInfoSignatureFacet(true, false, true));
+
+		XAdESSignatureFacet xadesSignatureFacet = new XAdESSignatureFacet(clock);
+		xadesSignatureFacet.setIdSignedProperties("idSignedProperties");
+		xadesSignatureFacet.setSignaturePolicyImplied(true);
+		// addSignatureFacet(xadesSignatureFacet);
+		/*
+		 * Activating the XAdES-BES still breaks the signature somehow.
+		 */
 	}
 
 	@Override

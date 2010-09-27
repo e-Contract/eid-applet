@@ -121,8 +121,17 @@ public class AbstractOOXMLSignatureServiceTest {
 		OOXMLTestSignatureService signatureService = new OOXMLTestSignatureService(
 				ooxmlUrl);
 
+		KeyPair keyPair = PkiTestUtils.generateKeyPair();
+		DateTime notBefore = new DateTime();
+		DateTime notAfter = notBefore.plusYears(1);
+		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
+				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
+				.getPrivate(), true, 0, null, null, new KeyUsage(
+				KeyUsage.nonRepudiation));
+
 		// operate
-		DigestInfo digestInfo = signatureService.preSign(null, null);
+		DigestInfo digestInfo = signatureService.preSign(null,
+				Collections.singletonList(certificate));
 
 		// verify
 		assertNotNull(digestInfo);
@@ -148,8 +157,13 @@ public class AbstractOOXMLSignatureServiceTest {
 	}
 
 	@Test
-	public void testSignOffice2010() throws Exception {
+	public void testSignOffice2010TechnicalPreview() throws Exception {
 		sign("/hello-world-office-2010-technical-preview-unsigned.docx");
+	}
+
+	@Test
+	public void testSignOffice2010() throws Exception {
+		sign("/ms-office-2010.docx");
 	}
 
 	@Test
@@ -196,8 +210,17 @@ public class AbstractOOXMLSignatureServiceTest {
 		OOXMLTestSignatureService signatureService = new OOXMLTestSignatureService(
 				ooxmlUrl);
 
+		KeyPair keyPair = PkiTestUtils.generateKeyPair();
+		DateTime notBefore = new DateTime();
+		DateTime notAfter = notBefore.plusYears(1);
+		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
+				.getPublic(), signerDn, notBefore, notAfter, null, keyPair
+				.getPrivate(), true, 0, null, null, new KeyUsage(
+				KeyUsage.nonRepudiation));
+
 		// operate
-		DigestInfo digestInfo = signatureService.preSign(null, null);
+		DigestInfo digestInfo = signatureService.preSign(null,
+				Collections.singletonList(certificate));
 
 		// verify
 		assertNotNull(digestInfo);
@@ -217,23 +240,16 @@ public class AbstractOOXMLSignatureServiceTest {
 		LOG.debug("tmp pre-sign file: " + tmpFile.getAbsolutePath());
 
 		// setup: key material, signature value
-		KeyPair keyPair = PkiTestUtils.generateKeyPair();
+
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
 		byte[] digestInfoValue = ArrayUtils.addAll(
 				PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
 		byte[] signatureValue = cipher.doFinal(digestInfoValue);
 
-		DateTime notBefore = new DateTime();
-		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
-				.getPublic(), signerDn, notBefore, notAfter, null, keyPair
-				.getPrivate(), true, 0, null, null, new KeyUsage(
-				KeyUsage.nonRepudiation));
-
 		// operate: postSign
-		signatureService.postSign(signatureValue, Collections
-				.singletonList(certificate));
+		signatureService.postSign(signatureValue,
+				Collections.singletonList(certificate));
 
 		// verify: signature
 		byte[] signedOOXMLData = signatureService

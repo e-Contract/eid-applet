@@ -43,7 +43,9 @@ import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -103,6 +105,10 @@ public class XAdESSignatureFacet implements SignatureFacet {
 	private final String xmlDigestAlgorithm;
 
 	private final SignaturePolicyService signaturePolicyService;
+
+	private String idSignedProperties;
+
+	private boolean signaturePolicyImplied;
 
 	/**
 	 * Default constructor. Will use a local clock and "SHA-1" for digest
@@ -229,7 +235,12 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		// SignedProperties
 		SignedPropertiesType signedProperties = this.xadesObjectFactory
 				.createSignedPropertiesType();
-		String signedPropertiesId = signatureId + "-xades";
+		String signedPropertiesId;
+		if (null != this.idSignedProperties) {
+			signedPropertiesId = this.idSignedProperties;
+		} else {
+			signedPropertiesId = signatureId + "-xades";
+		}
 		signedProperties.setId(signedPropertiesId);
 		qualifyingProperties.setSignedProperties(signedProperties);
 
@@ -240,12 +251,14 @@ public class XAdESSignatureFacet implements SignatureFacet {
 				.setSignedSignatureProperties(signedSignatureProperties);
 
 		// SigningTime
-		GregorianCalendar signingTime = new GregorianCalendar(TimeZone
-				.getTimeZone("Z"));
+		GregorianCalendar signingTime = new GregorianCalendar(
+				TimeZone.getTimeZone("Z"));
 		Date currentClockValue = this.clock.getTime();
 		signingTime.setTime(currentClockValue);
-		signedSignatureProperties.setSigningTime(this.datatypeFactory
-				.newXMLGregorianCalendar(signingTime));
+		XMLGregorianCalendar xmlGregorianCalendar = this.datatypeFactory
+				.newXMLGregorianCalendar(signingTime);
+		xmlGregorianCalendar.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
+		signedSignatureProperties.setSigningTime(xmlGregorianCalendar);
 
 		// SigningCertificate
 		if (null == signingCertificateChain
@@ -306,6 +319,13 @@ public class XAdESSignatureFacet implements SignatureFacet {
 						.createSPURI(signaturePolicyDownloadUrl);
 				sigPolicyQualifier.getContent().add(spUriElement);
 			}
+		} else if (this.signaturePolicyImplied) {
+			SignaturePolicyIdentifierType signaturePolicyIdentifier = this.xadesObjectFactory
+					.createSignaturePolicyIdentifierType();
+			signedSignatureProperties
+					.setSignaturePolicyIdentifier(signaturePolicyIdentifier);
+
+			signaturePolicyIdentifier.setSignaturePolicyImplied("");
 		}
 
 		// marshall XAdES QualifyingProperties
@@ -324,7 +344,7 @@ public class XAdESSignatureFacet implements SignatureFacet {
 				this.xmlDigestAlgorithm, null);
 		List<Transform> transforms = new LinkedList<Transform>();
 		Transform exclusiveTransform = signatureFactory
-				.newTransform(CanonicalizationMethod.EXCLUSIVE,
+				.newTransform(CanonicalizationMethod.INCLUSIVE,
 						(TransformParameterSpec) null);
 		transforms.add(exclusiveTransform);
 		Reference reference = signatureFactory.newReference("#"
@@ -440,5 +460,18 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		certId.setCertDigest(certDigest);
 
 		return certId;
+	}
+
+	/**
+	 * Sets the Id that will be used on the SignedProperties element;
+	 * 
+	 * @param idSignedProperties
+	 */
+	public void setIdSignedProperties(String idSignedProperties) {
+		this.idSignedProperties = idSignedProperties;
+	}
+
+	public void setSignaturePolicyImplied(boolean signaturePolicyImplied) {
+		this.signaturePolicyImplied = signaturePolicyImplied;
 	}
 }

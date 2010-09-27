@@ -41,6 +41,7 @@ import java.net.URL;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -49,6 +50,7 @@ import java.util.zip.ZipInputStream;
 
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
+import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Manifest;
 import javax.xml.crypto.dsig.Reference;
@@ -80,6 +82,8 @@ import org.xml.sax.SAXException;
 
 import be.fedict.eid.applet.service.signer.NoCloseInputStream;
 import be.fedict.eid.applet.service.signer.SignatureFacet;
+import be.fedict.eid.applet.service.signer.time.Clock;
+import be.fedict.eid.applet.service.signer.time.LocalClock;
 
 /**
  * Office OpenXML Signature Facet implementation.
@@ -93,13 +97,26 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 
 	private final AbstractOOXMLSignatureService signatureService;
 
+	private final Clock clock;
+
 	/**
 	 * Main constructor.
 	 * 
 	 * @param ooxmlUrl
 	 */
 	public OOXMLSignatureFacet(AbstractOOXMLSignatureService signatureService) {
+		this(signatureService, new LocalClock());
+	}
+
+	/**
+	 * Main constructor.
+	 * 
+	 * @param ooxmlUrl
+	 */
+	public OOXMLSignatureFacet(AbstractOOXMLSignatureService signatureService,
+			Clock clock) {
 		this.signatureService = signatureService;
+		this.clock = clock;
 	}
 
 	public void preSign(XMLSignatureFactory signatureFactory,
@@ -175,6 +192,12 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 				signatureFactory,
 				"application/vnd.openxmlformats-officedocument.wordprocessingml.webSettings+xml",
 				manifestReferences);
+		/*
+		 * Word 2010
+		 */
+		addParts(signatureFactory,
+				"application/vnd.ms-word.stylesWithEffects+xml",
+				manifestReferences);
 
 		/*
 		 * Powerpoint
@@ -227,11 +250,12 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 				.createElementNS(
 						"http://schemas.openxmlformats.org/package/2006/digital-signature",
 						"mdssi:Value");
-		DateTime dateTime = new DateTime(DateTimeZone.UTC);
+		Date now = this.clock.getTime();
+		DateTime dateTime = new DateTime(now.getTime(), DateTimeZone.UTC);
 		DateTimeFormatter fmt = ISODateTimeFormat.dateTimeNoMillis();
-		String now = fmt.print(dateTime);
-		LOG.debug("now: " + now);
-		valueElement.setTextContent(now);
+		String nowStr = fmt.print(dateTime);
+		LOG.debug("now: " + nowStr);
+		valueElement.setTextContent(nowStr);
 		signatureTimeElement.appendChild(valueElement);
 
 		List<XMLStructure> signatureTimeContent = new LinkedList<XMLStructure>();
@@ -304,8 +328,8 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 				continue;
 			}
 			Document relsDocument = loadDocumentNoClose(zipInputStream);
-			addRelationshipsReference(signatureFactory, document, zipEntry
-					.getName(), relsDocument, manifestReferences);
+			addRelationshipsReference(signatureFactory, document,
+					zipEntry.getName(), relsDocument, manifestReferences);
 		}
 	}
 
@@ -358,9 +382,9 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 		List<Transform> transforms = new LinkedList<Transform>();
 		transforms.add(signatureFactory.newTransform(
 				RelationshipTransformService.TRANSFORM_URI, parameterSpec));
-		transforms.add(signatureFactory.newTransform(
-				"http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
-				(TransformParameterSpec) null));
+		transforms.add(signatureFactory
+				.newTransform(CanonicalizationMethod.INCLUSIVE,
+						(TransformParameterSpec) null));
 		DigestMethod digestMethod = signatureFactory.newDigestMethod(
 				DigestMethod.SHA1, null);
 		Reference reference = signatureFactory
@@ -378,8 +402,9 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		List<String> documentResourceNames;
 		try {
-			documentResourceNames = getResourceNames(this.signatureService
-					.getOfficeOpenXMLDocumentURL(), contentType);
+			documentResourceNames = getResourceNames(
+					this.signatureService.getOfficeOpenXMLDocumentURL(),
+					contentType);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
