@@ -35,6 +35,7 @@
 
 package be.fedict.eid.applet.service.signer.ooxml;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -67,13 +68,25 @@ public class OOXMLURIDereferencer implements URIDereferencer {
 
 	private final URL ooxmlUrl;
 
+	private final byte[] ooxmlDocument;
+
 	private final URIDereferencer baseUriDereferencer;
 
 	public OOXMLURIDereferencer(URL ooxmlUrl) {
-		if (null == ooxmlUrl) {
-			throw new IllegalArgumentException("ooxmlUrl is null");
+		this(null, ooxmlUrl);
+	}
+
+	public OOXMLURIDereferencer(byte[] ooxmlDocument) {
+		this(ooxmlDocument, null);
+	}
+
+	protected OOXMLURIDereferencer(byte[] ooxmlDocument, URL ooxmlUrl) {
+		if (null == ooxmlUrl && null == ooxmlDocument) {
+			throw new IllegalArgumentException(
+					"need some reference to the OOXML document");
 		}
 		this.ooxmlUrl = ooxmlUrl;
+		this.ooxmlDocument = ooxmlDocument;
 		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
 				.getInstance();
 		this.baseUriDereferencer = xmlSignatureFactory.getURIDereferencer();
@@ -98,9 +111,8 @@ public class OOXMLURIDereferencer implements URIDereferencer {
 		try {
 			InputStream dataInputStream = findDataInputStream(uri);
 			if (null == dataInputStream) {
-				LOG
-						.debug("cannot resolve, delegating to base DOM URI dereferencer: "
-								+ uri);
+				LOG.debug("cannot resolve, delegating to base DOM URI dereferencer: "
+						+ uri);
 				return this.baseUriDereferencer.dereference(uriReference,
 						context);
 			}
@@ -122,7 +134,12 @@ public class OOXMLURIDereferencer implements URIDereferencer {
 		}
 		LOG.debug("ZIP entry name: " + entryName);
 
-		InputStream odfInputStream = this.ooxmlUrl.openStream();
+		InputStream odfInputStream;
+		if (null != this.ooxmlDocument) {
+			odfInputStream = new ByteArrayInputStream(this.ooxmlDocument);
+		} else {
+			odfInputStream = this.ooxmlUrl.openStream();
+		}
 		ZipInputStream odfZipInputStream = new ZipInputStream(odfInputStream);
 		ZipEntry zipEntry;
 		while (null != (zipEntry = odfZipInputStream.getNextEntry())) {
