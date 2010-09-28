@@ -200,6 +200,26 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 				manifestReferences);
 
 		/*
+		 * Excel
+		 */
+		addParts(
+				signatureFactory,
+				"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml",
+				manifestReferences);
+		addParts(
+				signatureFactory,
+				"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml",
+				manifestReferences);
+		addParts(
+				signatureFactory,
+				"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml",
+				manifestReferences);
+		addParts(
+				signatureFactory,
+				"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml",
+				manifestReferences);
+
+		/*
 		 * Powerpoint
 		 */
 		addParts(
