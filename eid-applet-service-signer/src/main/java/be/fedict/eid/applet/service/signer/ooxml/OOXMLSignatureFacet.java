@@ -242,6 +242,17 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 				signatureFactory,
 				"application/vnd.openxmlformats-officedocument.presentationml.tableStyles+xml",
 				manifestReferences);
+		/*
+		 * Powerpoint 2010
+		 */
+		addParts(
+				signatureFactory,
+				"application/vnd.openxmlformats-officedocument.presentationml.viewProps+xml",
+				manifestReferences);
+		addParts(
+				signatureFactory,
+				"application/vnd.openxmlformats-officedocument.presentationml.presProps+xml",
+				manifestReferences);
 
 		Manifest manifest = signatureFactory.newManifest(manifestReferences);
 		return manifest;
