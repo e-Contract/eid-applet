@@ -110,6 +110,8 @@ public class XAdESSignatureFacet implements SignatureFacet {
 
 	private boolean signaturePolicyImplied;
 
+	private String xadesNamespacePrefix;
+
 	/**
 	 * Default constructor. Will use a local clock and "SHA-1" for digest
 	 * algorithm.
@@ -209,7 +211,7 @@ public class XAdESSignatureFacet implements SignatureFacet {
 			this.marshaller = jaxbContext.createMarshaller();
 			this.marshaller.setProperty(
 					"com.sun.xml.bind.namespacePrefixMapper",
-					new XAdESNamespacePrefixMapper());
+					new XAdESNamespacePrefixMapper(this.xadesNamespacePrefix));
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
 		}
@@ -473,5 +475,9 @@ public class XAdESSignatureFacet implements SignatureFacet {
 
 	public void setSignaturePolicyImplied(boolean signaturePolicyImplied) {
 		this.signaturePolicyImplied = signaturePolicyImplied;
+	}
+
+	public void setXadesNamespacePrefix(String xadesNamespacePrefix) {
+		this.xadesNamespacePrefix = xadesNamespacePrefix;
 	}
 }
