@@ -102,7 +102,7 @@ public class OOXMLSignatureVerifierTest {
 		// verify
 		assertTrue(result);
 	}
-	
+
 	@Test
 	public void testIsOOXMLDocument2() throws Exception {
 		// setup
@@ -246,6 +246,54 @@ public class OOXMLSignatureVerifierTest {
 		// setup
 		URL url = OOXMLSignatureVerifierTest.class
 				.getResource("/signed-ooxml.docx");
+
+		// operate
+		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+
+		// verify
+		assertNotNull(result);
+		assertEquals(1, result.size());
+		X509Certificate signer = result.get(0);
+		LOG.debug("signer: " + signer.getSubjectX500Principal());
+	}
+
+	@Test
+	public void testSignedOOXMLOffice2010() throws Exception {
+		// setup
+		URL url = OOXMLSignatureVerifierTest.class
+				.getResource("/ms-office-2010-signed.docx");
+
+		// operate
+		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+
+		// verify
+		assertNotNull(result);
+		assertEquals(1, result.size());
+		X509Certificate signer = result.get(0);
+		LOG.debug("signer: " + signer.getSubjectX500Principal());
+	}
+
+	@Test
+	public void testSignedOOXMLOffice2010Powerpoint() throws Exception {
+		// setup
+		URL url = OOXMLSignatureVerifierTest.class
+				.getResource("/ms-office-2010-signed.pptx");
+
+		// operate
+		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+
+		// verify
+		assertNotNull(result);
+		assertEquals(1, result.size());
+		X509Certificate signer = result.get(0);
+		LOG.debug("signer: " + signer.getSubjectX500Principal());
+	}
+
+	@Test
+	public void testSignedOOXMLOffice2010Excel() throws Exception {
+		// setup
+		URL url = OOXMLSignatureVerifierTest.class
+				.getResource("/ms-office-2010-signed.xlsx");
 
 		// operate
 		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
