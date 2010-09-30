@@ -302,16 +302,6 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 		objectContent.add(signatureProperties);
 	}
 
-	private void addMSDigsigElement(Document document, String name,
-			String value, Element signatureInfoElement) {
-		Element msDigsigElement = document.createElementNS(
-				"http://schemas.microsoft.com/office/2006/digsig", name);
-		if (null != value) {
-			msDigsigElement.setTextContent(value);
-		}
-		signatureInfoElement.appendChild(msDigsigElement);
-	}
-
 	private void addSignatureInfo(XMLSignatureFactory signatureFactory,
 			Document document, String signatureId, List<Reference> references,
 			List<XMLObject> objects) throws NoSuchAlgorithmException,
@@ -324,45 +314,18 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 		signatureInfoElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns",
 				"http://schemas.microsoft.com/office/2006/digsig");
 
-		addMSDigsigElement(document, "SetupID", null, signatureInfoElement);
-		addMSDigsigElement(document, "SignatureText", null,
-				signatureInfoElement);
-		addMSDigsigElement(document, "SignatureImage", null,
-				signatureInfoElement);
-		addMSDigsigElement(document, "SignatureComments", "Test",
-				signatureInfoElement);
-		addMSDigsigElement(document, "WindowsVersion", "6.1",
-				signatureInfoElement);
-		addMSDigsigElement(document, "OfficeVersion", "14.0",
-				signatureInfoElement);
-		addMSDigsigElement(document, "ApplicationVersion", "14.0",
-				signatureInfoElement);
-		addMSDigsigElement(document, "Monitors", "1", signatureInfoElement);
-		addMSDigsigElement(document, "HorizontalResolution", "1680",
-				signatureInfoElement);
-		addMSDigsigElement(document, "VerticalResolution", "928",
-				signatureInfoElement);
-		addMSDigsigElement(document, "ColorDepth", "32", signatureInfoElement);
-		addMSDigsigElement(document, "SignatureProviderId",
-				"{00000000-0000-0000-0000-000000000000}", signatureInfoElement);
-		addMSDigsigElement(document, "SignatureProviderUrl", null,
-				signatureInfoElement);
-		addMSDigsigElement(document, "SignatureProviderDetails", "9",
-				signatureInfoElement);
-		addMSDigsigElement(document, "ManifestHashAlgorithm",
-				"http://www.w3.org/2000/09/xmldsig#sha1", signatureInfoElement);
-		addMSDigsigElement(document, "SignatureType", "1", signatureInfoElement);
+		Element manifestHashAlgorithmElement = document.createElementNS(
+				"http://schemas.microsoft.com/office/2006/digsig",
+				"ManifestHashAlgorithm");
+		manifestHashAlgorithmElement
+				.setTextContent("http://www.w3.org/2000/09/xmldsig#sha1");
+		signatureInfoElement.appendChild(manifestHashAlgorithmElement);
 
 		List<XMLStructure> signatureInfoContent = new LinkedList<XMLStructure>();
 		signatureInfoContent.add(new DOMStructure(signatureInfoElement));
-		
-		//SignatureProperty signatureInfoSignatureProperty = signatureFactory
-		//		.newSignatureProperty(signatureInfoContent, "#" + signatureId,
-		//				"idOfficeV1Details");
 		SignatureProperty signatureInfoSignatureProperty = signatureFactory
-				.newSignatureProperty(signatureInfoContent, signatureId,
+				.newSignatureProperty(signatureInfoContent, "#" + signatureId,
 						"idOfficeV1Details");
-						
 
 		List<SignatureProperty> signaturePropertyContent = new LinkedList<SignatureProperty>();
 		signaturePropertyContent.add(signatureInfoSignatureProperty);
