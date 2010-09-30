@@ -85,12 +85,14 @@ public abstract class AbstractOOXMLSignatureService extends
 	protected AbstractOOXMLSignatureService() {
 		ConstantLocalClock clock = new ConstantLocalClock();
 		addSignatureFacet(new OOXMLSignatureFacet(this, clock));
-		addSignatureFacet(new KeyInfoSignatureFacet(true, false, true));
+		addSignatureFacet(new KeyInfoSignatureFacet(true, false, false));
 
 		XAdESSignatureFacet xadesSignatureFacet = new XAdESSignatureFacet(clock);
+		xadesSignatureFacet.setXadesNamespacePrefix("xd");
 		xadesSignatureFacet.setIdSignedProperties("idSignedProperties");
 		xadesSignatureFacet.setSignaturePolicyImplied(true);
-		// addSignatureFacet(xadesSignatureFacet);
+		setSignatureId("idPackageSignature");
+		//addSignatureFacet(xadesSignatureFacet);
 		/*
 		 * Activating the XAdES-BES still breaks the signature somehow.
 		 */
