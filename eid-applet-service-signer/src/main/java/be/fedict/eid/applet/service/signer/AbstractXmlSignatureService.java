@@ -115,12 +115,26 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
 	private String signatureNamespacePrefix;
 
+	private String signatureId;
+
 	/**
 	 * Main constructor.
 	 */
 	public AbstractXmlSignatureService() {
 		this.signatureFacets = new LinkedList<SignatureFacet>();
 		this.signatureNamespacePrefix = null;
+		this.signatureId = null;
+	}
+
+	/**
+	 * Sets the signature Id attribute value used to create the XML signature. A
+	 * <code>null</code> value will trigger an automatically generated signature
+	 * Id.
+	 * 
+	 * @param signatureId
+	 */
+	protected void setSignatureId(String signatureId) {
+		this.signatureId = signatureId;
 	}
 
 	/**
@@ -291,8 +305,9 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		try {
 			writeDocument(document, signedDocumentOutputStream);
 		} catch (Exception e) {
-			LOG.debug("error writing the signed XML document: "
-					+ e.getMessage(), e);
+			LOG.debug(
+					"error writing the signed XML document: " + e.getMessage(),
+					e);
 			throw new RuntimeException(
 					"error writing the signed XML document: " + e.getMessage(),
 					e);
@@ -371,13 +386,19 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		/*
 		 * Invoke the signature facets.
 		 */
-		String signatureId = "xmldsig-" + UUID.randomUUID().toString();
+		String localSignatureId;
+		if (null == this.signatureId) {
+			localSignatureId = "xmldsig-" + UUID.randomUUID().toString();
+		} else {
+			localSignatureId = this.signatureId;
+		}
 		List<XMLObject> objects = new LinkedList<XMLObject>();
 		for (SignatureFacet signatureFacet : this.signatureFacets) {
 			LOG.debug("invoking signature facet: "
 					+ signatureFacet.getClass().getSimpleName());
-			signatureFacet.preSign(signatureFactory, document, signatureId,
-					signingCertificateChain, references, objects);
+			signatureFacet.preSign(signatureFactory, document,
+					localSignatureId, signingCertificateChain, references,
+					objects);
 		}
 
 		/*
@@ -394,9 +415,9 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		/*
 		 * JSR105 ds:Signature creation
 		 */
-		String signatureValueId = signatureId + "-signature-value";
+		String signatureValueId = localSignatureId + "-signature-value";
 		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory
-				.newXMLSignature(signedInfo, null, objects, signatureId,
+				.newXMLSignature(signedInfo, null, objects, localSignatureId,
 						signatureValueId);
 
 		/*
@@ -457,7 +478,8 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		OutputStream tempDocumentOutputStream = temporaryDataStorage
 				.getTempOutputStream();
 		writeDocument(document, tempDocumentOutputStream);
-		temporaryDataStorage.setAttribute(SIGNATURE_ID_ATTRIBUTE, signatureId);
+		temporaryDataStorage.setAttribute(SIGNATURE_ID_ATTRIBUTE,
+				localSignatureId);
 
 		/*
 		 * Calculation of XML signature digest value.
