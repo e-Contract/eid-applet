@@ -30,6 +30,16 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
  */
 public class XAdESNamespacePrefixMapper extends NamespacePrefixMapper {
 
+	private final String xadesNamespacePrefix;
+
+	public XAdESNamespacePrefixMapper() {
+		this("xades");
+	}
+
+	public XAdESNamespacePrefixMapper(String xadesNamespacePrefix) {
+		this.xadesNamespacePrefix = xadesNamespacePrefix;
+	}
+
 	@Override
 	public String getPreferredPrefix(String namespaceUri, String suggestion,
 			boolean requirePrefix) {
@@ -37,7 +47,7 @@ public class XAdESNamespacePrefixMapper extends NamespacePrefixMapper {
 			return "ds";
 		}
 		if (XAdESXLSignatureFacet.XADES_NAMESPACE.equals(namespaceUri)) {
-			return "xades";
+			return this.xadesNamespacePrefix;
 		}
 		if (XAdESXLSignatureFacet.XADES141_NAMESPACE.equals(namespaceUri)) {
 			return "xadesv141";
