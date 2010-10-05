@@ -20,4 +20,9 @@
 			</jxb:schemaBindings>
 		</jxb:bindings>
 	</jxb:bindings>
+	<jxb:bindings schemaLocation="identity.xsd" node="/xs:schema">
+		<jxb:schemaBindings>
+			<jxb:package name="be.fedict.eid.applet.service.signer.jaxb.identity" />
+		</jxb:schemaBindings>
+	</jxb:bindings>
 </jxb:bindings>
