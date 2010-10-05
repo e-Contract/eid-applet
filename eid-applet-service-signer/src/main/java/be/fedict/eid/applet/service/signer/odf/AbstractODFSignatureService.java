@@ -58,12 +58,25 @@ abstract public class AbstractODFSignatureService extends
 	private static final Log LOG = LogFactory
 			.getLog(AbstractODFSignatureService.class);
 
+	private final XAdESSignatureFacet xadesSignatureFacet;
+
 	public AbstractODFSignatureService() {
 		super();
 		addSignatureFacet(new ODFSignatureFacet(this));
 		addSignatureFacet(new OpenOfficeSignatureFacet());
-		addSignatureFacet(new XAdESSignatureFacet());
+		this.xadesSignatureFacet = new XAdESSignatureFacet();
+		addSignatureFacet(this.xadesSignatureFacet);
 		addSignatureFacet(new KeyInfoSignatureFacet(false, true, false));
+	}
+
+	/**
+	 * Gives back the used XAdES signature facet. Allows for extra configuration
+	 * of the XAdES elements.
+	 * 
+	 * @return
+	 */
+	protected XAdESSignatureFacet getXAdESSignatureFacet() {
+		return this.xadesSignatureFacet;
 	}
 
 	/**
@@ -179,8 +192,8 @@ abstract public class AbstractODFSignatureService extends
 			ParserConfigurationException, SAXException {
 		URL odfUrl = this.getOpenDocumentURL();
 
-		InputStream inputStream = ODFUtil.findDataInputStream(odfUrl
-				.openStream(), ODFUtil.SIGNATURE_FILE);
+		InputStream inputStream = ODFUtil.findDataInputStream(
+				odfUrl.openStream(), ODFUtil.SIGNATURE_FILE);
 		if (null != inputStream) {
 			return ODFUtil.loadDocument(inputStream);
 		}

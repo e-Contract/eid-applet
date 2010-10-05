@@ -82,20 +82,31 @@ public abstract class AbstractOOXMLSignatureService extends
 	static final Log LOG = LogFactory
 			.getLog(AbstractOOXMLSignatureService.class);
 
+	private final XAdESSignatureFacet xadesSignatureFacet;
+
 	protected AbstractOOXMLSignatureService() {
 		ConstantLocalClock clock = new ConstantLocalClock();
 		addSignatureFacet(new OOXMLSignatureFacet(this, clock));
 		addSignatureFacet(new KeyInfoSignatureFacet(true, false, false));
 
-		XAdESSignatureFacet xadesSignatureFacet = new XAdESSignatureFacet(clock);
-		xadesSignatureFacet.setXadesNamespacePrefix("xd");
-		xadesSignatureFacet.setIdSignedProperties("idSignedProperties");
-		xadesSignatureFacet.setSignaturePolicyImplied(true);
+		this.xadesSignatureFacet = new XAdESSignatureFacet(clock);
+		this.xadesSignatureFacet.setXadesNamespacePrefix("xd");
+		this.xadesSignatureFacet.setIdSignedProperties("idSignedProperties");
+		this.xadesSignatureFacet.setSignaturePolicyImplied(true);
 		setSignatureId("idPackageSignature");
-		//addSignatureFacet(xadesSignatureFacet);
+		// addSignatureFacet(xadesSignatureFacet);
 		/*
 		 * Activating the XAdES-BES still breaks the signature somehow.
 		 */
+	}
+
+	/**
+	 * Gives back the used XAdES signature facet.
+	 * 
+	 * @return
+	 */
+	protected XAdESSignatureFacet getXAdESSignatureFacet() {
+		return this.xadesSignatureFacet;
 	}
 
 	@Override

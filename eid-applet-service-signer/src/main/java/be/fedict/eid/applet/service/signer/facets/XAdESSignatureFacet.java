@@ -57,6 +57,7 @@ import be.fedict.eid.applet.service.signer.SignatureFacet;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.AnyType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.CertIDListType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.CertIDType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.ClaimedRolesListType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.DigestAlgAndValueType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.IdentifierType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.ObjectFactory;
@@ -67,6 +68,7 @@ import be.fedict.eid.applet.service.signer.jaxb.xades132.SignaturePolicyIdType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.SignaturePolicyIdentifierType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.SignedPropertiesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.SignedSignaturePropertiesType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.SignerRoleType;
 import be.fedict.eid.applet.service.signer.jaxb.xmldsig.DigestMethodType;
 import be.fedict.eid.applet.service.signer.jaxb.xmldsig.X509IssuerSerialType;
 import be.fedict.eid.applet.service.signer.time.Clock;
@@ -111,6 +113,8 @@ public class XAdESSignatureFacet implements SignatureFacet {
 	private boolean signaturePolicyImplied;
 
 	private String xadesNamespacePrefix;
+
+	private String role;
 
 	/**
 	 * Default constructor. Will use a local clock and "SHA-1" for digest
@@ -275,6 +279,19 @@ public class XAdESSignatureFacet implements SignatureFacet {
 				.createCertIDListType();
 		signingCertificates.getCert().add(signingCertificateId);
 		signedSignatureProperties.setSigningCertificate(signingCertificates);
+
+		// ClaimedRole
+		if (null != this.role && false == this.role.isEmpty()) {
+			SignerRoleType signerRole = this.xadesObjectFactory
+					.createSignerRoleType();
+			signedSignatureProperties.setSignerRole(signerRole);
+			ClaimedRolesListType claimedRolesList = this.xadesObjectFactory
+					.createClaimedRolesListType();
+			signerRole.setClaimedRoles(claimedRolesList);
+			AnyType claimedRole = this.xadesObjectFactory.createAnyType();
+			claimedRole.getContent().add(this.role);
+			claimedRolesList.getClaimedRole().add(claimedRole);
+		}
 
 		// XAdES-EPES
 		if (null != this.signaturePolicyService) {
@@ -473,11 +490,30 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		this.idSignedProperties = idSignedProperties;
 	}
 
+	/**
+	 * Sets the signature policy to implied.
+	 * 
+	 * @param signaturePolicyImplied
+	 */
 	public void setSignaturePolicyImplied(boolean signaturePolicyImplied) {
 		this.signaturePolicyImplied = signaturePolicyImplied;
 	}
 
+	/**
+	 * Sets the XAdES XML namespace prefix.
+	 * 
+	 * @param xadesNamespacePrefix
+	 */
 	public void setXadesNamespacePrefix(String xadesNamespacePrefix) {
 		this.xadesNamespacePrefix = xadesNamespacePrefix;
+	}
+
+	/**
+	 * Sets the XAdES claimed role.
+	 * 
+	 * @param role
+	 */
+	public void setRole(String role) {
+		this.role = role;
 	}
 }
