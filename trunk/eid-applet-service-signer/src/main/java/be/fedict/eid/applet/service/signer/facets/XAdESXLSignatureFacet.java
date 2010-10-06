@@ -92,8 +92,6 @@ import be.fedict.eid.applet.service.signer.jaxb.xades132.OCSPValuesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.ObjectFactory;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.ResponderIDType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.RevocationValuesType;
-import be.fedict.eid.applet.service.signer.jaxb.xades132.UnsignedPropertiesType;
-import be.fedict.eid.applet.service.signer.jaxb.xades132.UnsignedSignaturePropertiesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.XAdESTimeStampType;
 import be.fedict.eid.applet.service.signer.jaxb.xades141.ValidationDataType;
 import be.fedict.eid.applet.service.signer.jaxb.xmldsig.CanonicalizationMethodType;
@@ -250,18 +248,37 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		LOG.debug("XAdES-X-L post sign phase");
 
 		// check for XAdES-BES
-		Node qualifyingPropertiesNode = findSingleNode(signatureElement,
-				"ds:Object/xades:QualifyingProperties");
-		if (null == qualifyingPropertiesNode) {
+		Element qualifyingPropertiesElement = (Element) findSingleNode(
+				signatureElement, "ds:Object/xades:QualifyingProperties");
+		if (null == qualifyingPropertiesElement) {
 			throw new IllegalArgumentException("no XAdES-BES extension present");
 		}
 
-		// check for non XAdES-T
-		Node unsignedPropertiesNode = findSingleNode(qualifyingPropertiesNode,
-				"xades:UnsignedProperties");
-		if (null != unsignedPropertiesNode) {
-			throw new IllegalArgumentException(
-					"xades:UnsignedProperties already present");
+		// create basic XML container structure
+		Document document = signatureElement.getOwnerDocument();
+		String xadesNamespacePrefix;
+		if (null != qualifyingPropertiesElement.getPrefix()) {
+			xadesNamespacePrefix = qualifyingPropertiesElement.getPrefix()
+					+ ":";
+		} else {
+			xadesNamespacePrefix = "";
+		}
+		Element unsignedPropertiesElement = (Element) findSingleNode(
+				qualifyingPropertiesElement, "xades:UnsignedProperties");
+		if (null == unsignedPropertiesElement) {
+			unsignedPropertiesElement = document.createElementNS(
+					XADES_NAMESPACE, xadesNamespacePrefix
+							+ "UnsignedProperties");
+			qualifyingPropertiesElement.appendChild(unsignedPropertiesElement);
+		}
+		Element unsignedSignaturePropertiesElement = (Element) findSingleNode(
+				unsignedPropertiesElement, "xades:UnsignedSignatureProperties");
+		if (null == unsignedSignaturePropertiesElement) {
+			unsignedSignaturePropertiesElement = document.createElementNS(
+					XADES_NAMESPACE, xadesNamespacePrefix
+							+ "UnsignedSignatureProperties");
+			unsignedPropertiesElement
+					.appendChild(unsignedSignaturePropertiesElement);
 		}
 
 		// create the XAdES-T time-stamp
@@ -275,32 +292,25 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 				this.timeStampService, this.objectFactory,
 				this.xmldsigObjectFactory);
 
-		// xades:UnsignedProperties/xades:UnsignedSignatureProperties/xades:SignatureTimeStamp
-		UnsignedPropertiesType unsignedProperties = this.objectFactory
-				.createUnsignedPropertiesType();
-		UnsignedSignaturePropertiesType unsignedSignatureProperties = this.objectFactory
-				.createUnsignedSignaturePropertiesType();
-		unsignedProperties
-				.setUnsignedSignatureProperties(unsignedSignatureProperties);
-		List<Object> unsignedSignaturePropertiesContent = unsignedSignatureProperties
-				.getCounterSignatureOrSignatureTimeStampOrCompleteCertificateRefs();
-		unsignedSignaturePropertiesContent.add(this.objectFactory
-				.createSignatureTimeStamp(signatureTimeStamp));
+		// marshal the XAdES-T extension
+		try {
+			this.marshaller.marshal(this.objectFactory
+					.createSignatureTimeStamp(signatureTimeStamp),
+					unsignedSignaturePropertiesElement);
+		} catch (JAXBException e) {
+			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
+		}
 
 		// xadesv141::TimeStampValidationData
 		if (tsaRevocationDataXadesT.hasRevocationDataEntries()) {
 			ValidationDataType validationData = createValidationData(tsaRevocationDataXadesT);
-			unsignedSignaturePropertiesContent.add(this.xades141ObjectFactory
-					.createTimeStampValidationData(validationData));
-		}
-
-		// marshal the XAdES-T extension
-		try {
-			this.marshaller.marshal(this.objectFactory
-					.createUnsignedProperties(unsignedProperties),
-					qualifyingPropertiesNode);
-		} catch (JAXBException e) {
-			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
+			try {
+				this.marshaller.marshal(this.xades141ObjectFactory
+						.createTimeStampValidationData(validationData),
+						unsignedSignaturePropertiesElement);
+			} catch (JAXBException e) {
+				throw new RuntimeException("JAXB error: " + e.getMessage(), e);
+			}
 		}
 
 		if (null == this.revocationDataService) {
@@ -425,7 +435,7 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 		}
 
 		// marshal XAdES-C
-		NodeList unsignedSignaturePropertiesNodeList = ((Element) qualifyingPropertiesNode)
+		NodeList unsignedSignaturePropertiesNodeList = ((Element) qualifyingPropertiesElement)
 				.getElementsByTagNameNS(XADES_NAMESPACE,
 						"UnsignedSignatureProperties");
 		Node unsignedSignaturePropertiesNode = unsignedSignaturePropertiesNodeList
