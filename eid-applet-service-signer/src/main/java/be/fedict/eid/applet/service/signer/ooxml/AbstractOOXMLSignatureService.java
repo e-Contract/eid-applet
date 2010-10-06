@@ -94,10 +94,8 @@ public abstract class AbstractOOXMLSignatureService extends
 		this.xadesSignatureFacet.setIdSignedProperties("idSignedProperties");
 		this.xadesSignatureFacet.setSignaturePolicyImplied(true);
 		setSignatureId("idPackageSignature");
-		// addSignatureFacet(xadesSignatureFacet);
-		/*
-		 * Activating the XAdES-BES still breaks the signature somehow.
-		 */
+		addSignatureFacet(this.xadesSignatureFacet);
+		addSignatureFacet(new Office2010SignatureFacet());
 	}
 
 	/**
