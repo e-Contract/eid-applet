@@ -94,6 +94,8 @@ public class KeyInfoKeySelector extends KeySelector implements
 					 * The first certificate is presumably the signer.
 					 */
 					this.certificate = certificate;
+					LOG.debug("signer certificate: "
+							+ certificate.getSubjectX500Principal());
 				}
 			}
 			if (null != this.certificate) {

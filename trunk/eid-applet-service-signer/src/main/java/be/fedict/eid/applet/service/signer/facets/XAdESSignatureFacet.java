@@ -49,6 +49,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.jce.PrincipalUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -462,8 +463,15 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		X509IssuerSerialType issuerSerial = xmldsigObjectFactory
 				.createX509IssuerSerialType();
 		certId.setIssuerSerial(issuerSerial);
-		issuerSerial.setX509IssuerName(certificate.getIssuerX500Principal()
-				.toString());
+		String issuerName;
+		try {
+			issuerName = PrincipalUtil.getIssuerX509Principal(certificate)
+					.getName().replace(",", ", ");
+		} catch (CertificateEncodingException e) {
+			throw new RuntimeException(
+					"cert encoding error: " + e.getMessage(), e);
+		}
+		issuerSerial.setX509IssuerName(issuerName);
 		issuerSerial.setX509SerialNumber(certificate.getSerialNumber());
 
 		byte[] encodedCertificate;

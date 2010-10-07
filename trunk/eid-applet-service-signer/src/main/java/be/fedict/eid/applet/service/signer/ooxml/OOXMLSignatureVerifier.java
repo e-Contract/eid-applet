@@ -138,6 +138,7 @@ public class OOXMLSignatureVerifier {
 			boolean validity = xmlSignature.validate(domValidateContext);
 
 			if (false == validity) {
+				LOG.debug("not a valid signature");
 				continue;
 			}
 			// TODO: check what has been signed.

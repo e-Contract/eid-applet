@@ -216,7 +216,7 @@ public class AbstractOOXMLSignatureServiceTest {
 		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
 				.getPublic(), signerDn, notBefore, notAfter, null, keyPair
 				.getPrivate(), true, 0, null, null, new KeyUsage(
-				KeyUsage.nonRepudiation));
+				KeyUsage.digitalSignature));
 
 		// operate
 		DigestInfo digestInfo = signatureService.preSign(null,
