@@ -465,6 +465,10 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		certId.setIssuerSerial(issuerSerial);
 		String issuerName;
 		try {
+			/*
+			 * Make sure the DN is encoded using the same order as present
+			 * within the certificate.
+			 */
 			issuerName = PrincipalUtil.getIssuerX509Principal(certificate)
 					.getName().replace(",", ", ");
 		} catch (CertificateEncodingException e) {

@@ -51,6 +51,8 @@ import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.util.ASN1Dump;
+import org.bouncycastle.jce.PrincipalUtil;
+import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMWriter;
 import org.junit.Before;
@@ -362,6 +364,42 @@ public class PcscTest {
 		pcscEidSpi.readFile(PcscEid.IDENTITY_FILE_ID);
 		pcscEidSpi.readFile(PcscEid.ADDRESS_FILE_ID);
 		pcscEidSpi.selectBelpicJavaCardApplet();
+
+		pcscEidSpi.close();
+	}
+
+	@Test
+	public void testReadNonRepudiationCertificate() throws Exception {
+		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEidSpi.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEidSpi.waitForEidPresent();
+		}
+
+		File tmpFile = File.createTempFile("eid-sign-cert-", ".der");
+		byte[] signCert = pcscEidSpi.readFile(PcscEid.SIGN_CERT_FILE_ID);
+		FileUtils.writeByteArrayToFile(tmpFile, signCert);
+
+		LOG.debug("ASN1 dump: "
+				+ ASN1Dump.dumpAsString(new ASN1InputStream(signCert)
+						.readObject()));
+
+		LOG.debug("tmp file: " + tmpFile.getAbsolutePath());
+
+		CertificateFactory certificateFactory = CertificateFactory
+				.getInstance("X.509");
+		X509Certificate certificate = (X509Certificate) certificateFactory
+				.generateCertificate(new ByteArrayInputStream(signCert));
+		X509Principal issuerPrincipal = PrincipalUtil
+				.getIssuerX509Principal(certificate);
+		LOG.debug("BC issuer principal: " + issuerPrincipal.getName());
+		LOG.debug("Sun issuer (getName): "
+				+ certificate.getIssuerX500Principal().getName());
+		LOG.debug("Sun issuer (toString): "
+				+ certificate.getIssuerX500Principal());
+		String issuerName = PrincipalUtil.getIssuerX509Principal(certificate)
+				.getName().replace(",", ", ");
+		LOG.debug("issuer name: " + issuerName);
 
 		pcscEidSpi.close();
 	}

@@ -63,6 +63,7 @@ import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.ocsp.ResponderID;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.jce.PrincipalUtil;
 import org.bouncycastle.ocsp.BasicOCSPResp;
 import org.bouncycastle.ocsp.OCSPException;
 import org.bouncycastle.ocsp.OCSPResp;
@@ -365,8 +366,15 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 				CRLIdentifierType crlIdentifier = this.objectFactory
 						.createCRLIdentifierType();
 				crlRef.setCRLIdentifier(crlIdentifier);
-				crlIdentifier.setIssuer(crl.getIssuerX500Principal().getName(
-						X500Principal.RFC1779));
+				String issuerName;
+				try {
+					issuerName = PrincipalUtil.getIssuerX509Principal(crl)
+							.getName().replace(",", ", ");
+				} catch (CRLException e) {
+					throw new RuntimeException("CRL encoding error: "
+							+ e.getMessage(), e);
+				}
+				crlIdentifier.setIssuer(issuerName);
 				crlIdentifier.setIssueTime(this.datatypeFactory
 						.newXMLGregorianCalendar(new DateTime(crl
 								.getThisUpdate()).toGregorianCalendar()));
