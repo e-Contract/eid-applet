@@ -58,6 +58,7 @@ import be.fedict.eid.applet.service.spi.IdentityDTO;
 public class IdentitySignatureFacet implements SignatureFacet {
 
 	public static final String REFERENCE_TYPE = "be:fedict:eid:identity:1.0";
+	public static final String NAMESPACE_URI = "be:fedict:eid:identity:1.0";
 
 	private final IdentityDTO identityDTO;
 	private final byte[] photoData;
