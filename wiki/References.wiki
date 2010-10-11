@@ -84,3 +84,4 @@
   * [http://adullact.net/projects/libersign/ LiberSign - Java PKCS7 / XAdES applet]
   * [http://ooo-xadessig-it.forge.osor.eu OOoXAdESSigIT - OpenOffice.org extension for (Italian) XAdES]
   * [http://egovlabs.gv.at/projects/pdf-as/ PDF-AS]
+  * [http://portablesigner.sourceforge.net/ PortableSigner (PDF)]
