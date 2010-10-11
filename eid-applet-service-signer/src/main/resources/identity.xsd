@@ -20,6 +20,7 @@
 				minOccurs="0" />
 			<xsd:element name="Photo" type="tns:PhotoType" minOccurs="0" />
 		</xsd:sequence>
+		<xsd:attribute name="Id" type="xsd:ID" />
 	</xsd:complexType>
 	<xsd:simpleType name="GenderType">
 		<xsd:restriction base="xsd:string">

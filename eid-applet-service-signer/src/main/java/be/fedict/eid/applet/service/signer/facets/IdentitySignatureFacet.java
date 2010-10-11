@@ -103,6 +103,8 @@ public class IdentitySignatureFacet implements SignatureFacet {
 			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		// construct identity document
 		IdentityType identity = this.objectFactory.createIdentityType();
+		String identityId = "identity-" + UUID.randomUUID().toString();
+		identity.setId(identityId);
 		if (null != this.identityDTO) {
 			identity.setFirstName(this.identityDTO.firstName);
 			identity.setName(this.identityDTO.name);
@@ -133,11 +135,11 @@ public class IdentitySignatureFacet implements SignatureFacet {
 		Node identityNode = marshallNode.getFirstChild();
 
 		// ds:Object
-		String objectId = "identity-" + UUID.randomUUID().toString();
+
 		List<XMLStructure> identityObjectContent = new LinkedList<XMLStructure>();
 		identityObjectContent.add(new DOMStructure(identityNode));
 		XMLObject identityObject = signatureFactory.newXMLObject(
-				identityObjectContent, objectId, null, null);
+				identityObjectContent, null, null, null);
 		objects.add(identityObject);
 
 		// ds:Reference
@@ -148,7 +150,7 @@ public class IdentitySignatureFacet implements SignatureFacet {
 				.newTransform(CanonicalizationMethod.INCLUSIVE,
 						(TransformParameterSpec) null);
 		transforms.add(exclusiveTransform);
-		Reference reference = signatureFactory.newReference("#" + objectId,
+		Reference reference = signatureFactory.newReference("#" + identityId,
 				digestMethod, transforms, REFERENCE_TYPE, null);
 		references.add(reference);
 	}
