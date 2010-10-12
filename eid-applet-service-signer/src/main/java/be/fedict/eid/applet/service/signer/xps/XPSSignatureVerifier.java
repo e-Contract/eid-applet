@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2010 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -16,34 +16,14 @@
  * http://www.gnu.org/licenses/.
  */
 
-/*
- * Copyright (C) 2008-2009 FedICT.
- * This file is part of the eID Applet Project.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package be.fedict.eid.applet.service.signer.xps;
 
-package be.fedict.eid.applet.service.signer.ooxml;
-
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -59,7 +39,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -68,13 +49,15 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import be.fedict.eid.applet.service.signer.KeyInfoKeySelector;
 import be.fedict.eid.applet.service.signer.jaxb.opc.relationships.CTRelationship;
 import be.fedict.eid.applet.service.signer.jaxb.opc.relationships.CTRelationships;
 import be.fedict.eid.applet.service.signer.jaxb.opc.relationships.ObjectFactory;
+import be.fedict.eid.applet.service.signer.ooxml.OOXMLSignatureVerifier;
+import be.fedict.eid.applet.service.signer.ooxml.OOXMLURIDereferencer;
+import be.fedict.eid.applet.service.signer.ooxml.OPCKeySelector;
 
 /**
- * Signature verifier util class for Office Open XML file format.
+ * Simple signature verifier for the Open XML Paper Specification.
  * 
  * Implementation according to: Office Open XML - Part 2: Open Packaging
  * Conventions - ECMA-376-2
@@ -82,18 +65,14 @@ import be.fedict.eid.applet.service.signer.jaxb.opc.relationships.ObjectFactory;
  * @author Frank Cornelis
  * 
  */
-public class OOXMLSignatureVerifier {
+public class XPSSignatureVerifier {
 
 	private static final Log LOG = LogFactory
-			.getLog(OOXMLSignatureVerifier.class);
-
-	public static final String DIGITAL_SIGNATURE_ORIGIN_REL_TYPE = "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin";
-
-	public static final String DIGITAL_SIGNATURE_REL_TYPE = "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/signature";
+			.getLog(XPSSignatureVerifier.class);
 
 	private final Unmarshaller relationshipsUnmarshaller;
 
-	public OOXMLSignatureVerifier() {
+	public XPSSignatureVerifier() {
 		try {
 			JAXBContext relationshipsJAXBContext = JAXBContext
 					.newInstance(ObjectFactory.class);
@@ -104,48 +83,31 @@ public class OOXMLSignatureVerifier {
 		}
 	}
 
-	/**
-	 * Checks whether the file referred by the given URL is an OOXML document.
-	 * 
-	 * @param url
-	 * @return
-	 * @throws IOException
-	 */
-	public static boolean isOOXML(URL url) throws IOException {
-		ZipInputStream zipInputStream = new ZipInputStream(url.openStream());
-		ZipEntry zipEntry;
-		while (null != (zipEntry = zipInputStream.getNextEntry())) {
-			if (false == "[Content_Types].xml".equals(zipEntry.getName())) {
-				continue;
-			}
-			return true;
-		}
-		return false;
-	}
-
 	public List<X509Certificate> getSigners(URL url) throws IOException,
 			ParserConfigurationException, SAXException, TransformerException,
 			MarshalException, XMLSignatureException, JAXBException {
 		List<X509Certificate> signers = new LinkedList<X509Certificate>();
 		List<String> signatureResourceNames = getSignatureResourceNames(url);
-		if (signatureResourceNames.isEmpty()) {
-			LOG.debug("no signature resources");
-		}
 		for (String signatureResourceName : signatureResourceNames) {
-			Document signatureDocument = getSignatureDocument(url,
+			LOG.debug("signature resource name: " + signatureResourceName);
+			Document signatureDocument = loadDocument(url,
 					signatureResourceName);
 			if (null == signatureDocument) {
+				LOG.warn("signature resource not found: "
+						+ signatureResourceName);
 				continue;
 			}
 
 			NodeList signatureNodeList = signatureDocument
 					.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 			if (0 == signatureNodeList.getLength()) {
-				return null;
+				LOG.debug("no signature elements present");
+				continue;
 			}
 			Node signatureNode = signatureNodeList.item(0);
 
-			KeyInfoKeySelector keySelector = new KeyInfoKeySelector();
+			OPCKeySelector keySelector = new OPCKeySelector(url,
+					signatureResourceName);
 			DOMValidateContext domValidateContext = new DOMValidateContext(
 					keySelector, signatureNode);
 			domValidateContext.setProperty(
@@ -171,33 +133,29 @@ public class OOXMLSignatureVerifier {
 		return signers;
 	}
 
-	public Document getSignatureDocument(URL url, String signatureResourceName)
+	private Document loadDocument(URL url, String signatureResourceName)
 			throws IOException, ParserConfigurationException, SAXException {
-		return getSignatureDocument(url.openStream(), signatureResourceName);
-	}
-
-	public Document getSignatureDocument(InputStream documentInputStream,
-			String signatureResourceName) throws IOException,
-			ParserConfigurationException, SAXException {
-		ZipInputStream zipInputStream = new ZipInputStream(documentInputStream);
-		ZipEntry zipEntry;
-		while (null != (zipEntry = zipInputStream.getNextEntry())) {
+		ZipArchiveInputStream zipInputStream = new ZipArchiveInputStream(
+				url.openStream(), "UTF8", true, true);
+		ZipArchiveEntry zipEntry;
+		while (null != (zipEntry = zipInputStream.getNextZipEntry())) {
 			if (false == signatureResourceName.equals(zipEntry.getName())) {
 				continue;
 			}
-			Document signatureDocument = loadDocument(zipInputStream);
-			return signatureDocument;
+			Document document = loadDocument(zipInputStream);
+			return document;
 		}
 		return null;
 	}
 
-	public List<String> getSignatureResourceNames(byte[] document)
-			throws IOException, JAXBException {
+	private List<String> getSignatureResourceNames(URL url) throws IOException,
+			ParserConfigurationException, SAXException, TransformerException,
+			JAXBException {
 		List<String> signatureResourceNames = new LinkedList<String>();
-		ZipInputStream zipInputStream = new ZipInputStream(
-				new ByteArrayInputStream(document));
-		ZipEntry zipEntry;
-		while (null != (zipEntry = zipInputStream.getNextEntry())) {
+		ZipArchiveInputStream zipInputStream = new ZipArchiveInputStream(
+				url.openStream(), "UTF8", true, true);
+		ZipArchiveEntry zipEntry;
+		while (null != (zipEntry = zipInputStream.getNextZipEntry())) {
 			if ("_rels/.rels".equals(zipEntry.getName())) {
 				break;
 			}
@@ -215,8 +173,8 @@ public class OOXMLSignatureVerifier {
 		List<CTRelationship> packageRelationshipList = packageRelationships
 				.getRelationship();
 		for (CTRelationship packageRelationship : packageRelationshipList) {
-			if (DIGITAL_SIGNATURE_ORIGIN_REL_TYPE.equals(packageRelationship
-					.getType())) {
+			if (OOXMLSignatureVerifier.DIGITAL_SIGNATURE_ORIGIN_REL_TYPE
+					.equals(packageRelationship.getType())) {
 				dsOriginPart = packageRelationship.getTarget();
 				break;
 			}
@@ -236,9 +194,13 @@ public class OOXMLSignatureVerifier {
 		String dsOriginRels = dsOriginSegment + "_rels/" + dsOriginName
 				+ ".rels";
 		LOG.debug("Digital Signature Origin relationship part: " + dsOriginRels);
+		if (dsOriginRels.startsWith("/")) {
+			dsOriginRels = dsOriginRels.substring(1);
+		}
 
-		zipInputStream = new ZipInputStream(new ByteArrayInputStream(document));
-		while (null != (zipEntry = zipInputStream.getNextEntry())) {
+		zipInputStream = new ZipArchiveInputStream(url.openStream(), "UTF8",
+				true, true);
+		while (null != (zipEntry = zipInputStream.getNextZipEntry())) {
 			if (dsOriginRels.equals(zipEntry.getName())) {
 				break;
 			}
@@ -254,21 +216,24 @@ public class OOXMLSignatureVerifier {
 		List<CTRelationship> dsoRelationshipList = dsoRelationships
 				.getRelationship();
 		for (CTRelationship dsoRelationship : dsoRelationshipList) {
-			if (DIGITAL_SIGNATURE_REL_TYPE.equals(dsoRelationship.getType())) {
-				String signatureResourceName = dsOriginSegment
-						+ dsoRelationship.getTarget();
+			if (OOXMLSignatureVerifier.DIGITAL_SIGNATURE_REL_TYPE
+					.equals(dsoRelationship.getType())) {
+				String signatureResourceName;
+				if (dsoRelationship.getTarget().startsWith("/")) {
+					signatureResourceName = dsoRelationship.getTarget();
+				} else {
+					signatureResourceName = dsOriginSegment
+							+ dsoRelationship.getTarget();
+				}
+				if (signatureResourceName.startsWith("/")) {
+					signatureResourceName = signatureResourceName.substring(1);
+				}
+				LOG.debug("signature resource name: " + signatureResourceName);
 				signatureResourceNames.add(signatureResourceName);
 			}
 		}
 
 		return signatureResourceNames;
-	}
-
-	public List<String> getSignatureResourceNames(URL url) throws IOException,
-			ParserConfigurationException, SAXException, TransformerException,
-			JAXBException {
-		byte[] document = IOUtils.toByteArray(url.openStream());
-		return getSignatureResourceNames(document);
 	}
 
 	private Document loadDocument(InputStream documentInputStream)

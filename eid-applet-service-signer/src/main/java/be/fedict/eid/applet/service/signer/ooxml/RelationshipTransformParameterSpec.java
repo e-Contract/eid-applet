@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2009-2010 FedICT.
  * Copyright (C) 2009 Frank Cornelis.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -45,7 +45,7 @@ import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 /**
  * Relationship Transform parameter specification class.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class RelationshipTransformParameterSpec implements
@@ -53,11 +53,14 @@ public class RelationshipTransformParameterSpec implements
 
 	private final List<String> sourceIds;
 
+	private final List<String> sourceTypes;
+
 	/**
 	 * Main constructor.
 	 */
 	public RelationshipTransformParameterSpec() {
 		this.sourceIds = new LinkedList<String>();
+		this.sourceTypes = new LinkedList<String>();
 	}
 
 	/**
@@ -69,7 +72,20 @@ public class RelationshipTransformParameterSpec implements
 		this.sourceIds.add(sourceId);
 	}
 
+	/**
+	 * Adds a relationship group reference for the given source type.
+	 * 
+	 * @param sourceType
+	 */
+	public void addRelationshipGroupReference(String sourceType) {
+		this.sourceTypes.add(sourceType);
+	}
+
 	List<String> getSourceIds() {
 		return this.sourceIds;
+	}
+
+	List<String> getSourceTypes() {
+		return this.sourceTypes;
 	}
 }

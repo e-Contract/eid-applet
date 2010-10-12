@@ -176,7 +176,8 @@ public class OOXMLSignatureVerifierTest {
 				.getResource("/hello-world-unsigned.docx");
 
 		// operate
-		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
+		List<X509Certificate> result = verifier.getSigners(url);
 
 		// verify
 		assertNotNull(result);
@@ -190,7 +191,8 @@ public class OOXMLSignatureVerifierTest {
 				.getResource("/hello-world-office-2010-technical-preview-unsigned.docx");
 
 		// operate
-		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
+		List<X509Certificate> result = verifier.getSigners(url);
 
 		// verify
 		assertNotNull(result);
@@ -204,7 +206,8 @@ public class OOXMLSignatureVerifierTest {
 				.getResource("/hello-world-unsigned.pptx");
 
 		// operate
-		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
+		List<X509Certificate> result = verifier.getSigners(url);
 
 		// verify
 		assertNotNull(result);
@@ -218,7 +221,8 @@ public class OOXMLSignatureVerifierTest {
 				.getResource("/hello-world-unsigned.xlsx");
 
 		// operate
-		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
+		List<X509Certificate> result = verifier.getSigners(url);
 
 		// verify
 		assertNotNull(result);
@@ -232,7 +236,8 @@ public class OOXMLSignatureVerifierTest {
 				.getResource("/hello-world-signed.docx");
 
 		// operate
-		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
+		List<X509Certificate> result = verifier.getSigners(url);
 
 		// verify
 		assertNotNull(result);
@@ -248,7 +253,8 @@ public class OOXMLSignatureVerifierTest {
 				.getResource("/signed-ooxml.docx");
 
 		// operate
-		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
+		List<X509Certificate> result = verifier.getSigners(url);
 
 		// verify
 		assertNotNull(result);
@@ -264,7 +270,8 @@ public class OOXMLSignatureVerifierTest {
 				.getResource("/ms-office-2010-signed.docx");
 
 		// operate
-		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
+		List<X509Certificate> result = verifier.getSigners(url);
 
 		// verify
 		assertNotNull(result);
@@ -280,7 +287,8 @@ public class OOXMLSignatureVerifierTest {
 				.getResource("/ms-office-2010-signed.pptx");
 
 		// operate
-		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
+		List<X509Certificate> result = verifier.getSigners(url);
 
 		// verify
 		assertNotNull(result);
@@ -296,7 +304,8 @@ public class OOXMLSignatureVerifierTest {
 				.getResource("/ms-office-2010-signed.xlsx");
 
 		// operate
-		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
+		List<X509Certificate> result = verifier.getSigners(url);
 
 		// verify
 		assertNotNull(result);
@@ -312,7 +321,8 @@ public class OOXMLSignatureVerifierTest {
 				.getResource("/hello-world-office-2010-technical-preview.docx");
 
 		// operate
-		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
+		List<X509Certificate> result = verifier.getSigners(url);
 
 		// verify
 		assertNotNull(result);
@@ -328,7 +338,8 @@ public class OOXMLSignatureVerifierTest {
 				.getResource("/hello-world-signed.pptx");
 
 		// operate
-		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
+		List<X509Certificate> result = verifier.getSigners(url);
 
 		// verify
 		assertNotNull(result);
@@ -344,7 +355,8 @@ public class OOXMLSignatureVerifierTest {
 				.getResource("/hello-world-signed.xlsx");
 
 		// operate
-		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
+		List<X509Certificate> result = verifier.getSigners(url);
 
 		// verify
 		assertNotNull(result);
@@ -360,7 +372,8 @@ public class OOXMLSignatureVerifierTest {
 				.getResource("/hello-world-signed-twice.docx");
 
 		// operate
-		List<X509Certificate> result = OOXMLSignatureVerifier.getSigners(url);
+		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
+		List<X509Certificate> result = verifier.getSigners(url);
 
 		// verify
 		assertNotNull(result);

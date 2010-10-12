@@ -25,4 +25,16 @@
 			<jxb:package name="be.fedict.eid.applet.service.signer.jaxb.identity" />
 		</jxb:schemaBindings>
 	</jxb:bindings>
+	<jxb:bindings schemaLocation="opc-relationships.xsd" node="/xs:schema">
+		<jxb:schemaBindings>
+			<jxb:package
+				name="be.fedict.eid.applet.service.signer.jaxb.opc.relationships" />
+		</jxb:schemaBindings>
+	</jxb:bindings>
+	<jxb:bindings schemaLocation="opc-contentTypes.xsd" node="/xs:schema">
+		<jxb:schemaBindings>
+			<jxb:package
+				name="be.fedict.eid.applet.service.signer.jaxb.opc.contenttypes" />
+		</jxb:schemaBindings>
+	</jxb:bindings>
 </jxb:bindings>

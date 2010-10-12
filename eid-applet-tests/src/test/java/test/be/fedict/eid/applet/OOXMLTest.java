@@ -152,8 +152,9 @@ public class OOXMLTest {
 		tmpFile = File.createTempFile("ooxml-signed-", "." + extension);
 		FileUtils.writeByteArrayToFile(tmpFile, signedOOXMLData);
 		LOG.debug("signed OOXML file: " + tmpFile.getAbsolutePath());
-		List<X509Certificate> signers = OOXMLSignatureVerifier
-				.getSigners(tmpFile.toURI().toURL());
+		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
+		List<X509Certificate> signers = verifier.getSigners(tmpFile.toURI()
+				.toURL());
 		assertEquals(signerCount, signers.size());
 		// assertEquals(certificate, signers.get(0));
 		LOG.debug("signed OOXML file: " + tmpFile.getAbsolutePath());
@@ -220,8 +221,9 @@ public class OOXMLTest {
 		tmpFile = File.createTempFile("ooxml-signed-", "." + extension);
 		FileUtils.writeByteArrayToFile(tmpFile, signedOOXMLData);
 		LOG.debug("signed OOXML file: " + tmpFile.getAbsolutePath());
-		List<X509Certificate> signers = OOXMLSignatureVerifier
-				.getSigners(tmpFile.toURI().toURL());
+		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
+		List<X509Certificate> signers = verifier.getSigners(tmpFile.toURI()
+				.toURL());
 		assertEquals(1, signers.size());
 		// assertEquals(certificate, signers.get(0));
 		LOG.debug("signed OOXML file: " + tmpFile.getAbsolutePath());

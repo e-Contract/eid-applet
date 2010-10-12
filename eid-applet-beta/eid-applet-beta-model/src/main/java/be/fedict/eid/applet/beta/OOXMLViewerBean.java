@@ -63,8 +63,9 @@ public class OOXMLViewerBean implements OOXMLViewer {
 	@Factory(OOXML_SIGNERS_COMPONENT_NAME)
 	public void createSignersList() {
 		this.log.debug("create signers list");
+		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
 		try {
-			this.signers = OOXMLSignatureVerifier.getSigners(this.ooxmlFileUrl);
+			this.signers = verifier.getSigners(this.ooxmlFileUrl);
 		} catch (Exception e) {
 			this.log.error("OOXML signature verification error: "
 					+ e.getMessage());

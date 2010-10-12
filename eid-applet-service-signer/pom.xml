@@ -35,6 +35,8 @@
 							<schemaIncludes>
 								<schemaInclude>XAdESv141.xsd</schemaInclude>
 								<schemaInclude>identity.xsd</schemaInclude>
+								<schemaInclude>opc-relationships.xsd</schemaInclude>
+								<schemaInclude>opc-contentTypes.xsd</schemaInclude>
 							</schemaIncludes>
 							<debug>true</debug>
 							<verbose>true</verbose>
@@ -192,6 +194,10 @@
 					<artifactId>xml-apis</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
 		</dependency>
 	</dependencies>
 </project>

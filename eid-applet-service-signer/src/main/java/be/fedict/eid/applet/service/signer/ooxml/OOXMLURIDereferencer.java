@@ -42,7 +42,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import javax.xml.crypto.Data;
 import javax.xml.crypto.OctetStreamData;
@@ -52,6 +51,7 @@ import javax.xml.crypto.URIReferenceException;
 import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -134,17 +134,18 @@ public class OOXMLURIDereferencer implements URIDereferencer {
 		}
 		LOG.debug("ZIP entry name: " + entryName);
 
-		InputStream odfInputStream;
+		InputStream ooxmlInputStream;
 		if (null != this.ooxmlDocument) {
-			odfInputStream = new ByteArrayInputStream(this.ooxmlDocument);
+			ooxmlInputStream = new ByteArrayInputStream(this.ooxmlDocument);
 		} else {
-			odfInputStream = this.ooxmlUrl.openStream();
+			ooxmlInputStream = this.ooxmlUrl.openStream();
 		}
-		ZipInputStream odfZipInputStream = new ZipInputStream(odfInputStream);
+		ZipArchiveInputStream ooxmlZipInputStream = new ZipArchiveInputStream(
+				ooxmlInputStream, "UTF8", true, true);
 		ZipEntry zipEntry;
-		while (null != (zipEntry = odfZipInputStream.getNextEntry())) {
+		while (null != (zipEntry = ooxmlZipInputStream.getNextZipEntry())) {
 			if (zipEntry.getName().equals(entryName)) {
-				return odfZipInputStream;
+				return ooxmlZipInputStream;
 			}
 		}
 		return null;

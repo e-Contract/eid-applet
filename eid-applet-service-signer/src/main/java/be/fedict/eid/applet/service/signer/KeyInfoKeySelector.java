@@ -63,7 +63,7 @@ public class KeyInfoKeySelector extends KeySelector implements
 
 	private static final Log LOG = LogFactory.getLog(KeyInfoKeySelector.class);
 
-	private X509Certificate certificate;
+	protected X509Certificate certificate;
 
 	@SuppressWarnings("unchecked")
 	@Override
