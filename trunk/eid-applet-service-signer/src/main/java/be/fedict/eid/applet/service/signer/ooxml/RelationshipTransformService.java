@@ -98,13 +98,19 @@ public class RelationshipTransformService extends TransformService {
 
 	private final List<String> sourceIds;
 
+	private final List<String> sourceTypes;
+
 	private static final Log LOG = LogFactory
 			.getLog(RelationshipTransformService.class);
 
+	/**
+	 * Default constructor.
+	 */
 	public RelationshipTransformService() {
 		super();
 		LOG.debug("constructor");
 		this.sourceIds = new LinkedList<String>();
+		this.sourceTypes = new LinkedList<String>();
 	}
 
 	@Override
@@ -117,6 +123,9 @@ public class RelationshipTransformService extends TransformService {
 		RelationshipTransformParameterSpec relParams = (RelationshipTransformParameterSpec) params;
 		for (String sourceId : relParams.getSourceIds()) {
 			this.sourceIds.add(sourceId);
+		}
+		for (String sourceType : relParams.getSourceTypes()) {
+			this.sourceTypes.add(sourceType);
 		}
 	}
 
@@ -132,12 +141,17 @@ public class RelationshipTransformService extends TransformService {
 		} catch (TransformerException e) {
 			throw new InvalidAlgorithmParameterException();
 		}
+
 		Element nsElement = parentNode.getOwnerDocument().createElement("ns");
 		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds",
 				Constants.SignatureSpecNS);
 		nsElement
 				.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:mdssi",
 						"http://schemas.openxmlformats.org/package/2006/digital-signature");
+
+		/*
+		 * RelationshipReference
+		 */
 		NodeList nodeList;
 		try {
 			nodeList = XPathAPI.selectNodeList(parentNode,
@@ -146,14 +160,28 @@ public class RelationshipTransformService extends TransformService {
 			LOG.error("transformer exception: " + e.getMessage(), e);
 			throw new InvalidAlgorithmParameterException();
 		}
-		if (0 == nodeList.getLength()) {
-			LOG.warn("no RelationshipReference/@SourceId parameters present");
-		}
 		for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
 			Node node = nodeList.item(nodeIdx);
 			String sourceId = node.getTextContent();
 			LOG.debug("sourceId: " + sourceId);
 			this.sourceIds.add(sourceId);
+		}
+
+		/*
+		 * RelationshipsGroupReference
+		 */
+		try {
+			nodeList = XPathAPI.selectNodeList(parentNode,
+					"mdssi:RelationshipsGroupReference/@SourceType", nsElement);
+		} catch (TransformerException e) {
+			LOG.error("transformer exception: " + e.getMessage(), e);
+			throw new InvalidAlgorithmParameterException();
+		}
+		for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
+			Node node = nodeList.item(nodeIdx);
+			String sourceType = node.getTextContent();
+			LOG.debug("sourceType: " + sourceType);
+			this.sourceTypes.add(sourceType);
 		}
 	}
 
@@ -175,6 +203,15 @@ public class RelationshipTransformService extends TransformService {
 							"mdssi:RelationshipReference");
 			relationshipReferenceElement.setAttribute("SourceId", sourceId);
 			parentElement.appendChild(relationshipReferenceElement);
+		}
+		for (String sourceType : this.sourceTypes) {
+			Element relationshipsGroupReferenceElement = document
+					.createElementNS(
+							"http://schemas.openxmlformats.org/package/2006/digital-signature",
+							"mdssi:RelationshipsGroupReference");
+			relationshipsGroupReferenceElement.setAttribute("SourceType",
+					sourceType);
+			parentElement.appendChild(relationshipsGroupReferenceElement);
 		}
 	}
 
@@ -218,9 +255,12 @@ public class RelationshipTransformService extends TransformService {
 			}
 			Element childElement = (Element) childNode;
 			String idAttribute = childElement.getAttribute("Id");
+			String typeAttribute = childElement.getAttribute("Type");
 			LOG.debug("Relationship id attribute: " + idAttribute);
-			if (false == this.sourceIds.contains(idAttribute)) {
-				LOG.debug("removing element: " + idAttribute);
+			LOG.debug("Relationship type attribute: " + typeAttribute);
+			if (false == this.sourceIds.contains(idAttribute)
+					&& false == this.sourceTypes.contains(typeAttribute)) {
+				LOG.debug("removing Relationship element: " + idAttribute);
 				relationshipsElement.removeChild(childNode);
 				nodeIdx--;
 			}
@@ -288,8 +328,8 @@ public class RelationshipTransformService extends TransformService {
 		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		transformer.transform(source, result);
 		LOG.debug("result: " + new String(outputStream.toByteArray()));
-		return new OctetStreamData(new ByteArrayInputStream(outputStream
-				.toByteArray()));
+		return new OctetStreamData(new ByteArrayInputStream(
+				outputStream.toByteArray()));
 	}
 
 	private Document loadDocument(InputStream documentInputStream)
