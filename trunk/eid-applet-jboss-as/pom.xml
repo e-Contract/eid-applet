@@ -77,6 +77,7 @@
 							<targetDirectory>target/dependency/jboss-${jboss.version}</targetDirectory>
 							<patches>
 								<patch>jboss-conf-memory.patch</patch>
+								<patch>jvm-gc.patch</patch>
 								<patch>jboss-logging.patch</patch>
 								<patch>jbossweb-ssl.patch</patch>
 							</patches>
