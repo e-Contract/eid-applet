@@ -50,8 +50,6 @@
 				<!-- chmod+x on the UNIX scripts -->
 				<exclude>bin/run.sh</exclude>
 				<exclude>bin/shutdown.sh</exclude>
-				<!-- https://jira.jboss.org/browse/EJBTHREE-2152 -->
-				<exclude>server/all/deploy/jboss-ejb3-timerservice-mk2.jar</exclude>
 			</excludes>
 		</fileSet>
 		<fileSet>
@@ -88,8 +86,6 @@
 		<dependencySet>
 			<outputDirectory>server/all/lib</outputDirectory>
 			<excludes>
-				<!-- scope compile doesn't work... -->
-				<exclude>org.jboss.jbossas:jboss-as-distribution</exclude>
 				<!-- OpenSAML -->
 				<exclude>org.apache.xerces:serializer</exclude>
 				<!-- JAXB/JAXWS 2.2 -->
@@ -97,23 +93,14 @@
 				<exclude>com.sun.xml.bind:jaxb-impl</exclude>
 				<exclude>javax.xml.ws:jaxws-api</exclude>
 				<exclude>stax:stax-api</exclude>
-				<exclude>woodstox:wstx-asl</exclude>
 				<exclude>javax.xml.stream:stax-api</exclude>
 				<exclude>org.apache.xalan:xalan</exclude>
-				<!-- https://jira.jboss.org/browse/EJBTHREE-2152 -->
-				<exclude>org.jboss.ejb3.timerservice:*</exclude>
 			</excludes>
 		</dependencySet>
 		<dependencySet>
 			<outputDirectory>lib/endorsed</outputDirectory>
 			<includes>
 				<include>org.apache.xerces:serializer</include>
-			</includes>
-		</dependencySet>
-		<dependencySet>
-			<outputDirectory>server/all/deploy</outputDirectory>
-			<includes>
-				<include>org.jboss.ejb3.timerservice:jboss-ejb3-timerservice-mk2</include>
 			</includes>
 		</dependencySet>
 	</dependencySets>

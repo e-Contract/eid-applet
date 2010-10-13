@@ -15,7 +15,7 @@
 	<version>1.0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<properties>
-		<jboss.version>6.0.0.20100721-M4</jboss.version>
+		<jboss.version>6.0.0.20100911-M5</jboss.version>
 	</properties>
 	<build>
 		<plugins>
@@ -271,50 +271,6 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
-		</dependency>
-		<dependency>
-			<!-- https://jira.jboss.org/browse/EJBTHREE-2152 -->
-			<groupId>org.jboss.ejb3.timerservice</groupId>
-			<artifactId>jboss-ejb3-timerservice-mk2</artifactId>
-			<version>1.0.0-alpha-8</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.jboss.ejb3.timerservice</groupId>
-					<artifactId>ejb31-calendar-expr-parser</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.jboss.ejb3.context</groupId>
-					<artifactId>jboss-ejb3-context-base</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.jboss.spec.javax.ejb</groupId>
-					<artifactId>jboss-ejb-api_3.1_spec</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.jboss.spec.javax.interceptor</groupId>
-					<artifactId>jboss-interceptors-api_1.1_spec</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>javax.validation</groupId>
-					<artifactId>validation-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.jboss.kernel</groupId>
-					<artifactId>jboss-kernel</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.jboss.ejb3.timerservice</groupId>
-					<artifactId>jboss-ejb3-timerservice-extension</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.jboss.ejb3</groupId>
-					<artifactId>jboss-ejb3-timerservice-spi</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.jboss.logging</groupId>
-					<artifactId>jboss-logging-spi</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 	</dependencies>
 </project>
