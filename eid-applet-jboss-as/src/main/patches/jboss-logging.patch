@@ -1,6 +1,6 @@
---- server/all/deploy/jboss-logging.xml.orig	2010-02-22 11:45:22.979747409 +0100
-+++ server/all/deploy/jboss-logging.xml	2010-02-22 11:49:47.619744828 +0100
-@@ -52,7 +52,23 @@
+--- server/all/deploy/jboss-logging.xml.orig	2010-09-22 21:57:06.000000000 +0200
++++ server/all/deploy/jboss-logging.xml	2010-10-15 10:05:34.000000000 +0200
+@@ -53,7 +53,23 @@
           <pattern-formatter pattern="%d %-5p [%c] (%t) %m%n"/>
        </formatter>
     </size-rotating-file-handler>
@@ -25,7 +25,7 @@
  
     <!-- ============================== -->
     <!-- Append messages to the console -->
-@@ -659,6 +675,13 @@
+@@ -660,6 +676,13 @@
          should be removed once that bug if fixed in the bundled admin-console war. -->
     <logger category="org.rhq.plugins.jbossas5.ApplicationServerComponent">
        <level name="FATAL"/>
