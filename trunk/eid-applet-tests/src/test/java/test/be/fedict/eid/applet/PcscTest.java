@@ -18,6 +18,7 @@
 
 package test.be.fedict.eid.applet;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -646,6 +647,30 @@ public class PcscTest {
 		} finally {
 			pcscEid.close();
 		}
+	}
+
+	@Test
+	public void testGetChallenge() throws Exception {
+		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEid.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEid.waitForEidPresent();
+		}
+
+		CardChannel cardChannel = pcscEid.getCardChannel();
+
+		int size = 256;
+		CommandAPDU getChallengeApdu = new CommandAPDU(0x00, 0x84, 0x00, 0x00,
+				new byte[] {}, 0, 0, size);
+		ResponseAPDU responseApdu;
+		responseApdu = cardChannel.transmit(getChallengeApdu);
+		if (0x9000 != responseApdu.getSW()) {
+			fail("get challenge failure: "
+					+ Integer.toHexString(responseApdu.getSW()));
+		}
+		assertEquals(size, responseApdu.getData().length);
+
+		pcscEid.close();
 	}
 
 	@Test
