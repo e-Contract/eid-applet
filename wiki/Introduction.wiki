@@ -1,4 +1,4 @@
-#summary eID Card Authentication
+#summary eID Applet Introduction
 #sidebar TableOfContents
 
 =eID Applet=
