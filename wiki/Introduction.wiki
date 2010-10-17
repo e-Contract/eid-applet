@@ -3,4 +3,4 @@
 
 =eID Applet=
 
-TODO
+The eID Applet is a browser component to enable the use of the Belgian eID card within web applications in the most user friendly way possible today. The eID Applet runs on Windows, Mac OS X, and Linux platforms and supports a wide range of web browsers including Firefox, IE, and Safari. Since the eID Applet can run both with or without eID Middleware installed, it puts minimal requirements on the client browser environment.
