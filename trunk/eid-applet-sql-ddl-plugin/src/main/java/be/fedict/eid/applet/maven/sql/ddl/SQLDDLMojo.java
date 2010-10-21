@@ -223,6 +223,8 @@ public class SQLDDLMojo extends AbstractMojo {
 			}
 
 			SchemaExport schemaExport = new SchemaExport(configuration);
+			schemaExport.setFormat(true);
+			schemaExport.setHaltOnError(true);
 			schemaExport.setOutputFile(outputFile.getAbsolutePath());
 			schemaExport.setDelimiter(";");
 
@@ -238,7 +240,7 @@ public class SQLDDLMojo extends AbstractMojo {
 			}
 
 			// operate
-			schemaExport.execute(true, false, false, false);
+			schemaExport.execute(true, false, false, true);
 			List<Exception> exceptions = schemaExport.getExceptions();
 			for (Exception exception : exceptions) {
 				getLog().error("exception: " + exception.getMessage());
