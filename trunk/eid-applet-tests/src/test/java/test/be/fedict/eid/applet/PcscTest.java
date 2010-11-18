@@ -30,14 +30,19 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.Security;
 import java.security.Signature;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 
+import javax.crypto.Cipher;
 import javax.imageio.ImageIO;
 import javax.smartcardio.Card;
 import javax.smartcardio.CardChannel;
@@ -50,8 +55,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.util.ASN1Dump;
+import org.bouncycastle.asn1.x509.CertificateList;
+import org.bouncycastle.asn1.x509.DigestInfo;
+import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.jce.PrincipalUtil;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -77,6 +87,7 @@ import be.fedict.trust.FallbackTrustLinker;
 import be.fedict.trust.MemoryCertificateRepository;
 import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.PublicKeyTrustLinker;
+import be.fedict.trust.RevocationData;
 import be.fedict.trust.TrustValidator;
 import be.fedict.trust.crl.CachedCrlRepository;
 import be.fedict.trust.crl.CrlTrustLinker;
@@ -180,6 +191,86 @@ public class PcscTest {
 		signature.update(challenge);
 		boolean result = signature.verify(signatureValue);
 		assertTrue(result);
+	}
+
+	@Test
+	public void pcscOTPSpike() throws Exception {
+		this.messages = new Messages(Locale.GERMAN);
+		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEid.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEid.waitForEidPresent();
+		}
+		byte[] challenge1 = "123456".getBytes();
+		byte[] challenge2 = "654321".getBytes();
+		byte[] signatureValue1;
+		byte[] signatureValue2;
+		List<X509Certificate> authnCertChain;
+		try {
+			signatureValue1 = pcscEid.signAuthn(challenge1);
+			signatureValue2 = pcscEid.signAuthn(challenge2);
+			authnCertChain = pcscEid.getAuthnCertificateChain();
+		} finally {
+			pcscEid.close();
+		}
+
+		byte[] sv1 = Arrays.copyOf(signatureValue1, 13);
+		byte[] sv2 = Arrays.copyOf(signatureValue2, 13);
+		LOG.debug("same encrypted prefix: " + Arrays.equals(sv1, sv2));
+
+		Signature signature = Signature.getInstance("SHA1withRSA");
+		signature.initVerify(authnCertChain.get(0).getPublicKey());
+		signature.update(challenge1);
+		boolean result = signature.verify(signatureValue1);
+		assertTrue(result);
+
+		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+		cipher.init(Cipher.DECRYPT_MODE, authnCertChain.get(0).getPublicKey());
+		byte[] signatureDigestInfoValue = cipher.doFinal(signatureValue1);
+		LOG.debug("encrypted signature value: " + signatureValue1.length);
+		ASN1InputStream aIn = new ASN1InputStream(signatureDigestInfoValue);
+		DigestInfo signatureDigestInfo = new DigestInfo(
+				(ASN1Sequence) aIn.readObject());
+		LOG.debug("algo OID: "
+				+ signatureDigestInfo.getAlgorithmId().getObjectId().getId());
+		LOG.debug("digest size: " + signatureDigestInfo.getDigest().length);
+		int digestIndex = findSubArray(signatureDigestInfoValue,
+				signatureDigestInfo.getDigest());
+		assertTrue(-1 != digestIndex);
+		LOG.debug("digest index: " + digestIndex);
+
+		// inject the encrypted digest of signature1 into signature2
+		// padding will look bad now
+		System.arraycopy(signatureValue1, 13, signatureValue2, 13, 20);
+		cipher = Cipher.getInstance("RSA/ECB/nopadding");
+		cipher.init(Cipher.DECRYPT_MODE, authnCertChain.get(0).getPublicKey());
+		signatureValue2 = Arrays.copyOf(signatureValue2, 13 + 20);
+		byte[] signatureDigestInfoValue2 = cipher.doFinal(signatureValue2);
+		LOG.debug("decrypted structure size: "
+				+ signatureDigestInfoValue2.length);
+		signatureDigestInfoValue2 = Arrays.copyOf(signatureDigestInfoValue2,
+				13 + 20);
+		LOG.debug("decrypted structure size (truncated): "
+				+ signatureDigestInfoValue2.length);
+		ASN1InputStream aIn2 = new ASN1InputStream(signatureDigestInfoValue2);
+		DigestInfo signatureDigestInfo2 = new DigestInfo(
+				(ASN1Sequence) aIn2.readObject());
+		LOG.debug("digest size: " + signatureDigestInfo2.getDigest().length);
+		LOG.debug("digest: " + new String(signatureDigestInfo2.getDigest()));
+	}
+
+	private int findSubArray(byte[] array, byte[] subarray) {
+		LOG.debug("array size: " + array.length);
+		LOG.debug("subarray size: " + subarray.length);
+		for (int idx = 0; idx < array.length - subarray.length + 1; idx++) {
+			byte[] currentSubArray = Arrays.copyOfRange(array, idx, idx
+					+ subarray.length);
+			LOG.debug("subarray size: " + currentSubArray.length);
+			if (Arrays.equals(currentSubArray, subarray)) {
+				return idx;
+			}
+		}
+		return -1;
 	}
 
 	@Test
@@ -868,6 +959,58 @@ public class PcscTest {
 	}
 
 	@Test
+	public void testBeIDPKIValidationCRLOnly() throws Exception {
+		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEid.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEid.waitForEidPresent();
+		}
+
+		List<X509Certificate> certChain;
+		try {
+			certChain = pcscEid.getSignCertificateChain();
+		} finally {
+			pcscEid.close();
+		}
+		LOG.debug("certificate: " + certChain.get(0));
+
+		NetworkConfig networkConfig = new NetworkConfig("proxy.yourict.net",
+				8080);
+
+		MemoryCertificateRepository memoryCertificateRepository = new MemoryCertificateRepository();
+		X509Certificate rootCaCertificate = loadCertificate("be/fedict/trust/belgiumrca.crt");
+		memoryCertificateRepository.addTrustPoint(rootCaCertificate);
+		X509Certificate rootCa2Certificate = loadCertificate("be/fedict/trust/belgiumrca2.crt");
+		memoryCertificateRepository.addTrustPoint(rootCa2Certificate);
+
+		RevocationData revocationData = new RevocationData();
+		TrustValidator trustValidator = new TrustValidator(
+				memoryCertificateRepository);
+		trustValidator.setRevocationData(revocationData);
+
+		trustValidator.addTrustLinker(new PublicKeyTrustLinker());
+		OnlineCrlRepository crlRepository = new OnlineCrlRepository(
+				networkConfig);
+		trustValidator.addTrustLinker(new CrlTrustLinker(crlRepository));
+
+		try {
+			trustValidator.isTrusted(certChain);
+		} catch (Exception e) {
+			LOG.warn("error: " + e.getMessage());
+		}
+
+		byte[] crlData = revocationData.getCrlRevocationData().get(1).getData();
+		CertificateList certificateList = CertificateList
+				.getInstance(new ASN1InputStream(crlData).readObject());
+		X509Extensions crlExtensions = certificateList.getTBSCertList()
+				.getExtensions();
+		Enumeration<DERObjectIdentifier> oids = crlExtensions.oids();
+		while (oids.hasMoreElements()) {
+			LOG.debug("oid type: " + oids.nextElement().getId());
+		}
+	}
+
+	@Test
 	public void testPKIValidation() throws Exception {
 		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEid.isEidPresent()) {
@@ -912,6 +1055,27 @@ public class PcscTest {
 			trustValidator.isTrusted(certChain);
 		} finally {
 			pcscEid.close();
+		}
+	}
+
+	private static X509Certificate loadCertificate(String resourceName) {
+		LOG.debug("loading certificate: " + resourceName);
+		Thread currentThread = Thread.currentThread();
+		ClassLoader classLoader = currentThread.getContextClassLoader();
+		InputStream certificateInputStream = classLoader
+				.getResourceAsStream(resourceName);
+		if (null == certificateInputStream) {
+			throw new IllegalArgumentException("resource not found: "
+					+ resourceName);
+		}
+		try {
+			CertificateFactory certificateFactory = CertificateFactory
+					.getInstance("X.509");
+			X509Certificate certificate = (X509Certificate) certificateFactory
+					.generateCertificate(certificateInputStream);
+			return certificate;
+		} catch (CertificateException e) {
+			throw new RuntimeException("X509 error: " + e.getMessage(), e);
 		}
 	}
 }

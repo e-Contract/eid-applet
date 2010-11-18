@@ -12,7 +12,7 @@
 			<year>2008-2010</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>15 September 2010</releaseinfo>
+		<releaseinfo>18 November 2010</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -150,6 +150,16 @@
 					configure the Java plugin as follows:
 					<prompt>sudo ln -s $JAVA_HOME/jre/lib/i386/libnpjp2.so
 						/usr/lib/mozilla/plugins/</prompt>
+				</para>
+			</section>
+			<section>
+				<title>SELinux</title>
+				<para>
+					Under Fedora Linux you might trigger an SELinux error when the
+					browser tries to run the JRE plugin. The following command prevents
+					the SELinux error:
+					<prompt>sudo chcon -t $JAVA_HOME/jre/lib/i386/client/libjvm.so
+					</prompt>
 				</para>
 			</section>
 		</section>
