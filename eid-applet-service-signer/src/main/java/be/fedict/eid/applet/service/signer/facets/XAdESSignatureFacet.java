@@ -467,7 +467,10 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		try {
 			/*
 			 * Make sure the DN is encoded using the same order as present
-			 * within the certificate.
+			 * within the certificate. This is an Office2010 work-around. Should
+			 * be reverted back.
+			 * 
+			 * XXX: not correct according to RFC 4514.
 			 */
 			issuerName = PrincipalUtil.getIssuerX509Principal(certificate)
 					.getName().replace(",", ", ");

@@ -19,6 +19,7 @@
 package test.be.fedict.eid.applet;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -26,6 +27,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,7 +42,16 @@ public class LogFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		LOG.debug("doFilter");
-		chain.doFilter(request, response);
+		HttpServletRequest httpRequest = (HttpServletRequest) request;
+		LogHttpServletRequestWrapper requestWrapper = new LogHttpServletRequestWrapper(
+				httpRequest);
+		Enumeration<String> headerNamesEnum = requestWrapper.getHeaderNames();
+		while (headerNamesEnum.hasMoreElements()) {
+			String headerName = headerNamesEnum.nextElement();
+			String headerValue = requestWrapper.getHeader(headerName);
+			LOG.debug(headerName + ": " + headerValue);
+		}
+		chain.doFilter(requestWrapper, response);
 	}
 
 	public void init(FilterConfig config) throws ServletException {
