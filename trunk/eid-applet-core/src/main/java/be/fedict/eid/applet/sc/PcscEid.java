@@ -442,13 +442,18 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		 * Next doesn't work all the time.
 		 */
 		// this.cardTerminal.waitForCardAbsent(0);
-		while (this.cardTerminal.isCardPresent()) {
+		while (isCardStillPresent()) {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				this.view.addDetailMessage("sleep error: " + e.getMessage());
 			}
 		}
+	}
+
+        public boolean isCardStillPresent() throws CardException
+        {
+            return this.cardTerminal.isCardPresent();
 	}
 
 	public List<X509Certificate> getAuthnCertificateChain()
