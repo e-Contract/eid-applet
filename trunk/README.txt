@@ -11,10 +11,10 @@ The source code is hosted at: http://code.google.com/p/eid-applet/
 
 The following is required for compiling the eID Applet software:
 * Sun Java 1.6.0_21
-* Apache Maven 2.0.10 or 2.2.1
+* Apache Maven 2.2.1 or 3.0.1
 
 When sitting behind an HTTP proxy and you experience weird download behaviour,
-you might want to consider using Apache Maven 2.0.10.
+you might want to consider using Apache Maven 3.0.1.
 
 
 === 3. Build
