@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict</groupId>
@@ -51,7 +53,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<keystore>target/dependency/jboss-${jboss.version}/server/all/conf/ssl.p12</keystore>
+					<keystore>target/dependency/jboss-${jboss.version}/common/ssl.p12</keystore>
 					<dname><![CDATA[CN=localhost, OU=eID Test, L=Brussels, ST=Brussels, O=FedICT, C=BE]]></dname>
 					<keypass>secret</keypass>
 					<storepass>secret</storepass>
@@ -76,8 +78,10 @@
 							<patches>
 								<patch>jboss-conf-memory.patch</patch>
 								<patch>jvm-gc.patch</patch>
-								<patch>jboss-logging.patch</patch>
-								<patch>jbossweb-ssl.patch</patch>
+								<patch>default-jboss-logging.patch</patch>
+								<patch>all-jboss-logging.patch</patch>
+								<patch>default-jbossweb-ssl.patch</patch>
+								<patch>all-jbossweb-ssl.patch</patch>
 							</patches>
 						</configuration>
 					</execution>
