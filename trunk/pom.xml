@@ -5,7 +5,7 @@
 	<name>FedICT eID Applet Project</name>
 	<groupId>be.fedict</groupId>
 	<artifactId>eid-applet</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.2.Beta2</version>
 	<packaging>pom</packaging>
 	<inceptionYear>2008</inceptionYear>
 	<licenses>
@@ -58,6 +58,7 @@
 				</property>
 			</activation>
 			<modules>
+				<module>eid-applet-docbook-plugin</module>
 				<module>eid-applet-dev-guide</module>
 				<module>eid-applet-sdk</module>
 			</modules>
@@ -540,6 +541,13 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>1.0-beta-7</version>
+			</extension>
+		</extensions>
 		<pluginManagement>
 			<plugins>
 				<plugin>
