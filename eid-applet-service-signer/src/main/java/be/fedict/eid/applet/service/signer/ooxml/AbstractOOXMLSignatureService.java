@@ -93,6 +93,10 @@ public abstract class AbstractOOXMLSignatureService extends
 		this.xadesSignatureFacet.setXadesNamespacePrefix("xd");
 		this.xadesSignatureFacet.setIdSignedProperties("idSignedProperties");
 		this.xadesSignatureFacet.setSignaturePolicyImplied(true);
+		/*
+		 * Work-around for Office 2010.
+		 */
+		this.xadesSignatureFacet.setIssuerNameNoReverseOrder(true);
 		setSignatureId("idPackageSignature");
 		addSignatureFacet(this.xadesSignatureFacet);
 		addSignatureFacet(new Office2010SignatureFacet());

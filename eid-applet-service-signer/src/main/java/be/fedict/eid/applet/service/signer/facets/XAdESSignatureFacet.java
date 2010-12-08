@@ -117,6 +117,8 @@ public class XAdESSignatureFacet implements SignatureFacet {
 
 	private String role;
 
+	private boolean issuerNameNoReverseOrder = false;
+
 	/**
 	 * Default constructor. Will use a local clock and "SHA-1" for digest
 	 * algorithm.
@@ -275,7 +277,7 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		X509Certificate signingCertificate = signingCertificateChain.get(0);
 		CertIDType signingCertificateId = getCertID(signingCertificate,
 				this.xadesObjectFactory, this.xmldsigObjectFactory,
-				this.digestAlgorithm);
+				this.digestAlgorithm, this.issuerNameNoReverseOrder);
 		CertIDListType signingCertificates = this.xadesObjectFactory
 				.createCertIDListType();
 		signingCertificates.getCert().add(signingCertificateId);
@@ -457,26 +459,30 @@ public class XAdESSignatureFacet implements SignatureFacet {
 			X509Certificate certificate,
 			ObjectFactory xadesObjectFactory,
 			be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory xmldsigObjectFactory,
-			String digestAlgorithm) {
+			String digestAlgorithm, boolean issuerNameNoReverseOrder) {
 		CertIDType certId = xadesObjectFactory.createCertIDType();
 
 		X509IssuerSerialType issuerSerial = xmldsigObjectFactory
 				.createX509IssuerSerialType();
 		certId.setIssuerSerial(issuerSerial);
 		String issuerName;
-		try {
-			/*
-			 * Make sure the DN is encoded using the same order as present
-			 * within the certificate. This is an Office2010 work-around. Should
-			 * be reverted back.
-			 * 
-			 * XXX: not correct according to RFC 4514.
-			 */
-			issuerName = PrincipalUtil.getIssuerX509Principal(certificate)
-					.getName().replace(",", ", ");
-		} catch (CertificateEncodingException e) {
-			throw new RuntimeException(
-					"cert encoding error: " + e.getMessage(), e);
+		if (issuerNameNoReverseOrder) {
+			try {
+				/*
+				 * Make sure the DN is encoded using the same order as present
+				 * within the certificate. This is an Office2010 work-around.
+				 * Should be reverted back.
+				 * 
+				 * XXX: not correct according to RFC 4514.
+				 */
+				issuerName = PrincipalUtil.getIssuerX509Principal(certificate)
+						.getName().replace(",", ", ");
+			} catch (CertificateEncodingException e) {
+				throw new RuntimeException("cert encoding error: "
+						+ e.getMessage(), e);
+			}
+		} else {
+			issuerName = certificate.getIssuerX500Principal().toString();
 		}
 		issuerSerial.setX509IssuerName(issuerName);
 		issuerSerial.setX509SerialNumber(certificate.getSerialNumber());
@@ -530,5 +536,14 @@ public class XAdESSignatureFacet implements SignatureFacet {
 	 */
 	public void setRole(String role) {
 		this.role = role;
+	}
+
+	/**
+	 * Work-around for Office 2010 IssuerName encoding.
+	 * 
+	 * @param reverseOrder
+	 */
+	public void setIssuerNameNoReverseOrder(boolean reverseOrder) {
+		this.issuerNameNoReverseOrder = reverseOrder;
 	}
 }
