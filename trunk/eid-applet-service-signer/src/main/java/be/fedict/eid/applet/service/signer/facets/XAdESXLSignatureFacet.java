@@ -335,7 +335,7 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 			X509Certificate certificate = signingCertificateChain.get(certIdx);
 			CertIDType certId = XAdESSignatureFacet.getCertID(certificate,
 					this.objectFactory, this.xmldsigObjectFactory,
-					this.digestAlgorithm);
+					this.digestAlgorithm, false);
 			certIds.add(certId);
 		}
 
