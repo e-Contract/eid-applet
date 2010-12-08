@@ -21,7 +21,6 @@
 			<excludes>
 				<exclude>client/**</exclude>
 				<exclude>docs/**</exclude>
-				<exclude>server/default/**</exclude>
 				<exclude>server/minimal/**</exclude>
 				<exclude>server/standard/**</exclude>
 				<exclude>server/web/**</exclude>
@@ -30,14 +29,20 @@
 				<exclude>common/deploy/admin-console.war/**</exclude>
 				<!-- commons-collections via Richfaces -->
 				<exclude>common/lib/commons-collections.jar</exclude>
+				<exclude>common/lib/commons-beanutils.jar</exclude>
+				<exclude>common/lib/xmlsec.jar</exclude>
+				<exclude>common/lib/wss4j.jar</exclude>
 				<!-- we provider our own commons-httpclient -->
 				<exclude>common/lib/commons-httpclient.jar</exclude>
 				<!-- opensaml -->
 				<exclude>lib/endorsed/serializer.jar</exclude>
 				<!-- JAX-WS/JAXB -->
 				<exclude>server/all/deployers/jbossws.deployer/**</exclude>
+				<exclude>server/default/deployers/jbossws.deployer/**</exclude>
 				<exclude>server/all/deployers/jbossws-jaxrpc.deployer/**</exclude>
+				<exclude>server/default/deployers/jbossws-jaxrpc.deployer/**</exclude>
 				<exclude>server/all/deployers/resteasy.deployer/jaxb-impl-2.2.jar</exclude>
+				<exclude>server/default/deployers/resteasy.deployer/jaxb-impl-2.2.jar</exclude>
 				<exclude>common/lib/jaxws-api.jar</exclude>
 				<exclude>common/lib/jsr181-api.jar</exclude>
 				<exclude>common/lib/saaj-api.jar</exclude>
@@ -84,7 +89,7 @@
 	</fileSets>
 	<dependencySets>
 		<dependencySet>
-			<outputDirectory>server/all/lib</outputDirectory>
+			<outputDirectory>common/lib</outputDirectory>
 			<excludes>
 				<!-- OpenSAML -->
 				<exclude>org.apache.xerces:serializer</exclude>
