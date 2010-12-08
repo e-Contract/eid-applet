@@ -3,20 +3,20 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.2.Beta2</version>
+		<version>1.0.2-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet Developers' Guide</name>
 	<description>Developers' Guide for the eID applet.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-dev-guide</artifactId>
-	<version>1.0.2.Beta2</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>be.fedict.eid-applet</groupId>
 				<artifactId>eid-applet-docbook-plugin</artifactId>
-				<version>1.0.2.Beta2</version>
+				<version>1.0.2-SNAPSHOT</version>
 				<executions>
 					<execution>
 						<id>generate-docbook</id>
@@ -134,7 +134,7 @@
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-docbook-plugin</artifactId>
-			<version>1.0.2.Beta2</version>
+			<version>1.0.2-SNAPSHOT</version>
 			<type>maven-plugin</type>
 			<optional>true</optional>
 		</dependency>

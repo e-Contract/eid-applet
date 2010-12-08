@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.2.Beta2</version>
+		<version>1.0.2-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet Tests</name>
 	<description>Integration tests for the eID applet.</description>
@@ -13,7 +13,7 @@
 	-->
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-tests</artifactId>
-	<version>1.0.2.Beta2</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<build>
 		<plugins>
@@ -44,13 +44,13 @@
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-core</artifactId>
 			<scope>test</scope>
-			<version>1.0.2.Beta2</version>
+			<version>1.0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service</artifactId>
 			<scope>test</scope>
-			<version>1.0.2.Beta2</version>
+			<version>1.0.2-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>bouncycastle</groupId>
@@ -70,7 +70,7 @@
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service-signer</artifactId>
 			<scope>test</scope>
-			<version>1.0.2.Beta2</version>
+			<version>1.0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
