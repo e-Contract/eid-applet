@@ -74,6 +74,21 @@
 				<module>eid-applet-beta</module>
 			</modules>
 		</profile>
+		<profile>
+			<id>all</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>all</value>
+				</property>
+			</activation>
+			<modules>
+				<module>eid-applet-tests</module>
+				<module>eid-applet-dev-guide</module>
+				<module>eid-applet-sdk</module>
+				<module>eid-applet-beta</module>
+			</modules>
+		</profile>
 	</profiles>
 	<scm>
 		<developerConnection>scm:svn:https://eid-applet.googlecode.com/svn/trunk</developerConnection>

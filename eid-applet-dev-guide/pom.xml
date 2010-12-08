@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict</groupId>
@@ -87,14 +89,9 @@
 					<options>
 						<xincludeSupported>true</xincludeSupported>
 						<xmlTransformerType>saxon</xmlTransformerType>
-						<!--
-							needed for uri-resolvers; can be ommitted if using 'current' uri
-							scheme
-						-->
-						<!--
-							could also locate the docbook dependency and inspect its
-							version...
-						-->
+						<!-- needed for uri-resolvers; can be ommitted if using 'current' uri 
+							scheme -->
+						<!-- could also locate the docbook dependency and inspect its version... -->
 						<docbookVersion>1.72.0</docbookVersion>
 					</options>
 				</configuration>
@@ -135,4 +132,13 @@
 			</plugin>
 		</plugins>
 	</build>
+	<dependencies>
+		<dependency>
+			<groupId>be.fedict.eid-applet</groupId>
+			<artifactId>eid-applet-docbook-plugin</artifactId>
+			<version>1.0.2-SNAPSHOT</version>
+			<type>maven-plugin</type>
+			<optional>true</optional>
+		</dependency>
+	</dependencies>
 </project>
