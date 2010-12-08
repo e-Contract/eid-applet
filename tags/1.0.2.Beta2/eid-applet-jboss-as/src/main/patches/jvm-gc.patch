@@ -1,0 +1,9 @@
+--- bin/run.conf.orig	2010-10-13 10:59:56.577868817 +0200
++++ bin/run.conf	2010-10-13 11:00:54.145626910 +0200
+@@ -48,3 +48,6 @@
+ 
+ # Sample JPDA settings for shared memory debugging 
+ #JAVA_OPTS="$JAVA_OPTS -Xrunjdwp:transport=dt_shmem,server=y,suspend=n,address=jboss"
++
++# GC configuration
++JAVA_OPTS="$JAVA_OPTS -XX:+UseConcMarkSweepGC -XX:+ExplicitGCInvokesConcurrent"
