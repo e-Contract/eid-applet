@@ -704,6 +704,14 @@
 			<id>codehaus-snapshots</id>
 			<url>https://nexus.codehaus.org/content/repositories/snapshots/</url>
 		</pluginRepository>
+		<pluginRepository>
+			<id>jboss-public</id>
+			<name>JBoss public nexus</name>
+			<url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</pluginRepository>
 	</pluginRepositories>
 	<repositories>
 		<repository>
@@ -781,20 +789,20 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>maven-java.net</id>
-			<url>http://download.java.net/maven/1/</url>
-			<layout>legacy</layout>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
 			<id>jboss-brew</id>
 			<name>JBoss Maven2 Brew repository</name>
 			<url>http://repository.jboss.com/maven2-brew/</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>jboss-public</id>
+			<name>JBoss public nexus</name>
+			<url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
