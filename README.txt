@@ -10,7 +10,7 @@ The source code is hosted at: http://code.google.com/p/eid-applet/
 === 2. Requirements
 
 The following is required for compiling the eID Applet software:
-* Sun Java 1.6.0_21
+* Sun Java 1.6.0_21, 1.6.0_22, 1.6.0_23
 * Apache Maven 2.2.1 or 3.0.1
 
 When sitting behind an HTTP proxy and you experience weird download behaviour,
@@ -36,11 +36,6 @@ with this project.
 We provide a JBoss AS 6.0.x package artifact named:
 	eid-applet-jboss-as
 
-Missing dependencies can be added to your local Maven repository via:
-        mvn install:install-file -Dfile=Downloads/jboss-6.0.0.M1.zip \
-	-DgroupId=org.jboss -DartifactId=jboss-as-distribution \
-	-Dversion=6.0.0.M1 -Dpackaging=zip -DgeneratePom=true
-
 During the build process a token is required to sign the applet JAR.
 By default the Maven build will use a software token to sign the applet JAR.
 One can configure the usage of an eToken via the following Maven property:
@@ -58,7 +53,7 @@ An SDK build can be performed via:
 	mvn -Dhttp.proxyHost=proxy.yourict.net -Dhttp.proxyPort=8080 -Denv=sdk
 -Dtoken=etoken clean deploy
 
-The final artifact is located under:
+The final SDK artifact is located under:
 	eid-applet-sdk/target/
 
 An SDK release build should use the production eToken containing the official
