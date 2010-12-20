@@ -2133,7 +2133,7 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 				likely drop the existing proof-of-concept code for ASP.NET and PHP.
 			</para>
 		</warning>
-		<xi:include href="../../../target/protocol-messages.xml"
+		<xi:include href="../../../../target/protocol-messages.xml"
 			xmlns:xi="http://www.w3.org/2001/XInclude" />
 	</section>
 	<appendix>
@@ -2213,7 +2213,7 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 		<title>Revision history</title>
 		<table>
 			<title>Revision history</title>
-			<tgroup cols="2">
+			<tgroup cols="3">
 				<colspec colwidth="1*" />
 				<colspec colwidth="1*" />
 				<colspec colwidth="2*" />
