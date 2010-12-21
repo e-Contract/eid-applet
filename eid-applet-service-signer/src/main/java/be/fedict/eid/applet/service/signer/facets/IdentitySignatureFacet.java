@@ -135,11 +135,12 @@ public class IdentitySignatureFacet implements SignatureFacet {
 		Node identityNode = marshallNode.getFirstChild();
 
 		// ds:Object
+		String objectId = "identity-object-" + UUID.randomUUID().toString();
 
 		List<XMLStructure> identityObjectContent = new LinkedList<XMLStructure>();
 		identityObjectContent.add(new DOMStructure(identityNode));
 		XMLObject identityObject = signatureFactory.newXMLObject(
-				identityObjectContent, null, null, null);
+				identityObjectContent, objectId, null, null);
 		objects.add(identityObject);
 
 		// ds:Reference
@@ -150,7 +151,7 @@ public class IdentitySignatureFacet implements SignatureFacet {
 				.newTransform(CanonicalizationMethod.INCLUSIVE,
 						(TransformParameterSpec) null);
 		transforms.add(exclusiveTransform);
-		Reference reference = signatureFactory.newReference("#" + identityId,
+		Reference reference = signatureFactory.newReference("#" + objectId,
 				digestMethod, transforms, REFERENCE_TYPE, null);
 		references.add(reference);
 	}
