@@ -34,7 +34,6 @@ import javax.persistence.Query;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.ejb.Ejb3Configuration;
-import org.hibernate.validator.InvalidStateException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -186,7 +185,7 @@ public class PersistenceTest {
 		try {
 			this.entityManager.persist(feedbackEntity);
 			fail();
-		} catch (InvalidStateException e) {
+		} catch (Exception e) {
 			// expected
 			this.entityManager.getTransaction().rollback();
 		}

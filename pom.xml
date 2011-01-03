@@ -298,19 +298,24 @@
 				<version>3.5.6-Final</version>
 			</dependency>
 			<dependency>
+				<groupId>org.hibernate.javax.persistence</groupId>
+				<artifactId>hibernate-jpa-2.0-api</artifactId>
+				<version>1.0.0.Final</version>
+			</dependency>
+			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core</artifactId>
-				<version>3.5.6-Final</version>
+				<version>3.6.0.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-entitymanager</artifactId>
-				<version>3.5.1-Final</version>
+				<version>3.6.0.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-validator</artifactId>
-				<version>3.1.0.GA</version>
+				<version>4.1.0.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>hsqldb</groupId>

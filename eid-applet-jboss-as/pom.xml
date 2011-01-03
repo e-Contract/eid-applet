@@ -15,7 +15,7 @@
 	<version>1.0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<properties>
-		<jboss.version>6.0.0.20100911-M5</jboss.version>
+		<jboss.version>6.0.0.Final</jboss.version>
 	</properties>
 	<build>
 		<plugins>
@@ -36,12 +36,6 @@
 									<artifactId>jboss-as-distribution</artifactId>
 									<type>zip</type>
 									<outputDirectory>${project.build.directory}/dependency</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>org.jboss.ejb3.timerservice</groupId>
-									<artifactId>jboss-ejb3-timerservice-mk2</artifactId>
-									<type>jar</type>
-									<outputDirectory>${project.build.directory}/dependency/jboss-ejb3-timerservice-mk2.jar</outputDirectory>
 								</artifactItem>
 							</artifactItems>
 						</configuration>
@@ -88,6 +82,8 @@
 								<patch>all-jboss-logging.patch</patch>
 								<patch>default-jbossweb-ssl.patch</patch>
 								<patch>all-jbossweb-ssl.patch</patch>
+								<patch>default-jaxws-ri-switchboard.patch</patch>
+								<patch>all-jaxws-ri-switchboard.patch</patch>
 							</patches>
 						</configuration>
 					</execution>
@@ -281,13 +277,6 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
-		</dependency>
-		<dependency>
-			<!-- https://jira.jboss.org/browse/EJBTHREE-2152 -->
-			<groupId>org.jboss.ejb3.timerservice</groupId>
-			<artifactId>jboss-ejb3-timerservice-mk2</artifactId>
-			<version>1.0.0-alpha-12</version>
-			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>
