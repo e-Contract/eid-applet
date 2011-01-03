@@ -56,8 +56,6 @@
 				<!-- chmod+x on the UNIX scripts -->
 				<exclude>bin/run.sh</exclude>
 				<exclude>bin/shutdown.sh</exclude>
-				<!-- https://jira.jboss.org/browse/EJBTHREE-2152 -->
-				<exclude>common/deploy/jboss-ejb3-timerservice-mk2.jar/**</exclude>
 			</excludes>
 		</fileSet>
 		<fileSet>
@@ -88,11 +86,6 @@
 				<include>client/jboss-security-spi.jar</include>
 				<include>client/jboss-integration.jar</include>
 			</includes>
-		</fileSet>
-		<fileSet>
-			<!-- https://jira.jboss.org/browse/EJBTHREE-2152 -->
-			<directory>target/dependency/jboss-ejb3-timerservice-mk2.jar</directory>
-			<outputDirectory>common/deploy/jboss-ejb3-timerservice-mk2.jar</outputDirectory>
 		</fileSet>
 	</fileSets>
 	<dependencySets>
