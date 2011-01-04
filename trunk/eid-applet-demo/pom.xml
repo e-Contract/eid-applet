@@ -60,20 +60,20 @@
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-jboss-as</artifactId>
 			<type>zip</type>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-test-deploy</artifactId>
 			<type>ear</type>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-beta-deploy</artifactId>
 			<type>ear</type>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
