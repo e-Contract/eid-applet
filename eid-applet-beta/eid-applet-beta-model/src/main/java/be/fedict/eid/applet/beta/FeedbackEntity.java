@@ -40,7 +40,7 @@ import org.jboss.seam.annotations.Scope;
 @Entity
 @Name("feedbackEntry")
 @Scope(ScopeType.PAGE)
-@Table(name = "feedback")
+@Table(name = "beta_feedback")
 public class FeedbackEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;

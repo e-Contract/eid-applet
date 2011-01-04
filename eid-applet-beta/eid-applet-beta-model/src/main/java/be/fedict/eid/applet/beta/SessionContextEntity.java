@@ -33,7 +33,7 @@ import javax.persistence.TemporalType;
 import org.hibernate.annotations.Index;
 
 @Entity
-@Table(name = "sessions")
+@Table(name = "beta_sessions")
 public class SessionContextEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;

@@ -33,7 +33,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "tests")
+@Table(name = "beta_tests")
 public class TestResultEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;

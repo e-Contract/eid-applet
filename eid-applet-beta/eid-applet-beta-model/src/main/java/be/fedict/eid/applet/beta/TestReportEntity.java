@@ -38,7 +38,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "test_report")
+@Table(name = "beta_test_report")
 @NamedQueries( { @NamedQuery(name = QUERY_TEST_REPORT, query = "SELECT testReport FROM TestReportEntity AS testReport"
 		+ " ORDER BY test, osName, osVersion,  osArch, javaVersion, userAgent") })
 public class TestReportEntity implements Serializable {
