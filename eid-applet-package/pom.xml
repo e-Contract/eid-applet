@@ -133,7 +133,7 @@
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-core</artifactId>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 </project>

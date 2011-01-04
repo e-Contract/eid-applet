@@ -18,7 +18,7 @@
 			<plugin>
 				<groupId>be.fedict.eid-applet</groupId>
 				<artifactId>eid-applet-docbook-plugin</artifactId>
-				<version>1.0.2-SNAPSHOT</version>
+				<version>${project.version}</version>
 				<executions>
 					<execution>
 						<id>generate-docbook</id>
@@ -135,7 +135,7 @@
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-docbook-plugin</artifactId>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>maven-plugin</type>
 			<optional>true</optional>
 		</dependency>

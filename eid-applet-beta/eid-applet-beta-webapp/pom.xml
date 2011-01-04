@@ -43,31 +43,31 @@
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-package</artifactId>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service</artifactId>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service-spi</artifactId>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-beta-model</artifactId>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>ejb-client</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-beta-taglib</artifactId>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
