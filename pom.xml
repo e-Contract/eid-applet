@@ -77,6 +77,7 @@
 		</profile>
 		<profile>
 			<id>all</id>
+			<!-- handy to run "mvn eclipse:eclipse -Denv=all" -->
 			<activation>
 				<property>
 					<name>env</name>
@@ -86,8 +87,11 @@
 			<modules>
 				<module>eid-applet-tests</module>
 				<module>eid-applet-dev-guide</module>
+				<module>eid-applet-docbook-plugin</module>
 				<module>eid-applet-sdk</module>
 				<module>eid-applet-beta</module>
+				<module>eid-applet-demo</module>
+				<module>eid-applet-jboss-as</module>
 			</modules>
 		</profile>
 	</profiles>
