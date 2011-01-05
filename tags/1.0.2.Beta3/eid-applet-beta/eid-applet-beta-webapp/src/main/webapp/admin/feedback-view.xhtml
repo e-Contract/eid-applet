@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+        lang="en" xml:lang="en">
+<body>
+<ui:composition template="/WEB-INF/template.xhtml">
+	<ui:param name="activeMenu" value="admin" />
+	<ui:define name="body">
+		<h2>eID Applet Feedback</h2>
+		<rich:panel>
+			<f:facet name="header">
+			Subject: #{selectedFeedback.subject}
+			</f:facet>
+			<h:panelGrid columns="2">
+				<h:outputText value="Created" />
+				<h:outputText value="#{selectedFeedback.created.time}">
+					<f:convertDateTime timeZone="Europe/Paris" dateStyle="full"
+						type="both" />
+				</h:outputText>
+
+				<h:outputText value="Email" />
+				<h:panelGroup>
+					<a href="mailto:#{selectedFeedback.email}"><h:outputText
+						value="#{selectedFeedback.email}" /></a>
+				</h:panelGroup>
+
+				<h:outputText value="Session Context" />
+				<h:outputText value="#{selectedFeedback.sessionContext.contextId}" />
+
+				<h:outputText value="User Agent" />
+				<h:outputText value="#{selectedFeedback.sessionContext.userAgent}" />
+			</h:panelGrid>
+			<div style="overflow: auto; width: 600px; height: 200px;"><pre>#{selectedFeedback.message}</pre>
+			</div>
+			<h:form>
+				<rich:dataGrid value="#{testResults}" var="testResult" columns="1"
+					elements="2" rendered="#{!testResults.isEmpty()}">
+					<rich:panel>
+						<f:facet name="header">
+					#{testResult.test} - #{testResult.created.time}
+					</f:facet>
+						<div style="overflow: auto; width: 600px; height: 200px;"><pre>#{testResult.result}</pre>
+						</div>
+					</rich:panel>
+					<f:facet name="footer">
+						<rich:datascroller />
+					</f:facet>
+				</rich:dataGrid>
+			</h:form>
+		</rich:panel>
+		<rich:spacer height="10" />
+		<h:form>
+			<h:commandButton value="Back" action="back" />
+			<h:commandButton value="Delete" action="#{feedbackAdmin.delete}" />
+		</h:form>
+	</ui:define>
+</ui:composition>
+</body>
+</html>
