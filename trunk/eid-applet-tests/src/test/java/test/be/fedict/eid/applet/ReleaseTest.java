@@ -63,7 +63,7 @@ public class ReleaseTest {
 	private static final Log LOG = LogFactory.getLog(ReleaseTest.class);
 
 	// 1.0.2-SNAPSHOT
-	private static final String CURRENT_VERSION = "1.0.2.Beta2";
+	private static final String CURRENT_VERSION = "1.0.2.Beta3";
 
 	// 1.0.2.Beta2
 	private static final String NEW_VERSION = "1.0.2-SNAPSHOT";
@@ -78,12 +78,10 @@ public class ReleaseTest {
 		URL classUrl = classLoader.getResource(classResourceName);
 		LOG.debug("class URL: " + classUrl);
 		URL baseUrl = new URL(
-				classUrl
-						.toString()
+				classUrl.toString()
 						.substring(
 								0,
-								classUrl
-										.toString()
+								classUrl.toString()
 										.indexOf(
 												"eid-applet-tests/target/test-classes/test/be/fedict/eid/applet/ReleaseTest.class")));
 		LOG.debug("base URL: " + baseUrl);
@@ -94,20 +92,6 @@ public class ReleaseTest {
 		for (File pomFile : pomFiles) {
 			LOG.debug("pom.xml: " + pomFile.getAbsolutePath());
 			Document pomDocument = loadDocument(pomFile);
-			NodeList dependencyVersionTextNodeList = XPathAPI
-					.selectNodeList(
-							pomDocument.getDocumentElement(),
-							"//:dependency[:groupId/text()='be.fedict.eid-applet']/:version/text()",
-							pomDocument.getDocumentElement());
-			LOG.debug("# dependency nodes: "
-					+ dependencyVersionTextNodeList.getLength());
-			for (int idx = 0; idx < dependencyVersionTextNodeList.getLength(); idx++) {
-				Node dependencyVersionTextNode = dependencyVersionTextNodeList
-						.item(idx);
-				assertEquals(CURRENT_VERSION, dependencyVersionTextNode
-						.getNodeValue());
-				dependencyVersionTextNode.setNodeValue(NEW_VERSION);
-			}
 
 			Node projectVersionTextNode = XPathAPI
 					.selectSingleNode(
@@ -115,8 +99,8 @@ public class ReleaseTest {
 							"/:project[:groupId[contains(text(), 'be.fedict')]]/:version/text()",
 							pomDocument.getDocumentElement());
 			if (null != projectVersionTextNode) {
-				assertEquals(CURRENT_VERSION, projectVersionTextNode
-						.getNodeValue());
+				assertEquals(CURRENT_VERSION,
+						projectVersionTextNode.getNodeValue());
 				projectVersionTextNode.setNodeValue(NEW_VERSION);
 			}
 
@@ -126,24 +110,9 @@ public class ReleaseTest {
 							"/:project/:parent[:groupId[contains(text(), 'be.fedict')]]/:version/text()",
 							pomDocument.getDocumentElement());
 			if (null != parentVersionTextNode) {
-				assertEquals(CURRENT_VERSION, parentVersionTextNode
-						.getNodeValue());
+				assertEquals(CURRENT_VERSION,
+						parentVersionTextNode.getNodeValue());
 				parentVersionTextNode.setNodeValue(NEW_VERSION);
-			}
-
-			NodeList pluginVersionTextNodeList = XPathAPI
-					.selectNodeList(
-							pomDocument.getDocumentElement(),
-							"//:plugins//:plugin[:groupId/text()='be.fedict.eid-applet']/:version/text()",
-							pomDocument.getDocumentElement());
-			LOG.debug("# plugin nodes: "
-					+ pluginVersionTextNodeList.getLength());
-			for (int idx = 0; idx < pluginVersionTextNodeList.getLength(); idx++) {
-				Node pluginVersionTextNode = pluginVersionTextNodeList
-						.item(idx);
-				assertEquals(CURRENT_VERSION, pluginVersionTextNode
-						.getNodeValue());
-				pluginVersionTextNode.setNodeValue(NEW_VERSION);
 			}
 
 			storeDocument(pomDocument, pomFile);
