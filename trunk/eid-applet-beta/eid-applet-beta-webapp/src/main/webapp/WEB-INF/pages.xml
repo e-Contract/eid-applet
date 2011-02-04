@@ -4,13 +4,11 @@
 	login-view-id="/login.xhtml">
 	<!-- Security settings on administrator pages -->
 	<page view-id="*">
-		<!-- XXX: doesn't really work -->
 		<navigation from-action="#{identity.logout()}">
 			<redirect view-id="/main.xhtml" />
 		</navigation>
 	</page>
-	<page view-id="/admin/*">
-		<!-- login-required="true" doesn't work -->
+	<page view-id="/admin/*" login-required="true">
 		<restrict>#{s:hasRole('admin')}</restrict>
 	</page>
 	<!-- Without the following the user can just view the admin pages. -->
