@@ -49,6 +49,7 @@ public class HttpURLConnectionHttpTransmitter implements HttpTransmitter {
 		this.connection.setAllowUserInteraction(false);
 		this.connection.setRequestProperty("Content-Type",
 				"application/octet-stream");
+		this.connection.setChunkedStreamingMode(1);
 		this.connection.setDoInput(true);
 		this.connection.setDoOutput(true);
 		try {
@@ -68,6 +69,7 @@ public class HttpURLConnectionHttpTransmitter implements HttpTransmitter {
 	public void setBody(byte[] bodyValue) {
 		OutputStream connectionOutputStream;
 		try {
+			this.connection.setChunkedStreamingMode(bodyValue.length);
 			connectionOutputStream = this.connection.getOutputStream();
 			connectionOutputStream.write(bodyValue);
 			connectionOutputStream.close();
