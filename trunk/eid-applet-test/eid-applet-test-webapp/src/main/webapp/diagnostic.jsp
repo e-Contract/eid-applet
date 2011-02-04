@@ -13,7 +13,7 @@
 <script>
 	var attributes = {
 		code :'be.fedict.eid.applet.Applet.class',
-		archive :'eid-applet.jar',
+		archive :'eid-applet-package-${pom.version}.jar',
 		width :600,
 		height :300,
 		mayscript :'true'
