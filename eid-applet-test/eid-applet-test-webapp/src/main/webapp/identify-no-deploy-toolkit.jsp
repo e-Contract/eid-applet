@@ -9,7 +9,7 @@
 <p>This test is not using the Deployment Toolkit JavaScript of Java
 6u10.</p>
 <applet code="be.fedict.eid.applet.Applet.class" width="600"
-	height="300" archive="eid-applet.jar">
+	height="300" archive="eid-applet-package-${pom.version}.jar">
 	<param name="TargetPage" value="identity-result.jsp" />
 	<param name="AppletService" value="applet-service" />
 </applet>
