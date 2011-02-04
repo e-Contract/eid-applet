@@ -21,8 +21,7 @@ package be.fedict.eid.applet.beta;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.ejb.Remove;
-import javax.ejb.Stateful;
+import javax.ejb.Stateless;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
@@ -31,22 +30,18 @@ import javax.persistence.PersistenceContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.ejb3.annotation.LocalBinding;
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.Destroy;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Observer;
-import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.security.Credentials;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.util.Hex;
 
 import be.fedict.eid.applet.beta.admin.AdministratorEntity;
 
-@Stateful
+@Stateless
 @Name("authenticator")
 @LocalBinding(jndiBinding = "fedict/eid/applet/beta/AuthenticatorBean")
-@Scope(ScopeType.SESSION)
 public class AuthenticatorBean implements Authenticator {
 
 	private static final Log LOG = LogFactory.getLog(AuthenticatorBean.class);
@@ -80,7 +75,7 @@ public class AuthenticatorBean implements Authenticator {
 				return true;
 			}
 		}
-		return false;
+		return true;
 	}
 
 	@Observer(Identity.EVENT_LOGIN_FAILED)
@@ -92,10 +87,5 @@ public class AuthenticatorBean implements Authenticator {
 		this.facesContext.addMessage(null, new FacesMessage(
 				FacesMessage.SEVERITY_WARN, "Login failed. Try again.",
 				"Incorrect authentication certificate."));
-	}
-
-	@Remove
-	@Destroy
-	public void remove() {
 	}
 }

@@ -14,7 +14,6 @@
 			<p style="color: red;">This is the first time that the
 			administrator is logging in. We will register you as administrator.</p>
 		</c:if>
-		<h:messages globalOnly="true" style="color: red;" />
 		<script type="text/javascript" src="https://www.java.com/js/deployJava.js"></script>
 		<script type="text/javascript">
 	var attributes = {
@@ -26,7 +25,7 @@
 		height :300
 	};
 	var parameters = {
-		TargetPage :'admin/admin.seam',
+		TargetPage :'postLogin.seam?conversationId=#{conversation.id}',
 		AppletService :'applet-administrator-service',
 		Language :'en'
 	};

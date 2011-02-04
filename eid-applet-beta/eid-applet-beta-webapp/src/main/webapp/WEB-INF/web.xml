@@ -227,10 +227,6 @@
 			<param-name>AuthenticationService</param-name>
 			<param-value>fedict/eid/applet/beta/AdministratorServiceBean</param-value>
 		</init-param>
-		<init-param>
-			<param-name>RemoveCard</param-name>
-			<param-value>true</param-value>
-		</init-param>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>AppletAdministratorServiceServlet</servlet-name>
@@ -244,10 +240,6 @@
 		<init-param>
 			<param-name>AuthenticationService</param-name>
 			<param-value>fedict/eid/applet/beta/AdministratorRegistrationServiceBean</param-value>
-		</init-param>
-		<init-param>
-			<param-name>RemoveCard</param-name>
-			<param-value>true</param-value>
 		</init-param>
 	</servlet>
 	<servlet-mapping>

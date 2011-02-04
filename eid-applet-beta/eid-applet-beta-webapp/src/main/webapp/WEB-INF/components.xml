@@ -13,10 +13,10 @@
 	<core:init jndi-pattern="fedict/eid/applet/beta/#{ejbName}"
 		debug="true" />
 	<!-- remember navigation location after login -->
-	<event type="org.jboss.seam.notLoggedIn">
-		<action execute="#{redirect.captureCurrentView}" />
-	</event>
-	<event type="org.jboss.seam.postAuthenticate">
-		<action execute="#{redirect.returnToCapturedView}" />
-	</event>
+	<event type="org.jboss.seam.security.notLoggedIn">
+        <action execute="#{redirect.captureCurrentView}"/>
+    </event>
+    <event type="org.jboss.seam.security.postAuthenticate">
+        <action execute="#{redirect.returnToCapturedView}"/>
+    </event>
 </components>

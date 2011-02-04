@@ -8,12 +8,6 @@
 		<view-handler>com.sun.facelets.FaceletViewHandler</view-handler>
 	</application>
 
-	<!--
-		Next could be removed when using JBoss Gravel. But there seems to be a
-		major issue with JBoss Gravel when using JBoss Seam fileUpload
-		component in a multipart/form-data h:form.
-	-->
-
 	<navigation-rule>
 		<from-view-id>/upload-odf.xhtml</from-view-id>
 		<navigation-case>
