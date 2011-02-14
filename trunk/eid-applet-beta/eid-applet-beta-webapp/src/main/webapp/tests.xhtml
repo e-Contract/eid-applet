@@ -28,29 +28,6 @@
 			<p><a
 					href="#{facesContext.externalContext.requestContextPath}/authentication.seam">Run the eID Applet Authentication test.</a></p>
 			</rich:panel>
-
-			<rich:panel>
-				<f:facet name="header">eID Applet ODF Signature</f:facet>
-			This test will execute an eID Signature creation using the eID Applet.
-			This test requires you to enter your eID PIN code.
-			The demonstrated signature format is the Open Document Format (ODF).
-			The ODF signature format is also supported by 
-			<a href="http://www.openoffice.org/" target="_blank">OpenOffice.org 3.2</a>.
-			<p><a
-					href="#{facesContext.externalContext.requestContextPath}/upload-odf.seam">Run the eID Applet ODF Signature test.</a></p>
-			</rich:panel>
-
-			<rich:panel>
-				<f:facet name="header">eID Applet OOXML Signature</f:facet>
-			This test will perform an eID Signature creation via the eID Applet.
-			This test requires you to enter your eID PIN code.
-			The demonstrated signature format is Office OpenXML (OOXML).
-			The OOXML signature format is also supported by 
-			<a href="http://office.microsoft.com/" target="_blank">MS-Office
-				2007</a>.
-			<p><a
-					href="#{facesContext.externalContext.requestContextPath}/upload-ooxml.seam">Run the eID Applet OOXML Signature test.</a></p>
-			</rich:panel>
 		</h:panelGrid>
 	</ui:define>
 </ui:composition>

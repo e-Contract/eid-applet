@@ -9,46 +9,6 @@
 	</application>
 
 	<navigation-rule>
-		<from-view-id>/upload-odf.xhtml</from-view-id>
-		<navigation-case>
-			<from-outcome>success</from-outcome>
-			<to-view-id>/view-odf.xhtml</to-view-id>
-		</navigation-case>
-	</navigation-rule>
-
-	<navigation-rule>
-		<from-view-id>/view-odf.xhtml</from-view-id>
-		<navigation-case>
-			<from-outcome>add</from-outcome>
-			<to-view-id>/sign-odf.xhtml</to-view-id>
-		</navigation-case>
-		<navigation-case>
-			<from-outcome>back</from-outcome>
-			<to-view-id>/tests.xhtml</to-view-id>
-		</navigation-case>
-	</navigation-rule>
-
-	<navigation-rule>
-		<from-view-id>/upload-ooxml.xhtml</from-view-id>
-		<navigation-case>
-			<from-outcome>success</from-outcome>
-			<to-view-id>/view-ooxml.xhtml</to-view-id>
-		</navigation-case>
-	</navigation-rule>
-	
-	<navigation-rule>
-		<from-view-id>/view-ooxml.xhtml</from-view-id>
-		<navigation-case>
-			<from-outcome>add</from-outcome>
-			<to-view-id>/sign-ooxml.xhtml</to-view-id>
-		</navigation-case>
-		<navigation-case>
-			<from-outcome>back</from-outcome>
-			<to-view-id>/tests.xhtml</to-view-id>
-		</navigation-case>
-	</navigation-rule>
-
-	<navigation-rule>
 		<from-view-id>/feedback.xhtml</from-view-id>
 		<navigation-case>
 			<from-outcome>success</from-outcome>
