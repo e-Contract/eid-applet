@@ -120,52 +120,6 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>AppletSignatureServiceServlet</servlet-name>
-		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
-		<init-param>
-			<param-name>SignatureService</param-name>
-			<param-value>fedict/eid/applet/beta/SignatureServiceBean</param-value>
-		</init-param>
-		<init-param>
-			<param-name>AuditService</param-name>
-			<param-value>fedict/eid/applet/beta/AuditServiceBean</param-value>
-		</init-param>
-		<init-param>
-			<param-name>SecureClientEnvironmentService</param-name>
-			<param-value>fedict/eid/applet/beta/SecureClientEnvironmentBean</param-value>
-		</init-param>
-		<init-param>
-			<param-name>IncludeCertificates</param-name>
-			<param-value>true</param-value>
-		</init-param>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>AppletSignatureServiceServlet</servlet-name>
-		<url-pattern>/applet-sign-service</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>AppletOOXMLSignatureServiceServlet</servlet-name>
-		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
-		<init-param>
-			<param-name>SignatureService</param-name>
-			<param-value>fedict/eid/applet/beta/OOXMLSignatureServiceBean</param-value>
-		</init-param>
-		<init-param>
-			<param-name>AuditService</param-name>
-			<param-value>fedict/eid/applet/beta/AuditServiceBean</param-value>
-		</init-param>
-		<init-param>
-			<param-name>SecureClientEnvironmentService</param-name>
-			<param-value>fedict/eid/applet/beta/SecureClientEnvironmentBean</param-value>
-		</init-param>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>AppletOOXMLSignatureServiceServlet</servlet-name>
-		<url-pattern>/applet-sign-ooxml-service</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
 		<servlet-name>PhotoServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.PhotoServlet</servlet-class>
 	</servlet>
@@ -199,24 +153,6 @@
 	<servlet-mapping>
 		<servlet-name>VcardServlet</servlet-name>
 		<url-pattern>/identity.vcf</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>ODFDownloadServlet</servlet-name>
-		<servlet-class>be.fedict.eid.applet.beta.webapp.ODFDownloadServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>ODFDownloadServlet</servlet-name>
-		<url-pattern>/odf-download/*</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>OOXMLDownloadServlet</servlet-name>
-		<servlet-class>be.fedict.eid.applet.beta.webapp.OOXMLDownloadServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>OOXMLDownloadServlet</servlet-name>
-		<url-pattern>/ooxml-download/*</url-pattern>
 	</servlet-mapping>
 
 	<!-- eID Applet Administrator -->
@@ -260,9 +196,6 @@
 	<!-- Beta Feedback configuration -->
 	<listener>
 		<listener-class>be.fedict.eid.applet.beta.webapp.SessionContextListener</listener-class>
-	</listener>
-	<listener>
-		<listener-class>be.fedict.eid.applet.beta.webapp.TempFileManagerListener</listener-class>
 	</listener>
 	<session-config>
 		<!-- Increase for production environments -->
