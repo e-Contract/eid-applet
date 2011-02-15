@@ -76,6 +76,7 @@
 							<patches>
 								<patch>jboss-conf-memory.patch</patch>
 								<patch>jvm-gc.patch</patch>
+								<patch>headless.patch</patch>
 								<patch>default-jboss-logging.patch</patch>
 								<patch>all-jboss-logging.patch</patch>
 								<patch>default-jbossweb-ssl.patch</patch>
