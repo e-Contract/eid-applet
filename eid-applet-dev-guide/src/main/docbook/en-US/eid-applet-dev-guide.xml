@@ -9,10 +9,10 @@
 			Integrating the eID Applet within your web applications.
 		</subtitle>
 		<copyright>
-			<year>2008-2010</year>
+			<year>2008-2011</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>18 November 2010</releaseinfo>
+		<releaseinfo>15 February 2011</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -206,6 +206,14 @@
 			revoke the corresponding code signing certificate to guarantee
 			maximal safety of the citizen.
 		</para>
+		<tip>
+			<title>Google Chrome</title>
+			<para>
+				For Google Chrome to be able to load the eID Applet using the
+				Deployment Toolkit Javascript you should host the deployJava.js
+				Javascript locally. 
+			</para>
+		</tip>
 		<para>
 			The available eID Applet parameters are summarized in
 			<xref linkend="table-applet-params" />
@@ -430,13 +438,11 @@
 			<para>
 				For the moment we only fully support Java EE servlet containers
 				out of the box. At the same time this serves as the reference
-				implementation. Depending on the success of the eID Applet SDK, we
-				will also provide backends for other web application frameworks.
-				Although we already have initial support for the ASP.NET web
-				application environment and for the PHP environment we strongly
-				advise to use the eID Identity Provider and eID Digital Signature
-				Service products to integrate eID within ASP.NET and PHP based web
-				applications.
+				implementation. For other web application environments like the
+				ASP.NET web application environment and the PHP environment we
+				strongly advise to use the eID Identity Provider and eID Digital
+				Signature Service products to integrate eID within ASP.NET and PHP
+				based web applications.
 			</para>
 		</note>
 		<tip>
@@ -445,9 +451,10 @@
 				When using web frameworks like JBoss Seam you might stumble on
 				conversation preservation issues because of the redirect executed by
 				the eID Applet at the end of the performed eID operation. When using
-				a conversation scoped JBoss Seam managed bean, you can preserve the
-				conversation across the eID Applet screen flow by adding the
-				following HTTP parameter to the TargetPage applet parameter:
+				a conversation scoped JBoss Seam managed bean (like the built-in
+				redirect component), you can preserve the conversation across the
+				eID Applet screen flow by adding the following HTTP parameter to the
+				TargetPage applet parameter:
 				<code>TargetPage
 					:'your-target-page.seam?conversationId=#{conversation.id}',</code>
 			</para>
@@ -2129,8 +2136,7 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 				and the eID Digital Signature Service. As these products implement
 				services based on open standards like OpenID you already have
 				various implementations available for integrating via these open
-				protocols. Once the eID IdP product has been finalized we will most
-				likely drop the existing proof-of-concept code for ASP.NET and PHP.
+				protocols.
 			</para>
 		</warning>
 		<xi:include href="../../../../target/protocol-messages.xml"
