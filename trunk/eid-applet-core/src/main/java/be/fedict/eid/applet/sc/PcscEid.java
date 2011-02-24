@@ -451,9 +451,16 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		}
 	}
 
-        public boolean isCardStillPresent() throws CardException
-        {
-            return this.cardTerminal.isCardPresent();
+	public boolean isCardStillPresent() throws CardException {
+		return this.cardTerminal.isCardPresent();
+	}
+
+	public void yieldExclusive(boolean yield) throws CardException {
+		if (yield) {
+			getCard().endExclusive();
+		} else {
+			getCard().beginExclusive();
+		}
 	}
 
 	public List<X509Certificate> getAuthnCertificateChain()
@@ -1428,8 +1435,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		try {
 			certificateFactory = CertificateFactory.getInstance("X.509");
 		} catch (CertificateException e) {
-			this.view.addTestResult(DiagnosticTests.EID_READOUT, false, e
-					.getMessage());
+			this.view.addTestResult(DiagnosticTests.EID_READOUT, false,
+					e.getMessage());
 			return null;
 		}
 		int maxProgress = 1; // identity file
