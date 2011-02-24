@@ -79,6 +79,23 @@ public interface PcscEidSpi {
 	void waitForEidPresent() throws Exception;
 
 	/**
+	 * Checks whether the card has been removed. This is a non-blocking version
+	 * of removeCard()
+	 * 
+	 * @throws Exception
+	 */
+	public boolean isCardStillPresent() throws Exception;
+
+	/**
+	 * Gives up exclusive access. Call with true to give up, with false to
+	 * re-grab the exclusive access. May block when called with false and
+	 * another application has a transaction.
+	 * 
+	 * @throws Exception
+	 */
+	public void yieldExclusive(boolean yield) throws Exception;
+
+	/**
 	 * Waits until (some) smart card has been removed from some smart card
 	 * reader.
 	 * 
