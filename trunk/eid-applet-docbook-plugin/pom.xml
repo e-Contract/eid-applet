@@ -3,14 +3,14 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.2.GA</version>
+		<version>1.0.3-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet Docbook Plugin</name>
 	<description>Docbook plugin for eID Applet protocol
 		documentation.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-docbook-plugin</artifactId>
-	<version>1.0.2.GA</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 	<build>
 		<plugins>
