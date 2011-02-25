@@ -1,3 +1,13 @@
+1.0.2.GA - 25 Feb 2011
+	* co-signature signature facet
+	* Office 2010 XAdES-X-L support
+	* identity signature facet
+	* upgrade to JBoss AS 6.0.0.Final
+	* SQL DDL maven plugin
+	* upgrade to Maven 3.0.2
+	* Transfer-Encoding chunked (IIS)
+	* various MW 4 patches (Frank Marien)
+
 1.0.1.GA - 15 Sep 2010
 	* fix: no javadoc for JAXB generated classes
 	* fix for EJBTHREE-2152
