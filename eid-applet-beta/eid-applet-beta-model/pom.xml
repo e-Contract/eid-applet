@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>be.fedict.eid-applet</groupId>
 		<artifactId>eid-applet-beta</artifactId>
-		<version>1.0.2.GA</version>
+		<version>1.0.3-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet Beta Model</name>
 	<description>EJB3 Model for eID Applet Beta Web Application</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-beta-model</artifactId>
-	<version>1.0.2.GA</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<packaging>ejb</packaging>
 	<build>
 		<plugins>
