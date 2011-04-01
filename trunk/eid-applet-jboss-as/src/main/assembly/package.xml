@@ -53,6 +53,9 @@
 				<exclude>lib/endorsed/jbossws-cxf-factories.jar</exclude>
 				<exclude>common/deploy/jbossws-console.war/**</exclude>
 				<exclude>common/lib/cxf-*</exclude>
+				<!-- Hibernate -->
+				<exclude>common/lib/hibernate-core.jar</exclude>
+				<exclude>common/lib/hibernate-entitymanager.jar</exclude>
 				<!-- chmod+x on the UNIX scripts -->
 				<exclude>bin/run.sh</exclude>
 				<exclude>bin/shutdown.sh</exclude>
