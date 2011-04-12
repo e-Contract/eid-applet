@@ -45,6 +45,16 @@ XML on the other hand is the most versatile structure to handle business data.
 
 == Validation ==
 
+This is a very interesting topic. Two approaches are possible here. On is a document-centric approach, the other is a service-centric approach.
+
+In the document-centric approach we expect users to upload/sign/download documents and store them somewhere. As one can imagine such an approach does not integrate very well in a web based workflow.
+Even is people exchange signed documents via mail, we still have to fight the difference in validation implementation by the different desktop tools.
+
+In a service-centric approach we kind of move the document to the background, i.e. the service back-end.
+In general you don't want to bother users with signed documents, they just don't care.
+Users simply want to use automated workflows where creation/validation of digital signatures can be part of.
+The service of course keeps record of the signed documents (in case of a legal dispute later on), but everything -including the signature validation- should be part of the automated workflow as offered by the business web application.
+
 == Service Directive readiness ==
 
 == Long-Term Accessibility ==
