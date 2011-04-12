@@ -33,7 +33,7 @@ On the other hand, I was able to implement XAdES-X-L version 1.4.2 in less than 
 
 == Easy of implementation ==
 
-== Accessibility ==
+== Business Integration ==
 
 == Validation ==
 
@@ -48,3 +48,10 @@ On the other hand, I was able to implement XAdES-X-L version 1.4.2 in less than 
 == Preservation of Visualization ==
 
 == Visualization of Signatures ==
+
+Another interesting subject is the 'human-readable' aspect of a signature.
+There seems to be an interesting mind-twist that some play very handy: they claim that PDF is more human-readable than XML.
+I noticed the same mind-twist when working on the TSL.
+There I also witnessed the fact that people think of PDF as being human-readable, while XML is being machine-readable.
+However, when you open a XAdES-X-L signed XML file in notepad, and you do the same for PDF, all of the sudden it becomes very quite in the room.
+In my view PDF is not human-readable, the output of a PDF reader is human-readable, but the PDF format itself carries some serious vendor locking risk.
