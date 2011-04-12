@@ -39,6 +39,10 @@ As a matter of fact, all commodity office document formats (ODF/OpenOffice and O
 
 == Business Integration ==
 
+Allowing a business to define its own XML schema according to the workflow that needs to be implemented gives maximum freedom of choice.
+Of course, PDF also allows for embedding XML fragments, but adding/extracting this XML data often required using proprietary products.
+XML on the other hand is the most versatile structure to handle business data.
+
 == Validation ==
 
 == Service Directive readiness ==
