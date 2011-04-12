@@ -21,7 +21,13 @@ This document will guide you through the various options you have for integratin
 
 == Open Standard ==
 
-Everything is an open standard these days, so this argument becomes irrelevant somehow.
+Since nowadays everything is an 'open standard' maybe we should revise the definition of 'open'.
+'Open' should not only mean publishing your specifications online somewhere and have a standardization body ratify this.
+'Open' should also include the ability for developers to implement the standard.
+And this is where PDF signatures totally fail. It is nearly impossible for one to implement PDF signatures using open source libraries.
+Especially since iText recently changed its license model preventing commercial usage of their library.
+On the other hand, I was able to implement XAdES-X-L version 1.4.2 in less than a week as part of our eID Digital Signature Service product.
+
 
 == Data Format ==
 
