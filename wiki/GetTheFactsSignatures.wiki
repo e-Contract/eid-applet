@@ -31,6 +31,10 @@ On the other hand, I was able to implement XAdES-X-L version 1.4.2 in less than 
 
 == Data Format ==
 
+When you choose for PAdES signatures, you are forces to use PDF as data container. Of course PDF can embed other data formats, but accessing this data often requires proprietary products.
+For XAdES on the other hand you can choose whatever data format you want to.
+As a matter of fact, all commodity office document formats (ODF/OpenOffice and OOXML/Microsoft Office) offer native support for XML signatures (and thus allow for XAdES).
+
 == Easy of implementation ==
 
 == Business Integration ==
