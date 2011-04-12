@@ -8,14 +8,14 @@ This document will guide you through the various options you have for integratin
 || *Aspect* || *PDF signatures* || *XML signatures* ||
 || Open Standard || yes || yes ||
 || Data Format || PDF || whatever you want it to be ||
-|| Easy of implementation || limited choice: iText or via Adobe Lifecycle products || lightweight via various open source solutions ||
-|| Accessibility || almost forced using Adobe products to extract data || you can define your own XML schema according to your business needs ||
-|| Validation || Adobe specific as people will want valid signatures in Acrobat Reader || under your own control ||
+|| Easy of implementation || limited choice: iText or via proprietary products || lightweight via various open source solutions ||
+|| Business Integration || almost forced using proprietary products to extract data || you can define your own XML schema according to your business needs ||
+|| Validation || proprietary product specific as people will want valid signatures in Acrobat Reader || under your own control ||
 || Service Directive readiness || PAdES is premature || XAdES is a proven standard that has been implemented in various open source projects ||
 || Long-Term Accessibility || your PDFs just might survive the Adobe products || no matter how the IT landscape changes, there will always be some notepad ||
 || Long-Term Signature Validity || PAdES is premature, so is PAdES-A || XAdES-A has proven implementations (ETSI XAdES plugtests) ||
 || Risk for Vendor lock-in || high. What if Adobe decides to charge for the Reader? || low. XML parsers are all over the place ||
-|| Preservation of Visualization || PDF/A is cool. But what if the Reader is buggy? || via XSLT to HTML will always work ||
+|| Preservation of Visualization || PDF/A is cool. But what if the proprietary product is buggy? || via XSLT to HTML will always work ||
 || Visualization of Signatures || PDF has this feature. Is human interpretation this important? || the business application should handle this aspect ||
 
 
