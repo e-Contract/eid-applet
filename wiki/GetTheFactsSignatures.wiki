@@ -21,26 +21,31 @@ This document will guide you through the various options you have for integratin
 
 == Open Standard ==
 
-Since nowadays everything is an 'open standard' maybe we should revise the definition of 'open'.
 'Open' should not only mean publishing your specifications online somewhere and have a standardization body ratify this.
-'Open' should also include the ability for developers to implement the standard.
-And this is where PDF signatures totally fail. It is nearly impossible for one to implement PDF signatures using open source libraries.
-Especially since iText recently changed its license model preventing commercial usage of their library.
-On the other hand, I was able to implement XAdES-X-L version 1.4.2 in less than a week as part of our eID Digital Signature Service product.
+'Open' should also include the ability for developers to implement the standard on multiple platforms.
+
+And this is where PDF signatures fail. It is very hard for one to implement PDF signatures using open source libraries.
+Especially since iText changed its license model to AGPL, limiting the  usage of the library (a commercial version is available however)
+
+On the other hand, I (Frank) was able to implement XAdES-X-L version 1.4.2 in less than a week as part of our open source eID Digital Signature Service product.
 
 
 == Data Format ==
 
-When you choose for PAdES signatures, you are forces to use PDF as data container. Of course PDF can embed other data formats, but accessing this data often requires proprietary products.
-For XAdES on the other hand you can choose whatever data format you want to.
-As a matter of fact, all commodity office document formats (ODF/OpenOffice and OOXML/Microsoft Office) offer native support for XML signatures (and thus allow for XAdES).
+When you choose for PAdES signatures, you are forced to use PDF as data container. Of course PDF can embed other data formats, but accessing this data often requires proprietary products and/or additional tooling.
 
-== Easy of implementation ==
+XAdES is of course very well suited for XML-based formats, but can also handle binary files including (but not limited to) PDF.
+Commodity office document formats  like ODF and OOXML (Microsoft Office, OpenOffice.org etc) offer native support for XML signatures, and thus allow for XAdES although not all products implement this feature.
+
+
+== Ease of implementation ==
 
 == Business Integration ==
 
-Allowing a business to define its own XML schema according to the workflow that needs to be implemented gives maximum freedom of choice.
-Of course, PDF also allows for embedding XML fragments, but adding/extracting this XML data often required using proprietary products.
+Allowing a business to define its own XML schema according to the workflow that needs to be implemented, gives maximum freedom of choice.
+
+Of course, PDF also allows for embedding XML fragments, but adding/extracting this XML data often requires using additional tooling: most PDF-products aren't designed for handling XML, and XML tools are not used to deal with PDF.
+
 XML on the other hand is the most versatile structure to handle business data.
 
 == Validation ==
@@ -48,12 +53,12 @@ XML on the other hand is the most versatile structure to handle business data.
 This is a very interesting topic. Two approaches are possible here. On is a document-centric approach, the other is a service-centric approach.
 
 In the document-centric approach we expect users to upload/sign/download documents and store them somewhere. As one can imagine such an approach does not integrate very well in a web based workflow.
-Even is people exchange signed documents via mail, we still have to fight the difference in validation implementation by the different desktop tools.
+Even if people exchange signed documents by mail, we still have to fight the difference in validation implementation by the different desktop tools.
 
-In a service-centric approach we kind of move the document to the background, i.e. the service back-end.
+In a service-centric approach, we sort of move the document to the background, i.e. the service back-end.
 In general you don't want to bother users with signed documents, they just don't care.
-Users simply want to use automated workflows where creation/validation of digital signatures can be part of.
-The service of course keeps record of the signed documents (in case of a legal dispute later on), but everything -including the signature validation- should be part of the automated workflow as offered by the business web application.
+Users simply want to use automated workflows, and the creation/validation of digital signatures can be part of.
+The service of course keeps record of the signed documents (in case a legal dispute should arise in the future), but everything -including the signature validation- should be part of the automated workflow as offered by the business web application.
 
 == Service Directive readiness ==
 
@@ -68,8 +73,8 @@ The service of course keeps record of the signed documents (in case of a legal d
 == Visualization of Signatures ==
 
 Another interesting subject is the 'human-readable' aspect of a signature.
-There seems to be an interesting mind-twist that some play very handy: they claim that PDF is more human-readable than XML.
-I noticed the same mind-twist when working on the TSL.
-There I also witnessed the fact that people think of PDF as being human-readable, while XML is being machine-readable.
-However, when you open a XAdES-X-L signed XML file in notepad, and you do the same for PDF, all of the sudden it becomes very quite in the room.
+There seems to be an interesting mind-twist: some say that PDF is more human-readable than XML. I noticed the same mind-twist when working on the TSL. There I also witnessed the fact that people think of PDF as being human-readable, while XML is being machine-readable.
+
+However, when you open a XAdES-X-L signed XML file in notepad, and you do the same for PDF, the XML version is actually easier to read than the PDF version.
+
 In my view PDF is not human-readable, the output of a PDF reader is human-readable, but the PDF format itself carries some serious vendor locking risk.
