@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.3.Beta2</version>
+		<version>1.0.3-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet SDK</name>
 	<description>SDK for the eID applet.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-sdk</artifactId>
-	<version>1.0.3.Beta2</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<build>
 		<plugins>
