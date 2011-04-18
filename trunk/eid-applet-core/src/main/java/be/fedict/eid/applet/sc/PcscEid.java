@@ -132,6 +132,29 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		this.locale = messages.getLocale();
 	}
 
+	/**
+	 * Finds .so.version file on GNU/Linux. avoid guessing all GNU/Linux
+	 * distros' library path configurations on 32 and 64-bit when working around
+	 * the buggy libj2pcsc.so implementation based on JRE implementations adding
+	 * the native library paths to the end of java.library.path
+	 */
+	private static File findLinuxNativeLibrary(String baseName, int version) {
+		String nativeLibraryPaths = System.getProperty("java.library.path");
+		if (nativeLibraryPaths == null) {
+			return null;
+		}
+
+		String libFileName = System.mapLibraryName(baseName) + "." + version;
+		for (String nativeLibraryPath : nativeLibraryPaths.split(":")) {
+			File libraryFile = new File(nativeLibraryPath, libFileName);
+			if (libraryFile.exists()) {
+				return libraryFile;
+			}
+		}
+
+		return null;
+	}
+
 	private void linuxPcscliteLibraryConfig() {
 		String osName = System.getProperty("os.name");
 		if (osName.startsWith("Linux")) {
@@ -143,21 +166,25 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			 * 
 			 * See also: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=529339
 			 */
-			File libPcscLite = new File("/usr/lib/libpcsclite.so.1");
-			if (libPcscLite.exists()) {
+
+			this.view
+					.addDetailMessage("[libj2pcsc.so workaround] Workaround for developer-only libj2pcsc.so on GNU/Linux Platforms enabled..");
+
+			File libPcscLite = findLinuxNativeLibrary("pcsclite", 1);
+			if (libPcscLite != null) {
+				this.view
+						.addDetailMessage("[libj2pcsc.so workaround] pcsclite found. Adjusting sun.security.smartcardio.library to ["
+								+ libPcscLite.getAbsolutePath() + "]");
 				System.setProperty("sun.security.smartcardio.library",
 						libPcscLite.getAbsolutePath());
-			}
-			/*
-			 * Workaround for Ubuntu 9.10.
-			 * 
-			 * See also:
-			 * https://bugs.launchpad.net/ubuntu/+source/pcsc-lite/+bug/378294
-			 */
-			libPcscLite = new File("/lib/libpcsclite.so.1");
-			if (libPcscLite.exists()) {
-				System.setProperty("sun.security.smartcardio.library",
-						libPcscLite.getAbsolutePath());
+			} else {
+				this.view
+						.addDetailMessage("[libj2pcsc.so workaround] failed to find pcsclite.");
+				String pathSought = System.getProperty("java.library.path");
+				this.view
+						.addDetailMessage("[libj2pcsc.so workaround] java.library.path=["
+								+ (pathSought != null ? pathSought : "null")
+								+ "]");
 			}
 		}
 	}
