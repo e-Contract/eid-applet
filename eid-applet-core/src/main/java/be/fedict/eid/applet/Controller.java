@@ -201,9 +201,18 @@ public class Controller {
 		this.protocolStateMachine.checkRequestMessage(message);
 
 		String userAgent = this.runtime.getParameter("UserAgent");
+		boolean noChunkedTransferEncoding = false;
+		String noChunkedTransferEncodingParam = this.runtime
+				.getParameter("NoChunkedTransferEncoding");
+		if (null != noChunkedTransferEncodingParam) {
+			noChunkedTransferEncoding = Boolean
+					.parseBoolean(noChunkedTransferEncodingParam);
+			addDetailMessage("no chunked transfer-encoding: "
+					+ noChunkedTransferEncoding);
+		}
 		HttpURLConnection connection = getServerConnection();
 		HttpURLConnectionHttpTransmitter httpTransmitter = new HttpURLConnectionHttpTransmitter(
-				connection, userAgent);
+				connection, userAgent, noChunkedTransferEncoding);
 		Transport.transfer(message, httpTransmitter);
 		int responseCode = connection.getResponseCode();
 		if (HttpURLConnection.HTTP_OK != responseCode) {
@@ -539,8 +548,8 @@ public class Controller {
 		} catch (ClassNotFoundException e) {
 			addDetailMessage("JSObject class not found");
 			addDetailMessage("not running inside a browser?");
-			this.view.addTestResult(DiagnosticTests.BROWSER, false, e
-					.getMessage());
+			this.view.addTestResult(DiagnosticTests.BROWSER, false,
+					e.getMessage());
 			return;
 		}
 		try {
@@ -548,18 +557,18 @@ public class Controller {
 					new Class<?>[] { java.applet.Applet.class });
 			Method getMemberMethod = jsObjectClass.getMethod("getMember",
 					new Class<?>[] { String.class });
-			Object windowJSObject = getWindowMethod.invoke(null, this.runtime
-					.getApplet());
+			Object windowJSObject = getWindowMethod.invoke(null,
+					this.runtime.getApplet());
 			Object navigatorJSObject = getMemberMethod.invoke(windowJSObject,
 					"navigator");
 			Object userAgent = getMemberMethod.invoke(navigatorJSObject,
 					"userAgent");
 			addDetailMessage("user agent: " + userAgent);
-			this.view.addTestResult(DiagnosticTests.BROWSER, true, userAgent
-					.toString());
+			this.view.addTestResult(DiagnosticTests.BROWSER, true,
+					userAgent.toString());
 		} catch (Exception e) {
-			this.view.addTestResult(DiagnosticTests.BROWSER, false, e
-					.getMessage());
+			this.view.addTestResult(DiagnosticTests.BROWSER, false,
+					e.getMessage());
 			return;
 		}
 	}
@@ -580,8 +589,8 @@ public class Controller {
 		} catch (Exception e) {
 			this.view.addDetailMessage("error loading MSCAPI keystore: "
 					+ e.getMessage());
-			this.view.addTestResult(DiagnosticTests.MSCAPI, false, e
-					.getMessage());
+			this.view.addTestResult(DiagnosticTests.MSCAPI, false,
+					e.getMessage());
 			return;
 		}
 		String eIDSubjectName = null;
@@ -594,8 +603,8 @@ public class Controller {
 			} catch (KeyStoreException e) {
 				this.view.addDetailMessage("error loading MSCAPI certificate: "
 						+ e.getMessage());
-				this.view.addTestResult(DiagnosticTests.MSCAPI, false, e
-						.getMessage());
+				this.view.addTestResult(DiagnosticTests.MSCAPI, false,
+						e.getMessage());
 				return;
 			}
 
@@ -786,8 +795,8 @@ public class Controller {
 			}
 			Method getWindowMethod = jsObjectClass.getMethod("getWindow",
 					new Class<?>[] { java.applet.Applet.class });
-			Object jsObject = getWindowMethod.invoke(null, this.runtime
-					.getApplet());
+			Object jsObject = getWindowMethod.invoke(null,
+					this.runtime.getApplet());
 			Method callMethod = jsObjectClass.getMethod("call", new Class<?>[] {
 					String.class, Class.forName("[Ljava.lang.Object;") });
 			String removeCardCallback = this.runtime
@@ -969,12 +978,12 @@ public class Controller {
 			 * description. Also showing the digest value is pointless.
 			 */
 			// TODO DRY refactoring
-			int response = JOptionPane.showConfirmDialog(this
-					.getParentComponent(), "OK to sign \""
-					+ signRequestMessage.description + "\"?\n"
-					+ "Signature algorithm: " + signRequestMessage.digestAlgo
-					+ " with RSA", "Signature creation",
-					JOptionPane.YES_NO_OPTION);
+			int response = JOptionPane.showConfirmDialog(
+					this.getParentComponent(), "OK to sign \""
+							+ signRequestMessage.description + "\"?\n"
+							+ "Signature algorithm: "
+							+ signRequestMessage.digestAlgo + " with RSA",
+					"Signature creation", JOptionPane.YES_NO_OPTION);
 			// TODO i18n
 			if (JOptionPane.OK_OPTION != response) {
 				throw new SecurityException("sign operation aborted");
@@ -1025,12 +1034,12 @@ public class Controller {
 			 * description. Also showing the digest value is pointless.
 			 */
 			// TODO DRY refactoring
-			int response = JOptionPane.showConfirmDialog(this
-					.getParentComponent(), "OK to sign \""
-					+ signRequestMessage.description + "\"?\n"
-					+ "Signature algorithm: " + signRequestMessage.digestAlgo
-					+ " with RSA", "Signature creation",
-					JOptionPane.YES_NO_OPTION);
+			int response = JOptionPane.showConfirmDialog(
+					this.getParentComponent(), "OK to sign \""
+							+ signRequestMessage.description + "\"?\n"
+							+ "Signature algorithm: "
+							+ signRequestMessage.digestAlgo + " with RSA",
+					"Signature creation", JOptionPane.YES_NO_OPTION);
 			// TODO i18n
 			if (JOptionPane.OK_OPTION != response) {
 				throw new SecurityException("sign operation aborted");

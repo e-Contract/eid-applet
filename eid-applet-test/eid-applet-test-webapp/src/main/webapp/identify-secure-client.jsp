@@ -21,7 +21,8 @@
 		Language : 'nl',
 		NavigatorUserAgent : navigator.userAgent,
 		NavigatorAppName : navigator.appName,
-		NavigatorAppVersion : navigator.appVersion
+		NavigatorAppVersion : navigator.appVersion,
+		NoChunkedTransferEncoding : 'true'
 	};
 	var version = '1.6';
 	deployJava.runApplet(attributes, parameters, version);

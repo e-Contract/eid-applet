@@ -35,21 +35,29 @@ public class HttpURLConnectionHttpTransmitter implements HttpTransmitter {
 
 	private final HttpURLConnection connection;
 
+	private final boolean noChunkedTransferEncoding;
+
 	/**
 	 * Main constructor.
 	 * 
 	 * @param connection
 	 * @param userAgent
 	 *            the optional User-Agent value.
+	 * @param noChunkedTransferEncoding
+	 *            set to <code>true</code> to disable chunked transfer-encoding.
 	 */
 	public HttpURLConnectionHttpTransmitter(HttpURLConnection connection,
-			String userAgent) {
+			String userAgent, boolean noChunkedTransferEncoding) {
 		this.connection = connection;
+		this.noChunkedTransferEncoding = noChunkedTransferEncoding;
+
 		this.connection.setUseCaches(false);
 		this.connection.setAllowUserInteraction(false);
 		this.connection.setRequestProperty("Content-Type",
 				"application/octet-stream");
-		this.connection.setChunkedStreamingMode(1);
+		if (false == this.noChunkedTransferEncoding) {
+			this.connection.setChunkedStreamingMode(1);
+		}
 		this.connection.setDoInput(true);
 		this.connection.setDoOutput(true);
 		try {
@@ -69,7 +77,9 @@ public class HttpURLConnectionHttpTransmitter implements HttpTransmitter {
 	public void setBody(byte[] bodyValue) {
 		OutputStream connectionOutputStream;
 		try {
-			this.connection.setChunkedStreamingMode(bodyValue.length);
+			if (false == this.noChunkedTransferEncoding) {
+				this.connection.setChunkedStreamingMode(bodyValue.length);
+			}
 			connectionOutputStream = this.connection.getOutputStream();
 			connectionOutputStream.write(bodyValue);
 			connectionOutputStream.close();

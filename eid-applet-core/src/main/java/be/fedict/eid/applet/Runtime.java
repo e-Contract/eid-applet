@@ -36,6 +36,16 @@ public interface Runtime {
 
 	URL getDocumentBase();
 
+	/**
+	 * Gives back the parameter value for the given parameter name. Will map to
+	 * the applet runtime parameters as set within the web browser where this
+	 * applet is being run.
+	 * 
+	 * @param name
+	 *            the name of the parameter.
+	 * @return the value of the parameter, or <code>null</code> if not
+	 *         available.
+	 */
 	String getParameter(String name);
 
 	Applet getApplet();

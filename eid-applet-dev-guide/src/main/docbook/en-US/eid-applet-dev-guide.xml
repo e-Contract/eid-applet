@@ -12,7 +12,7 @@
 			<year>2008-2011</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>25 February 2011</releaseinfo>
+		<releaseinfo>18 April 2011</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -369,6 +369,18 @@
 							the
 							<code>jcontrol</code>
 							JVM tool.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<code>NoChunkedTransferEncoding</code>
+						</entry>
+						<entry>optional</entry>
+						<entry>
+							When this parameter is set to
+							<code>true</code>
+							the eID Applet will not used chunked transfer-encoding when
+							communicating with the eID Applet Service component.
 						</entry>
 					</row>
 				</tbody>
