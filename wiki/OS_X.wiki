@@ -17,7 +17,7 @@ The ccid driver on this version is only compiled for running in 32 bit mode and 
 eid authentication and identification of the applet should work out of the box as 3.6 is a 32 bit browser.
 eid 
 
-*Firefox 4*
+*Firefox 4* and *Chrome 10*
 
 Will not work for any operation as this is a 64 bit browser. This can be resolved with following "Java Preferences" settings:
   * Run applets: In their own process
