@@ -7,5 +7,5 @@
   * Specifications
     * [CardAuthentication eID Card Authentication]
     * [SmartCardReader eID Smart Card Reader]
-  * [ OS_X OS_X ]
+  * [OS_X OS_X]
   * [References References]
