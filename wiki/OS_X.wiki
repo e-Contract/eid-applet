@@ -23,4 +23,7 @@ Will not work for any operation as this is a 64 bit browser. This can be resolve
   * Run applets: In their own process
   * Java SE6 32bit on top of 64bit in ordering
 
+http://eid-applet.googlecode.com/svn/wiki/images/ff4.png
+
+
 Using this setting should allow for all operations to work.
