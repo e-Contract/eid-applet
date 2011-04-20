@@ -1,8 +1,9 @@
 #summary An overview of the eid-applet on Mac OS X
+#sidebar TableOfContents
 
 = Introduction =
 
-OS X and Java have never been a good mariage. This page tries to help Apple users in getting their environment ok for OS X. 
+OS X and Java have never been a good marriage. This page tries to help Apple users in getting their environment ok for OS X. 
 
 = Details =
 
