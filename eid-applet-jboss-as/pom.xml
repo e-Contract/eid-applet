@@ -81,6 +81,8 @@
 								<patch>all-jboss-logging.patch</patch>
 								<patch>default-jbossweb-ssl.patch</patch>
 								<patch>all-jbossweb-ssl.patch</patch>
+								<patch>default-jbossweb-utf8.patch</patch>
+								<patch>all-jbossweb-utf8.patch</patch>
 								<patch>default-jaxws-ri-switchboard.patch</patch>
 								<patch>all-jaxws-ri-switchboard.patch</patch>
 							</patches>
