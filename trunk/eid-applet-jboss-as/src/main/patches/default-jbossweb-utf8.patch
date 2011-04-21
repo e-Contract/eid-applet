@@ -1,0 +1,20 @@
+--- server/default/deploy/jbossweb.sar/server.xml.orig	2011-04-21 10:13:32.651343066 +0200
++++ server/default/deploy/jbossweb.sar/server.xml	2011-04-21 10:19:16.359337226 +0200
+@@ -10,7 +10,7 @@
+ 
+       <!-- A HTTP/1.1 Connector on port 8080 -->
+       <Connector protocol="HTTP/1.1" port="${jboss.web.http.port}" address="${jboss.bind.address}" 
+-         redirectPort="${jboss.web.https.port}" />
++         redirectPort="${jboss.web.https.port}" URIEncoding="UTF-8" />
+ 
+       <!-- Add this option to the connector to avoid problems with 
+           .NET clients that don't implement HTTP/1.1 correctly 
+@@ -32,7 +32,7 @@
+            port="${jboss.web.https.port}" address="${jboss.bind.address}"
+            scheme="https" secure="true" clientAuth="false" 
+            keystoreFile="${jboss.home.dir}/common/ssl.p12"
+-           keystorePass="secret" keystoreType="PKCS12" sslProtocol = "TLS" />
++           keystorePass="secret" keystoreType="PKCS12" sslProtocol = "TLS" URIEncoding="UTF-8"/>
+ 
+       <Engine name="jboss.web" defaultHost="localhost">
+ 
