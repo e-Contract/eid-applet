@@ -15,10 +15,9 @@ The ccid driver on this version is only compiled for running in 32 bit mode and 
 
 *Firefox 3.6*
 
-eid authentication and identification of the applet should work out of the box as 3.6 is a 32 bit browser.
-eid 
+eid authentication and identification of the applet should work out of the box as 3.6 is a 32 bit browser. 
 
-*Firefox 4* and *Chrome 10*
+*Firefox 4* and *Chrome 10 and *Safari 5*
 
 Will not work for any operation as this is a 64 bit browser. This can be resolved with following "Java Preferences" settings:
   * Run applets: In their own process
@@ -26,5 +25,7 @@ Will not work for any operation as this is a 64 bit browser. This can be resolve
 
 http://eid-applet.googlecode.com/svn/wiki/images/ff4.png
 
-
 Using this setting should allow for all operations to work.
+
+Note that their are some display issues, mainly on Firefox and Chrome where the progressbar of the applet is flickeing heavily, work is in progress on resolving this.
+Also when using the sign operation, a dialog from the eid middleware will not disappear after the sign operation has finished. This does not cause any failure on that or future signing operations.
