@@ -52,6 +52,7 @@
   * http://www.foo.be/eID/opensc-belgium/
   * [http://code.google.com/p/seek-for-android/ eID on Android]
   * [https://dofi.ibz.be/nl/elek%20vreemdelingenkaarten/faq%20en.pdf Electronic Foreigner Cards - Questions and Answers]
+  * [http://www.ibz.rrn.fgov.be/fileadmin/user_upload/CI/eID/5%20aspects%20techniques/nl/format%20des%20dates/formaat_van_de_datums_04042006.pdf Date of Birth]
 
 
 == Legal ==
