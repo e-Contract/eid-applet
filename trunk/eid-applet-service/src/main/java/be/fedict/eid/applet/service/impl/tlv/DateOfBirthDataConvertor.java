@@ -50,15 +50,31 @@ public class DateOfBirthDataConvertor implements
 			// german card
 			spaceIdx = dateOfBirthStr.indexOf('.');
 		}
-		String dayStr = dateOfBirthStr.substring(0, spaceIdx);
-		int day = Integer.parseInt(dayStr);
-		String monthStr = dateOfBirthStr.substring(spaceIdx + 1, dateOfBirthStr
-				.length() - 4 - 1);
-		String yearStr = dateOfBirthStr.substring(dateOfBirthStr.length() - 4);
-		int year = Integer.parseInt(yearStr);
-		int month = toMonth(monthStr);
-		GregorianCalendar calendar = new GregorianCalendar(year, month, day);
-		return calendar;
+
+		if (spaceIdx > 0) {
+			String dayStr = dateOfBirthStr.substring(0, spaceIdx);
+			int day = Integer.parseInt(dayStr);
+			String monthStr = dateOfBirthStr.substring(spaceIdx + 1,
+					dateOfBirthStr.length() - 4 - 1);
+			String yearStr = dateOfBirthStr
+					.substring(dateOfBirthStr.length() - 4);
+			int year = Integer.parseInt(yearStr);
+			int month = toMonth(monthStr);
+			return new GregorianCalendar(year, month, day);
+		}
+
+		if (dateOfBirthStr.length() == 4) {
+			/*
+			 * "case II2b2". Only a birth year is given
+			 * 
+			 * there's no way of representing "missing" fields via
+			 * GregorianCalendar, so we set Jan 1st
+			 */
+			return new GregorianCalendar(Integer.parseInt(dateOfBirthStr), 0, 1);
+		}
+
+		throw new DataConvertorException("Unsupported Birth Date Format ["
+				+ dateOfBirthStr + "]");
 	}
 
 	private static final String[][] MONTHS = new String[][] {
