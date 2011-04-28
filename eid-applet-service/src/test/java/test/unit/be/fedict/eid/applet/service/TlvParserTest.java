@@ -24,6 +24,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -42,6 +43,7 @@ import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.SpecialStatus;
 import be.fedict.eid.applet.service.impl.tlv.TlvField;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
+import java.util.Calendar;
 
 public class TlvParserTest {
 
@@ -205,6 +207,51 @@ public class TlvParserTest {
 		assertEquals("2000", address.zip);
 		LOG.debug("municipality: " + address.municipality);
 		assertEquals("Antwerpen", address.municipality);
+	}
+
+	@Test
+	public void testYearOnlyDate() throws Exception {
+		byte[] yearOnlyTLV = new byte[] { 12, 4, '1', '9', '8', '4' };
+		Identity identity = TlvParser.parse(yearOnlyTLV, Identity.class);
+		assertEquals(1984, identity.getDateOfBirth().get(Calendar.YEAR));
+	}
+
+	@Test
+	public void testInvalidDateTruncatedYear() throws Exception {
+		byte[] yearOnlyTLV = new byte[] { 12, 3, '9', '8', '4' };
+
+		try {
+			TlvParser.parse(yearOnlyTLV, Identity.class);
+			fail("Parser failed to throw exception at invalid date");
+		} catch (RuntimeException rte) {
+			// expected
+		}
+	}
+
+	@Test
+	public void testInvalidDateUnknownMonth() throws Exception {
+		byte[] yearOnlyTLV = new byte[] { 12, 12, '2', '0', ' ', 'J', 'U', 'N',
+				'O', ' ', '1', '9', '6', '4' };
+
+		try {
+			TlvParser.parse(yearOnlyTLV, Identity.class);
+			fail("Parser failed to throw exception at invalid month");
+		} catch (RuntimeException rte) {
+			// expected
+		}
+	}
+
+	@Test
+	public void testInvalidDateMissingDayOfMonth() throws Exception {
+		byte[] yearOnlyTLV = new byte[] { 12, 8, 'S', 'E', 'P', ' ', '1', '9',
+				'6', '4' };
+
+		try {
+			TlvParser.parse(yearOnlyTLV, Identity.class);
+			fail("Parser failed to throw exception at missing day of month");
+		} catch (RuntimeException rte) {
+			// expected
+		}
 	}
 
 	public static class LargeField {
