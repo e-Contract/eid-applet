@@ -27,5 +27,10 @@ http://eid-applet.googlecode.com/svn/wiki/images/ff4.png
 
 Using this setting should allow for all operations to work.
 
-Note that their are some display issues, mainly on Firefox and Chrome where the progressbar of the applet is flickeing heavily, work is in progress on resolving this.
-Also when using the sign operation, a dialog from the eid middleware will not disappear after the sign operation has finished. This does not cause any failure on that or future signing operations.
+*Known Issues*
+
+Some display issues like progressbar flickering exist on non-webkit browsers (Firefox, Chrome ) at the moment.  This due to the latest Java update which is using the new Java Browser Plugin 2 which still has alot of bugs. WebKit browsers like Safari and Opera do not have these issues as they are using a custom java plugin, built by Apple.
+Some info regarding these issues can be found at:
+[https://discussions.apple.com/message/13296008?messageID=13296008%25EF%25BF%25BD Apple/Java Discussion]
+
+When using the sign operation, a dialog from the eid middleware will not disappear after the sign operation has finished. This does not cause any failure on that or future signing operations. Work is in progress on this issue and can be found [http://code.google.com/p/eid-mw/issues/detail?id=65 here]
