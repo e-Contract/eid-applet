@@ -34,3 +34,9 @@ Some info regarding these issues can be found at:
 [https://discussions.apple.com/message/13296008?messageID=13296008%25EF%25BF%25BD Apple/Java Discussion]
 
 When using the sign operation, a dialog from the eid middleware will not disappear after the sign operation has finished. This does not cause any failure on that or future signing operations. Work is in progress on this issue and can be found [http://code.google.com/p/eid-mw/issues/detail?id=65 here]
+
+
+=== Java 1.6.0_25-b06-361 ===
+
+This (currently only in developer preview) update has fixed a lot of issues for the Plugin2 Java Browser Plugin, like the flickering issues on non-webkit browsers.
+The preview can be found at: https://connect.apple.com/cgi-bin/WebObjects/MemberSite.woa/wa/getSoftware?bundleID=20809
