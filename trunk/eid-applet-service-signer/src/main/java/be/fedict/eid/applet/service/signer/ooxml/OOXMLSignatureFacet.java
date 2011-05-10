@@ -95,14 +95,15 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 
 	private static final Log LOG = LogFactory.getLog(OOXMLSignatureFacet.class);
 
+	public static final String OOXML_DIGSIG_NS = "http://schemas.openxmlformats.org/package/2006/digital-signature";
+	public static final String OFFICE_DIGSIG_NS = "http://schemas.microsoft.com/office/2006/digsig";
+
 	private final AbstractOOXMLSignatureService signatureService;
 
 	private final Clock clock;
 
 	/**
 	 * Main constructor.
-	 * 
-	 * @param ooxmlUrl
 	 */
 	public OOXMLSignatureFacet(AbstractOOXMLSignatureService signatureService) {
 		this(signatureService, new LocalClock());
@@ -110,8 +111,6 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 
 	/**
 	 * Main constructor.
-	 * 
-	 * @param ooxmlUrl
 	 */
 	public OOXMLSignatureFacet(AbstractOOXMLSignatureService signatureService,
 			Clock clock) {
@@ -166,96 +165,11 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 			throw new RuntimeException("error: " + e.getMessage(), e);
 		}
 
-		/*
-		 * Word
-		 */
-		addParts(
-				signatureFactory,
-				"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml",
-				manifestReferences);
-		addParts(
-				signatureFactory,
-				"application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml",
-				manifestReferences);
-		addParts(
-				signatureFactory,
-				"application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml",
-				manifestReferences);
-		addParts(
-				signatureFactory,
-				"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml",
-				manifestReferences);
-		addParts(signatureFactory,
-				"application/vnd.openxmlformats-officedocument.theme+xml",
-				manifestReferences);
-		addParts(
-				signatureFactory,
-				"application/vnd.openxmlformats-officedocument.wordprocessingml.webSettings+xml",
-				manifestReferences);
-		/*
-		 * Word 2010
-		 */
-		addParts(signatureFactory,
-				"application/vnd.ms-word.stylesWithEffects+xml",
-				manifestReferences);
+		for (String contentType : contentTypes) {
+			addParts(signatureFactory, contentType, manifestReferences);
+		}
 
-		/*
-		 * Excel
-		 */
-		addParts(
-				signatureFactory,
-				"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml",
-				manifestReferences);
-		addParts(
-				signatureFactory,
-				"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml",
-				manifestReferences);
-		addParts(
-				signatureFactory,
-				"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml",
-				manifestReferences);
-		addParts(
-				signatureFactory,
-				"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml",
-				manifestReferences);
-
-		/*
-		 * Powerpoint
-		 */
-		addParts(
-				signatureFactory,
-				"application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml",
-				manifestReferences);
-		addParts(
-				signatureFactory,
-				"application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml",
-				manifestReferences);
-		addParts(
-				signatureFactory,
-				"application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml",
-				manifestReferences);
-		addParts(
-				signatureFactory,
-				"application/vnd.openxmlformats-officedocument.presentationml.slide+xml",
-				manifestReferences);
-		addParts(
-				signatureFactory,
-				"application/vnd.openxmlformats-officedocument.presentationml.tableStyles+xml",
-				manifestReferences);
-		/*
-		 * Powerpoint 2010
-		 */
-		addParts(
-				signatureFactory,
-				"application/vnd.openxmlformats-officedocument.presentationml.viewProps+xml",
-				manifestReferences);
-		addParts(
-				signatureFactory,
-				"application/vnd.openxmlformats-officedocument.presentationml.presProps+xml",
-				manifestReferences);
-
-		Manifest manifest = signatureFactory.newManifest(manifestReferences);
-		return manifest;
+		return signatureFactory.newManifest(manifestReferences);
 	}
 
 	private void addSignatureTime(XMLSignatureFactory signatureFactory,
@@ -264,23 +178,16 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 		/*
 		 * SignatureTime
 		 */
-		Element signatureTimeElement = document
-				.createElementNS(
-						"http://schemas.openxmlformats.org/package/2006/digital-signature",
-						"mdssi:SignatureTime");
-		signatureTimeElement
-				.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:mdssi",
-						"http://schemas.openxmlformats.org/package/2006/digital-signature");
-		Element formatElement = document
-				.createElementNS(
-						"http://schemas.openxmlformats.org/package/2006/digital-signature",
-						"mdssi:Format");
+		Element signatureTimeElement = document.createElementNS(
+				OOXML_DIGSIG_NS, "mdssi:SignatureTime");
+		signatureTimeElement.setAttributeNS(Constants.NamespaceSpecNS,
+				"xmlns:mdssi", OOXML_DIGSIG_NS);
+		Element formatElement = document.createElementNS(OOXML_DIGSIG_NS,
+				"mdssi:Format");
 		formatElement.setTextContent("YYYY-MM-DDThh:mm:ssTZD");
 		signatureTimeElement.appendChild(formatElement);
-		Element valueElement = document
-				.createElementNS(
-						"http://schemas.openxmlformats.org/package/2006/digital-signature",
-						"mdssi:Value");
+		Element valueElement = document.createElementNS(OOXML_DIGSIG_NS,
+				"mdssi:Value");
 		Date now = this.clock.getTime();
 		DateTime dateTime = new DateTime(now.getTime(), DateTimeZone.UTC);
 		DateTimeFormatter fmt = ISODateTimeFormat.dateTimeNoMillis();
@@ -309,14 +216,12 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 		List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
 
 		Element signatureInfoElement = document.createElementNS(
-				"http://schemas.microsoft.com/office/2006/digsig",
-				"SignatureInfoV1");
+				OFFICE_DIGSIG_NS, "SignatureInfoV1");
 		signatureInfoElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns",
-				"http://schemas.microsoft.com/office/2006/digsig");
+				OFFICE_DIGSIG_NS);
 
 		Element manifestHashAlgorithmElement = document.createElementNS(
-				"http://schemas.microsoft.com/office/2006/digsig",
-				"ManifestHashAlgorithm");
+				OFFICE_DIGSIG_NS, "ManifestHashAlgorithm");
 		manifestHashAlgorithmElement
 				.setTextContent("http://www.w3.org/2000/09/xmldsig#sha1");
 		signatureInfoElement.appendChild(manifestHashAlgorithmElement);
@@ -418,12 +323,9 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 						(TransformParameterSpec) null));
 		DigestMethod digestMethod = signatureFactory.newDigestMethod(
 				DigestMethod.SHA1, null);
-		Reference reference = signatureFactory
-				.newReference(
-						"/"
-								+ zipEntryName
-								+ "?ContentType=application/vnd.openxmlformats-package.relationships+xml",
-						digestMethod, transforms, null, null);
+		Reference reference = signatureFactory.newReference(
+				getRelationshipReferenceURI(zipEntryName), digestMethod,
+				transforms, null, null);
 
 		manifestReferences.add(reference);
 	}
@@ -444,8 +346,8 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 		for (String documentResourceName : documentResourceNames) {
 			LOG.debug("document resource: " + documentResourceName);
 
-			Reference reference = signatureFactory.newReference("/"
-					+ documentResourceName + "?ContentType=" + contentType,
+			Reference reference = signatureFactory.newReference(
+					getResourceReferenceURI(documentResourceName, contentType),
 					digestMethod);
 
 			references.add(reference);
@@ -520,11 +422,10 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 		documentBuilderFactory.setNamespaceAware(true);
 		DocumentBuilder documentBuilder = documentBuilderFactory
 				.newDocumentBuilder();
-		Document document = documentBuilder.parse(inputSource);
-		return document;
+		return documentBuilder.parse(inputSource);
 	}
 
-	private Document loadDocument(InputStream documentInputStream)
+	public static Document loadDocument(InputStream documentInputStream)
 			throws ParserConfigurationException, SAXException, IOException {
 		InputSource inputSource = new InputSource(documentInputStream);
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
@@ -532,12 +433,64 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 		documentBuilderFactory.setNamespaceAware(true);
 		DocumentBuilder documentBuilder = documentBuilderFactory
 				.newDocumentBuilder();
-		Document document = documentBuilder.parse(inputSource);
-		return document;
+		return documentBuilder.parse(inputSource);
 	}
 
 	public void postSign(Element signatureElement,
 			List<X509Certificate> signingCertificateChain) {
 		// empty
 	}
+
+	public static String getRelationshipReferenceURI(String zipEntryName) {
+
+		return "/"
+				+ zipEntryName
+				+ "?ContentType=application/vnd.openxmlformats-package.relationships+xml";
+	}
+
+	public static String getResourceReferenceURI(String resourceName,
+			String contentType) {
+
+		return "/" + resourceName + "?ContentType=" + contentType;
+	}
+
+	public static String[] contentTypes = {
+
+			/*
+			 * Word
+			 */
+			"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml",
+			"application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml",
+			"application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml",
+			"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml",
+			"application/vnd.openxmlformats-officedocument.theme+xml",
+			"application/vnd.openxmlformats-officedocument.wordprocessingml.webSettings+xml",
+
+			/*
+			 * Word 2010
+			 */
+			"application/vnd.ms-word.stylesWithEffects+xml",
+
+			/*
+			 * Excel
+			 */
+			"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml",
+			"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml",
+			"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml",
+			"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml",
+
+			/*
+			 * Powerpoint
+			 */
+			"application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml",
+			"application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml",
+			"application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml",
+			"application/vnd.openxmlformats-officedocument.presentationml.slide+xml",
+			"application/vnd.openxmlformats-officedocument.presentationml.tableStyles+xml",
+
+			/*
+			 * Powerpoint 2010
+			 */
+			"application/vnd.openxmlformats-officedocument.presentationml.viewProps+xml",
+			"application/vnd.openxmlformats-officedocument.presentationml.presProps+xml" };
 }
