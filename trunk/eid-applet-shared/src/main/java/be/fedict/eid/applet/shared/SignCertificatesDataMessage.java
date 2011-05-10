@@ -185,12 +185,13 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 
 		byte[] rootCaCertFile = copy(this.body, idx, this.rootCertFileSize);
 		idx += this.rootCertFileSize;
-		X509Certificate rootCaCert = getCertificate(rootCaCertFile);
+		this.rootCertificate = getCertificate(rootCaCertFile);
+
 
 		this.certificateChain = new LinkedList<X509Certificate>();
 		this.certificateChain.add(signCert);
 		this.certificateChain.add(citizenCaCert);
-		this.certificateChain.add(rootCaCert);
+		this.certificateChain.add(this.rootCertificate);
 
 		if (null != this.identityFileSize) {
 			this.identityData = copy(this.body, idx, this.identityFileSize);
@@ -232,6 +233,8 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 	public byte[] addressSignatureData;
 
 	public X509Certificate rrnCertificate;
+
+    public X509Certificate rootCertificate;
 
 	private X509Certificate getCertificate(byte[] certData) {
 		CertificateFactory certificateFactory;
