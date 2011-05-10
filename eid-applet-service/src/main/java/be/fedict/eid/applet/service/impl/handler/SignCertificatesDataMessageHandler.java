@@ -26,6 +26,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -55,9 +56,9 @@ import be.fedict.eid.applet.shared.SignRequestMessage;
 
 /**
  * Sign Certificate Data Message Handler.
- * 
+ *
  * @author Frank Cornelis
- * 
+ *
  */
 @HandlesMessage(SignCertificatesDataMessage.class)
 public class SignCertificatesDataMessageHandler implements
@@ -167,6 +168,14 @@ public class SignCertificatesDataMessageHandler implements
 								message.identitySignatureData);
 					}
 				}
+
+                LOG.debug("checking national registration certificate: "
+                        + message.rrnCertificate.getSubjectX500Principal());
+                List<X509Certificate> rrnCertificateChain = new LinkedList<X509Certificate>();
+                rrnCertificateChain.add(message.rrnCertificate);
+                rrnCertificateChain.add(message.rootCertificate);
+                identityIntegrityService
+                        .checkNationalRegistrationCertificate(rrnCertificateChain);
 			}
 		}
 
