@@ -42,4 +42,5 @@ This (currently only in developer preview) update has fixed a lot of issues for 
 
 It also fixes the issue of the 64bit JVM not being able to communicate correctly with the 32bit pcscd. ( which can run in both 64bit as 32bit but switches as the 2 ccid drivers are both only compiled 32bit ...).
 So basically everything works out of the box without any explicit configuration with this developer preview, lets hope for a quick official release by apple.
+
 The preview can be found at: https://connect.apple.com/cgi-bin/WebObjects/MemberSite.woa/wa/getSoftware?bundleID=20809
