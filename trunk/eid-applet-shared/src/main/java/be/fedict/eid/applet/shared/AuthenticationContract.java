@@ -20,6 +20,7 @@ package be.fedict.eid.applet.shared;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetAddress;
 
 /**
@@ -45,10 +46,22 @@ import java.net.InetAddress;
  * intention via this formal authentication contract.
  * </p>
  * 
+ * <p>
+ * We use a 32-bit TLV structure to prevent type flaw attacks.
+ * </p>
+ * 
  * @author Frank Cornelis
  * 
  */
 public class AuthenticationContract {
+
+	public static final int SALT_TAG = 1;
+	public static final int HOSTNAME_TAG = 2;
+	public static final int INET_ADDRESS_TAG = 3;
+	public static final int LEGAL_NOTICE_TAG = 4;
+	public static final int SESSION_ID_TAG = 5;
+	public static final int ENCODED_SERVER_CERTIFICATE_TAG = 6;
+	public static final int CHALLENGE_TAG = 7;
 
 	private final byte[] salt;
 
@@ -96,7 +109,8 @@ public class AuthenticationContract {
 		 * Salting prevents that we sign a document digest directly instead of
 		 * some meaningless challenge.
 		 */
-		toBeSignedOutputStream.write(this.salt);
+		writeTag(SALT_TAG, this.salt, toBeSignedOutputStream);
+
 		if (null != this.hostname) {
 			/*
 			 * Signing (salt||hostname||challenge) prevents man-in-the-middle
@@ -104,29 +118,56 @@ public class AuthenticationContract {
 			 * trusted but that have been compromised. If at the same time the
 			 * DNS is also attacked, well then everything is lost anyway.
 			 */
-			toBeSignedOutputStream.write(this.hostname.getBytes());
+			writeTag(HOSTNAME_TAG, this.hostname.getBytes(),
+					toBeSignedOutputStream);
 		}
 		if (null != this.inetAddress) {
 			byte[] address = this.inetAddress.getAddress();
-			toBeSignedOutputStream.write(address);
+			writeTag(INET_ADDRESS_TAG, address, toBeSignedOutputStream);
 		}
 		/*
 		 * Next is to prevent abuse of the challenge in the context of a digital
 		 * signature claim on this cryptographic authentication signature.
 		 */
-		toBeSignedOutputStream.write(LEGAL_NOTICE.getBytes());
+		writeTag(LEGAL_NOTICE_TAG, LEGAL_NOTICE.getBytes(),
+				toBeSignedOutputStream);
 		if (null != this.sessionId) {
-			toBeSignedOutputStream.write(this.sessionId);
+			writeTag(SESSION_ID_TAG, this.sessionId, toBeSignedOutputStream);
 		}
 		if (null != this.encodedServerCertificate) {
-			toBeSignedOutputStream.write(this.encodedServerCertificate);
+			writeTag(ENCODED_SERVER_CERTIFICATE_TAG,
+					this.encodedServerCertificate, toBeSignedOutputStream);
 		}
 		/*
 		 * Of course we also digest the challenge as the server needs some mean
 		 * to authenticate us.
 		 */
-		toBeSignedOutputStream.write(this.challenge);
+		writeTag(CHALLENGE_TAG, this.challenge, toBeSignedOutputStream);
 		byte[] toBeSigned = toBeSignedOutputStream.toByteArray();
 		return toBeSigned;
+	}
+
+	/**
+	 * Write a 32-bit TLV entry to the given output stream.
+	 * 
+	 * @param tag
+	 * @param value
+	 * @param outputStream
+	 * @throws IOException
+	 */
+	private void writeTag(int tag, byte[] value, OutputStream outputStream)
+			throws IOException {
+		outputStream.write(intToByteArray(tag));
+		if (null == value) {
+			outputStream.write(intToByteArray(0));
+		} else {
+			outputStream.write(intToByteArray(value.length));
+			outputStream.write(value);
+		}
+	}
+
+	private byte[] intToByteArray(int value) {
+		return new byte[] { (byte) (value >>> 24), (byte) (value >>> 16),
+				(byte) (value >>> 8), (byte) value };
 	}
 }
