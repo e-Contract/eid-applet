@@ -27,6 +27,8 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import be.fedict.eid.applet.shared.protocol.HttpReceiver;
 
@@ -37,6 +39,9 @@ import be.fedict.eid.applet.shared.protocol.HttpReceiver;
  * 
  */
 public class HttpServletRequestHttpReceiver implements HttpReceiver {
+
+	private static final Log LOG = LogFactory
+			.getLog(HttpServletRequestHttpReceiver.class);
 
 	private final HttpServletRequest httpServletRequest;
 
@@ -85,6 +90,15 @@ public class HttpServletRequestHttpReceiver implements HttpReceiver {
 	}
 
 	public boolean isSecure() {
+		String referrerHeader = this.httpServletRequest.getHeader("Referer");
+		if (null != referrerHeader) {
+			/*
+			 * Only the eID Applet should be able to call our eID Applet
+			 * Service.
+			 */
+			LOG.warn("Refered HTTP header should not be present");
+			return false;
+		}
 		if (true == this.skipSecureConnectionCheck) {
 			return true;
 		}
