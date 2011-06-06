@@ -226,7 +226,7 @@
 			<dependency>
 				<groupId>javax.security</groupId>
 				<artifactId>jacc</artifactId>
-				<version>1.0</version>
+				<version>1.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven</groupId>
@@ -817,6 +817,13 @@
 			<id>jboss-public</id>
 			<name>JBoss public nexus</name>
 			<url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>ow2-maven-repo</id>
+			<url>http://maven.ow2.org/maven2/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
