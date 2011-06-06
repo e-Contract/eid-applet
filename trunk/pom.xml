@@ -758,17 +758,6 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>jboss.org</id>
-			<name>JBoss Maven2 Repository</name>
-			<url>http://repository.jboss.org/maven2/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
 			<id>nexus-jboss.org</id>
 			<name>JBoss Maven2 Repository</name>
 			<url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
@@ -823,17 +812,6 @@
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
-		</repository>
-		<repository>
-			<id>jboss-brew</id>
-			<name>JBoss Maven2 Brew repository</name>
-			<url>http://repository.jboss.com/maven2-brew/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
 		</repository>
 		<repository>
 			<id>jboss-public</id>
