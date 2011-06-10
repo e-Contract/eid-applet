@@ -56,6 +56,17 @@ public class MessagesTest {
 	}
 
 	@Test
+	public void testGermanMessages() throws Exception {
+		Locale locale = Locale.GERMAN;
+		Messages messages = new Messages(locale);
+		String message = messages
+				.getMessage(Messages.MESSAGE_ID.INSERT_CARD_QUESTION);
+		LOG.debug("message: " + message);
+		LOG.debug("connectReader: "
+				+ messages.getMessage(Messages.MESSAGE_ID.CONNECT_READER));
+	}
+
+	@Test
 	public void testUnsupportedLanguage() throws Exception {
 		Locale.setDefault(new Locale("nl"));
 		Locale locale = Locale.JAPANESE;
@@ -92,6 +103,7 @@ public class MessagesTest {
 		allStringsAvailable("en");
 		allStringsAvailable("nl");
 		allStringsAvailable("fr");
+		allStringsAvailable("de");
 	}
 
 	private void allStringsAvailable(String language) throws Exception {
@@ -105,8 +117,8 @@ public class MessagesTest {
 		properties.load(messagesInputStream);
 		for (MESSAGE_ID messageId : MESSAGE_ID.values()) {
 			assertTrue("missing message \"" + messageId.getId()
-					+ "\" for language \"" + language + "\"", properties
-					.containsKey(messageId.getId()));
+					+ "\" for language \"" + language + "\"",
+					properties.containsKey(messageId.getId()));
 		}
 	}
 

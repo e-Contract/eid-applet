@@ -19,7 +19,7 @@
 		TargetPage :'authn-result.jsp',
 		AppletService :'applet-service-authn-revoke',
 		BackgroundColor :'#ffffff',
-		Language : 'en'
+		Language : 'de'
 	};
 	var version = '1.5';
 	deployJava.runApplet(attributes, parameters, version);
