@@ -39,7 +39,7 @@ import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "beta_test_report")
-@NamedQueries( { @NamedQuery(name = QUERY_TEST_REPORT, query = "SELECT testReport FROM TestReportEntity AS testReport"
+@NamedQueries({ @NamedQuery(name = QUERY_TEST_REPORT, query = "SELECT testReport FROM TestReportEntity AS testReport"
 		+ " ORDER BY test, osName, osVersion,  osArch, javaVersion, userAgent") })
 public class TestReportEntity implements Serializable {
 
@@ -189,6 +189,7 @@ public class TestReportEntity implements Serializable {
 		this.navigatorAppVersion = navigatorAppVersion;
 	}
 
+	@Column(length = 512)
 	public String getNavigatorUserAgent() {
 		return this.navigatorUserAgent;
 	}
