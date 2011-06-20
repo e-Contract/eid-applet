@@ -1,3 +1,16 @@
+1.0.3.GA - 20 Jun 2011
+	* fixed Hibernate LOB and Oracle issue
+	* 64-bit workaround for Ubuntu
+	* fixed UTF-8 issue in AJP/HTTP connectors
+	* fixed year only in DoB
+	* verification of NRN cert chain during signature creation
+	* OOXML signature improvements
+	* TLV-structured AuthenticationContract (security fix)
+	* CSRF countermeasure
+	* cleanup of Maven repository locations
+	* German translation
+	* fixed Beta site JPA mapping
+
 1.0.2.GA - 25 Feb 2011
 	* co-signature signature facet
 	* Office 2010 XAdES-X-L support
