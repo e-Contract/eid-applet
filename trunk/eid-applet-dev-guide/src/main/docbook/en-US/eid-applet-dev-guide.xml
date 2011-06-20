@@ -12,7 +12,7 @@
 			<year>2008-2011</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>18 April 2011</releaseinfo>
+		<releaseinfo>20 June 2011</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -2312,6 +2312,11 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 						<entry>25 Feb 2011</entry>
 						<entry>Frank Cornelis</entry>
 						<entry>1.0.2.GA</entry>
+					</row>
+					<row>
+						<entry>20 Jun 2011</entry>
+						<entry>Frank Cornelis</entry>
+						<entry>1.0.3.GA</entry>
 					</row>
 				</tbody>
 			</tgroup>
