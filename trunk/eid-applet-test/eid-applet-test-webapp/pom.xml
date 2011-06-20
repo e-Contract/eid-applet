@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>be.fedict.eid-applet</groupId>
 		<artifactId>eid-applet-test</artifactId>
-		<version>1.0.3-SNAPSHOT</version>
+		<version>1.0.3.GA</version>
 	</parent>
 	<name>FedICT eID Applet Test Web Application</name>
 	<description>Test Web Application for eID Applet.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-test-webapp</artifactId>
-	<version>1.0.3-SNAPSHOT</version>
+	<version>1.0.3.GA</version>
 	<packaging>war</packaging>
 	<build>
 		<plugins>
