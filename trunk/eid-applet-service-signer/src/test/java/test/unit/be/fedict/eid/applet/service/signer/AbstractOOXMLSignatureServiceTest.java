@@ -49,6 +49,7 @@ import java.util.List;
 
 import javax.crypto.Cipher;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -86,6 +87,7 @@ public class AbstractOOXMLSignatureServiceTest {
 		private final ByteArrayOutputStream signedOOXMLOutputStream;
 
 		public OOXMLTestSignatureService(URL ooxmlUrl) {
+            super(DigestAlgo.SHA1);
 			this.temporaryDataStorage = new TemporaryTestDataStorage();
 			this.signedOOXMLOutputStream = new ByteArrayOutputStream();
 			this.ooxmlUrl = ooxmlUrl;

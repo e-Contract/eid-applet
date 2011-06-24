@@ -81,6 +81,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -140,7 +141,7 @@ public class AbstractXmlSignatureServiceTest {
 		}
 
 		public XmlSignatureTestService(SignatureFacet signatureFacet) {
-			super();
+			super(DigestAlgo.SHA1);
 			this.temporaryDataStorage = new TemporaryTestDataStorage();
 			this.signedDocumentOutputStream = new ByteArrayOutputStream();
 			if (null != signatureFacet) {

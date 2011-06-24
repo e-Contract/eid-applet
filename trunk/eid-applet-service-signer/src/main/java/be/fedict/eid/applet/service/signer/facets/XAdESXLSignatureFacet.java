@@ -46,6 +46,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.transform.TransformerException;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -140,7 +141,7 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 
 	private final DatatypeFactory datatypeFactory;
 
-	private final String digestAlgorithm;
+	private final DigestAlgo digestAlgorithm;
 
 	static {
 		Init.init();
@@ -158,7 +159,7 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 	 */
 	public XAdESXLSignatureFacet(TimeStampService timeStampService,
 			RevocationDataService revocationDataService) {
-		this(timeStampService, revocationDataService, "SHA-1");
+		this(timeStampService, revocationDataService, DigestAlgo.SHA1);
 	}
 
 	/**
@@ -175,7 +176,7 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 	 *            XAdES-X-L elements.
 	 */
 	public XAdESXLSignatureFacet(TimeStampService timeStampService,
-			RevocationDataService revocationDataService, String digestAlgorithm) {
+			RevocationDataService revocationDataService, DigestAlgo digestAlgorithm) {
 		this.objectFactory = new ObjectFactory();
 		this.c14nAlgoId = CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS;
 		this.digestAlgorithm = digestAlgorithm;

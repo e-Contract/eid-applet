@@ -44,6 +44,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
@@ -132,6 +133,7 @@ public class AbstractODFSignatureServiceTest {
 		private final ByteArrayOutputStream signedODFOutputStream;
 
 		public ODFTestSignatureService() {
+            super(DigestAlgo.SHA1);
 			this.temporaryDataStorage = new TemporaryTestDataStorage();
 			this.signedODFOutputStream = new ByteArrayOutputStream();
 		}

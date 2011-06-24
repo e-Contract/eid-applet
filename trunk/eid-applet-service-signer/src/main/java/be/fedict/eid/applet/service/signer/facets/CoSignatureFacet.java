@@ -35,6 +35,7 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathFilterParameterSpec;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -49,13 +50,13 @@ import be.fedict.eid.applet.service.signer.SignatureFacet;
  */
 public class CoSignatureFacet implements SignatureFacet {
 
-	private final String xmlDigestAlgorithm;
+	private final DigestAlgo digestAlgo;
 
 	/**
 	 * Default constructor. Digest algorithm will be SHA-1.
 	 */
 	public CoSignatureFacet() {
-		this("SHA-1");
+		this(DigestAlgo.SHA1);
 	}
 
 	/**
@@ -65,8 +66,8 @@ public class CoSignatureFacet implements SignatureFacet {
 	 *            the digest algorithm to be used within the ds:Reference
 	 *            element. Possible values: "SHA-1", "SHA-256, or "SHA-512".
 	 */
-	public CoSignatureFacet(String digestAlgorithm) {
-		this.xmlDigestAlgorithm = getXmlDigestAlgo(digestAlgorithm);
+	public CoSignatureFacet(DigestAlgo digestAlgorithm) {
+		this.digestAlgo = digestAlgorithm;
 	}
 
 	public void preSign(XMLSignatureFactory signatureFactory,
@@ -75,7 +76,7 @@ public class CoSignatureFacet implements SignatureFacet {
 			List<Reference> references, List<XMLObject> objects)
 			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				this.xmlDigestAlgorithm, null);
+				this.digestAlgo.getXmlAlgoId(), null);
 
 		List<Transform> transforms = new LinkedList<Transform>();
 		Map<String, String> xpathNamespaceMap = new HashMap<String, String>();
@@ -99,18 +100,5 @@ public class CoSignatureFacet implements SignatureFacet {
 	public void postSign(Element signatureElement,
 			List<X509Certificate> signingCertificateChain) {
 		// empty
-	}
-
-	private String getXmlDigestAlgo(String digestAlgo) {
-		if ("SHA-1".equals(digestAlgo)) {
-			return DigestMethod.SHA1;
-		}
-		if ("SHA-256".equals(digestAlgo)) {
-			return DigestMethod.SHA256;
-		}
-		if ("SHA-512".equals(digestAlgo)) {
-			return DigestMethod.SHA512;
-		}
-		throw new RuntimeException("unsupported digest algo: " + digestAlgo);
 	}
 }

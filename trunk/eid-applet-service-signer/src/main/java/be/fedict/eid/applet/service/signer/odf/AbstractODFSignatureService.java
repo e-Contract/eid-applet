@@ -29,6 +29,7 @@ import java.util.zip.ZipOutputStream;
 import javax.xml.crypto.URIDereferencer;
 import javax.xml.parsers.ParserConfigurationException;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,11 +61,11 @@ abstract public class AbstractODFSignatureService extends
 
 	private final XAdESSignatureFacet xadesSignatureFacet;
 
-	public AbstractODFSignatureService() {
-		super();
-		addSignatureFacet(new ODFSignatureFacet(this));
-		addSignatureFacet(new OpenOfficeSignatureFacet());
-		this.xadesSignatureFacet = new XAdESSignatureFacet();
+	public AbstractODFSignatureService(DigestAlgo digestAlgo) {
+		super(digestAlgo);
+		addSignatureFacet(new ODFSignatureFacet(this, getSignatureDigestAlgorithm()));
+		addSignatureFacet(new OpenOfficeSignatureFacet(getSignatureDigestAlgorithm()));
+		this.xadesSignatureFacet = new XAdESSignatureFacet(getSignatureDigestAlgorithm());
 		addSignatureFacet(this.xadesSignatureFacet);
 		addSignatureFacet(new KeyInfoSignatureFacet(false, true, false));
 	}
