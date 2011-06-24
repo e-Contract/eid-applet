@@ -32,6 +32,7 @@ import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -45,13 +46,13 @@ import be.fedict.eid.applet.service.signer.SignatureFacet;
  */
 public class EnvelopedSignatureFacet implements SignatureFacet {
 
-	private final String xmlDigestAlgorithm;
+	private final DigestAlgo digestAlgo;
 
 	/**
 	 * Default constructor. Digest algorithm will be SHA-1.
 	 */
 	public EnvelopedSignatureFacet() {
-		this("SHA-1");
+		this(DigestAlgo.SHA1);
 	}
 
 	/**
@@ -61,8 +62,8 @@ public class EnvelopedSignatureFacet implements SignatureFacet {
 	 *            the digest algorithm to be used within the ds:Reference
 	 *            element. Possible values: "SHA-1", "SHA-256, or "SHA-512".
 	 */
-	public EnvelopedSignatureFacet(String digestAlgorithm) {
-		this.xmlDigestAlgorithm = getXmlDigestAlgo(digestAlgorithm);
+	public EnvelopedSignatureFacet(DigestAlgo digestAlgorithm) {
+		this.digestAlgo = digestAlgorithm;
 	}
 
 	public void postSign(Element signatureElement,
@@ -76,7 +77,7 @@ public class EnvelopedSignatureFacet implements SignatureFacet {
 			List<Reference> references, List<XMLObject> objects)
 			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				this.xmlDigestAlgorithm, null);
+				this.digestAlgo.getXmlAlgoId(), null);
 
 		List<Transform> transforms = new LinkedList<Transform>();
 		Transform envelopedTransform = signatureFactory
@@ -92,18 +93,5 @@ public class EnvelopedSignatureFacet implements SignatureFacet {
 				transforms, null, null);
 
 		references.add(reference);
-	}
-
-	private String getXmlDigestAlgo(String digestAlgo) {
-		if ("SHA-1".equals(digestAlgo)) {
-			return DigestMethod.SHA1;
-		}
-		if ("SHA-256".equals(digestAlgo)) {
-			return DigestMethod.SHA256;
-		}
-		if ("SHA-512".equals(digestAlgo)) {
-			return DigestMethod.SHA512;
-		}
-		throw new RuntimeException("unsupported digest algo: " + digestAlgo);
 	}
 }

@@ -38,6 +38,7 @@ import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -64,12 +65,13 @@ public class IdentitySignatureFacet implements SignatureFacet {
 	private final byte[] photoData;
 	private final ObjectFactory objectFactory;
 	private final Marshaller marshaller;
-	private final String xmlDigestAlgo;
+	private final DigestAlgo digestAlgo;
 
 	public IdentitySignatureFacet(IdentityDTO identity, byte[] photo,
-			String digestAlgo) {
+			DigestAlgo digestAlgo) {
 		this.identityDTO = identity;
 		this.photoData = photo;
+        this.digestAlgo = digestAlgo;
 		this.objectFactory = new ObjectFactory();
 
 		try {
@@ -79,21 +81,6 @@ public class IdentitySignatureFacet implements SignatureFacet {
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
 		}
-
-		this.xmlDigestAlgo = getXmlDigestAlgo(digestAlgo);
-	}
-
-	private String getXmlDigestAlgo(String digestAlgo) {
-		if ("SHA-1".equals(digestAlgo)) {
-			return DigestMethod.SHA1;
-		}
-		if ("SHA-256".equals(digestAlgo)) {
-			return DigestMethod.SHA256;
-		}
-		if ("SHA-512".equals(digestAlgo)) {
-			return DigestMethod.SHA512;
-		}
-		throw new RuntimeException("unsupported digest algo: " + digestAlgo);
 	}
 
 	public void preSign(XMLSignatureFactory signatureFactory,
@@ -145,7 +132,7 @@ public class IdentitySignatureFacet implements SignatureFacet {
 
 		// ds:Reference
 		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				this.xmlDigestAlgo, null);
+				this.digestAlgo.getXmlAlgoId(), null);
 		List<Transform> transforms = new LinkedList<Transform>();
 		Transform exclusiveTransform = signatureFactory
 				.newTransform(CanonicalizationMethod.INCLUSIVE,

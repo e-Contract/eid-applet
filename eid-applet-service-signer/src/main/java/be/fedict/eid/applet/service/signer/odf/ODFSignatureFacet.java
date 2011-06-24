@@ -37,6 +37,7 @@ import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -55,9 +56,12 @@ public class ODFSignatureFacet implements SignatureFacet {
 	private static final Log LOG = LogFactory.getLog(ODFSignatureFacet.class);
 
 	private final AbstractODFSignatureService signatureService;
+    private final DigestAlgo digestAlgo;
 
-	public ODFSignatureFacet(AbstractODFSignatureService signatureService) {
+	public ODFSignatureFacet(AbstractODFSignatureService signatureService,
+                             DigestAlgo digestAlgo) {
 		this.signatureService = signatureService;
+        this.digestAlgo = digestAlgo;
 	}
 
 	public void postSign(Element signatureElement,
@@ -78,7 +82,7 @@ public class ODFSignatureFacet implements SignatureFacet {
 			ZipEntry zipEntry;
 
 			DigestMethod digestMethod = signatureFactory.newDigestMethod(
-					DigestMethod.SHA1, null);
+					this.digestAlgo.getXmlAlgoId(), null);
 
 			while (null != (zipEntry = odfZipInputStream.getNextEntry())) {
 				if (ODFUtil.isToBeSigned(zipEntry)) {

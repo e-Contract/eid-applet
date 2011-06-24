@@ -65,6 +65,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.utils.Constants;
@@ -87,7 +88,7 @@ import be.fedict.eid.applet.service.signer.time.LocalClock;
 
 /**
  * Office OpenXML Signature Facet implementation.
- * 
+ *
  * @author fcorneli
  * @see http://msdn.microsoft.com/en-us/library/cc313071.aspx
  */
@@ -102,20 +103,23 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 
 	private final Clock clock;
 
+    private final DigestAlgo digestAlgo;
+
 	/**
 	 * Main constructor.
 	 */
 	public OOXMLSignatureFacet(AbstractOOXMLSignatureService signatureService) {
-		this(signatureService, new LocalClock());
+		this(signatureService, new LocalClock(), DigestAlgo.SHA1);
 	}
 
 	/**
 	 * Main constructor.
 	 */
 	public OOXMLSignatureFacet(AbstractOOXMLSignatureService signatureService,
-			Clock clock) {
+			Clock clock, DigestAlgo digestAlgo) {
 		this.signatureService = signatureService;
 		this.clock = clock;
+        this.digestAlgo = digestAlgo;
 	}
 
 	public void preSign(XMLSignatureFactory signatureFactory,
@@ -146,7 +150,7 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 				null, null));
 
 		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				DigestMethod.SHA1, null);
+				this.digestAlgo.getXmlAlgoId(), null);
 		Reference reference = signatureFactory.newReference("#" + objectId,
 				digestMethod, null, "http://www.w3.org/2000/09/xmldsig#Object",
 				null);
@@ -243,7 +247,7 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 				null, null));
 
 		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				DigestMethod.SHA1, null);
+				this.digestAlgo.getXmlAlgoId(), null);
 		Reference reference = signatureFactory.newReference("#" + objectId,
 				digestMethod, null, "http://www.w3.org/2000/09/xmldsig#Object",
 				null);
@@ -322,7 +326,7 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 				.newTransform(CanonicalizationMethod.INCLUSIVE,
 						(TransformParameterSpec) null));
 		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				DigestMethod.SHA1, null);
+				this.digestAlgo.getXmlAlgoId(), null);
 		Reference reference = signatureFactory.newReference(
 				getRelationshipReferenceURI(zipEntryName), digestMethod,
 				transforms, null, null);
@@ -342,7 +346,7 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 			throw new RuntimeException(e);
 		}
 		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				DigestMethod.SHA1, null);
+				this.digestAlgo.getXmlAlgoId(), null);
 		for (String documentResourceName : documentResourceNames) {
 			LOG.debug("document resource: " + documentResourceName);
 

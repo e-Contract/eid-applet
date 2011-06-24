@@ -52,6 +52,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -102,7 +103,7 @@ public class XAdESSignatureFacetTest {
 		private ByteArrayOutputStream signedDocumentOutputStream;
 
 		public XmlSignatureTestService(SignatureFacet... signatureFacets) {
-			super();
+			super(DigestAlgo.SHA1);
 			this.temporaryDataStorage = new TemporaryTestDataStorage();
 			this.signedDocumentOutputStream = new ByteArrayOutputStream();
 			for (SignatureFacet signatureFacet : signatureFacets) {

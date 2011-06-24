@@ -53,6 +53,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -84,12 +85,14 @@ public abstract class AbstractOOXMLSignatureService extends
 
 	private final XAdESSignatureFacet xadesSignatureFacet;
 
-	protected AbstractOOXMLSignatureService() {
+	protected AbstractOOXMLSignatureService(DigestAlgo digestAlgo) {
+
+        super(digestAlgo);
 		ConstantLocalClock clock = new ConstantLocalClock();
-		addSignatureFacet(new OOXMLSignatureFacet(this, clock));
+		addSignatureFacet(new OOXMLSignatureFacet(this, clock, digestAlgo));
 		addSignatureFacet(new KeyInfoSignatureFacet(true, false, false));
 
-		this.xadesSignatureFacet = new XAdESSignatureFacet(clock);
+		this.xadesSignatureFacet = new XAdESSignatureFacet(clock, digestAlgo);
 		this.xadesSignatureFacet.setXadesNamespacePrefix("xd");
 		this.xadesSignatureFacet.setIdSignedProperties("idSignedProperties");
 		this.xadesSignatureFacet.setSignaturePolicyImplied(true);
