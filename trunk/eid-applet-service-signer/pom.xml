@@ -35,6 +35,7 @@
 								<schemaInclude>identity.xsd</schemaInclude>
 								<schemaInclude>opc-relationships.xsd</schemaInclude>
 								<schemaInclude>opc-contentTypes.xsd</schemaInclude>
+								<schemaInclude>ts_102918v010101.xsd</schemaInclude>
 							</schemaIncludes>
 							<debug>true</debug>
 							<verbose>true</verbose>
