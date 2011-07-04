@@ -37,4 +37,9 @@
 				name="be.fedict.eid.applet.service.signer.jaxb.opc.contenttypes" />
 		</jxb:schemaBindings>
 	</jxb:bindings>
+	<jxb:bindings schemaLocation="ts_102918v010101.xsd" node="/xs:schema">
+		<jxb:schemaBindings>
+			<jxb:package name="be.fedict.eid.applet.service.signer.jaxb.asic" />
+		</jxb:schemaBindings>
+	</jxb:bindings>
 </jxb:bindings>
