@@ -176,9 +176,10 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 	 *            XAdES-X-L elements.
 	 */
 	public XAdESXLSignatureFacet(TimeStampService timeStampService,
-			RevocationDataService revocationDataService, DigestAlgo digestAlgorithm) {
+			RevocationDataService revocationDataService,
+			DigestAlgo digestAlgorithm) {
 		this.objectFactory = new ObjectFactory();
-		this.c14nAlgoId = CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS;
+		this.c14nAlgoId = CanonicalizationMethod.EXCLUSIVE;
 		this.digestAlgorithm = digestAlgorithm;
 		this.timeStampService = timeStampService;
 		this.revocationDataService = revocationDataService;
