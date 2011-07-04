@@ -30,13 +30,17 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
  */
 public class XAdESNamespacePrefixMapper extends NamespacePrefixMapper {
 
-	private final String xadesNamespacePrefix;
+	private String xadesNamespacePrefix;
 
 	public XAdESNamespacePrefixMapper() {
 		this("xades");
 	}
 
 	public XAdESNamespacePrefixMapper(String xadesNamespacePrefix) {
+		this.xadesNamespacePrefix = xadesNamespacePrefix;
+	}
+
+	public void setXAdESNamespacePrefix(String xadesNamespacePrefix) {
 		this.xadesNamespacePrefix = xadesNamespacePrefix;
 	}
 
