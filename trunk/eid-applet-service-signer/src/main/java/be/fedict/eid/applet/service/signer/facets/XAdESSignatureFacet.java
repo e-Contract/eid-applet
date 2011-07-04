@@ -112,7 +112,7 @@ public class XAdESSignatureFacet implements SignatureFacet {
 
 	private boolean signaturePolicyImplied;
 
-	private String xadesNamespacePrefix;
+	private final XAdESNamespacePrefixMapper xadesNamespacePrefixMapper;
 
 	private String role;
 
@@ -210,13 +210,14 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		}
 		this.xadesObjectFactory = new ObjectFactory();
 		this.xmldsigObjectFactory = new be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory();
+		this.xadesNamespacePrefixMapper = new XAdESNamespacePrefixMapper();
 		try {
 			JAXBContext jaxbContext = JAXBContext
 					.newInstance(ObjectFactory.class);
 			this.marshaller = jaxbContext.createMarshaller();
 			this.marshaller.setProperty(
 					"com.sun.xml.bind.namespacePrefixMapper",
-					new XAdESNamespacePrefixMapper(this.xadesNamespacePrefix));
+					this.xadesNamespacePrefixMapper);
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
 		}
@@ -412,7 +413,8 @@ public class XAdESSignatureFacet implements SignatureFacet {
 
 		MessageDigest messageDigest;
 		try {
-			messageDigest = MessageDigest.getInstance(digestAlgorithm.getAlgoId());
+			messageDigest = MessageDigest.getInstance(digestAlgorithm
+					.getAlgoId());
 		} catch (NoSuchAlgorithmException e) {
 			throw new RuntimeException("message digest algo error: "
 					+ e.getMessage(), e);
@@ -503,7 +505,8 @@ public class XAdESSignatureFacet implements SignatureFacet {
 	 * @param xadesNamespacePrefix
 	 */
 	public void setXadesNamespacePrefix(String xadesNamespacePrefix) {
-		this.xadesNamespacePrefix = xadesNamespacePrefix;
+		this.xadesNamespacePrefixMapper
+				.setXAdESNamespacePrefix(xadesNamespacePrefix);
 	}
 
 	/**
