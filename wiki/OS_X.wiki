@@ -44,3 +44,11 @@ It also fixes the issue of the 64bit JVM not being able to communicate correctly
 So basically everything works out of the box without any explicit configuration with this developer preview, lets hope for a quick official release by apple.
 
 The preview can be found at: https://connect.apple.com/cgi-bin/WebObjects/MemberSite.woa/wa/getSoftware?bundleID=20809
+
+
+==OS X 10.7 aka Lion ==
+
+Upon first use of Java, OS X will install version 1.6.0_26-b03-383. This version has the above fixes in it so nothing special needs to be done from now on.
+Beware that also the first time a Java applet will be run the java browser plugin will need to be explicitly activated, needing a restart of your browser. After that, all should be good.
+
+Tested on Chrome 12.0.742.122, Firefox 5.0.1 and Safari 5.1 (7534.48.3).
