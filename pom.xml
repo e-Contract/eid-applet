@@ -118,7 +118,7 @@
 				<groupId>log4j</groupId>
 				<artifactId>log4j</artifactId>
 				<scope>test</scope>
-				<version>1.2.14</version>
+				<version>1.2.16</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
@@ -133,22 +133,22 @@
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
 				<artifactId>bcprov-jdk16</artifactId>
-				<version>1.45</version>
+				<version>${bouncycastle.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
 				<artifactId>bcprov-jdk15</artifactId>
-				<version>1.45</version>
+				<version>${bouncycastle.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
 				<artifactId>bcmail-jdk16</artifactId>
-				<version>1.45</version>
+				<version>${bouncycastle.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
 				<artifactId>bctsp-jdk16</artifactId>
-				<version>1.45</version>
+				<version>${bouncycastle.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.seleniumhq.selenium.client-drivers</groupId>
@@ -285,11 +285,6 @@
 				<version>1.0</version>
 			</dependency>
 			<dependency>
-				<groupId>org.jboss.gravel</groupId>
-				<artifactId>gravel</artifactId>
-				<version>1.0.2.GA</version>
-			</dependency>
-			<dependency>
 				<groupId>javax.faces</groupId>
 				<artifactId>jsf-api</artifactId>
 				<version>1.2_13</version>
@@ -325,20 +320,9 @@
 				<version>1.8.0.10</version>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.myfaces.tomahawk</groupId>
-				<artifactId>tomahawk12</artifactId>
-				<version>1.1.8</version>
-			</dependency>
-			<dependency>
 				<groupId>com.lowagie</groupId>
 				<artifactId>itext</artifactId>
 				<version>2.1.7</version>
-			</dependency>
-			<dependency>
-				<groupId>com.caucho</groupId>
-				<artifactId>resin-quercus</artifactId>
-				<!-- GPL license! -->
-				<version>3.2.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.jboss.security</groupId>
@@ -378,12 +362,7 @@
 			<dependency>
 				<groupId>org.apache.santuario</groupId>
 				<artifactId>xmlsec</artifactId>
-				<version>1.4.4</version>
-			</dependency>
-			<dependency>
-				<groupId>org.easytesting</groupId>
-				<artifactId>fest-swing</artifactId>
-				<version>1.2a2</version>
+				<version>1.4.5</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.poi</groupId>
@@ -433,7 +412,7 @@
 			<dependency>
 				<groupId>org.apache.ws.security</groupId>
 				<artifactId>wss4j</artifactId>
-				<version>1.5.8</version>
+				<version>1.6.1</version>
 			</dependency>
 			<dependency>
 				<groupId>javax</groupId>
@@ -575,7 +554,7 @@
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
 				<artifactId>wagon-ssh</artifactId>
-				<version>1.0-beta-7</version>
+				<version>1.0</version>
 			</extension>
 		</extensions>
 		<pluginManagement>
@@ -618,7 +597,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>2.7</version>
+					<version>2.8</version>
 					<configuration>
 						<links>
 							<link>http://java.sun.com/javase/6/docs/api/</link>
@@ -629,17 +608,12 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>2.1</version>
-				</plugin>
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>minijar-maven-plugin</artifactId>
-					<version>1.0-SNAPSHOT</version>
+					<version>2.3</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-assembly-plugin</artifactId>
-					<version>2.2</version>
+					<version>2.2.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -649,9 +623,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-ear-plugin</artifactId>
-					<!-- Cannot use 2.4 with JBoss AS 6.0.0.M1 because of the description 
-						element in application.xml -->
-					<version>2.4.2</version>
+					<version>2.6</version>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
@@ -666,12 +638,12 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>2.1</version>
+					<version>2.2.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.7</version>
+					<version>2.9</version>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
@@ -691,7 +663,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
-					<version>2.5</version>
+					<version>2.6</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -701,7 +673,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-resources-plugin</artifactId>
-					<version>2.4.3</version>
+					<version>2.5</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -838,10 +810,12 @@
 	</distributionManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jboss-seam.version>2.2.1.Final</jboss-seam.version>
+		<jboss-seam.version>2.2.2.Final</jboss-seam.version>
 		<jaxws.version>2.2.1</jaxws.version>
 		<hornetq.version>2.1.1.Final</hornetq.version>
 		<jaxb-impl.version>2.2.1</jaxb-impl.version>
 		<richfaces.version>3.3.3.Final</richfaces.version>
+		<bouncycastle.version>1.45</bouncycastle.version>
+		<!-- jTrust 1.1.2 fails on 1.46 -->
 	</properties>
 </project>

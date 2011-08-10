@@ -10,8 +10,8 @@ The source code is hosted at: http://code.google.com/p/eid-applet/
 === 2. Requirements
 
 The following is required for compiling the eID Applet software:
-* Sun Java 1.6.0_21, 1.6.0_22, 1.6.0_23
-* Apache Maven 3.0.1
+* Sun Java 1.6.0_21, 1.6.0_22, 1.6.0_23, 1.6.0_26
+* Apache Maven 3.0.3
 
 
 === 3. Build
@@ -58,6 +58,10 @@ FedICT code signing certificate.
 
 
 === 5. Eclipse IDE
+
+You can use the m2eclipse Eclipse plugin to import the Maven projects.
+
+Another option is to use the Maven Eclipse plugin.
 
 The Eclipse project files can be created via:
 	mvn -Denv=sdk eclipse:eclipse
