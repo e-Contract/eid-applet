@@ -1020,10 +1020,10 @@ public class PcscTest {
 
 		try {
 			List<X509Certificate> certChain = pcscEid
-					.getAuthnCertificateChain();
-			// List<X509Certificate> certChain =
-			// pcscEid.getAuthnCertificateChain();
-			LOG.debug("end-entity certificate: " + certChain.get(0));
+					.getSignCertificateChain();
+			for (X509Certificate cert : certChain) {
+				LOG.debug("certificate: " + cert);
+			}
 
 			MemoryCertificateRepository certificateRepository = new MemoryCertificateRepository();
 			certificateRepository
