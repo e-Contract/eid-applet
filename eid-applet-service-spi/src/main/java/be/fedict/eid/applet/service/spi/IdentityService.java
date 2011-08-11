@@ -31,7 +31,7 @@ public interface IdentityService {
 	 * Gives back an identity request object that indicates what eID identity
 	 * data we exactly want to retrieve from the user.
 	 * 
-	 * @return
+	 * @return the identity request object.
 	 */
 	IdentityRequest getIdentityRequest();
 }

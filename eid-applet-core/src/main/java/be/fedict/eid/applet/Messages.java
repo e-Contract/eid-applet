@@ -38,6 +38,12 @@ public class Messages {
 
 	private final Locale locale;
 
+	/**
+	 * Enumeration of all possible message identifiers.
+	 * 
+	 * @author Frank Cornelis
+	 * 
+	 */
 	public static enum MESSAGE_ID {
 		LOADING("loading"), SECURITY_ERROR("securityError"), CARD_ERROR(
 				"cardError"), GENERIC_ERROR("genericError"), DETECTING_CARD(

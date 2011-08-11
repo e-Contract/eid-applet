@@ -177,7 +177,7 @@ public class ODFUtil {
 	/**
 	 * Get a list of all the files / zip entries in an ODF package
 	 * 
-	 * @param odfUrl
+	 * @param odfInputStream
 	 * @return
 	 * @throws IOException
 	 */

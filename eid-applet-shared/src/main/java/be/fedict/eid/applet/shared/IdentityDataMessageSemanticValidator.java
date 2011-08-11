@@ -21,6 +21,12 @@ package be.fedict.eid.applet.shared;
 import be.fedict.eid.applet.shared.protocol.SemanticValidator;
 import be.fedict.eid.applet.shared.protocol.SemanticValidatorException;
 
+/**
+ * Semantic validator implementation of the IdentityDataMessage.
+ * 
+ * @author Frank Cornelis
+ * 
+ */
 public class IdentityDataMessageSemanticValidator implements
 		SemanticValidator<IdentityDataMessage> {
 

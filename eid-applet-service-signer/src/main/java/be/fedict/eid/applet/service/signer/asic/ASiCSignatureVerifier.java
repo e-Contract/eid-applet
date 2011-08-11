@@ -41,12 +41,30 @@ import org.xml.sax.SAXException;
 import be.fedict.eid.applet.service.signer.KeyInfoKeySelector;
 import be.fedict.eid.applet.service.signer.odf.ODFUtil;
 
+/**
+ * Simple signature verifier for Associated Signature Container signed files.
+ * 
+ * @author Frank Cornelis
+ * 
+ */
 public class ASiCSignatureVerifier {
 
 	private ASiCSignatureVerifier() {
 		super();
 	}
 
+	/**
+	 * Verifies the signatures on the given ASiC document.
+	 * 
+	 * @param asicDocument
+	 *            the ASiC document as byte array.
+	 * @return the list of signatories.
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws MarshalException
+	 * @throws XMLSignatureException
+	 */
 	public static List<X509Certificate> verifySignatures(byte[] asicDocument)
 			throws IOException, ParserConfigurationException, SAXException,
 			MarshalException, XMLSignatureException {

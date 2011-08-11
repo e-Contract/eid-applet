@@ -12,6 +12,7 @@
 	<artifactId>eid-applet-shared</artifactId>
 	<version>1.0.4-SNAPSHOT</version>
 	<packaging>jar</packaging>
+	<url>http://code.google.com/p/eid-applet/</url>
 	<build>
 		<plugins>
 			<plugin>
@@ -29,6 +30,24 @@
 					<archive>
 						<addMavenDescriptor>false</addMavenDescriptor>
 					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<configuration>
+					<reportPlugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-project-info-reports-plugin</artifactId>
+							<version>${maven-project-info-reports-plugin.version}</version>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-javadoc-plugin</artifactId>
+							<version>${maven-javadoc-plugin.version}</version>
+						</plugin>
+					</reportPlugins>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -53,7 +53,8 @@ public class InsecureClientEnvironmentException extends Exception {
 	 * marks the client environment as being insecure. Else the eID Applet will
 	 * abort the requested eID operation.
 	 * 
-	 * @return
+	 * @return <code>true</code> if the applet should only give a warning,
+	 *         <code>false</code> otherwise.
 	 */
 	public boolean isWarnOnly() {
 		return this.warnOnly;

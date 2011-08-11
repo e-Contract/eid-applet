@@ -81,7 +81,6 @@ public class AuthenticationChallenge implements Serializable {
 	 * consumption.
 	 * 
 	 * @param session
-	 * @param maxMaturity
 	 * @return the challenge.
 	 */
 	public static byte[] generateChallenge(HttpSession session) {
