@@ -39,24 +39,12 @@
 	<profiles>
 		<profile>
 			<id>tests</id>
-			<activation>
-				<property>
-					<name>env</name>
-					<value>tests</value>
-				</property>
-			</activation>
 			<modules>
 				<module>eid-applet-tests</module>
 			</modules>
 		</profile>
 		<profile>
 			<id>sdk</id>
-			<activation>
-				<property>
-					<name>env</name>
-					<value>sdk</value>
-				</property>
-			</activation>
 			<modules>
 				<module>eid-applet-docbook-plugin</module>
 				<module>eid-applet-dev-guide</module>
@@ -65,25 +53,12 @@
 		</profile>
 		<profile>
 			<id>beta</id>
-			<activation>
-				<property>
-					<name>env</name>
-					<value>beta</value>
-				</property>
-			</activation>
 			<modules>
 				<module>eid-applet-beta</module>
 			</modules>
 		</profile>
 		<profile>
 			<id>all</id>
-			<!-- handy to run "mvn eclipse:eclipse -Denv=all" -->
-			<activation>
-				<property>
-					<name>env</name>
-					<value>all</value>
-				</property>
-			</activation>
 			<modules>
 				<module>eid-applet-tests</module>
 				<module>eid-applet-dev-guide</module>

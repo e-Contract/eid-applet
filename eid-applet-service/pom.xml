@@ -60,13 +60,7 @@
 	</build>
 	<profiles>
 		<profile>
-			<id>env-sdk</id>
-			<activation>
-				<property>
-					<name>env</name>
-					<value>sdk</value>
-				</property>
-			</activation>
+			<id>sdk</id>
 			<build>
 				<plugins>
 					<plugin>
