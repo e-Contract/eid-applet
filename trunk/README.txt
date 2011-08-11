@@ -36,7 +36,7 @@ We provide a JBoss AS 6.0.x package artifact named:
 During the build process a token is required to sign the applet JAR.
 By default the Maven build will use a software token to sign the applet JAR.
 One can configure the usage of an eToken via the following Maven property:
-	-Dtoken=etoken
+	-Petoken
 The eToken configuration is located in pom.xml under the eid-applet-package 
 artifact.
 
@@ -47,8 +47,7 @@ You can speed up the development build cycle by skipping the unit tests via:
 === 4. SDK Release
 
 An SDK build can be performed via:
-	mvn -Dhttp.proxyHost=proxy.yourict.net -Dhttp.proxyPort=8080 -Denv=sdk
--Dtoken=etoken clean deploy
+	mvn -Dhttp.proxyHost=proxy.yourict.net -Dhttp.proxyPort=8080 -Psdk,etoken clean deploy
 
 The final SDK artifact is located under:
 	eid-applet-sdk/target/
@@ -59,12 +58,14 @@ FedICT code signing certificate.
 
 === 5. Eclipse IDE
 
-You can use the m2eclipse Eclipse plugin to import the Maven projects.
+You can use the m2eclipse Eclipse plugin to import the Maven projects although
+the m2eclipse Eclipse plugin does not yet understand the entire project
+structure.
 
 Another option is to use the Maven Eclipse plugin.
 
 The Eclipse project files can be created via:
-	mvn -Denv=sdk eclipse:eclipse
+	mvn -Psdk eclipse:eclipse
 
 Afterwards simply import the projects in Eclipse via:
 	File -> Import... -> General:Existing Projects into Workspace

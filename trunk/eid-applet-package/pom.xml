@@ -101,13 +101,7 @@
 			</build>
 		</profile>
 		<profile>
-			<id>token-etoken</id>
-			<activation>
-				<property>
-					<name>token</name>
-					<value>etoken</value>
-				</property>
-			</activation>
+			<id>etoken</id>
 			<build>
 				<plugins>
 					<plugin>
