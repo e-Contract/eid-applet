@@ -36,7 +36,7 @@ public interface SignatureService {
 	 * to let the client sign some locally stored files. Return
 	 * <code>null</code> if no pre-sign digest infos are required.
 	 * 
-	 * @return
+	 * @return the digest algorithm to be used when digesting local files.
 	 * @see #preSign(List, List)
 	 */
 	String getFilesDigestAlgorithm();

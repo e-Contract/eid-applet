@@ -40,6 +40,12 @@ import org.apache.commons.logging.LogFactory;
 
 import be.fedict.eid.applet.service.signer.odf.ODFUtil;
 
+/**
+ * JSR105 URI dereferencer implementation for ASiC documents.
+ * 
+ * @author Frank Cornelis
+ * 
+ */
 public class ASiCURIDereferencer implements URIDereferencer {
 
 	private static final Log LOG = LogFactory.getLog(ASiCURIDereferencer.class);

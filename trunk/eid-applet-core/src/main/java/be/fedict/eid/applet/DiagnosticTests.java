@@ -18,6 +18,12 @@
 
 package be.fedict.eid.applet;
 
+/**
+ * Enumeration of all available diagnostic tests.
+ * 
+ * @author Frank Cornelis
+ * 
+ */
 public enum DiagnosticTests {
 	OS("Operating system"), JAVA_RUNTIME("Java runtime"), BROWSER("Browser"), PCSC(
 			"PC/SC layer"), CARD_READER("Card reader"), EID_READOUT(

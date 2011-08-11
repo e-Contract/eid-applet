@@ -74,9 +74,9 @@ public class Dialogs {
 
 		if (-1 != retriesLeft) {
 			Box retriesPanel = Box.createHorizontalBox();
-			JLabel retriesLabel = new JLabel(this.messages
-					.getMessage(MESSAGE_ID.RETRIES_LEFT)
-					+ ": " + retriesLeft);
+			JLabel retriesLabel = new JLabel(
+					this.messages.getMessage(MESSAGE_ID.RETRIES_LEFT) + ": "
+							+ retriesLeft);
 			retriesLabel.setForeground(Color.RED);
 			retriesPanel.add(retriesLabel);
 			retriesPanel.add(Box.createHorizontalGlue());
@@ -128,6 +128,12 @@ public class Dialogs {
 		}
 	}
 
+	/**
+	 * Structure to hold PIN data.
+	 * 
+	 * @author Frank Cornelis
+	 * 
+	 */
 	public static final class Pins {
 		private final char[] oldPin;
 		private final char[] newPin;
@@ -153,9 +159,9 @@ public class Dialogs {
 
 		if (-1 != retriesLeft) {
 			Box retriesPanel = Box.createHorizontalBox();
-			JLabel retriesLabel = new JLabel(this.messages
-					.getMessage(MESSAGE_ID.RETRIES_LEFT)
-					+ ": " + retriesLeft);
+			JLabel retriesLabel = new JLabel(
+					this.messages.getMessage(MESSAGE_ID.RETRIES_LEFT) + ": "
+							+ retriesLeft);
 			retriesLabel.setForeground(Color.RED);
 			retriesPanel.add(retriesLabel);
 			retriesPanel.add(Box.createHorizontalGlue());
@@ -166,9 +172,8 @@ public class Dialogs {
 		JPasswordField oldPinField = new JPasswordField(MAX_PIN_SIZE);
 		{
 			Box oldPinPanel = Box.createHorizontalBox();
-			JLabel oldPinLabel = new JLabel(this.messages
-					.getMessage(MESSAGE_ID.CURRENT_PIN)
-					+ ":");
+			JLabel oldPinLabel = new JLabel(
+					this.messages.getMessage(MESSAGE_ID.CURRENT_PIN) + ":");
 			oldPinLabel.setLabelFor(oldPinField);
 			oldPinPanel.add(oldPinLabel);
 			oldPinPanel.add(Box.createHorizontalStrut(5));
@@ -181,9 +186,8 @@ public class Dialogs {
 		JPasswordField newPinField = new JPasswordField(MAX_PIN_SIZE);
 		{
 			Box newPinPanel = Box.createHorizontalBox();
-			JLabel newPinLabel = new JLabel(this.messages
-					.getMessage(MESSAGE_ID.NEW_PIN)
-					+ ":");
+			JLabel newPinLabel = new JLabel(
+					this.messages.getMessage(MESSAGE_ID.NEW_PIN) + ":");
 			newPinLabel.setLabelFor(newPinField);
 			newPinPanel.add(newPinLabel);
 			newPinPanel.add(Box.createHorizontalStrut(5));
@@ -196,9 +200,8 @@ public class Dialogs {
 		JPasswordField new2PinField = new JPasswordField(MAX_PIN_SIZE);
 		{
 			Box new2PinPanel = Box.createHorizontalBox();
-			JLabel new2PinLabel = new JLabel(this.messages
-					.getMessage(MESSAGE_ID.NEW_PIN)
-					+ ":");
+			JLabel new2PinLabel = new JLabel(
+					this.messages.getMessage(MESSAGE_ID.NEW_PIN) + ":");
 			new2PinLabel.setLabelFor(new2PinField);
 			new2PinPanel.add(new2PinLabel);
 			new2PinPanel.add(Box.createHorizontalStrut(5));
@@ -213,12 +216,12 @@ public class Dialogs {
 		if (result != JOptionPane.OK_OPTION) {
 			throw new RuntimeException("operation canceled.");
 		}
-		if (false == Arrays.equals(newPinField.getPassword(), new2PinField
-				.getPassword())) {
+		if (false == Arrays.equals(newPinField.getPassword(),
+				new2PinField.getPassword())) {
 			throw new RuntimeException("new PINs not equal");
 		}
-		Pins pins = new Pins(oldPinField.getPassword(), newPinField
-				.getPassword());
+		Pins pins = new Pins(oldPinField.getPassword(),
+				newPinField.getPassword());
 		Arrays.fill(oldPinField.getPassword(), (char) 0);
 		Arrays.fill(newPinField.getPassword(), (char) 0);
 		return pins;
@@ -231,8 +234,8 @@ public class Dialogs {
 	private JFrame pinPadFrame;
 
 	public void showPINPadFrame(int retriesLeft) {
-		showPINPadFrame(retriesLeft, "PIN", this.messages
-				.getMessage(MESSAGE_ID.PIN_PAD));
+		showPINPadFrame(retriesLeft, "PIN",
+				this.messages.getMessage(MESSAGE_ID.PIN_PAD));
 	}
 
 	private void showPINPadFrame(int retriesLeft, String title, String message) {
@@ -252,9 +255,9 @@ public class Dialogs {
 		panel.setLayout(boxLayout);
 
 		if (-1 != retriesLeft) {
-			JLabel retriesLabel = new JLabel(this.messages
-					.getMessage(MESSAGE_ID.RETRIES_LEFT)
-					+ ": " + retriesLeft);
+			JLabel retriesLabel = new JLabel(
+					this.messages.getMessage(MESSAGE_ID.RETRIES_LEFT) + ": "
+							+ retriesLeft);
 			retriesLabel.setForeground(Color.RED);
 			panel.add(retriesLabel);
 		}
@@ -290,9 +293,9 @@ public class Dialogs {
 
 		if (-1 != retriesLeft) {
 			Box retriesPanel = Box.createHorizontalBox();
-			JLabel retriesLabel = new JLabel(this.messages
-					.getMessage(MESSAGE_ID.RETRIES_LEFT)
-					+ ": " + retriesLeft);
+			JLabel retriesLabel = new JLabel(
+					this.messages.getMessage(MESSAGE_ID.RETRIES_LEFT) + ": "
+							+ retriesLeft);
 			retriesLabel.setForeground(Color.RED);
 			retriesPanel.add(retriesLabel);
 			retriesPanel.add(Box.createHorizontalGlue());
@@ -302,7 +305,7 @@ public class Dialogs {
 
 		Box passwordPanel = Box.createHorizontalBox();
 		JLabel promptLabel = new JLabel(
-                        this.messages.getMessage(MESSAGE_ID.LABEL_PIN) + ": ");
+				this.messages.getMessage(MESSAGE_ID.LABEL_PIN) + ": ");
 		passwordPanel.add(promptLabel);
 		passwordPanel.add(Box.createHorizontalStrut(5));
 		final JPasswordField passwordField = new JPasswordField(MAX_PIN_SIZE);
@@ -319,17 +322,17 @@ public class Dialogs {
 				return new Insets(0, 0, 5, 5);
 			}
 		};
-		final JButton okButton = new JButton(this.messages
-				.getMessage(MESSAGE_ID.OK));
+		final JButton okButton = new JButton(
+				this.messages.getMessage(MESSAGE_ID.OK));
 		okButton.setEnabled(false);
 		buttonPanel.add(okButton);
-		JButton cancelButton = new JButton(this.messages
-				.getMessage(MESSAGE_ID.CANCEL));
+		JButton cancelButton = new JButton(
+				this.messages.getMessage(MESSAGE_ID.CANCEL));
 		buttonPanel.add(cancelButton);
 
 		// dialog box
-		final JDialog dialog = new JDialog((Frame) null, 
-                        this.messages.getMessage(MESSAGE_ID.ENTER_PIN), true);
+		final JDialog dialog = new JDialog((Frame) null,
+				this.messages.getMessage(MESSAGE_ID.ENTER_PIN), true);
 		dialog.setLayout(new BorderLayout());
 		dialog.getContentPane().add(mainPanel, BorderLayout.CENTER);
 		dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
@@ -414,27 +417,27 @@ public class Dialogs {
 	}
 
 	public void showPUKPadFrame(int retriesLeft) {
-		showPINPadFrame(retriesLeft, "eID PIN unblock", this.messages
-				.getMessage(MESSAGE_ID.PUK_PAD));
+		showPINPadFrame(retriesLeft, "eID PIN unblock",
+				this.messages.getMessage(MESSAGE_ID.PUK_PAD));
 	}
 
 	public void showPINChangePadFrame(int retriesLeft) {
-		showPINPadFrame(retriesLeft, "eID PIN change", this.messages
-				.getMessage(MESSAGE_ID.PIN_PAD_CHANGE));
+		showPINPadFrame(retriesLeft, "eID PIN change",
+				this.messages.getMessage(MESSAGE_ID.PIN_PAD_CHANGE));
 	}
 
 	public void showPINModifyOldPINFrame(int retriesLeft) {
-		showPINPadFrame(retriesLeft, "eID PIN change", this.messages
-				.getMessage(MESSAGE_ID.PIN_PAD_MODIFY_OLD));
+		showPINPadFrame(retriesLeft, "eID PIN change",
+				this.messages.getMessage(MESSAGE_ID.PIN_PAD_MODIFY_OLD));
 	}
 
 	public void showPINModifyNewPINFrame(int retriesLeft) {
-		showPINPadFrame(retriesLeft, "eID PIN change", this.messages
-				.getMessage(MESSAGE_ID.PIN_PAD_MODIFY_NEW));
+		showPINPadFrame(retriesLeft, "eID PIN change",
+				this.messages.getMessage(MESSAGE_ID.PIN_PAD_MODIFY_NEW));
 	}
 
 	public void showPINModifyNewPINAgainFrame(int retriesLeft) {
-		showPINPadFrame(retriesLeft, "eID PIN change", this.messages
-				.getMessage(MESSAGE_ID.PIN_PAD_MODIFY_NEW_AGAIN));
+		showPINPadFrame(retriesLeft, "eID PIN change",
+				this.messages.getMessage(MESSAGE_ID.PIN_PAD_MODIFY_NEW_AGAIN));
 	}
 }
