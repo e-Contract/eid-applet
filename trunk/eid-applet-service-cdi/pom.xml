@@ -7,10 +7,10 @@
 		<artifactId>eid-applet</artifactId>
 		<version>1.0.4-SNAPSHOT</version>
 	</parent>
-	<name>FedICT eID Applet Service SPI</name>
-	<description>SPI for the eID Applet Service.</description>
+	<name>FedICT eID Applet Service CDI</name>
+	<description>CDI extension for the eID Applet Service.</description>
 	<groupId>be.fedict.eid-applet</groupId>
-	<artifactId>eid-applet-service-spi</artifactId>
+	<artifactId>eid-applet-service-cdi</artifactId>
 	<version>1.0.4-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<url>http://code.google.com/p/eid-applet/</url>
@@ -20,8 +20,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.6</source>
+					<target>1.6</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -41,7 +41,7 @@
 						<plugin>
 							<groupId>org.apache.maven.plugins</groupId>
 							<artifactId>maven-project-info-reports-plugin</artifactId>
-							<version>${maven-project-info-reports-plugin.version}</version>µ
+							<version>${maven-project-info-reports-plugin.version}</version>
 							<configuration>
 								<dependencyDetailsEnabled>false</dependencyDetailsEnabled>
 								<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
@@ -78,4 +78,21 @@
 			</build>
 		</profile>
 	</profiles>
+	<dependencies>
+		<dependency>
+			<groupId>be.fedict.eid-applet</groupId>
+			<artifactId>eid-applet-service</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.seam.servlet</groupId>
+			<artifactId>seam-servlet</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+	</dependencies>
 </project>

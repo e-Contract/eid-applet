@@ -33,6 +33,7 @@
 		<module>eid-applet-service-spi</module>
 		<module>eid-applet-service</module>
 		<module>eid-applet-service-signer</module>
+		<module>eid-applet-service-cdi</module>
 		<module>eid-applet-test</module>
 		<module>eid-applet-sql-ddl-plugin</module>
 	</modules>
@@ -71,7 +72,8 @@
 		</profile>
 	</profiles>
 	<scm>
-		<developerConnection>scm:svn:https://eid-applet.googlecode.com/svn/trunk</developerConnection>
+		<developerConnection>scm:svn:https://eid-applet.googlecode.com/svn/trunk
+		</developerConnection>
 	</scm>
 	<dependencyManagement>
 		<dependencies>
@@ -492,6 +494,16 @@
 				<artifactId>mail</artifactId>
 				<version>1.4</version>
 			</dependency>
+			<dependency>
+				<groupId>org.jboss.seam.servlet</groupId>
+				<artifactId>seam-servlet</artifactId>
+				<version>3.0.0.Final</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.enterprise</groupId>
+				<artifactId>cdi-api</artifactId>
+				<version>1.0</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<build>
@@ -535,6 +547,10 @@
 							<groupId>org.apache.maven.plugins</groupId>
 							<artifactId>maven-project-info-reports-plugin</artifactId>
 							<version>${maven-project-info-reports-plugin.version}</version>
+							<configuration>
+								<dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+								<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+							</configuration>
 						</plugin>
 					</reportPlugins>
 				</configuration>
@@ -688,7 +704,8 @@
 		</pluginRepository>
 		<pluginRepository>
 			<id>jboss.org</id>
-			<url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
+			<url>https://repository.jboss.org/nexus/content/repositories/releases/
+			</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -710,7 +727,8 @@
 		<pluginRepository>
 			<id>jboss-public</id>
 			<name>JBoss public nexus</name>
-			<url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+			<url>http://repository.jboss.org/nexus/content/groups/public-jboss/
+			</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -727,7 +745,8 @@
 		<repository>
 			<id>nexus-jboss.org</id>
 			<name>JBoss Maven2 Repository</name>
-			<url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
+			<url>https://repository.jboss.org/nexus/content/repositories/releases/
+			</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -783,7 +802,8 @@
 		<repository>
 			<id>jboss-public</id>
 			<name>JBoss public nexus</name>
-			<url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+			<url>http://repository.jboss.org/nexus/content/groups/public-jboss/
+			</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -827,7 +847,9 @@
 		<bouncycastle.version>1.45</bouncycastle.version>
 		<!-- jTrust 1.1.2 fails on 1.46 -->
 		<maven-javadoc-plugin.version>2.8</maven-javadoc-plugin.version>
-		<maven-project-info-reports-plugin.version>2.4</maven-project-info-reports-plugin.version>
-		<maven-surefire-report-plugin.version>2.9</maven-surefire-report-plugin.version>
+		<maven-project-info-reports-plugin.version>2.4
+		</maven-project-info-reports-plugin.version>
+		<maven-surefire-report-plugin.version>2.9
+		</maven-surefire-report-plugin.version>
 	</properties>
 </project>
