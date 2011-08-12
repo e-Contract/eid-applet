@@ -84,7 +84,12 @@ public class IdentityDataMessageHandler implements
 
 	public static final String CA_CERT_SESSION_ATTRIBUTE = "eid.certs.ca";
 
+	/**
+	 * Please use ROOT_CERT_SESSION_ATTRIBUTE instead.
+	 */
 	public static final String ROOT_CERT_SESSION_ATTRIBTUE = "eid.certs.root";
+	
+	public static final String ROOT_CERT_SESSION_ATTRIBUTE = "eid.certs.root";
 
 	public static final String SKIP_NATIONAL_NUMBER_CHECK_INIT_PARAM_NAME = "SkipNationalNumberCheck";
 
@@ -249,7 +254,7 @@ public class IdentityDataMessageHandler implements
 			session.setAttribute(AUTHN_CERT_SESSION_ATTRIBUTE, authnCert);
 			session.setAttribute(SIGN_CERT_SESSION_ATTRIBUTE, signCert);
 			session.setAttribute(CA_CERT_SESSION_ATTRIBUTE, caCert);
-			session.setAttribute(ROOT_CERT_SESSION_ATTRIBTUE, rootCert);
+			session.setAttribute(ROOT_CERT_SESSION_ATTRIBUTE, rootCert);
 		}
 
 		EIdData eidData = (EIdData) session.getAttribute(EID_SESSION_ATTRIBUTE);
@@ -273,7 +278,7 @@ public class IdentityDataMessageHandler implements
 			session.setAttribute(AUTHN_CERT_SESSION_ATTRIBUTE, authnCert);
 			session.setAttribute(SIGN_CERT_SESSION_ATTRIBUTE, signCert);
 			session.setAttribute(CA_CERT_SESSION_ATTRIBUTE, caCert);
-			session.setAttribute(ROOT_CERT_SESSION_ATTRIBTUE, rootCert);
+			session.setAttribute(ROOT_CERT_SESSION_ATTRIBUTE, rootCert);
 		}
 
 		AuditService auditService = this.auditServiceLocator.locateService();
