@@ -1,0 +1,38 @@
+<xsd:schema targetNamespace="be:fedict:eid:identity:1.0"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="be:fedict:eid:identity:1.0"
+	elementFormDefault="qualified">
+	<xsd:annotation>
+		<xsd:documentation>
+			XML Schema for an eID Identity data container.
+
+			Copyright (C) 2010 FedICT.
+		</xsd:documentation>
+	</xsd:annotation>
+	<xsd:element name="Identity" type="tns:IdentityType" />
+	<xsd:complexType name="IdentityType">
+		<xsd:sequence>
+			<xsd:element name="FirstName" type="xsd:string"
+				minOccurs="0" />
+			<xsd:element name="MiddleName" type="xsd:string"
+				minOccurs="0" />
+			<xsd:element name="Name" type="xsd:string" minOccurs="0" />
+			<xsd:element name="Gender" type="tns:GenderType"
+				minOccurs="0" />
+			<xsd:element name="Photo" type="tns:PhotoType" minOccurs="0" />
+		</xsd:sequence>
+		<xsd:attribute name="Id" type="xsd:ID" />
+	</xsd:complexType>
+	<xsd:simpleType name="GenderType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="MALE" />
+			<xsd:enumeration value="FEMALE" />
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="PhotoType">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:base64Binary">
+				<xsd:attribute name="MimeType" type="xsd:string" />
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+</xsd:schema>
