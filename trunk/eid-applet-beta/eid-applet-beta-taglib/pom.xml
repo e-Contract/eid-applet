@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>be.fedict.eid-applet</groupId>
 		<artifactId>eid-applet-beta</artifactId>
-		<version>1.0.4.Beta2</version>
+		<version>1.0.4-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet Beta Taglib</name>
 	<description>Tag Library for eID Applet Beta Web Application</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-beta-taglib</artifactId>
-	<version>1.0.4.Beta2</version>
+	<version>1.0.4-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<build>
 		<plugins>
