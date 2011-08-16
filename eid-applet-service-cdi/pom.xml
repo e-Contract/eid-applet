@@ -1,16 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.4.Beta2</version>
+		<version>1.0.4-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet Service CDI</name>
 	<description>CDI extension for the eID Applet Service.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-service-cdi</artifactId>
-	<version>1.0.4.Beta2</version>
+	<version>1.0.4-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<url>http://code.google.com/p/eid-applet/</url>
 	<build>
