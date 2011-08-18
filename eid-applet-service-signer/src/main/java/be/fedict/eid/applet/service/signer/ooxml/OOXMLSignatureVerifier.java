@@ -355,9 +355,11 @@ public class OOXMLSignatureVerifier {
 		}
 		if (!signatureInfoProperty.getTarget().equals("#" + signatureId)) {
 			LOG.error("Unexpected SignatureProperty: expected target=#"
-					+ signatureId + "but got: "
+					+ signatureId + " but got: "
 					+ signatureInfoProperty.getTarget());
-			return false;
+			LOG.warn("Allowing this error because of a bug in Office2010");
+			// work-around for existing bug in Office2011
+			//return false;
 		}
 
 		// SignatureInfoV1
