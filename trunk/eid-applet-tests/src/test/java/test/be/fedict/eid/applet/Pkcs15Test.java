@@ -42,7 +42,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import test.be.fedict.eid.applet.PcscTest.TestView;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.sc.PcscEid;
 

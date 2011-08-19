@@ -46,11 +46,11 @@ import javax.smartcardio.TerminalFactory;
 
 import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Dialogs;
+import be.fedict.eid.applet.Dialogs.Pins;
 import be.fedict.eid.applet.Messages;
+import be.fedict.eid.applet.Messages.MESSAGE_ID;
 import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
-import be.fedict.eid.applet.Dialogs.Pins;
-import be.fedict.eid.applet.Messages.MESSAGE_ID;
 
 /**
  * Holds all function related to eID card access over PC/SC.
@@ -642,6 +642,30 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		 */
 		this.view.addDetailMessage("PIN verification required...");
 
+		verifyPin(directPinVerifyFeature, verifyPinStartFeature);
+
+		this.view.addDetailMessage("computing digital signature...");
+		responseApdu = cardChannel.transmit(computeDigitalSignatureApdu);
+		if (0x9000 != responseApdu.getSW()) {
+			throw new RuntimeException("compute digital signature error: "
+					+ Integer.toHexString(responseApdu.getSW()));
+		}
+
+		byte[] signatureValue = responseApdu.getData();
+		return signatureValue;
+	}
+
+	public void verifyPin() throws IOException, CardException,
+			InterruptedException {
+		Integer directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
+		Integer verifyPinStartFeature = getFeature(FEATURE_VERIFY_PIN_START_TAG);
+		verifyPin(directPinVerifyFeature, verifyPinStartFeature);
+	}
+
+	private void verifyPin(Integer directPinVerifyFeature,
+			Integer verifyPinStartFeature) throws IOException, CardException,
+			InterruptedException {
+		ResponseAPDU responseApdu;
 		int retriesLeft = -1;
 		do {
 			if (null != directPinVerifyFeature) {
@@ -668,16 +692,6 @@ public class PcscEid extends Observable implements PcscEidSpi {
 				this.view.addDetailMessage("retries left: " + retriesLeft);
 			}
 		} while (0x9000 != responseApdu.getSW());
-
-		this.view.addDetailMessage("computing digital signature...");
-		responseApdu = cardChannel.transmit(computeDigitalSignatureApdu);
-		if (0x9000 != responseApdu.getSW()) {
-			throw new RuntimeException("compute digital signature error: "
-					+ Integer.toHexString(responseApdu.getSW()));
-		}
-
-		byte[] signatureValue = responseApdu.getData();
-		return signatureValue;
 	}
 
 	private ResponseAPDU verifyPin(int retriesLeft,

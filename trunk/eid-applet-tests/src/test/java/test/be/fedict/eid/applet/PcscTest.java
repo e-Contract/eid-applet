@@ -23,7 +23,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -72,7 +71,6 @@ import org.junit.Test;
 
 import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Messages;
-import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
 import be.fedict.eid.applet.sc.Constants;
 import be.fedict.eid.applet.sc.DiagnosticCallbackHandler;
@@ -103,55 +101,7 @@ import be.fedict.trust.ocsp.OnlineOcspRepository;
  */
 public class PcscTest {
 
-	private static final Log LOG = LogFactory.getLog(PcscTest.class);
-
-	public static class TestView implements View {
-
-		private Messages messages = new Messages(Locale.getDefault());
-
-		@Override
-		public void addDetailMessage(String detailMessage) {
-			LOG.debug("detail: " + detailMessage);
-		}
-
-		@Override
-		public Component getParentComponent() {
-			return null;
-		}
-
-		@Override
-		public boolean privacyQuestion(boolean includeAddress,
-				boolean includePhoto, String identityDataUsage) {
-			return false;
-		}
-
-		@Override
-		public void setStatusMessage(Status status,
-				Messages.MESSAGE_ID messageId) {
-			String statusMessage = this.messages.getMessage(messageId);
-			LOG.debug("status message: " + status + ": " + statusMessage);
-			if (Status.ERROR == status) {
-				throw new RuntimeException("status ERROR received");
-			}
-		}
-
-		@Override
-		public void addTestResult(DiagnosticTests diagnosticTest,
-				boolean success, String description) {
-		}
-
-		@Override
-		public void setProgressIndeterminate() {
-		}
-
-		@Override
-		public void resetProgress(int max) {
-		}
-
-		@Override
-		public void increaseProgress() {
-		}
-	}
+	static final Log LOG = LogFactory.getLog(PcscTest.class);
 
 	@BeforeClass
 	public static void beforeClass() {
