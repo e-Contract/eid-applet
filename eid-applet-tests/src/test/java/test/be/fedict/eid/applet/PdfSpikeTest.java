@@ -36,7 +36,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
-import test.be.fedict.eid.applet.PcscTest.TestView;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.sc.PcscEid;
 

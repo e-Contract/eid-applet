@@ -44,10 +44,10 @@ import org.joda.time.DateTime;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import test.be.fedict.eid.applet.PcscTest.TestView;
 import test.unit.be.fedict.eid.applet.service.signer.AbstractOOXMLSignatureServiceTest;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.sc.PcscEid;
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import be.fedict.eid.applet.service.signer.TemporaryDataStorage;
 import be.fedict.eid.applet.service.signer.ooxml.AbstractOOXMLSignatureService;
 import be.fedict.eid.applet.service.signer.ooxml.OOXMLProvider;
@@ -73,6 +73,7 @@ public class OOXMLTest {
 		private final ByteArrayOutputStream signedOOXMLOutputStream;
 
 		public OOXMLTestSignatureService(URL ooxmlUrl) {
+			super(DigestAlgo.SHA1);
 			this.temporaryDataStorage = new TemporaryTestDataStorage();
 			this.signedOOXMLOutputStream = new ByteArrayOutputStream();
 			this.ooxmlUrl = ooxmlUrl;

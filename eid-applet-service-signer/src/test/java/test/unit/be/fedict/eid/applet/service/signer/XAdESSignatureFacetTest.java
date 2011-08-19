@@ -144,9 +144,10 @@ public class XAdESSignatureFacetTest {
 		EnvelopedSignatureFacet envelopedSignatureFacet = new EnvelopedSignatureFacet();
 		KeyInfoSignatureFacet keyInfoSignatureFacet = new KeyInfoSignatureFacet(
 				true, false, false);
-		SignaturePolicyService signaturePolicyService = new ExplicitSignaturePolicyService(
-				"urn:test", "hello world".getBytes(), "description",
-				"http://here.com");
+		SignaturePolicyService signaturePolicyService = null;
+		//SignaturePolicyService signaturePolicyService = new ExplicitSignaturePolicyService(
+		//		"urn:test", "hello world".getBytes(), "description",
+		//		"http://here.com");
 		XAdESSignatureFacet xadesSignatureFacet = new XAdESSignatureFacet(
 				signaturePolicyService);
 		TimeStampService mockTimeStampService = EasyMock
@@ -267,7 +268,7 @@ public class XAdESSignatureFacetTest {
 		boolean validity = xmlSignature.validate(domValidateContext);
 		assertTrue(validity);
 
-		File tmpFile = File.createTempFile("xades-bes-", ".xml");
+		File tmpFile = File.createTempFile("xades-x-l-", ".xml");
 		FileUtils.writeStringToFile(tmpFile,
 				PkiTestUtils.toString(signedDocument));
 		LOG.debug("tmp file: " + tmpFile.getAbsolutePath());
