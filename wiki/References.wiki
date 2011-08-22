@@ -68,6 +68,7 @@
   * [http://msdn.microsoft.com/en-us/library/cc313071.aspx MS-OFFCRYPTO: Office Document Cryptography Structure Specification]
   * [http://blogs.technet.com/office2010/archive/2009/12/08/digital-signitures-in-office-2010.aspx Digital Signatures in Office 2010]
   * [http://wiki.services.openoffice.org/wiki/Security/Digital_Signatures OpenOffice Digital Signatures]
+  * [http://www.etsi.org/deliver/etsi_ts/101900_101999/101903/01.04.02_60/ XAdES v1.4.2]
 
 
 
