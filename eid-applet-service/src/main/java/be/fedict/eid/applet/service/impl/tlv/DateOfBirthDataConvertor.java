@@ -45,19 +45,28 @@ public class DateOfBirthDataConvertor implements
 			throw new DataConvertorException("UTF-8 not supported");
 		}
 		LOG.debug(dateOfBirthStr);
-		int spaceIdx = dateOfBirthStr.indexOf(' ');
+		/*
+		 * First try to detect the German format as there are cases in which a
+		 * German format contains both dots and spaces.
+		 */
+		int spaceIdx = dateOfBirthStr.indexOf('.');
 		if (-1 == spaceIdx) {
-			// german card
-			spaceIdx = dateOfBirthStr.indexOf('.');
+			spaceIdx = dateOfBirthStr.indexOf(' ');
 		}
 
 		if (spaceIdx > 0) {
 			String dayStr = dateOfBirthStr.substring(0, spaceIdx);
+			LOG.debug("day: \"" + dayStr + "\"");
 			int day = Integer.parseInt(dayStr);
 			String monthStr = dateOfBirthStr.substring(spaceIdx + 1,
 					dateOfBirthStr.length() - 4 - 1);
+			if (monthStr.endsWith(".")) {
+				monthStr = monthStr.substring(0, monthStr.length() - 1);
+			}
+			LOG.debug("month: \"" + monthStr + "\"");
 			String yearStr = dateOfBirthStr
 					.substring(dateOfBirthStr.length() - 4);
+			LOG.debug("year: \"" + yearStr + "\"");
 			int year = Integer.parseInt(yearStr);
 			int month = toMonth(monthStr);
 			return new GregorianCalendar(year, month, day);
