@@ -35,6 +35,7 @@ import javax.smartcardio.CardChannel;
 import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -174,6 +175,8 @@ public class SecurePinPadReaderTest {
 		AlgorithmIdentifier algoId = new AlgorithmIdentifier(
 				"2.16.56.1.2.1.3.1");
 		DigestInfo digestInfo = new DigestInfo(algoId, textMessage.getBytes());
+		LOG.debug("DigestInfo DER encoded: "
+				+ new String(Hex.encodeHex(digestInfo.getDEREncoded())));
 		CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A,
 				0x9E, 0x9A, digestInfo.getDEREncoded());
 

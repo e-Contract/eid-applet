@@ -78,6 +78,7 @@ import be.fedict.eid.applet.sc.PcscEid;
 import be.fedict.eid.applet.sc.PcscEidSpi;
 import be.fedict.eid.applet.sc.Task;
 import be.fedict.eid.applet.sc.TaskRunner;
+import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
 import be.fedict.trust.BelgianTrustValidatorFactory;
@@ -302,6 +303,75 @@ public class PcscTest {
 	}
 
 	@Test
+	public void signWhatever() throws Exception {
+		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEid.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEid.waitForEidPresent();
+		}
+		CardChannel cardChannel = pcscEid.getCardChannel();
+
+		CommandAPDU setApdu = new CommandAPDU(0x00, 0x22, 0x41, 0xB6,
+				new byte[] { 0x04, // length of following data
+						(byte) 0x80, // algo ref
+						0x01, // rsa pkcs#1
+						(byte) 0x84, // tag for private key ref
+						(byte) 0x82 }); // auth key
+		ResponseAPDU responseApdu = cardChannel.transmit(setApdu);
+		assertEquals(0x9000, responseApdu.getSW());
+
+		// pcscEid.verifyPin();
+
+		// CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A,
+		// 0x9E, 0x9A, new byte[] {
+		// 0x30, // DER
+		// 0x1f, // length
+		// 0x30, // DER
+		// 0x07, // length
+		// // OID = SHA1
+		// 0x06, // OID tag
+		// 0x05, 0x2b, 0x0e, 0x03,
+		// 0x02,
+		// 0x1a,
+		// 0x04, // tag OCTET STRING
+		// 0x14, // length
+		// 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+		// 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12,
+		// 0x13, 0x14 });
+
+		// CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A,
+		// 0x9E, 0x9A, new byte[] {
+		// 0x30, // DER DigestInfo
+		// 0x18, // length
+		// 0x30, // DER AlgorithmIdentifier
+		// 0x00, // length: no OID
+		// 0x04, // tag OCTET STRING
+		// 0x14, // length
+		// 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+		// 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12,
+		// 0x13, 0x14 });
+
+		CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A,
+				0x9E, 0x9A, "Hello world encrypted".getBytes());
+
+		responseApdu = cardChannel.transmit(computeDigitalSignatureApdu);
+		assertEquals(0x9000, responseApdu.getSW());
+		byte[] signatureValue = responseApdu.getData();
+		LOG.debug("signature value size: " + signatureValue.length);
+
+		List<X509Certificate> authnCertChain = pcscEid
+				.getAuthnCertificateChain();
+
+		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+		cipher.init(Cipher.DECRYPT_MODE, authnCertChain.get(0).getPublicKey());
+		byte[] decryptedSignatureValue = cipher.doFinal(signatureValue);
+		LOG.debug("decrypted signature value: "
+				+ new String(decryptedSignatureValue));
+
+		pcscEid.close();
+	}
+
+	@Test
 	public void logoffAndDie() throws Exception {
 		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEidSpi.isEidPresent()) {
@@ -404,10 +474,15 @@ public class PcscTest {
 		}
 
 		pcscEidSpi.readFile(PcscEid.IDENTITY_FILE_ID);
-		pcscEidSpi.readFile(PcscEid.ADDRESS_FILE_ID);
+		byte[] addressFile = pcscEidSpi.readFile(PcscEid.ADDRESS_FILE_ID);
 		pcscEidSpi.selectBelpicJavaCardApplet();
 
 		pcscEidSpi.close();
+
+		Address address = TlvParser.parse(addressFile, Address.class);
+		LOG.debug("street and number: " + address.getStreetAndNumber());
+		LOG.debug("zip: " + address.getZip());
+		LOG.debug("municipality: " + address.getMunicipality());
 	}
 
 	@Test
@@ -625,6 +700,8 @@ public class PcscTest {
 		LOG.debug("national registry certificate: " + nationalRegitryCert);
 		LOG.debug("authn cert size: " + authnCertData.length);
 		LOG.debug("sign cert size: " + signCertData.length);
+		LOG.debug("citizen CA certificate: " + citizenCaCert);
+		LOG.debug("root CA certificate: " + rootCaCert);
 
 		File rootCaFile = File.createTempFile("test-root-ca-", ".pem");
 		FileWriter rootCaFileWriter = new FileWriter(rootCaFile);
@@ -662,6 +739,9 @@ public class PcscTest {
 		FileUtils.writeByteArrayToFile(tmpIdentityFile, identityFile);
 		Identity identity = TlvParser.parse(identityFile, Identity.class);
 		LOG.debug("DoB: " + identity.getDateOfBirth().getTime());
+		LOG.debug("document type: " + identity.getDocumentType());
+		LOG.debug("noble condition: " + identity.getNobleCondition());
+		LOG.debug("special status: " + identity.getSpecialStatus());
 	}
 
 	@Test
@@ -969,8 +1049,7 @@ public class PcscTest {
 		}
 
 		try {
-			List<X509Certificate> certChain = pcscEid
-					.getSignCertificateChain();
+			List<X509Certificate> certChain = pcscEid.getSignCertificateChain();
 			for (X509Certificate cert : certChain) {
 				LOG.debug("certificate: " + cert);
 			}
