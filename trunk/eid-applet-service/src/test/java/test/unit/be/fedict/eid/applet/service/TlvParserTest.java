@@ -28,6 +28,7 @@ import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import org.apache.commons.codec.binary.Base64;
@@ -43,7 +44,6 @@ import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.SpecialStatus;
 import be.fedict.eid.applet.service.impl.tlv.TlvField;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
-import java.util.Calendar;
 
 public class TlvParserTest {
 
@@ -353,6 +353,26 @@ public class TlvParserTest {
 		assertEquals(DocumentType.FOREIGNER_E_PLUS, identity.getDocumentType());
 		assertNotNull(identity.getDuplicate());
 		LOG.debug("duplicate: " + identity.getDuplicate());
+	}
+
+	@Test
+	public void testGermanIdentityFileDoB() throws Exception {
+		// setup
+		byte[] idFileCaseInTheField = new byte[] { 12, 12, '2', '3', '.', 'S',
+				'E', 'P', '.', ' ', '1', '9', '8', '2' };
+
+		// operate
+		Identity identity = TlvParser.parse(idFileCaseInTheField,
+				Identity.class);
+
+		// verify
+		assertNotNull(identity.getDateOfBirth());
+		LOG.debug("date of birth: " + identity.getDateOfBirth().getTime());
+
+		byte[] idFile = new byte[] { 12, 12, '2', '3', '.', 'S', 'E', 'P', '.',
+				' ', '1', '9', '8', '2' };
+		Identity identity2 = TlvParser.parse(idFile, Identity.class);
+		assertEquals(identity.getDateOfBirth(), identity2.getDateOfBirth());
 	}
 
 	@Test
