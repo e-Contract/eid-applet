@@ -46,7 +46,6 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.sun.org.apache.xpath.internal.XPathAPI;
@@ -63,7 +62,7 @@ public class ReleaseTest {
 	private static final Log LOG = LogFactory.getLog(ReleaseTest.class);
 
 	// 1.0.2-SNAPSHOT
-	private static final String CURRENT_VERSION = "1.0.4.Beta2";
+	private static final String CURRENT_VERSION = "1.0.4.Beta3";
 
 	// 1.0.2.Beta2
 	private static final String NEW_VERSION = "1.0.4-SNAPSHOT";
