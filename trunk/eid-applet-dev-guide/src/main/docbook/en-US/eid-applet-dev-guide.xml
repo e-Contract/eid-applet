@@ -170,7 +170,7 @@
 			The eID Applet should be used within a web page as shown in the
 			following example:
 		</para>
-		<programlisting role="XML"><![CDATA[<script src="https://www.java.com/js/deployJava.js"></script>
+		<programlisting language="XML"><![CDATA[<script src="https://www.java.com/js/deployJava.js"></script>
 <script>
 	var attributes = {
 		code :'be.fedict.eid.applet.Applet.class',
@@ -222,7 +222,7 @@
 		<table id="table-applet-params">
 			<title>eID Applet Parameters</title>
 			<tgroup cols="3">
-				<colspec colwidth="2*" />
+				<colspec colwidth="3*" />
 				<colspec colwidth="1*" />
 				<colspec colwidth="4*" />
 				<thead>
@@ -485,7 +485,7 @@
 				<code>web.xml</code>
 				web deployment descriptor as shown in the following example:
 			</para>
-			<programlisting role="XML"><![CDATA[<servlet>
+			<programlisting language="XML"><![CDATA[<servlet>
 	<servlet-name>AppletServiceServlet</servlet-name>
 	<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
 </servlet>
@@ -562,7 +562,7 @@
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>IncludeAddress</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -591,7 +591,7 @@
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>IncludePhoto</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -612,7 +612,7 @@
 					<code>PhotoServlet</code>
 					as follows:
 				</para>
-				<programlisting role="XML"><![CDATA[<servlet>
+				<programlisting language="XML"><![CDATA[<servlet>
 	<servlet-name>PhotoServlet</servlet-name>
 	<servlet-class>be.fedict.eid.applet.service.PhotoServlet</servlet-class>
 </servlet>
@@ -624,7 +624,7 @@
 					After a successful eID identification you can display the eID
 					photo by putting next HTML tag in your web page:
 				</para>
-				<programlisting role="XML"><![CDATA[<img src="photo.jpg" />]]></programlisting>
+				<programlisting language="XML"><![CDATA[<img src="photo.jpg" />]]></programlisting>
 			</section>
 			<section>
 				<title>eID Certificates</title>
@@ -634,7 +634,7 @@
 					certificates via the following eID Applet Service servlet
 					configuration:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>IncludeCertificates</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -664,7 +664,7 @@
 					you want to print the eID identity data from within your web
 					application pages. The PDF servlet can be configured as follows:
 				</para>
-				<programlisting role="XML"><![CDATA[<servlet>
+				<programlisting language="XML"><![CDATA[<servlet>
 	<servlet-name>PdfServlet</servlet-name>
 	<servlet-class>be.fedict.eid.applet.service.PdfServlet</servlet-class>
 </servlet>
@@ -676,7 +676,7 @@
 					After a successful eID identification, the PDF is available
 					via:
 				</para>
-				<programlisting role="XML"><![CDATA[<a href="identity.pdf" target="_blank">View as PDF</a>]]></programlisting>
+				<programlisting language="XML"><![CDATA[<a href="identity.pdf" target="_blank">View as PDF</a>]]></programlisting>
 			</section>
 			<section>
 				<title>Output to KML (Google Earth)</title>
@@ -705,7 +705,7 @@
 					</screenshot>
 				</figure>
 				<para>The servlet is configured as follows:</para>
-				<programlisting role="XML"><![CDATA[<servlet>
+				<programlisting language="XML"><![CDATA[<servlet>
 	<servlet-name>KmlServlet</servlet-name>
 	<servlet-class>be.fedict.eid.applet.service.KmlServlet</servlet-class>
 </servlet>
@@ -716,7 +716,7 @@
 				<para>After a successful eID identification, the Google Earth KMZ
 					file is available
 					via:</para>
-				<programlisting role="XML"><![CDATA[<a href="identity.kmz" target="_blank">View in Google Earth</a>]]></programlisting>
+				<programlisting language="XML"><![CDATA[<a href="identity.kmz" target="_blank">View in Google Earth</a>]]></programlisting>
 			</section>
 			<section>
 				<title>JSON</title>
@@ -725,7 +725,7 @@
 					identity data retrieval inside your web application via JSON. The
 					JSON servlet is configured as follows:
 				</para>
-				<programlisting role="XML"><![CDATA[<servlet>
+				<programlisting language="XML"><![CDATA[<servlet>
 	<servlet-name>JSONServlet</servlet-name>
 	<servlet-class>be.fedict.eid.applet.service.JSONServlet</servlet-class>
 </servlet>
@@ -775,7 +775,7 @@
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>IdentityIntegrityService</param-name>
 	<param-value>your/location/in/jndi/IdentityIntegrityServiceBean</param-value>
 </init-param>]]></programlisting>
@@ -846,7 +846,7 @@
 					B after eID authentication of citizen A, you might want to disable
 					this feature. Do so via:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>SkipNationalNumberCheck</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -871,7 +871,7 @@
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>PrivacyService</param-name>
 	<param-value>your/location/in/jndi/PrivacyServiceBean</param-value>
 </init-param>]]></programlisting>
@@ -913,7 +913,7 @@
 				<code>AppletServiceServlet</code>
 				:
 			</para>
-			<programlisting role="XML"><![CDATA[<init-param>
+			<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>AuthenticationService</param-name>
 	<param-value>your/location/in/jndi/AuthenticationServiceBean</param-value>
 </init-param>]]></programlisting>
@@ -993,7 +993,7 @@
 				<code>AppletServiceServlet</code>
 				:
 			</para>
-			<programlisting role="XML"><![CDATA[<init-param>
+			<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>Hostname</param-name>
 	<param-value>www.PutYourSiteHostnameHere.be</param-value>
 </init-param>]]></programlisting>
@@ -1013,7 +1013,7 @@
 				<code>AppletServiceServlet</code>
 				:
 			</para>
-			<programlisting role="XML"><![CDATA[<init-param>
+			<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>InetAddress</param-name>
 	<param-value>1.2.3.4</param-value>
 </init-param>]]></programlisting>
@@ -1047,7 +1047,7 @@
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>NRCIDSecret</param-name>
 	<param-value>place-your-application-secret-here</param-value>
 </init-param>]]></programlisting>
@@ -1079,7 +1079,7 @@
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>ChannelBindingServerCertificate</param-name>
 	<param-value>/path/to/your/server/certificate.der</param-value>
 </init-param>]]></programlisting>
@@ -1104,7 +1104,7 @@
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>ChannelBindingService</param-name>
 	<param-value>your/location/in/jndi/ChannelBindingServiceBean</param-value>
 </init-param>]]></programlisting>
@@ -1122,7 +1122,7 @@
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>SessionIdChannelBinding</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -1154,7 +1154,7 @@
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>PreLogoff</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -1170,7 +1170,7 @@
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>IncludeIdentity</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -1186,7 +1186,7 @@
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>IncludeAddress</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -1197,7 +1197,7 @@
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>IncludePhoto</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -1216,7 +1216,7 @@
 					certificates via the following eID Applet Service servlet
 					configuration:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>IncludeCertificates</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -1284,7 +1284,7 @@
 				<code>AppletServiceServlet</code>
 				:
 			</para>
-			<programlisting role="XML"><![CDATA[<init-param>
+			<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>SignatureService</param-name>
 	<param-value>your/location/in/jndi/SignatureServiceBean</param-value>
 </init-param>]]></programlisting>
@@ -1297,7 +1297,7 @@
 				During pre-sign phase you can receive the non-repudiation
 				certificate chain via:
 			</para>
-			<programlisting role="XML"><![CDATA[<init-param>
+			<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>IncludeCertificates</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -1441,7 +1441,7 @@
 				<code>AppletServiceServlet</code>
 				:
 			</para>
-			<programlisting role="XML"><![CDATA[<init-param>
+			<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>ChangePin</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -1453,7 +1453,7 @@
 				<code>AppletServiceServlet</code>
 				:
 			</para>
-			<programlisting role="XML"><![CDATA[<init-param>
+			<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>UnblockPin</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -1476,7 +1476,7 @@
 				<code>AppletServiceServlet</code>
 				:
 			</para>
-			<programlisting role="XML"><![CDATA[<init-param>
+			<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>Kiosk</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -1484,7 +1484,7 @@
 				The web developer can install the notification callback as
 				follows inside a web page:
 			</para>
-			<programlisting role="XML"><![CDATA[<script src="https://www.java.com/js/deployJava.js"></script>
+			<programlisting language="XML"><![CDATA[<script src="https://www.java.com/js/deployJava.js"></script>
 <script>
 	var attributes = {
 		code :'be.fedict.eid.applet.Applet.class',
@@ -1538,7 +1538,7 @@
 				<code>AppletServiceServlet</code>
 				:
 			</para>
-			<programlisting role="XML"><![CDATA[<init-param>
+			<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>DiagnosticMode</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -1548,7 +1548,7 @@
 				callback. The web developer can install the test result callback as
 				follows inside a web page:
 			</para>
-			<programlisting role="XML"><![CDATA[<script src="https://www.java.com/js/deployJava.js"></script>
+			<programlisting language="XML"><![CDATA[<script src="https://www.java.com/js/deployJava.js"></script>
 <script>
 	var attributes = {
 		code :'be.fedict.eid.applet.Applet.class',
@@ -1650,7 +1650,7 @@
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>SecureClientEnvironmentService</param-name>
 	<param-value>your/location/in/jndi/SecureClientEnvironmentServiceBean</param-value>
 </init-param>]]></programlisting>
@@ -1664,7 +1664,7 @@
 					eID Applet Service by adding the following eID Applet parameters
 					within your web page eID Applet configuration:
 				</para>
-				<programlisting role="XML"><![CDATA[NavigatorUserAgent : navigator.userAgent,
+				<programlisting language="XML"><![CDATA[NavigatorUserAgent : navigator.userAgent,
 NavigatorAppName : navigator.appName,
 NavigatorAppVersion : navigator.appVersion]]></programlisting>
 				<note>
@@ -1689,7 +1689,7 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>RemoveCard</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -1715,7 +1715,7 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>Logoff</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -1755,7 +1755,7 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>AuditService</param-name>
 	<param-value>your/location/in/jndi/AuditServiceBean</param-value>
 </init-param>]]></programlisting>
@@ -1778,7 +1778,7 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 					The web developer can install the info message callback inside
 					a web page as follows:
 				</para>
-				<programlisting role="XML"><![CDATA[<script src="https://www.java.com/js/deployJava.js"></script>
+				<programlisting language="XML"><![CDATA[<script src="https://www.java.com/js/deployJava.js"></script>
 <script>
 	var attributes = {
 		code :'be.fedict.eid.applet.Applet.class',
@@ -1849,7 +1849,7 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>RequireSecureReader</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -1874,7 +1874,7 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 					<code>AppletServiceServlet</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>NoPKCS11</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
@@ -1906,7 +1906,7 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 					<code>IdentityService</code>
 					:
 				</para>
-				<programlisting role="XML"><![CDATA[<init-param>
+				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>IdentityService</param-name>
 	<param-value>your/location/in/jndi/IdentityServiceBean</param-value>
 </init-param>]]></programlisting>
@@ -2007,7 +2007,7 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 				<code>AppletServiceServlet</code>
 				:
 			</para>
-			<programlisting role="XML"><![CDATA[<init-param>
+			<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>SkipSecureConnectionCheck</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
