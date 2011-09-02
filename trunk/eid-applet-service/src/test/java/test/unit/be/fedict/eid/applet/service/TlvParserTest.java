@@ -369,8 +369,8 @@ public class TlvParserTest {
 		assertNotNull(identity.getDateOfBirth());
 		LOG.debug("date of birth: " + identity.getDateOfBirth().getTime());
 
-		byte[] idFile = new byte[] { 12, 12, '2', '3', '.', 'S', 'E', 'P', '.',
-				' ', '1', '9', '8', '2' };
+		byte[] idFile = new byte[] { 12, 11, '2', '3', '.', 'S', 'E', 'P', '.',
+				'1', '9', '8', '2' };
 		Identity identity2 = TlvParser.parse(idFile, Identity.class);
 		assertEquals(identity.getDateOfBirth(), identity2.getDateOfBirth());
 	}
