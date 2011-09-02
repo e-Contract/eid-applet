@@ -1,0 +1,5 @@
+eID Applet SQL DDL Plugin
+
+  This artifact holds the SQL DDL Maven plugin.
+  
+  Via this plugin you can generate SQL DDL scripts from JPA annotated classes.
