@@ -240,7 +240,6 @@ public class PcscTest {
 		} finally {
 			pcscEid.close();
 		}
-		LOG.debug("test: " + (true ? "true" : "false"));
 	}
 
 	@Test

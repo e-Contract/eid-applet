@@ -18,6 +18,14 @@
 
 package be.fedict.eid.applet.sc;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -29,11 +37,14 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Observable;
+import java.util.Set;
 
+import javax.imageio.ImageIO;
 import javax.smartcardio.ATR;
 import javax.smartcardio.Card;
 import javax.smartcardio.CardChannel;
@@ -43,6 +54,13 @@ import javax.smartcardio.CardTerminals;
 import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 import javax.smartcardio.TerminalFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
 
 import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Dialogs;
@@ -345,6 +363,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			}
 			return false;
 		}
+		Set<CardTerminal> eIDCardTerminals = new HashSet<CardTerminal>();
 		for (CardTerminal cardTerminal : cardTerminalList) {
 			this.view.addDetailMessage("Scanning card terminal: "
 					+ cardTerminal.getName());
@@ -369,13 +388,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 				}
 				ATR atr = card.getATR();
 				if (matchesEidAtr(atr)) {
-					this.view
-							.addDetailMessage("eID card detected in card terminal : "
-									+ cardTerminal.getName());
-					this.cardTerminal = cardTerminal;
-					this.card = card;
-					this.cardChannel = card.getBasicChannel();
-					return true;
+					eIDCardTerminals.add(cardTerminal);
 				} else {
 					byte[] atrBytes = atr.getBytes();
 					StringBuffer atrStringBuffer = new StringBuffer();
@@ -391,7 +404,128 @@ public class PcscEid extends Observable implements PcscEidSpi {
 				card.disconnect(true);
 			}
 		}
-		return false;
+		if (eIDCardTerminals.isEmpty()) {
+			return false;
+		}
+		if (eIDCardTerminals.size() == 1) {
+			this.cardTerminal = eIDCardTerminals.iterator().next();
+		} else {
+			try {
+				this.cardTerminal = selectCardTerminal(eIDCardTerminals);
+			} catch (IOException e) {
+				this.view.addDetailMessage("error: " + e.getMessage());
+				return false;
+			}
+		}
+		if (null == this.cardTerminal) {
+			/*
+			 * In case the card terminal selection was canceled.
+			 */
+			return false;
+		}
+		this.view.addDetailMessage("eID card detected in card terminal : "
+				+ this.cardTerminal.getName());
+		this.card = this.cardTerminal.connect("T=0");
+		this.card.beginExclusive();
+		this.cardChannel = card.getBasicChannel();
+		return true;
+	}
+
+	private static class ListData {
+		private CardTerminal cardTerminal;
+		private BufferedImage photo;
+
+		public ListData(CardTerminal cardTerminal, BufferedImage photo) {
+			this.cardTerminal = cardTerminal;
+			this.photo = photo;
+		}
+
+		public CardTerminal getCardTerminal() {
+			return this.cardTerminal;
+		}
+
+		public BufferedImage getPhoto() {
+			return this.photo;
+		}
+	}
+
+	private static class EidListCellRenderer extends JPanel implements
+			ListCellRenderer {
+
+		private static final long serialVersionUID = 1L;
+
+		public Component getListCellRendererComponent(JList list, Object value,
+				int index, boolean isSelected, boolean cellHasFocus) {
+			JPanel panel = new JPanel();
+			ListData listData = (ListData) value;
+			panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+			JLabel photoLabel = new JLabel(new ImageIcon(listData.getPhoto()));
+			panel.add(photoLabel);
+			JLabel nameLabel = new JLabel(listData.getCardTerminal().getName());
+			if (isSelected) {
+				panel.setBackground(list.getSelectionBackground());
+			} else {
+				panel.setBackground(list.getBackground());
+			}
+			panel.add(nameLabel);
+			return panel;
+		}
+	}
+
+	private CardTerminal selectCardTerminal(Set<CardTerminal> eIDCardTerminals)
+			throws CardException, IOException {
+		this.view.addDetailMessage("multiple eID card detected...");
+		DefaultListModel listModel = new DefaultListModel();
+		for (CardTerminal cardTerminal : eIDCardTerminals) {
+			this.cardTerminal = cardTerminal;
+			this.card = this.cardTerminal.connect("T=0");
+			this.card.beginExclusive();
+			this.cardChannel = this.card.getBasicChannel();
+
+			this.view.addDetailMessage("reading photo from: "
+					+ this.cardTerminal.getName());
+			byte[] photoFile = readFile(PHOTO_FILE_ID);
+			BufferedImage photo = ImageIO.read(new ByteArrayInputStream(
+					photoFile));
+			listModel.addElement(new ListData(cardTerminal, photo));
+
+			this.card.endExclusive(); // SCARD_E_SHARING_VIOLATION fix
+			this.card.disconnect(true);
+		}
+
+		final JDialog dialog = new JDialog((Frame) null, "Select eID card",
+				true);
+		final ListData selectedListData = new ListData(null, null);
+		dialog.setLayout(new BorderLayout());
+
+		JList list = new JList(listModel);
+		list.setCellRenderer(new EidListCellRenderer());
+		dialog.getContentPane().add(list);
+
+		MouseListener mouseListener = new MouseAdapter() {
+			public void mouseClicked(MouseEvent mouseEvent) {
+				JList theList = (JList) mouseEvent.getSource();
+				if (mouseEvent.getClickCount() == 2) {
+					int index = theList.locationToIndex(mouseEvent.getPoint());
+					if (index >= 0) {
+						Object object = theList.getModel().getElementAt(index);
+						ListData listData = (ListData) object;
+						selectedListData.cardTerminal = listData.cardTerminal;
+						selectedListData.photo = listData.photo;
+						dialog.dispose();
+					}
+				}
+			}
+		};
+		list.addMouseListener(mouseListener);
+
+		dialog.pack();
+		dialog.setLocationRelativeTo(this.view.getParentComponent());
+		dialog.setResizable(false);
+
+		dialog.setVisible(true);
+
+		return selectedListData.getCardTerminal();
 	}
 
 	private void selectFile(byte[] fileId) throws CardException,
