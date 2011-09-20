@@ -28,6 +28,7 @@
 		<module>eid-applet-shared</module>
 		<module>eid-applet-core</module>
 		<module>eid-applet-package</module>
+		<module>eid-applet-js</module>
 		<module>eid-applet-service-spi</module>
 		<module>eid-applet-service</module>
 		<module>eid-applet-service-signer</module>
