@@ -42,7 +42,7 @@ public class ASiCUtil {
 
 	public static String ASIC_NS_PREFIX = "asic";
 
-	public static String SIGNATURE_ELEMENT = "ASiCSignatures";
+	public static String SIGNATURE_ELEMENT = "XAdESSignatures";
 
 	private ASiCUtil() {
 		super();

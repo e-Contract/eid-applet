@@ -55,12 +55,12 @@
 			<xsd:element ref="Extension" maxOccurs="unbounded"/>
 		</xsd:sequence>
 	</xsd:complexType>
-	<xsd:element name="ASiCSignatures" type="ASiCSignaturesType">
+	<xsd:element name="XAdESSignatures" type="XAdESSignaturesType">
 		<xsd:annotation>
 			<xsd:documentation>Schema for ASiC-E with XAdES specifying content for ASiC Signatures files</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="ASiCSignaturesType">
+	<xsd:complexType name="XAdESSignaturesType">
 		<xsd:sequence>
 			<xsd:element ref="ds:Signature" maxOccurs="unbounded"/>
 		</xsd:sequence>
