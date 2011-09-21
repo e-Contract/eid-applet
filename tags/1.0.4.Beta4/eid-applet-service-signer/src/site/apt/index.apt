@@ -1,0 +1,5 @@
+eID Applet Service Signer
+
+  This artifact holds the eID Applet Service SPI implementations related to creation of digital signatures.
+  
+  {{{./apidocs/index.html}Javadoc}}

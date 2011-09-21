@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>be.fedict</groupId>
+		<artifactId>eid-applet</artifactId>
+		<version>1.0.4.Beta4</version>
+	</parent>
+	<name>FedICT eID Applet Beta Project</name>
+	<description>Contains an eID Applet Beta Java EE web
+		application.</description>
+	<groupId>be.fedict.eid-applet</groupId>
+	<artifactId>eid-applet-beta</artifactId>
+	<version>1.0.4.Beta4</version>
+	<packaging>pom</packaging>
+	<modules>
+		<module>eid-applet-beta-service</module>
+		<module>eid-applet-beta-model</module>
+		<module>eid-applet-beta-taglib</module>
+		<module>eid-applet-beta-webapp</module>
+		<module>eid-applet-beta-deploy</module>
+	</modules>
+</project>
