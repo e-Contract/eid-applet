@@ -44,6 +44,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import be.fedict.eid.applet.service.signer.facets.CoSignatureFacet;
 
 public class CoSignatureFacetTest {
@@ -68,6 +69,65 @@ public class CoSignatureFacetTest {
 				javax.xml.crypto.dsig.XMLSignature.XMLNS, "ds");
 
 		CoSignatureFacet testedInstance = new CoSignatureFacet();
+		List<Reference> references = new LinkedList<Reference>();
+		testedInstance.preSign(signatureFactory, document, "foo-bar", null,
+				references, null);
+
+		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(
+				SignatureMethod.RSA_SHA1, null);
+		CanonicalizationMethod canonicalizationMethod = signatureFactory
+				.newCanonicalizationMethod(
+						CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
+						(C14NMethodParameterSpec) null);
+		SignedInfo signedInfo = signatureFactory.newSignedInfo(
+				canonicalizationMethod, signatureMethod, references);
+
+		XMLSignature xmlSignature = signatureFactory.newXMLSignature(
+				signedInfo, null);
+
+		// operate
+		xmlSignature.sign(signContext);
+
+		// verify
+		LOG.debug("signed document: " + PkiTestUtils.toString(document));
+		NodeList signatureNodeList = document.getElementsByTagNameNS(
+				XMLSignature.XMLNS, "Signature");
+		assertEquals(1, signatureNodeList.getLength());
+		Node signatureNode = signatureNodeList.item(0);
+		DOMValidateContext domValidateContext = new DOMValidateContext(
+				keyPair.getPublic(), signatureNode);
+		XMLSignature validationXmlSignature = signatureFactory
+				.unmarshalXMLSignature(domValidateContext);
+		boolean validity = validationXmlSignature.validate(domValidateContext);
+		assertTrue(validity);
+
+		document.getDocumentElement().getFirstChild().setNodeValue("test");
+		LOG.debug("signed document: " + PkiTestUtils.toString(document));
+		assertTrue(validationXmlSignature.validate(domValidateContext));
+		// really have to re-load the XML signature object.
+		validationXmlSignature = signatureFactory
+				.unmarshalXMLSignature(domValidateContext);
+		assertFalse(validationXmlSignature.validate(domValidateContext));
+	}
+
+	@Test
+	public void testCoSignatureUri() throws Exception {
+		// setup
+		Document document = PkiTestUtils
+				.loadDocument(CoSignatureFacetTest.class
+						.getResourceAsStream("/helloworld.xml"));
+		KeyPair keyPair = PkiTestUtils.generateKeyPair();
+
+		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
+				"DOM", new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
+
+		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(),
+				document.getDocumentElement());
+		signContext.putNamespacePrefix(
+				javax.xml.crypto.dsig.XMLSignature.XMLNS, "ds");
+
+		CoSignatureFacet testedInstance = new CoSignatureFacet(DigestAlgo.SHA1,
+				"ref-1234");
 		List<Reference> references = new LinkedList<Reference>();
 		testedInstance.preSign(signatureFactory, document, "foo-bar", null,
 				references, null);
