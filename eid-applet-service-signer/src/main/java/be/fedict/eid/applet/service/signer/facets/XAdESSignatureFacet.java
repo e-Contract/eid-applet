@@ -25,8 +25,10 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.xml.bind.JAXBContext;
@@ -47,7 +49,6 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.PrincipalUtil;
@@ -55,11 +56,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import be.fedict.eid.applet.service.signer.SignatureFacet;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.AnyType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.CertIDListType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.CertIDType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.ClaimedRolesListType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.DataObjectFormatType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.DigestAlgAndValueType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.IdentifierType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.ObjectFactory;
@@ -68,6 +71,7 @@ import be.fedict.eid.applet.service.signer.jaxb.xades132.QualifyingPropertiesTyp
 import be.fedict.eid.applet.service.signer.jaxb.xades132.SigPolicyQualifiersListType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.SignaturePolicyIdType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.SignaturePolicyIdentifierType;
+import be.fedict.eid.applet.service.signer.jaxb.xades132.SignedDataObjectPropertiesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.SignedPropertiesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.SignedSignaturePropertiesType;
 import be.fedict.eid.applet.service.signer.jaxb.xades132.SignerRoleType;
@@ -117,6 +121,8 @@ public class XAdESSignatureFacet implements SignatureFacet {
 	private String role;
 
 	private boolean issuerNameNoReverseOrder = false;
+
+	private Map<String, String> dataObjectFormatMimeTypes;
 
 	/**
 	 * Default constructor. Will use a local clock and "SHA-1" for digest
@@ -221,6 +227,7 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
 		}
+		this.dataObjectFormatMimeTypes = new HashMap<String, String>();
 	}
 
 	public void postSign(Element signatureElement,
@@ -347,6 +354,27 @@ public class XAdESSignatureFacet implements SignatureFacet {
 					.setSignaturePolicyIdentifier(signaturePolicyIdentifier);
 
 			signaturePolicyIdentifier.setSignaturePolicyImplied("");
+		}
+
+		// DataObjectFormat
+		if (false == this.dataObjectFormatMimeTypes.isEmpty()) {
+			SignedDataObjectPropertiesType signedDataObjectProperties = this.xadesObjectFactory
+					.createSignedDataObjectPropertiesType();
+			signedProperties
+					.setSignedDataObjectProperties(signedDataObjectProperties);
+
+			List<DataObjectFormatType> dataObjectFormats = signedDataObjectProperties
+					.getDataObjectFormat();
+			for (Map.Entry<String, String> dataObjectFormatMimeType : this.dataObjectFormatMimeTypes
+					.entrySet()) {
+				DataObjectFormatType dataObjectFormat = this.xadesObjectFactory
+						.createDataObjectFormatType();
+				dataObjectFormat.setObjectReference("#"
+						+ dataObjectFormatMimeType.getKey());
+				dataObjectFormat.setMimeType(dataObjectFormatMimeType
+						.getValue());
+				dataObjectFormats.add(dataObjectFormat);
+			}
 		}
 
 		// marshall XAdES QualifyingProperties
@@ -479,6 +507,17 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		certId.setCertDigest(certDigest);
 
 		return certId;
+	}
+
+	/**
+	 * Adds a mime-type for the given ds:Reference (referred via its @URI). This
+	 * information is added via the xades:DataObjectFormat element.
+	 * 
+	 * @param dsReferenceUri
+	 * @param mimetype
+	 */
+	public void addMimeType(String dsReferenceUri, String mimetype) {
+		this.dataObjectFormatMimeTypes.put(dsReferenceUri, mimetype);
 	}
 
 	/**

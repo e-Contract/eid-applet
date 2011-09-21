@@ -35,10 +35,10 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathFilterParameterSpec;
 
-import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import be.fedict.eid.applet.service.signer.SignatureFacet;
 
 /**
@@ -51,6 +51,8 @@ import be.fedict.eid.applet.service.signer.SignatureFacet;
 public class CoSignatureFacet implements SignatureFacet {
 
 	private final DigestAlgo digestAlgo;
+
+	private final String dsReferenceId;
 
 	/**
 	 * Default constructor. Digest algorithm will be SHA-1.
@@ -67,7 +69,21 @@ public class CoSignatureFacet implements SignatureFacet {
 	 *            element. Possible values: "SHA-1", "SHA-256, or "SHA-512".
 	 */
 	public CoSignatureFacet(DigestAlgo digestAlgorithm) {
+		this(digestAlgorithm, "");
+	}
+
+	/**
+	 * Main constructor.
+	 * 
+	 * @param digestAlgorithm
+	 *            the digest algorithm to be used within the ds:Reference
+	 *            element. Possible values: "SHA-1", "SHA-256, or "SHA-512".
+	 * @param dsReferenceId
+	 *            the optional Id to be used on the ds:Reference element.
+	 */
+	public CoSignatureFacet(DigestAlgo digestAlgorithm, String dsReferenceId) {
 		this.digestAlgo = digestAlgorithm;
+		this.dsReferenceId = dsReferenceId;
 	}
 
 	public void preSign(XMLSignatureFactory signatureFactory,
@@ -92,7 +108,7 @@ public class CoSignatureFacet implements SignatureFacet {
 		transforms.add(exclusiveTransform);
 
 		Reference reference = signatureFactory.newReference("", digestMethod,
-				transforms, null, null);
+				transforms, null, this.dsReferenceId);
 
 		references.add(reference);
 	}
