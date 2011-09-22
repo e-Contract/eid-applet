@@ -13,7 +13,7 @@ var deployJavaEIDApplet = {
 		var version = '1.6';
 		var browser = deployJava.getBrowser();
 		if (browser == 'MSIE') {
-			version = '1.6.0_27+';
+			version = '1.6.0_27';
 		}
 		deployJava.runApplet(attributes, parameters, version);
 	}
