@@ -1,0 +1,7 @@
+eID Applet Service
+
+  This artifact holds the eID Applet Service.
+  
+  The configuration of the eID Applet Service directly impacts the behavior of the eID Applet.
+
+  {{{./apidocs/index.html}Javadoc}}
