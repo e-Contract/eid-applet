@@ -376,6 +376,23 @@ public class TlvParserTest {
 	}
 
 	@Test
+	public void testIdentityFileDoBYearOnlyWithSpaces() throws Exception {
+		// setup
+		byte[] idFile = new byte[] { 12, 12, ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+				' ', '1', '9', '6', '2' };
+
+		// operate
+		Identity identity = TlvParser.parse(idFile, Identity.class);
+
+		// verify
+		assertNotNull(identity.getDateOfBirth());
+		LOG.debug("date of birth: " + identity.getDateOfBirth().getTime());
+		assertEquals(1962, identity.getDateOfBirth().get(Calendar.YEAR));
+		assertEquals(0, identity.getDateOfBirth().get(Calendar.MONTH));
+		assertEquals(1, identity.getDateOfBirth().get(Calendar.DAY_OF_MONTH));
+	}
+
+	@Test
 	public void testParseOldIdentityFile() throws Exception {
 		// setup
 		InputStream inputStream = TlvParserTest.class

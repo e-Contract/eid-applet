@@ -40,11 +40,11 @@ public class DateOfBirthDataConvertor implements
 			throws DataConvertorException {
 		String dateOfBirthStr;
 		try {
-			dateOfBirthStr = new String(value, "UTF-8");
+			dateOfBirthStr = new String(value, "UTF-8").trim();
 		} catch (UnsupportedEncodingException e) {
 			throw new DataConvertorException("UTF-8 not supported");
 		}
-		LOG.debug(dateOfBirthStr);
+		LOG.debug("\"" + dateOfBirthStr + "\"");
 		/*
 		 * First try to detect the German format as there are cases in which a
 		 * German format contains both dots and spaces.
