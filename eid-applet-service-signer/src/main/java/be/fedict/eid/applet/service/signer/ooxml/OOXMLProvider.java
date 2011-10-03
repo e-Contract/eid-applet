@@ -52,7 +52,7 @@ public class OOXMLProvider extends Provider {
 
 	public static final String NAME = "OOXMLProvider";
 
-	private OOXMLProvider() {
+	public OOXMLProvider() {
 		super(NAME, 1.0, "OOXML Security Provider");
 		put("TransformService." + RelationshipTransformService.TRANSFORM_URI,
 				RelationshipTransformService.class.getName());
