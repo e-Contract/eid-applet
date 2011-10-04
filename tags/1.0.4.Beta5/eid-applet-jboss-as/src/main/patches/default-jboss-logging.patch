@@ -1,0 +1,41 @@
+--- server/default/deploy/jboss-logging.xml.orig	2010-12-28 08:29:02.000000000 +0100
++++ server/default/deploy/jboss-logging.xml	2011-02-15 09:44:34.000000000 +0100
+@@ -53,7 +53,23 @@
+          <pattern-formatter pattern="%d %-5p [%c] (%t) %m%n"/>
+       </formatter>
+    </size-rotating-file-handler>
+-   -->
++   -->
++
++   <size-rotating-file-handler
++         file-name="${jboss.server.log.dir}/fedict.log"
++         name="FEDICT"
++         autoflush="true"
++         append="true"
++         rotate-size="500k"
++         max-backup-index="5">
++
++      <error-manager>
++         <only-once/>
++      </error-manager>
++      <formatter>
++         <pattern-formatter pattern="%d %-5p [%C{1}] %m%n"/>
++      </formatter>
++   </size-rotating-file-handler>
+ 
+    <!-- ============================== -->
+    <!-- Append messages to the console -->
+@@ -665,6 +681,13 @@
+         should be removed once that bug if fixed in the bundled admin-console war. -->
+    <logger category="org.rhq.plugins.jbossas5.ApplicationServerComponent">
+       <level name="FATAL"/>
++   </logger>
++
++   <logger category="be.fedict">
++      <level name="DEBUG" />
++      <handlers>
++         <handler-ref name="FEDICT" />
++      </handlers>
+    </logger>
+ 
+    <!-- ======================= -->

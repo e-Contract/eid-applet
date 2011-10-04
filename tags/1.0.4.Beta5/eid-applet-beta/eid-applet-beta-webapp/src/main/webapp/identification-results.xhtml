@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:rich="http://richfaces.org/rich"
+        lang="en" xml:lang="en">
+<body>
+<ui:composition template="/WEB-INF/template.xhtml">
+	<ui:param name="activeMenu" value="test" />
+	<ui:define name="body">
+		<h2>eID Applet Identification Test Results</h2>
+		<p>The eID Applet Identification was successful.</p>
+		<rich:tabPanel switchType="client">
+			<rich:tab label="Identity">
+				<h:panelGrid columns="2">
+                                    <h:graphicImage alt="photo from eID card" url="photo"/>
+					<h:panelGroup>
+						<h:panelGrid columns="2">
+                            <h:outputText value="National Number" />
+							<h:outputText value="#{eid.identity.nationalNumber}" />
+
+							<h:outputText value="Name" />
+							<h:outputText value="#{eid.identity.name}" />
+
+							<h:outputText value="First Name" />
+							<h:outputText value="#{eid.identity.firstName}" />
+
+							<h:outputText value="Middle Name" />
+							<h:outputText value="#{eid.identity.middleName}" />
+
+							<h:outputText value="Nationality" />
+							<h:outputText value="#{eid.identity.nationality}" />
+
+							<h:outputText value="Place Of Birth" />
+							<h:outputText value="#{eid.identity.placeOfBirth}" />
+
+							<h:outputText value="Date Of Birth" />
+							<h:outputText value="#{eid.identity.dateOfBirth.time}">
+								<f:convertDateTime timeZone="Europe/Paris" dateStyle="full"
+									type="date" />
+							</h:outputText>
+
+							<h:outputText value="Gender" />
+							<h:outputText value="#{eid.identity.gender}" />
+
+							<h:outputText value="Noble Condition"
+								rendered="#{!empty eid.identity.nobleCondition}" />
+							<h:outputText value="#{eid.identity.nobleCondition}"
+								rendered="#{!empty eid.identity.nobleCondition}" />
+
+							<h:outputText value="Special Status" />
+							<h:outputText value="#{eid.identity.specialStatus}" />
+						</h:panelGrid>
+					</h:panelGroup>
+					<p><a href="identity.pdf" target="_blank">View as PDF</a></p>
+					<p><a href="identity.kmz" target="_blank">View in Google Earth</a></p>
+				</h:panelGrid>
+			</rich:tab>
+			<rich:tab label="Address">
+				<h:panelGrid columns="2">
+					<h:outputText value="Street And Number" />
+					<h:outputText value="#{eid.address.streetAndNumber}" />
+
+					<h:outputText value="ZIP" />
+					<h:outputText value="#{eid.address.zip}" />
+
+					<h:outputText value="Municipality" />
+					<h:outputText value="#{eid.address.municipality}" />
+				</h:panelGrid>
+			</rich:tab>
+			<rich:tab label="Card">
+				<h:panelGrid columns="2">
+					<h:outputText value="Card Number" />
+					<h:outputText value="#{eid.identity.cardNumber}" />
+
+					<h:outputText value="Chip Number" />
+					<h:outputText value="#{eid.identity.chipNumber}" />
+
+					<h:outputText value="Card Validity Date Begin" />
+					<h:outputText value="#{eid.identity.cardValidityDateBegin.time}">
+						<f:convertDateTime dateStyle="full" type="date"
+							timeZone="Europe/Paris" />
+					</h:outputText>
+
+					<h:outputText value="Card Validity Date End" />
+					<h:outputText value="#{eid.identity.cardValidityDateEnd.time}">
+						<f:convertDateTime dateStyle="full" type="date"
+							timeZone="Europe/Paris" />
+					</h:outputText>
+
+					<h:outputText value="Card Delivery Municipality" />
+					<h:outputText value="#{eid.identity.cardDeliveryMunicipality}" />
+
+					<h:outputText value="Document Type" />
+					<h:outputText value="#{eid.identity.documentType}" />
+
+					<h:outputText value="Duplicate"
+						rendered="#{!empty eid.identity.duplicate}" />
+					<h:outputText value="#{eid.identity.duplicate}"
+						rendered="#{!empty eid.identity.duplicate}" />
+				</h:panelGrid>
+			</rich:tab>
+			<rich:tab label="Client Environment">
+				<h:panelGrid columns="2">
+					<h:outputText value="Client Java Version" />
+					<h:outputText value="#{clientJavaVersion}" />
+
+					<h:outputText value="Client Java Vendor" />
+					<h:outputText value="#{clientJavaVendor}" />
+
+					<h:outputText value="Client OS Name" />
+					<h:outputText value="#{clientOSName}" />
+
+					<h:outputText value="Client OS Arch" />
+					<h:outputText value="#{clientOSArch}" />
+
+					<h:outputText value="Client OS Version" />
+					<h:outputText value="#{clientOSVersion}" />
+
+					<h:outputText value="Client Readers" />
+					<h:outputText value="#{clientReaders}" />
+
+					<h:outputText value="Client User Agent" />
+					<h:outputText value="#{clientUserAgent}" />
+
+					<h:outputText value="Client SSL Cipher Suite" />
+					<h:outputText value="#{clientSslCipherSuite}" />
+
+					<h:outputText value="Client SSL Key Size" />
+					<h:outputText value="#{clientSslKeySize}" />
+
+					<h:outputText value="Client Remote Address" />
+					<h:outputText value="#{clientRemoteAddress}" />
+
+					<h:outputText value="Client Navigator User Agent" />
+					<h:outputText value="#{clientNavigatorUserAgent}" />
+
+					<h:outputText value="Client Navigator App Name" />
+					<h:outputText value="#{clientNavigatorAppName}" />
+
+					<h:outputText value="Client Navigator App Version" />
+					<h:outputText value="#{clientNavigatorAppVersion}" />
+				</h:panelGrid>
+			</rich:tab>
+			<rich:tab label="Data Integrity">
+				<h:outputText value="The eID Identification was authenticated."
+					rendered="#{!empty eid.identifier}" />
+				<p>National Registry Certificate:</p>
+				<div style="overflow: auto; width: 600px; height: 200px;"><pre>
+					#{nationalRegistryCertificate}
+				</pre></div>
+			</rich:tab>
+		</rich:tabPanel>
+		<p><a
+			href="#{facesContext.externalContext.requestContextPath}/tests.seam">Go back to the tests.</a></p>
+	</ui:define>
+</ui:composition>
+</body>
+</html>
