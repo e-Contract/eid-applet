@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.4-SNAPSHOT</version>
+		<version>1.0.4.Beta5</version>
 	</parent>
 	<name>FedICT eID Applet Service SPI</name>
 	<description>SPI for the eID Applet Service.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-service-spi</artifactId>
-	<version>1.0.4-SNAPSHOT</version>
+	<version>1.0.4.Beta5</version>
 	<packaging>jar</packaging>
 	<url>http://code.google.com/p/eid-applet/</url>
 	<build>
