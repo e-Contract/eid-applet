@@ -87,12 +87,16 @@ public class SecurePinPadReaderTest {
 		/**
 		 * First test sample provided at 18/08/2011.
 		 */
-		V006Z
+		V006Z,
+		/**
+		 * Second test sample provided at 13/10/2011.
+		 */
+		V010Z
 	}
 
 	@Before
 	public void beforeTest() throws Exception {
-		this.messages = new Messages(Locale.ENGLISH);
+		this.messages = new Messages(Locale.FRENCH);
 		this.pcscEid = new PcscEid(new TestView(), this.messages);
 		if (false == this.pcscEid.isEidPresent()) {
 			LOG.debug("insert eID card");
@@ -108,31 +112,65 @@ public class SecurePinPadReaderTest {
 	/**
 	 * Creates a regular SHA1 signature using the non-repudiation key.
 	 * <p/>
-	 * Remark: PC/SC specs Interoperability Specification for ICCs and Personal
-	 * Computer Systems Part 10 IFDs with Secure PIN Entry Capabilities allow
-	 * room for vendor specific feature tags within the range of 0x80 – 0xFE. So
-	 * we could add a feature tag to indicate the specific capabilities of the
-	 * new smart card readers. This would allow us to have better user
-	 * interaction. I.e. when the smart card readers asks for validation of the
-	 * digest value, the software UI could display some info message that you
-	 * have to check the reader display to be able to continue.
-	 * <p/>
 	 * Remark: right now you have to wait until the digest value has been
 	 * scrolled completely before being able to continue.
 	 * <p/>
 	 * Remark: The smart card reader does not honor the wLangId of the CCID pin
-	 * verification data structure yet.
+	 * verification data structure yet. V010Z still does not honor the wLangId
+	 * <p/>
+	 * V010Z: the reader first displays "Sign Hash?", then it requests the
+	 * "Authentication PIN?" and then it asks to "Sign Hash?" again.
 	 * 
 	 * @throws Exception
 	 */
 	@Test
-	@QualityAssurance(firmware = Firmware.V006Z, approved = false)
+	@QualityAssurance(firmware = Firmware.V010Z, approved = false)
 	public void testRegularDigestValueWithNonRepudiation() throws Exception {
 		this.pcscEid.sign("hello world".getBytes(), "SHA1");
 	}
 
+	/**
+	 * Secure PIN Entry Capabilities
+	 * <p/>
+	 * PC/SC specs Interoperability Specification for ICCs and Personal Computer
+	 * Systems Part 10 IFDs with Secure PIN Entry Capabilities allow room for
+	 * vendor specific feature tags within the range of 0x80 – 0xFE. So we could
+	 * add a feature tag to indicate the specific capabilities of the new smart
+	 * card readers. This would allow us to have better user interaction. I.e.
+	 * when the smart card readers asks for validation of the digest value, the
+	 * software UI could display some info message that you have to check the
+	 * reader display to be able to continue.
+	 * <p/>
+	 * V010Z still has no such feature indication.
+	 * 
+	 * @see http
+	 *      ://www.pcscworkgroup.com/specifications/files/pcsc10_v2.02.08.pdf
+	 * @throws Exception
+	 */
 	@Test
-	@QualityAssurance(firmware = Firmware.V006Z, approved = true)
+	@QualityAssurance(firmware = Firmware.V010Z, approved = false)
+	public void testGetCCIDFeatures() throws Exception {
+		int ioctl;
+		String osName = System.getProperty("os.name");
+		if (osName.startsWith("Windows")) {
+			ioctl = (0x31 << 16 | (3400) << 2);
+		} else {
+			ioctl = 0x42000D48;
+		}
+		byte[] features = this.pcscEid.getCard().transmitControlCommand(ioctl,
+				new byte[0]);
+		int idx = 0;
+		while (idx < features.length) {
+			byte tag = features[idx];
+			idx++;
+			idx++;
+			LOG.debug("CCID feature tag: " + Integer.toHexString(tag));
+			idx += 4;
+		}
+	}
+
+	@Test
+	@QualityAssurance(firmware = Firmware.V010Z, approved = true)
 	public void testRegularDigestValueWithAuthRepudiation() throws Exception {
 		byte[] signatureValue = this.pcscEid
 				.signAuthn("hello world".getBytes());
@@ -145,13 +183,13 @@ public class SecurePinPadReaderTest {
 	 * regular SHA1 authentication signature. This is the sequence that will be
 	 * implemented in the eID Applet.
 	 * <p/>
-	 * Remark: without the SET APDU the secure smart card reader won't display
-	 * the plain text message.
+	 * V006Z: Remark: without the SET APDU the secure smart card reader won't
+	 * display the plain text message. Fixed in V010Z.
 	 * 
 	 * @throws Exception
 	 */
 	@Test
-	@QualityAssurance(firmware = Firmware.V006Z, approved = false)
+	@QualityAssurance(firmware = Firmware.V010Z, approved = true)
 	public void testAuthnSignPlainText() throws Exception {
 		CardChannel cardChannel = this.pcscEid.getCardChannel();
 
@@ -168,8 +206,8 @@ public class SecurePinPadReaderTest {
 						0x01, // rsa pkcs#1
 						(byte) 0x84, // tag for private key ref
 						(byte) 0x82 }); // auth key
-		ResponseAPDU responseApdu = cardChannel.transmit(setApdu);
-		assertEquals(0x9000, responseApdu.getSW());
+		// ResponseAPDU responseApdu = cardChannel.transmit(setApdu);
+		// assertEquals(0x9000, responseApdu.getSW());
 
 		String textMessage = "My Testcase";
 		AlgorithmIdentifier algoId = new AlgorithmIdentifier(
@@ -180,9 +218,10 @@ public class SecurePinPadReaderTest {
 		CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A,
 				0x9E, 0x9A, digestInfo.getDEREncoded());
 
-		responseApdu = cardChannel.transmit(computeDigitalSignatureApdu);
-		assertEquals(0x9000, responseApdu.getSW());
-		byte[] signatureValue = responseApdu.getData();
+		ResponseAPDU responseApdu2 = cardChannel
+				.transmit(computeDigitalSignatureApdu);
+		assertEquals(0x9000, responseApdu2.getSW());
+		byte[] signatureValue = responseApdu2.getData();
 		LOG.debug("signature value size: " + signatureValue.length);
 
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
@@ -203,12 +242,12 @@ public class SecurePinPadReaderTest {
 	 * Creates a non-repudiation signature with plain text.
 	 * <p/>
 	 * Remark: "Enter NonRep PIN" should maybe be replaced with
-	 * "Enter Sign PIN".
+	 * "Enter Sign PIN". Fixed in V010Z.
 	 * 
 	 * @throws Exception
 	 */
 	@Test
-	@QualityAssurance(firmware = Firmware.V006Z, approved = true)
+	@QualityAssurance(firmware = Firmware.V010Z, approved = true)
 	public void testNonRepSignPlainText() throws Exception {
 		CardChannel cardChannel = this.pcscEid.getCardChannel();
 
