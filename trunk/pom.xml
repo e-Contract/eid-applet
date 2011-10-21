@@ -3,7 +3,7 @@
 	<name>FedICT eID Applet Project</name>
 	<groupId>be.fedict</groupId>
 	<artifactId>eid-applet</artifactId>
-	<version>1.0.4.Beta6</version>
+	<version>1.0.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<inceptionYear>2008</inceptionYear>
 	<licenses>
