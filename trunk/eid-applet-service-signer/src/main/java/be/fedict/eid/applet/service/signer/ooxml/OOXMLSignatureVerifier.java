@@ -41,9 +41,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -67,6 +69,7 @@ import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -79,6 +82,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import be.fedict.eid.applet.service.signer.KeyInfoKeySelector;
+import be.fedict.eid.applet.service.signer.jaxb.opc.contenttypes.CTDefault;
+import be.fedict.eid.applet.service.signer.jaxb.opc.contenttypes.CTOverride;
+import be.fedict.eid.applet.service.signer.jaxb.opc.contenttypes.CTTypes;
 import be.fedict.eid.applet.service.signer.jaxb.opc.relationships.CTRelationship;
 import be.fedict.eid.applet.service.signer.jaxb.opc.relationships.CTRelationships;
 import be.fedict.eid.applet.service.signer.jaxb.opc.relationships.ObjectFactory;
@@ -172,11 +178,199 @@ public class OOXMLSignatureVerifier {
 				LOG.debug("not a valid signature");
 				continue;
 			}
-			// TODO: check what has been signed.
+
+			/*
+			 * Check the content of idPackageObject.
+			 */
+			List<XMLObject> objects = xmlSignature.getObjects();
+			XMLObject idPackageObject = null;
+			for (XMLObject object : objects) {
+				if ("idPackageObject".equals(object.getId())) {
+					idPackageObject = object;
+					break;
+				}
+			}
+			if (null == idPackageObject) {
+				LOG.debug("idPackageObject ds:Object not present");
+				continue;
+			}
+			List<XMLStructure> idPackageObjectContent = idPackageObject
+					.getContent();
+			Manifest idPackageObjectManifest = null;
+			for (XMLStructure content : idPackageObjectContent) {
+				if (content instanceof Manifest) {
+					idPackageObjectManifest = (Manifest) content;
+					break;
+				}
+			}
+			if (null == idPackageObjectManifest) {
+				LOG.debug("no ds:Manifest present within idPackageObject ds:Object");
+				continue;
+			}
+			LOG.debug("ds:Manifest present within idPackageObject ds:Object");
+			List<Reference> idPackageObjectReferences = idPackageObjectManifest
+					.getReferences();
+			Set<String> idPackageObjectReferenceUris = new HashSet<String>();
+			Set<String> remainingIdPackageObjectReferenceUris = new HashSet<String>();
+			for (Reference idPackageObjectReference : idPackageObjectReferences) {
+				idPackageObjectReferenceUris.add(idPackageObjectReference
+						.getURI());
+				remainingIdPackageObjectReferenceUris
+						.add(idPackageObjectReference.getURI());
+			}
+			LOG.debug("idPackageObject ds:Reference URIs: "
+					+ idPackageObjectReferenceUris);
+			CTTypes contentTypes = getContentTypes(url);
+			List<String> relsEntryNames = getRelsEntryNames(url);
+			for (String relsEntryName : relsEntryNames) {
+				LOG.debug("---- relationship entry name: " + relsEntryName);
+				CTRelationships relationships = getRelationships(url,
+						relsEntryName);
+				List<CTRelationship> relationshipList = relationships
+						.getRelationship();
+				boolean includeRelationshipInSignature = false;
+				for (CTRelationship relationship : relationshipList) {
+					String relationshipType = relationship.getType();
+					if (false == OOXMLSignatureFacet
+							.isSignedRelationship(relationshipType)) {
+						continue;
+					}
+					String relationshipTarget = relationship.getTarget();
+					String baseUri = "/"
+							+ relsEntryName.substring(0,
+									relsEntryName.indexOf("_rels/"));
+					String streamEntry = baseUri + relationshipTarget;
+					LOG.debug("stream entry: " + streamEntry);
+					streamEntry = FilenameUtils.normalize(streamEntry);
+					LOG.debug("normalized stream entry: " + streamEntry);
+					String contentType = getContentType(contentTypes,
+							streamEntry);
+					if (relationshipType.endsWith("customXml")) {
+						if (false == contentType.equals("inkml+xml")
+								&& false == contentType.equals("text/xml")) {
+							LOG.debug("skipping customXml with content type: "
+									+ contentType);
+							continue;
+						}
+					}
+					includeRelationshipInSignature = true;
+					LOG.debug("content type: " + contentType);
+					String referenceUri = streamEntry + "?ContentType="
+							+ contentType;
+					LOG.debug("reference URI: " + referenceUri);
+					if (false == idPackageObjectReferenceUris
+							.contains(referenceUri)) {
+						throw new RuntimeException(
+								"no reference in idPackageObject ds:Object for relationship target: "
+										+ streamEntry);
+					}
+					remainingIdPackageObjectReferenceUris.remove(referenceUri);
+				}
+				String relsReferenceUri = "/"
+						+ relsEntryName
+						+ "?ContentType=application/vnd.openxmlformats-package.relationships+xml";
+				if (includeRelationshipInSignature
+						&& false == idPackageObjectReferenceUris
+								.contains(relsReferenceUri)) {
+					LOG.debug("missing ds:Reference for: " + relsEntryName);
+					throw new RuntimeException("missing ds:Reference for: "
+							+ relsEntryName);
+				}
+				remainingIdPackageObjectReferenceUris.remove(relsReferenceUri);
+			}
+			if (false == remainingIdPackageObjectReferenceUris.isEmpty()) {
+				LOG.debug("remaining idPackageObject reference URIs"
+						+ idPackageObjectReferenceUris);
+				throw new RuntimeException(
+						"idPackageObject manifest contains unknown ds:References: "
+								+ remainingIdPackageObjectReferenceUris);
+			}
+
 			X509Certificate signer = keySelector.getCertificate();
 			signers.add(signer);
 		}
 		return signers;
+	}
+
+	private String getContentType(CTTypes contentTypes, String partName) {
+		List<Object> defaultOrOverrideList = contentTypes
+				.getDefaultOrOverride();
+		for (Object defaultOrOverride : defaultOrOverrideList) {
+			if (defaultOrOverride instanceof CTOverride) {
+				CTOverride override = (CTOverride) defaultOrOverride;
+				if (partName.equals(override.getPartName())) {
+					return override.getContentType();
+				}
+			}
+		}
+		for (Object defaultOrOverride : defaultOrOverrideList) {
+			if (defaultOrOverride instanceof CTDefault) {
+				CTDefault ctDefault = (CTDefault) defaultOrOverride;
+				if (partName.endsWith(ctDefault.getExtension())) {
+					return ctDefault.getContentType();
+				}
+			}
+		}
+		return null;
+	}
+
+	private CTRelationships getRelationships(URL url,
+			String relationshipsEntryName) throws IOException, JAXBException {
+		ZipInputStream zipInputStream = new ZipInputStream(url.openStream());
+		ZipEntry zipEntry;
+		InputStream relationshipsInputStream = null;
+		while (null != (zipEntry = zipInputStream.getNextEntry())) {
+			if (false == relationshipsEntryName.equals(zipEntry.getName())) {
+				continue;
+			}
+			relationshipsInputStream = zipInputStream;
+			break;
+		}
+		if (null == relationshipsInputStream) {
+			return null;
+		}
+		JAXBContext jaxbContext = JAXBContext
+				.newInstance(be.fedict.eid.applet.service.signer.jaxb.opc.relationships.ObjectFactory.class);
+		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+		JAXBElement<CTRelationships> relationshipsElement = (JAXBElement<CTRelationships>) unmarshaller
+				.unmarshal(relationshipsInputStream);
+		return relationshipsElement.getValue();
+	}
+
+	private List<String> getRelsEntryNames(URL url) throws IOException {
+		List<String> relsEntryNames = new LinkedList<String>();
+		ZipInputStream zipInputStream = new ZipInputStream(url.openStream());
+		ZipEntry zipEntry;
+		while (null != (zipEntry = zipInputStream.getNextEntry())) {
+			String entryName = zipEntry.getName();
+			if (entryName.endsWith(".rels")) {
+				relsEntryNames.add(entryName);
+			}
+		}
+		return relsEntryNames;
+	}
+
+	private CTTypes getContentTypes(URL url) throws IOException,
+			ParserConfigurationException, SAXException, JAXBException {
+		ZipInputStream zipInputStream = new ZipInputStream(url.openStream());
+		ZipEntry zipEntry;
+		InputStream contentTypesInputStream = null;
+		while (null != (zipEntry = zipInputStream.getNextEntry())) {
+			if (!"[Content_Types].xml".equals(zipEntry.getName())) {
+				continue;
+			}
+			contentTypesInputStream = zipInputStream;
+			break;
+		}
+		if (null == contentTypesInputStream) {
+			return null;
+		}
+		JAXBContext jaxbContext = JAXBContext
+				.newInstance(be.fedict.eid.applet.service.signer.jaxb.opc.contenttypes.ObjectFactory.class);
+		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+		JAXBElement<CTTypes> contentTypesElement = (JAXBElement<CTTypes>) unmarshaller
+				.unmarshal(contentTypesInputStream);
+		return contentTypesElement.getValue();
 	}
 
 	public Document getSignatureDocument(URL url, String signatureResourceName)
@@ -359,7 +553,7 @@ public class OOXMLSignatureVerifier {
 					+ signatureInfoProperty.getTarget());
 			LOG.warn("Allowing this error because of a bug in Office2010");
 			// work-around for existing bug in Office2011
-			//return false;
+			// return false;
 		}
 
 		// SignatureInfoV1
@@ -575,7 +769,7 @@ public class OOXMLSignatureVerifier {
 
 		List<XMLObject> objects = xmlSignature.getObjects();
 		for (XMLObject object : objects) {
-			if (object.getId().equals(objectId)) {
+			if (objectId.equals(object.getId())) {
 				LOG.debug("Found \"" + objectId + "\" ds:object");
 				return object;
 			}
