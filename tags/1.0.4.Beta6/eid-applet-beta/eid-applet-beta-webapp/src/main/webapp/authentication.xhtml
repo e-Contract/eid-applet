@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html" lang="en" xml:lang="en">
+<body>
+	<ui:composition template="/WEB-INF/template.xhtml">
+		<ui:param name="activeMenu" value="test" />
+		<ui:define name="body">
+			<h2>eID Applet Authentication Test</h2>
+			<p>Via this page you can test the eID Applet Authentication
+				functionality.</p>
+			<!-- https://www.java.com/js/deployJava.js -->
+			<script type="text/javascript" src="./deployJava.js"></script>
+			<script type="text/javascript" src="./deploy-eid-applet.js"></script>
+			<script type="text/javascript">
+				var attributes = {
+					name : 'beidapplet',
+					alt : 'eID applet',
+					code : 'be.fedict.eid.applet.Applet.class',
+					archive : 'eid-applet-package-${pom.version}.jar',
+					width : 600,
+					height : 300
+				};
+				var parameters = {
+					TargetPage : 'authentication-results.seam',
+					AppletService : 'applet-authentication-service',
+					Language : 'en',
+					NavigatorUserAgent : navigator.userAgent,
+					NavigatorAppName : navigator.appName,
+					NavigatorAppVersion : navigator.appVersion
+				};
+				deployJavaEIDApplet.runApplet(attributes, parameters);
+			</script>
+			<noscript>Error: your browser does not support Javascript,
+				or Javascript has been disabled.</noscript>
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

@@ -1,0 +1,9 @@
+--- bin/run.conf.orig	2011-02-15 09:39:35.052200112 +0100
++++ bin/run.conf	2011-02-15 09:41:08.632455325 +0100
+@@ -51,3 +51,6 @@
+ 
+ # GC configuration
+ JAVA_OPTS="$JAVA_OPTS -XX:+UseConcMarkSweepGC -XX:+ExplicitGCInvokesConcurrent"
++
++# headless for jFreeChart
++JAVA_OPTS="$JAVA_OPTS -Djava.awt.headless=true"
