@@ -71,7 +71,7 @@ import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
 
 /**
- * Holds all function related to eID card access over PC/SC.
+ * Holds all functions related to eID card access over PC/SC.
  * 
  * This class required the Java 6 runtime to operate.
  * 
@@ -137,15 +137,25 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	private final CardTerminals cardTerminals;
 
-	private final Dialogs dialogs;
+	private Dialogs dialogs;
 
-	private final Locale locale;
+	private Locale locale;
 
 	public PcscEid(View view, Messages messages) {
 		this.view = view;
 		linuxPcscliteLibraryConfig();
 		this.terminalFactory = TerminalFactory.getDefault();
 		this.cardTerminals = this.terminalFactory.terminals();
+		this.dialogs = new Dialogs(this.view, messages);
+		this.locale = messages.getLocale();
+	}
+
+	/**
+	 * Changes the messages, and thus the locale.
+	 * 
+	 * @param messages
+	 */
+	public void setMessages(Messages messages) {
 		this.dialogs = new Dialogs(this.view, messages);
 		this.locale = messages.getLocale();
 	}
