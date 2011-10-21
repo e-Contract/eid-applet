@@ -42,12 +42,18 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
@@ -63,32 +69,33 @@ import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
-import be.fedict.eid.applet.service.signer.DigestAlgo;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.utils.Constants;
-import org.apache.xpath.XPathAPI;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import be.fedict.eid.applet.service.signer.NoCloseInputStream;
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import be.fedict.eid.applet.service.signer.SignatureFacet;
+import be.fedict.eid.applet.service.signer.jaxb.opc.contenttypes.CTDefault;
+import be.fedict.eid.applet.service.signer.jaxb.opc.contenttypes.CTOverride;
+import be.fedict.eid.applet.service.signer.jaxb.opc.contenttypes.CTTypes;
+import be.fedict.eid.applet.service.signer.jaxb.opc.relationships.CTRelationship;
+import be.fedict.eid.applet.service.signer.jaxb.opc.relationships.CTRelationships;
 import be.fedict.eid.applet.service.signer.time.Clock;
 import be.fedict.eid.applet.service.signer.time.LocalClock;
 
 /**
  * Office OpenXML Signature Facet implementation.
- *
+ * 
  * @author fcorneli
  * @see http://msdn.microsoft.com/en-us/library/cc313071.aspx
  */
@@ -103,7 +110,7 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 
 	private final Clock clock;
 
-    private final DigestAlgo digestAlgo;
+	private final DigestAlgo digestAlgo;
 
 	/**
 	 * Main constructor.
@@ -119,7 +126,7 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 			Clock clock, DigestAlgo digestAlgo) {
 		this.signatureService = signatureService;
 		this.clock = clock;
-        this.digestAlgo = digestAlgo;
+		this.digestAlgo = digestAlgo;
 	}
 
 	public void preSign(XMLSignatureFactory signatureFactory,
@@ -163,17 +170,176 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 		List<Reference> manifestReferences = new LinkedList<Reference>();
 
 		try {
-			addRelationshipsReferences(signatureFactory, document,
+			addManifestReferences(signatureFactory, document,
 					manifestReferences);
 		} catch (Exception e) {
 			throw new RuntimeException("error: " + e.getMessage(), e);
 		}
 
-		for (String contentType : contentTypes) {
-			addParts(signatureFactory, contentType, manifestReferences);
-		}
-
 		return signatureFactory.newManifest(manifestReferences);
+	}
+
+	private void addManifestReferences(XMLSignatureFactory signatureFactory,
+			Document document, List<Reference> manifestReferences)
+			throws IOException, JAXBException, NoSuchAlgorithmException,
+			InvalidAlgorithmParameterException {
+		CTTypes contentTypes = getContentTypes();
+		List<String> relsEntryNames = getRelsEntryNames();
+		DigestMethod digestMethod = signatureFactory.newDigestMethod(
+				this.digestAlgo.getXmlAlgoId(), null);
+		Set<String> digestedPartNames = new HashSet<String>();
+		for (String relsEntryName : relsEntryNames) {
+			CTRelationships relationships = getRelationships(relsEntryName);
+			List<CTRelationship> relationshipList = relationships
+					.getRelationship();
+			RelationshipTransformParameterSpec parameterSpec = new RelationshipTransformParameterSpec();
+			for (CTRelationship relationship : relationshipList) {
+				String relationshipType = relationship.getType();
+				if (false == OOXMLSignatureFacet
+						.isSignedRelationship(relationshipType)) {
+					continue;
+				}
+				String baseUri = "/"
+						+ relsEntryName.substring(0,
+								relsEntryName.indexOf("_rels/"));
+				String relationshipTarget = relationship.getTarget();
+				String partName = FilenameUtils.normalize(baseUri
+						+ relationshipTarget);
+				LOG.debug("part name: " + partName);
+				String relationshipId = relationship.getId();
+				parameterSpec.addRelationshipReference(relationshipId);
+				String contentType = getContentType(contentTypes, partName);
+				if (relationshipType.endsWith("customXml")) {
+					if (false == contentType.equals("inkml+xml")
+							&& false == contentType.equals("text/xml")) {
+						LOG.debug("skipping customXml with content type: "
+								+ contentType);
+						continue;
+					}
+				}
+				if (false == digestedPartNames.contains(partName)) {
+					/*
+					 * We only digest a part once.
+					 */
+					Reference reference = signatureFactory.newReference(
+							partName + "?ContentType=" + contentType,
+							digestMethod);
+					manifestReferences.add(reference);
+					digestedPartNames.add(partName);
+				}
+			}
+			if (false == parameterSpec.getSourceIds().isEmpty()) {
+				List<Transform> transforms = new LinkedList<Transform>();
+				transforms.add(signatureFactory.newTransform(
+						RelationshipTransformService.TRANSFORM_URI,
+						parameterSpec));
+				transforms.add(signatureFactory.newTransform(
+						CanonicalizationMethod.INCLUSIVE,
+						(TransformParameterSpec) null));
+				Reference reference = signatureFactory
+						.newReference(
+								"/"
+										+ relsEntryName
+										+ "?ContentType=application/vnd.openxmlformats-package.relationships+xml",
+								digestMethod, transforms, null, null);
+
+				manifestReferences.add(reference);
+			}
+		}
+	}
+
+	/**
+	 * According to ECMA-376, Part 2. 10.1.2 Mapping Content Types.
+	 * 
+	 * @param contentTypes
+	 * @param partName
+	 * @return
+	 */
+	private String getContentType(CTTypes contentTypes, String partName) {
+		List<Object> defaultOrOverrideList = contentTypes
+				.getDefaultOrOverride();
+		for (Object defaultOrOverride : defaultOrOverrideList) {
+			if (defaultOrOverride instanceof CTOverride) {
+				CTOverride override = (CTOverride) defaultOrOverride;
+				if (partName.equals(override.getPartName())) {
+					return override.getContentType();
+				}
+			}
+		}
+		for (Object defaultOrOverride : defaultOrOverrideList) {
+			if (defaultOrOverride instanceof CTDefault) {
+				CTDefault ctDefault = (CTDefault) defaultOrOverride;
+				if (partName.endsWith(ctDefault.getExtension())) {
+					return ctDefault.getContentType();
+				}
+			}
+		}
+		return null;
+	}
+
+	private CTRelationships getRelationships(String relsEntryName)
+			throws IOException, JAXBException {
+		URL ooxmlUrl = this.signatureService.getOfficeOpenXMLDocumentURL();
+		ZipInputStream zipInputStream = new ZipInputStream(
+				ooxmlUrl.openStream());
+		ZipEntry zipEntry;
+		InputStream relationshipsInputStream = null;
+		while (null != (zipEntry = zipInputStream.getNextEntry())) {
+			if (false == relsEntryName.equals(zipEntry.getName())) {
+				continue;
+			}
+			relationshipsInputStream = zipInputStream;
+			break;
+		}
+		if (null == relationshipsInputStream) {
+			return null;
+		}
+		JAXBContext jaxbContext = JAXBContext
+				.newInstance(be.fedict.eid.applet.service.signer.jaxb.opc.relationships.ObjectFactory.class);
+		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+		JAXBElement<CTRelationships> relationshipsElement = (JAXBElement<CTRelationships>) unmarshaller
+				.unmarshal(relationshipsInputStream);
+		return relationshipsElement.getValue();
+	}
+
+	private CTTypes getContentTypes() throws IOException, JAXBException {
+		URL ooxmlUrl = this.signatureService.getOfficeOpenXMLDocumentURL();
+		ZipInputStream zipInputStream = new ZipInputStream(
+				ooxmlUrl.openStream());
+		ZipEntry zipEntry;
+		InputStream contentTypesInputStream = null;
+		while (null != (zipEntry = zipInputStream.getNextEntry())) {
+			if (!"[Content_Types].xml".equals(zipEntry.getName())) {
+				continue;
+			}
+			contentTypesInputStream = zipInputStream;
+			break;
+		}
+		if (null == contentTypesInputStream) {
+			return null;
+		}
+		JAXBContext jaxbContext = JAXBContext
+				.newInstance(be.fedict.eid.applet.service.signer.jaxb.opc.contenttypes.ObjectFactory.class);
+		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+		JAXBElement<CTTypes> contentTypesElement = (JAXBElement<CTTypes>) unmarshaller
+				.unmarshal(contentTypesInputStream);
+		return contentTypesElement.getValue();
+	}
+
+	private List<String> getRelsEntryNames() throws IOException {
+		List<String> relsEntryNames = new LinkedList<String>();
+		URL ooxmlUrl = this.signatureService.getOfficeOpenXMLDocumentURL();
+		InputStream inputStream = ooxmlUrl.openStream();
+		ZipInputStream zipInputStream = new ZipInputStream(inputStream);
+		ZipEntry zipEntry;
+		while (null != (zipEntry = zipInputStream.getNextEntry())) {
+			String zipEntryName = zipEntry.getName();
+			if (false == zipEntryName.endsWith(".rels")) {
+				continue;
+			}
+			relsEntryNames.add(zipEntryName);
+		}
+		return relsEntryNames;
 	}
 
 	private void addSignatureTime(XMLSignatureFactory signatureFactory,
@@ -254,143 +420,6 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 		references.add(reference);
 	}
 
-	private void addRelationshipsReferences(
-			XMLSignatureFactory signatureFactory, Document document,
-			List<Reference> manifestReferences) throws IOException,
-			ParserConfigurationException, SAXException, TransformerException,
-			NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-		URL ooxmlUrl = this.signatureService.getOfficeOpenXMLDocumentURL();
-		InputStream inputStream = ooxmlUrl.openStream();
-		ZipInputStream zipInputStream = new ZipInputStream(inputStream);
-		ZipEntry zipEntry;
-		while (null != (zipEntry = zipInputStream.getNextEntry())) {
-			if (false == zipEntry.getName().endsWith(".rels")) {
-				continue;
-			}
-			Document relsDocument = loadDocumentNoClose(zipInputStream);
-			addRelationshipsReference(signatureFactory, document,
-					zipEntry.getName(), relsDocument, manifestReferences);
-		}
-	}
-
-	private void addRelationshipsReference(
-			XMLSignatureFactory signatureFactory, Document document,
-			String zipEntryName, Document relsDocument,
-			List<Reference> manifestReferences)
-			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-		LOG.debug("relationships: " + zipEntryName);
-		RelationshipTransformParameterSpec parameterSpec = new RelationshipTransformParameterSpec();
-		NodeList nodeList = relsDocument.getDocumentElement().getChildNodes();
-		for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
-			Node node = nodeList.item(nodeIdx);
-			if (node.getNodeType() != Node.ELEMENT_NODE) {
-				continue;
-			}
-			Element element = (Element) node;
-			String relationshipType = element.getAttribute("Type");
-			/*
-			 * We skip some relationship types.
-			 */
-			if ("http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties"
-					.equals(relationshipType)) {
-				continue;
-			}
-			if ("http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties"
-					.equals(relationshipType)) {
-				continue;
-			}
-			if ("http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin"
-					.equals(relationshipType)) {
-				continue;
-			}
-			if ("http://schemas.openxmlformats.org/package/2006/relationships/metadata/thumbnail"
-					.equals(relationshipType)) {
-				continue;
-			}
-			if ("http://schemas.openxmlformats.org/officeDocument/2006/relationships/presProps"
-					.equals(relationshipType)) {
-				continue;
-			}
-			if ("http://schemas.openxmlformats.org/officeDocument/2006/relationships/viewProps"
-					.equals(relationshipType)) {
-				continue;
-			}
-			String relationshipId = element.getAttribute("Id");
-			parameterSpec.addRelationshipReference(relationshipId);
-		}
-
-		List<Transform> transforms = new LinkedList<Transform>();
-		transforms.add(signatureFactory.newTransform(
-				RelationshipTransformService.TRANSFORM_URI, parameterSpec));
-		transforms.add(signatureFactory
-				.newTransform(CanonicalizationMethod.INCLUSIVE,
-						(TransformParameterSpec) null));
-		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				this.digestAlgo.getXmlAlgoId(), null);
-		Reference reference = signatureFactory.newReference(
-				getRelationshipReferenceURI(zipEntryName), digestMethod,
-				transforms, null, null);
-
-		manifestReferences.add(reference);
-	}
-
-	private void addParts(XMLSignatureFactory signatureFactory,
-			String contentType, List<Reference> references)
-			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-		List<String> documentResourceNames;
-		try {
-			documentResourceNames = getResourceNames(
-					this.signatureService.getOfficeOpenXMLDocumentURL(),
-					contentType);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				this.digestAlgo.getXmlAlgoId(), null);
-		for (String documentResourceName : documentResourceNames) {
-			LOG.debug("document resource: " + documentResourceName);
-
-			Reference reference = signatureFactory.newReference(
-					getResourceReferenceURI(documentResourceName, contentType),
-					digestMethod);
-
-			references.add(reference);
-		}
-	}
-
-	private List<String> getResourceNames(URL url, String contentType)
-			throws IOException, ParserConfigurationException, SAXException,
-			TransformerException {
-		List<String> signatureResourceNames = new LinkedList<String>();
-		if (null == url) {
-			throw new RuntimeException("OOXML URL is null");
-		}
-		InputStream inputStream = url.openStream();
-		ZipInputStream zipInputStream = new ZipInputStream(inputStream);
-		ZipEntry zipEntry;
-		while (null != (zipEntry = zipInputStream.getNextEntry())) {
-			if (false == "[Content_Types].xml".equals(zipEntry.getName())) {
-				continue;
-			}
-			Document contentTypesDocument = loadDocument(zipInputStream);
-			Element nsElement = contentTypesDocument.createElement("ns");
-			nsElement
-					.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
-							"http://schemas.openxmlformats.org/package/2006/content-types");
-			NodeList nodeList = XPathAPI.selectNodeList(contentTypesDocument,
-					"/tns:Types/tns:Override[@ContentType='" + contentType
-							+ "']/@PartName", nsElement);
-			for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
-				String partName = nodeList.item(nodeIdx).getTextContent();
-				LOG.debug("part name: " + partName);
-				partName = partName.substring(1); // remove '/'
-				signatureResourceNames.add(partName);
-			}
-			break;
-		}
-		return signatureResourceNames;
-	}
-
 	protected Document loadDocument(String zipEntryName) throws IOException,
 			ParserConfigurationException, SAXException {
 		Document document = findDocument(zipEntryName);
@@ -414,19 +443,6 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 			return document;
 		}
 		return null;
-	}
-
-	private Document loadDocumentNoClose(InputStream documentInputStream)
-			throws ParserConfigurationException, SAXException, IOException {
-		NoCloseInputStream noCloseInputStream = new NoCloseInputStream(
-				documentInputStream);
-		InputSource inputSource = new InputSource(noCloseInputStream);
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
-		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
-		return documentBuilder.parse(inputSource);
 	}
 
 	public static Document loadDocument(InputStream documentInputStream)
@@ -469,6 +485,7 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 			"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml",
 			"application/vnd.openxmlformats-officedocument.theme+xml",
 			"application/vnd.openxmlformats-officedocument.wordprocessingml.webSettings+xml",
+			"application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml",
 
 			/*
 			 * Word 2010
@@ -497,4 +514,169 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 			 */
 			"application/vnd.openxmlformats-officedocument.presentationml.viewProps+xml",
 			"application/vnd.openxmlformats-officedocument.presentationml.presProps+xml" };
+
+	public static boolean isSignedRelationship(String relationshipType) {
+		LOG.debug("relationship type: " + relationshipType);
+		for (String signedTypeExtension : signed) {
+			if (relationshipType.endsWith(signedTypeExtension)) {
+				return true;
+			}
+		}
+		if (relationshipType.endsWith("customXml")) {
+			LOG.debug("customXml relationship type");
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Office 2010 list of signed types (extensions).
+	 */
+	public static String[] signed = { "powerPivotData", //
+			"activeXControlBinary", //
+			"attachedToolbars", //
+			"connectorXml", //
+			"downRev", //
+			"functionPrototypes", //
+			"graphicFrameDoc", //
+			"groupShapeXml", //
+			"ink", //
+			"keyMapCustomizations", //
+			"legacyDiagramText", //
+			"legacyDocTextInfo", //
+			"officeDocument", //
+			"pictureXml", //
+			"shapeXml", //
+			"smartTags", //
+			"ui/altText", //
+			"ui/buttonSize", //
+			"ui/controlID", //
+			"ui/description", //
+			"ui/enabled", //
+			"ui/extensibility", //
+			"ui/helperText", //
+			"ui/imageID", //
+			"ui/imageMso", //
+			"ui/keyTip", //
+			"ui/label", //
+			"ui/lcid", //
+			"ui/loud", //
+			"ui/pressed", //
+			"ui/progID", //
+			"ui/ribbonID", //
+			"ui/showImage", //
+			"ui/showLabel", //
+			"ui/supertip", //
+			"ui/target", //
+			"ui/text", //
+			"ui/title", //
+			"ui/tooltip", //
+			"ui/userCustomization", //
+			"ui/visible", //
+			"userXmlData", //
+			"vbaProject", //
+			"wordVbaData", //
+			"wsSortMap", //
+			"xlBinaryIndex", //
+			"xlExternalLinkPath/xlAlternateStartup", //
+			"xlExternalLinkPath/xlLibrary", //
+			"xlExternalLinkPath/xlPathMissing", //
+			"xlExternalLinkPath/xlStartup", //
+			"xlIntlMacrosheet", //
+			"xlMacrosheet", //
+			"customData", //
+			"diagramDrawing", //
+			"hdphoto", //
+			"inkXml", //
+			"media", //
+			"slicer", //
+			"slicerCache", //
+			"stylesWithEffects", //
+			"ui/extensibility", //
+			"chartColorStyle", //
+			"chartLayout", //
+			"chartStyle", //
+			"dictionary", //
+			"timeline", //
+			"timelineCache", //
+			"aFChunk", //
+			"attachedTemplate", //
+			"audio", //
+			"calcChain", //
+			"chart", //
+			"chartsheet", //
+			"chartUserShapes", //
+			"commentAuthors", //
+			"comments", //
+			"connections", //
+			"control", //
+			"customProperty", //
+			"customXml", //
+			"diagramColors", //
+			"diagramData", //
+			"diagramLayout", //
+			"diagramQuickStyle", //
+			"dialogsheet", //
+			"drawing", //
+			"endnotes", //
+			"externalLink", //
+			"externalLinkPath", //
+			"font", //
+			"fontTable", //
+			"footer", //
+			"footnotes", //
+			"glossaryDocument", //
+			"handoutMaster", //
+			"header", //
+			"hyperlink", //
+			"image", //
+			"mailMergeHeaderSource", //
+			"mailMergeRecipientData", //
+			"mailMergeSource", //
+			"notesMaster", //
+			"notesSlide", //
+			"numbering", //
+			"officeDocument", //
+			"oleObject", //
+			"package", //
+			"pivotCacheDefinition", //
+			"pivotCacheRecords", //
+			"pivotTable", //
+			"presProps", //
+			"printerSettings", //
+			"queryTable", //
+			"recipientData", //
+			"settings", //
+			"sharedStrings", //
+			"sheetMetadata", //
+			"slide", //
+			"slideLayout", //
+			"slideMaster", //
+			"slideUpdateInfo", //
+			"slideUpdateUrl", //
+			"styles", //
+			"table", //
+			"tableSingleCells", //
+			"tableStyles", //
+			"tags", //
+			"theme", //
+			"themeOverride", //
+			"transform", //
+			"video", //
+			"viewProps", //
+			"volatileDependencies", //
+			"webSettings", //
+			"worksheet", //
+			"xmlMaps", //
+			"ctrlProp", //
+			"customData", //
+			"diagram", //
+			"diagramColorsHeader", //
+			"diagramLayoutHeader", //
+			"diagramQuickStyleHeader", //
+			"documentParts", //
+			"slicer", //
+			"slicerCache", //
+			"vmlDrawing" //
+	};
 }

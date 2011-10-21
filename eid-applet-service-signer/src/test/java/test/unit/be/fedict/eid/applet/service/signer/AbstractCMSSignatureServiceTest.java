@@ -56,7 +56,9 @@ public class AbstractCMSSignatureServiceTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		Security.addProvider(new BouncyCastleProvider());
+		if (null == Security.getProvider(BouncyCastleProvider.PROVIDER_NAME)) {
+			Security.addProvider(new BouncyCastleProvider());
+		}
 	}
 
 	public class CMSTestSignatureService extends AbstractCMSSignatureService {

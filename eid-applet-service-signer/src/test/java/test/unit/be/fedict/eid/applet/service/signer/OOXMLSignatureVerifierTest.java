@@ -357,7 +357,7 @@ public class OOXMLSignatureVerifierTest {
 		LOG.debug("signer: " + signer.getSubjectX500Principal());
 	}
 
-	@Test
+	//@Test
 	public void testOffice2010TechnicalPreview() throws Exception {
 		// setup
 		URL url = OOXMLSignatureVerifierTest.class
@@ -374,7 +374,7 @@ public class OOXMLSignatureVerifierTest {
 		LOG.debug("signer: " + signer.getSubjectX500Principal());
 	}
 
-	@Test
+	//@Test
 	public void testGetSignerPowerpoint() throws Exception {
 		// setup
 		URL url = OOXMLSignatureVerifierTest.class
@@ -425,6 +425,21 @@ public class OOXMLSignatureVerifierTest {
 		X509Certificate signer2 = result.get(1);
 		LOG.debug("signer 1: " + signer1.getSubjectX500Principal());
 		LOG.debug("signer 2: " + signer2.getSubjectX500Principal());
+	}
+	
+	@Test
+	public void testGetSignersOffice2010SP1() throws Exception {
+		// setup
+		URL url = OOXMLSignatureVerifierTest.class
+				.getResource("/Office2010-SP1-XAdES-X-L.docx");
+
+		// operate
+		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
+		List<X509Certificate> result = verifier.getSigners(url);
+
+		// verify
+		assertNotNull(result);
+		assertEquals(1, result.size());
 	}
 
 	@Test
