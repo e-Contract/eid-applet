@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict</groupId>
@@ -7,10 +9,8 @@
 	</parent>
 	<name>FedICT eID Applet Tests</name>
 	<description>Integration tests for the eID applet.</description>
-	<!--
-		This artifact should not be part of the default Maven reactor since
-		its unit tests do not run as is.
-	-->
+	<!-- This artifact should not be part of the default Maven reactor since 
+		its unit tests do not run as is. -->
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-tests</artifactId>
 	<version>1.0.4-SNAPSHOT</version>
@@ -192,14 +192,20 @@
 			<version>1.0</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>1.6.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<repositories>
-                <repository>
-                        <id>e-contract</id>
-                        <url>http://www.e-contract.be/maven2/</url>
-                        <releases>
-                                <enabled>true</enabled>
-                        </releases>
-                </repository>
-        </repositories>
+		<repository>
+			<id>e-contract</id>
+			<url>http://www.e-contract.be/maven2/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+	</repositories>
 </project>
