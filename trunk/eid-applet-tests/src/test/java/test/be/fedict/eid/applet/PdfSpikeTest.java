@@ -34,6 +34,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.pdfbox.cos.COSArray;
+import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.cos.COSString;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.Test;
 
 import be.fedict.eid.applet.Messages;
@@ -81,8 +86,8 @@ public class PdfSpikeTest {
 		FileUtils.writeByteArrayToFile(tmpFile, baos.toByteArray());
 
 		// eID
-		PcscEid pcscEid = new PcscEid(new TestView(), new Messages(Locale
-				.getDefault()));
+		PcscEid pcscEid = new PcscEid(new TestView(), new Messages(
+				Locale.getDefault()));
 		if (false == pcscEid.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEid.waitForEidPresent();
@@ -146,8 +151,8 @@ public class PdfSpikeTest {
 		PdfPKCS7 signature = sigStandard.getSigner();
 		signature.setExternalDigest(signatureBytes, hash, "RSA");
 		PdfDictionary dictionary = new PdfDictionary();
-		dictionary.put(PdfName.CONTENTS, new PdfString(signature
-				.getEncodedPKCS1()).setHexWriting(true));
+		dictionary.put(PdfName.CONTENTS,
+				new PdfString(signature.getEncodedPKCS1()).setHexWriting(true));
 		signatureAppearance.close(dictionary);
 
 		LOG.debug("signed tmp file: " + signedTmpFile.getAbsolutePath());
@@ -173,6 +178,60 @@ public class PdfSpikeTest {
 				X509Certificate x509Certificate = (X509Certificate) certificate;
 				LOG.debug("cert subject: "
 						+ x509Certificate.getSubjectX500Principal());
+			}
+		}
+
+		/*
+		 * Reading the signature using Apache PDFBox.
+		 */
+		PDDocument pdDocument = PDDocument.load(signedTmpFile);
+		COSDictionary trailer = pdDocument.getDocument().getTrailer();
+		/*
+		 * PDF Reference - third edition - Adobe Portable Document Format -
+		 * Version 1.4 - 3.6.1 Document Catalog
+		 */
+		COSDictionary documentCatalog = (COSDictionary) trailer
+				.getDictionaryObject(COSName.ROOT);
+
+		/*
+		 * 8.6.1 Interactive Form Dictionary
+		 */
+		COSDictionary acroForm = (COSDictionary) documentCatalog
+				.getDictionaryObject(COSName.ACRO_FORM);
+
+		COSArray fields = (COSArray) acroForm
+				.getDictionaryObject(COSName.FIELDS);
+		for (int fieldIdx = 0; fieldIdx < fields.size(); fieldIdx++) {
+			COSDictionary field = (COSDictionary) fields.getObject(fieldIdx);
+			String fieldType = field.getNameAsString("FT");
+			if ("Sig".equals(fieldType)) {
+				COSDictionary signatureDictionary = (COSDictionary) field
+						.getDictionaryObject(COSName.V);
+				/*
+				 * TABLE 8.60 Entries in a signature dictionary
+				 */
+				COSString signatoryName = (COSString) signatureDictionary
+						.getDictionaryObject(COSName.NAME);
+				if (null != signatoryName) {
+					LOG.debug("signatory name: " + signatoryName.getString());
+				}
+				COSString reason = (COSString) signatureDictionary
+						.getDictionaryObject(COSName.REASON);
+				if (null != reason) {
+					LOG.debug("reason: " + reason.getString());
+				}
+				COSString location = (COSString) signatureDictionary
+						.getDictionaryObject(COSName.LOCATION);
+				if (null != location) {
+					LOG.debug("location: " + location.getString());
+				}
+				Calendar signingTime = signatureDictionary.getDate(COSName.M);
+				if (null != signingTime) {
+					LOG.debug("signing time: " + signingTime.getTime());
+				}
+				String signatureHandler = signatureDictionary
+						.getNameAsString(COSName.FILTER);
+				LOG.debug("signature handler: " + signatureHandler);
 			}
 		}
 	}
