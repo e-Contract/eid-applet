@@ -148,7 +148,7 @@
 		<dependency>
 			<groupId>be.fedict</groupId>
 			<artifactId>jtrust</artifactId>
-			<version>1.1.2-SNAPSHOT</version>
+			<version>1.1.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -186,5 +186,20 @@
 			<artifactId>jgroups</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.beblue.jna.usb</groupId>
+			<artifactId>libusb4j</artifactId>
+			<version>1.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
+	<repositories>
+                <repository>
+                        <id>e-contract</id>
+                        <url>http://www.e-contract.be/maven2/</url>
+                        <releases>
+                                <enabled>true</enabled>
+                        </releases>
+                </repository>
+        </repositories>
 </project>
