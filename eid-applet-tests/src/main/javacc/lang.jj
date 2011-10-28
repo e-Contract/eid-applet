@@ -1,0 +1,51 @@
+options {
+	STATIC = false;
+}
+
+PARSER_BEGIN(Language)
+package be.fedict.eid.applet.tests.javacc.lang;
+
+import be.fedict.eid.applet.tests.javacc.Program;
+import be.fedict.eid.applet.tests.javacc.OutputInstruction;
+import be.fedict.eid.applet.tests.javacc.StopInstruction;
+	
+public class Language {
+	private Program program;
+}
+PARSER_END(Language)
+
+SKIP : { " " | "\t"  | "\r" | "\n"}
+
+TOKEN : { < BEGIN : "BEGIN" > }
+TOKEN : { < END : "END" > }
+
+TOKEN : { < EXIT : "EXIT" > }
+TOKEN : { < OUT : "OUT" > }
+TOKEN : { < NUMBER : (<DIGIT>)+ > }
+TOKEN : { < #DIGIT : ["0"-"9"] > } 
+
+Program Start() :
+{}
+{
+	<BEGIN>
+	{ this.program = new Program(); }
+	(
+		Expression()
+	)*
+	<END>
+	{ this.program.addInstruction(new StopInstruction()); }
+	<EOF>
+	{ return this.program; }
+}
+
+void Expression() :
+{
+	Token t;
+}
+{
+	<EXIT>
+|
+	<OUT> 
+	t = <NUMBER>
+	{ this.program.addInstruction(new OutputInstruction(Integer.parseInt(t.image))); }
+}
