@@ -8,6 +8,7 @@ package be.fedict.eid.applet.tests.javacc.lang;
 import be.fedict.eid.applet.tests.javacc.Program;
 import be.fedict.eid.applet.tests.javacc.OutputInstruction;
 import be.fedict.eid.applet.tests.javacc.StopInstruction;
+import be.fedict.eid.applet.tests.javacc.StoreInstruction;
 	
 public class Language {
 	private Program program;
@@ -24,13 +25,24 @@ TOKEN : { < OUT : "OUT" > }
 TOKEN : { < NUMBER : (<DIGIT>)+ > }
 TOKEN : { < #DIGIT : ["0"-"9"] > } 
 
+TOKEN : {  < IDENT : ["a"-"z","A"-"Z", "_"] (["a"-"z","A"-"Z","0"-"9","_"])* > }
+TOKEN : {  < ASSIGN : "=" > }
+
+TOKEN : { < OPEN_PAR : "(" > }
+TOKEN : { < CLOSE_PAR : ")" > }
+
+TOKEN : { < PLUS : "+" > }
+TOKEN : { < MINUS : "-" > }
+TOKEN : { < TIMES : "*" > }
+TOKEN : { < DIVIDE : "/" > }
+
 Program Start() :
 {}
 {
 	<BEGIN>
 	{ this.program = new Program(); }
 	(
-		Expression()
+		Statement()
 	)*
 	<END>
 	{ this.program.addInstruction(new StopInstruction()); }
@@ -38,14 +50,83 @@ Program Start() :
 	{ return this.program; }
 }
 
-void Expression() :
+void Statement() :
 {
-	Token t;
+	int value;
 }
 {
 	<EXIT>
+	{ this.program.addInstruction(new StopInstruction()); }
 |
 	<OUT> 
+	value = ValueExpression()
+	{ this.program.addInstruction(new OutputInstruction(value)); }
+|
+	Assignment()
+}
+
+void Assignment() :
+{
+	Token identToken;
+	int value;
+}
+{
+	identToken = <IDENT> 
+	<ASSIGN> 
+	value = ValueExpression()
+	{ this.program.addInstruction(new StoreInstruction(identToken.image, value)); }
+}
+
+int ValueExpression() :
+{
+	int i;
+	int value;
+}
+{
+	value = Term()
+	(
+		<PLUS>
+		i = Term()
+		{ value += i; }
+	|
+		<MINUS>
+		i = Term()
+		{ value -= i; }
+	)*
+	{ return value; }
+}
+
+int Term() :
+{
+	int i;
+	int value;
+}
+{
+	value = Primary()
+	(
+		<TIMES>
+		i = Primary()
+		{ value *= i; }
+	|
+		<DIVIDE>
+		i = Primary()
+		{ value /= i; }
+	)*
+	{ return value; }
+}
+
+int Primary() :
+{
+	Token t;
+	int i;
+}
+{
 	t = <NUMBER>
-	{ this.program.addInstruction(new OutputInstruction(Integer.parseInt(t.image))); }
+	{ return Integer.parseInt(t.image); }
+|
+	<OPEN_PAR> i = ValueExpression() <CLOSE_PAR>
+	{ return i; }
+|
+	<MINUS> i = Primary()
+	{ return - i; }
 }

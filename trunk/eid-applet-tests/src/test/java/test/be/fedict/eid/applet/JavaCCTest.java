@@ -150,7 +150,12 @@ public class JavaCCTest {
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(
 				"BEGIN\nEXIT\nEND".getBytes());
 		Language language = new Language(inputStream);
-		language.Start();
+		Program program = language.Start();
+		assertNotNull(program);
+		assertEquals(2, program.getInstructions().size());
+		for (Instruction instruction : program.getInstructions()) {
+			assertTrue(instruction instanceof StopInstruction);
+		}
 	}
 
 	@Test
@@ -175,8 +180,10 @@ public class JavaCCTest {
 
 	@Test
 	public void testLanguageOutput2() throws Exception {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(
-				"BEGIN\nOUT 1234\nOUT 5678\nEND".getBytes());
+		ByteArrayInputStream inputStream = new ByteArrayInputStream(("BEGIN\n" //
+				+ "OUT 1234\n" //
+				+ "OUT 5678 + 1234\n" + //
+				"END").getBytes());
 		Language language = new Language(inputStream);
 		Program program = language.Start();
 		assertNotNull(program);
@@ -192,17 +199,60 @@ public class JavaCCTest {
 		Instruction instruction2 = programInstructions.get(1);
 		assertTrue(instruction2 instanceof OutputInstruction);
 		OutputInstruction outputInstruction2 = (OutputInstruction) instruction2;
-		assertEquals(5678, outputInstruction2.getValue());
+		assertEquals(5678 + 1234, outputInstruction2.getValue());
 
 		be.fedict.eid.applet.tests.javacc.Runtime mockRuntime = EasyMock
 				.createMock(be.fedict.eid.applet.tests.javacc.Runtime.class);
 		Interpreter interpreter = new Interpreter(program, mockRuntime);
 
 		mockRuntime.output(1234);
-		mockRuntime.output(5678);
+		mockRuntime.output(5678 + 1234);
 
 		EasyMock.replay(mockRuntime);
 		interpreter.run();
 		EasyMock.verify(mockRuntime);
+
+		LOG.debug("program: " + program);
+	}
+
+	@Test
+	public void testLanguageAssignment() throws Exception {
+		ByteArrayInputStream inputStream = new ByteArrayInputStream(
+				"BEGIN\nMyVar = 1234\nEND".getBytes());
+		Language language = new Language(inputStream);
+		Program program = language.Start();
+		LOG.debug("program size: " + program.getInstructions().size());
+		LOG.debug("program: " + program);
+
+		be.fedict.eid.applet.tests.javacc.Runtime mockRuntime = EasyMock
+				.createMock(be.fedict.eid.applet.tests.javacc.Runtime.class);
+		Interpreter interpreter = new Interpreter(program, mockRuntime);
+
+		EasyMock.replay(mockRuntime);
+		interpreter.run();
+		EasyMock.verify(mockRuntime);
+
+		assertEquals(1234, interpreter.getVariable("MyVar"));
+	}
+
+	@Test
+	public void testLanguageAssignmentExpression() throws Exception {
+		ByteArrayInputStream inputStream = new ByteArrayInputStream(
+				"BEGIN\nMyVar = - 1234 + 5678 - 1 * (1 + 2)\nEND".getBytes());
+		Language language = new Language(inputStream);
+		Program program = language.Start();
+		LOG.debug("program size: " + program.getInstructions().size());
+		LOG.debug("program: " + program);
+
+		be.fedict.eid.applet.tests.javacc.Runtime mockRuntime = EasyMock
+				.createMock(be.fedict.eid.applet.tests.javacc.Runtime.class);
+		Interpreter interpreter = new Interpreter(program, mockRuntime);
+
+		EasyMock.replay(mockRuntime);
+		interpreter.run();
+		EasyMock.verify(mockRuntime);
+
+		assertEquals(-1234 + 5678 - 1 * (1 + 2),
+				interpreter.getVariable("MyVar"));
 	}
 }

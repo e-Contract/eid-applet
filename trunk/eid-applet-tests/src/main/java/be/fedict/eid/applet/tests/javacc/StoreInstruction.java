@@ -18,31 +18,25 @@
 
 package be.fedict.eid.applet.tests.javacc;
 
-import java.util.LinkedList;
-import java.util.List;
+public class StoreInstruction implements Instruction {
 
-public class Program {
+	private final String variableName;
 
-	private final List<Instruction> instructions;
+	private final int value;
 
-	public Program() {
-		this.instructions = new LinkedList<Instruction>();
+	public StoreInstruction(String variableName, int value) {
+		this.variableName = variableName;
+		this.value = value;
 	}
 
-	public List<Instruction> getInstructions() {
-		return this.instructions;
-	}
-
-	public void addInstruction(Instruction instruction) {
-		this.instructions.add(instruction);
+	@Override
+	public void execute(State state, Runtime runtime) {
+		state.store(this.variableName, this.value);
+		state.increaseInstructionPointer();
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder stringBuilder = new StringBuilder();
-		for (Instruction instruction : this.instructions) {
-			stringBuilder.append(instruction.toString() + "\n");
-		}
-		return stringBuilder.toString();
+		return "STORE " + this.variableName + " = " + this.value;
 	}
 }

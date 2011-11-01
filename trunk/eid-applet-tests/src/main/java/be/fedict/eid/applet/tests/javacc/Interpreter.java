@@ -21,20 +21,27 @@ package be.fedict.eid.applet.tests.javacc;
 public class Interpreter {
 
 	private final Program program;
-	
+
 	private final Runtime runtime;
-	
+
+	private State state;
+
 	public Interpreter(Program program, Runtime runtime) {
 		this.program = program;
 		this.runtime = runtime;
 	}
-	
+
 	public void run() {
-		State state = new State();
-		while (state.isRunning()) {
-			int instructionPointer = state.getInstructionPointer();
-			Instruction instruction = this.program.getInstructions().get(instructionPointer);
-			instruction.execute(state, this.runtime);
+		this.state = new State();
+		while (this.state.isRunning()) {
+			int instructionPointer = this.state.getInstructionPointer();
+			Instruction instruction = this.program.getInstructions().get(
+					instructionPointer);
+			instruction.execute(this.state, this.runtime);
 		}
+	}
+
+	public int getVariable(String variableName) {
+		return this.state.getVariable(variableName);
 	}
 }
