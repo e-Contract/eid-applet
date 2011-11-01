@@ -34,4 +34,9 @@ public class OutputInstruction implements Instruction {
 		runtime.output(this.value);
 		state.increaseInstructionPointer();
 	}
+
+	@Override
+	public String toString() {
+		return "OUT " + this.value;
+	}
 }

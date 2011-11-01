@@ -24,4 +24,9 @@ public class StopInstruction implements Instruction {
 	public void execute(State state, Runtime runtime) {
 		state.stop();
 	}
+
+	@Override
+	public String toString() {
+		return "STOP";
+	}
 }
