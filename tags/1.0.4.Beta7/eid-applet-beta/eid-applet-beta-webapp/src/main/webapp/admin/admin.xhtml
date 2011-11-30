@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:rich="http://richfaces.org/rich"
+        lang="en" xml:lang="en">
+<body>
+<ui:composition template="/WEB-INF/template.xhtml">
+	<ui:param name="activeMenu" value="admin" />
+	<ui:define name="body">
+		<h2>Administrator</h2>
+		<h:form>
+			<h3>Feedback</h3>
+			<rich:dataTable var="feedbackItem" value="#{feedbackList}" rows="10">
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="Subject" />
+					</f:facet>
+					<h:commandLink value="#{feedbackItem.subject}"
+						action="#{feedbackAdmin.view}" />
+				</rich:column>
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="Created" />
+					</f:facet>
+					<h:outputText value="#{feedbackItem.created.time}">
+						<f:convertDateTime timeZone="Europe/Paris" dateStyle="full"
+							type="both" />
+					</h:outputText>
+				</rich:column>
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="Context" />
+					</f:facet>
+					<h:outputText value="#{feedbackItem.sessionContext.contextId}" />
+				</rich:column>
+				<f:facet name="footer">
+					<rich:datascroller />
+				</f:facet>
+			</rich:dataTable>
+			<h3>Administrators</h3>
+			<rich:dataTable var="adminItem" value="#{adminList}" rows="10">
+				<f:facet name="footer">
+					<rich:datascroller />
+				</f:facet>
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="Serial Number" />
+					</f:facet>
+					<h:outputText value="#{adminItem.serialNumber}" />
+				</rich:column>
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="Actions" />
+					</f:facet>
+					<h:commandLink value="Delete" action="#{adminAdmins.delete}" />
+				</rich:column>
+			</rich:dataTable>
+			<h:commandButton value="Add" action="add" />
+			<h:messages globalOnly="true" style="color: red;" />
+		</h:form>
+	</ui:define>
+</ui:composition>
+</body>
+</html>

@@ -1,0 +1,26 @@
+options {
+	STATIC = false;
+}
+
+PARSER_BEGIN(Adder)
+package be.fedict.eid.applet.tests.javacc.adder;
+
+public class Adder {
+	public static void main(String[] args) throws ParseException, TokenMgrError {
+		Adder parser = new Adder(System.in);
+		parser.Start();
+	}
+}
+PARSER_END(Adder)
+
+SKIP : { " " }
+SKIP : { "\n" | "\r" | "\r\n" }
+TOKEN : { < PLUS : "+" > }
+TOKEN : { < NUMBER : (["0"-"9"])+ > }
+
+void Start() :
+{
+}
+{
+	<NUMBER> ( <PLUS> <NUMBER> )* <EOF>
+}

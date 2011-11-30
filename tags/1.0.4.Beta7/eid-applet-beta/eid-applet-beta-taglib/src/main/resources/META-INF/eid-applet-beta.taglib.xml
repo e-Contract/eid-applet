@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE facelet-taglib PUBLIC
+  "-//Sun Microsystems, Inc.//DTD Facelet Taglib 1.0//EN"
+  "https://facelets.dev.java.net/source/browse/*checkout*/facelets/src/etc/facelet-taglib_1_0.dtd">
+<facelet-taglib>
+	<namespace>urn:be:fedict:eid:applet:beta:taglib:1.0</namespace>
+	<tag>
+		<tag-name>projectInfo</tag-name>
+		<source>tags/projectInfo.xhtml</source>
+	</tag>
+	<tag>
+		<tag-name>downloads</tag-name>
+		<source>tags/downloads.xhtml</source>
+	</tag>
+	<tag>
+		<tag-name>mailingList</tag-name>
+		<source>tags/mailingList.xhtml</source>
+	</tag>
+	<tag>
+		<tag-name>wiki</tag-name>
+		<source>tags/wiki.xhtml</source>
+	</tag>
+	<tag>
+		<tag-name>issueTracker</tag-name>
+		<source>tags/issueTracker.xhtml</source>
+	</tag>
+	<tag>
+		<tag-name>codeChanges</tag-name>
+		<source>tags/codeChanges.xhtml</source>
+	</tag>
+</facelet-taglib>
