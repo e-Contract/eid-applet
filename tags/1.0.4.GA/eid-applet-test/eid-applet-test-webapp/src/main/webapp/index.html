@@ -1,0 +1,93 @@
+<html>
+<head>
+<title>eID Applet Test Web Application</title>
+</head>
+<body>
+<h1>eID Applet Test Web Application</h1>
+<p>This web application demonstrates what's possible with the eID
+Applet.</p>
+<h2>Identification</h2>
+<ul>
+	<li><a href="identify.html">eID based Identification (EN)</a></li>
+	<li><a href="identify-no-deploy-toolkit.jsp">eID based
+	Identification (without Java 6u10 Deploy Toolkit)</a></li>
+	<li><a href="identify-remove-card.jsp">eID based
+	Identification with card removal (EN)</a></li>
+	<li><a href="identify-address.jsp">eID based Identification
+	including address (NL) + Javascript message callback</a></li>
+	<li><a href="identify-photo.jsp">eID based Identification
+	including address and photo (FR) + User-Agent setting</a></li>
+	<li><a href="identify-secure-client.jsp">eID based
+	Identification with Secure Client Environment Verification (NL) +
+	NoChunkedTransferEncoding</a></li>
+	<li><a href="identify-insecure-client.jsp">eID based
+	Identification where client is marked as insecure.</a></li>
+	<li><a href="identify-insecure-warn-client.jsp">eID based
+	Identification where client is warned about insecure environment.</a></li>
+	<li><a href="identify-integrity.jsp">eID based Identification
+	with Identity Integrity Verification (FR) + hiding the details buttons</a></li>
+	<li><a href="identify-all.jsp">eID based Identification with
+	every option enabled. (EN) + skip secure connection check</a></li>
+	<li><a href="identify-json.jsp">JSON test</a></li>
+	<li><a href="identify-frameset.html">Framed eID Applet</a></li>
+</ul>
+<h2>Authentication</h2>
+<ul>
+	<li><a href="authenticate.jsp">eID based authentication (EN)</a></li>
+	<li><a href="authenticate-revoke.jsp">eID authentication
+	(simulates revoked certificates) (DE)</a></li>
+	<li><a href="authenticate-expired.jsp">eID authentication
+	(simulates expired certificates) + No PKCS11</a></li>
+	<li><a href="authenticate-untrusted.jsp">eID authentication
+	(simulates untrusted certificates)</a></li>
+	<li><a href="authenticate-secure-reader.jsp">eID based
+	authentication (require secure smart card reader)</a></li>
+	<li><a href="authenticate-no-deploy-toolkit.jsp">eID based
+	authentication (without Java 6u10 Deploy Toolkit)</a></li>
+	<li><a href="authn-remove-card.jsp">eID based authentication
+	with card removal (FR)</a></li>
+	<li><a href="authn-logoff-card.jsp">eID based authentication
+	with logoff and pre-logoff, and identity data retrieval</a></li>
+	<li><a href="authn-secure-client.jsp">eID based authentication
+	with Secure Client Environment Verification and hostname/IP
+	verification (NL)</a></li>
+	<li><a href="kiosk.jsp">Kiosk Mode</a></li>
+	<li><a href="authn-certs.jsp">Authentication including
+	certificates</a></li>
+</ul>
+<h2>Signature</h2>
+<ul>
+	<li><a href="sign-text.jsp">Sign Some Text (include certs
+	during pre-sign)</a></li>
+	<li><a href="sign-identity.jsp">Sign your identity</a></li>
+	<li><a href="sign-files.jsp">Sign Local Files</a></li>
+	<li><a href="sign-xml-files.jsp">Sign Local Files (XML
+	Signature) + No PKCS11</a></li>
+	<li><a href="sign-files-all.jsp">Sign Local Files with Secure
+	Client Environment Verification and logoff</a></li>
+	<li><a href="sign-untrusted.jsp">Signing that simulates
+	untrusted certificates.</a></li>
+</ul>
+<h2>Administration</h2>
+<ul>
+	<li><a href="change-pin.jsp">Change PIN with Logoff</a></li>
+	<li><a href="change-pin-secure-client.jsp">Change PIN with
+	Secure Client Environment Verification</a></li>
+	<li><a href="change-pin-remove-card.jsp">Change PIN with card
+	removal</a></li>
+	<li><a href="unblock-pin.jsp">Unblock PIN</a></li>
+	<li><a href="diagnostic.jsp">Diagnostic Mode</a></li>
+</ul>
+<h2>OWASP Demos</h2>
+<ul>
+	<li><a href="identification.jsp">eID Identification Demo</a></li>
+	<li><a href="identification-integrity.jsp">eID Identification
+	with Integrity Verification Demo</a></li>
+	<li><a href="authentication.jsp">eID Authentication Demo</a></li>
+	<li><a href="channel-binding.jsp">Secure Channel Binding
+	Settings</a></li>
+	<li><a href="authentication-channel-binding.jsp">eID
+	Authentication with Secure Channel Binding Demo</a></li>
+</ul>
+</body>
+</html>

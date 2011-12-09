@@ -1,0 +1,5 @@
+eID Applet Package
+
+  This artifact creates the standalone eID Applet package.
+  
+  The resulting JAR is also signed.
