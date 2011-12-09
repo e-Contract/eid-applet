@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.4.GA</version>
+		<version>1.0.5-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet Tests</name>
 	<description>Integration tests for the eID applet.</description>
@@ -11,7 +11,7 @@
 		its unit tests do not run as is. -->
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-tests</artifactId>
-	<version>1.0.4.GA</version>
+	<version>1.0.5-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<build>
 		<plugins>
