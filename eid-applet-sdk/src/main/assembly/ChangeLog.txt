@@ -1,3 +1,14 @@
+1.0.4.GA - 9 Dec 2011
+	* XAdES digest algo configuration
+	* XAdES c14n, namespace, XML schema fixes
+	* ASiC support
+	* Maven site configuration
+	* Maven fixes (cleanup & repository changes)
+	* CDI support
+	* Office2010 signature improvements
+	* German date of birth fixes
+	* common deployment javascript for the eID Applet
+
 1.0.3.GA - 20 Jun 2011
 	* fixed Hibernate LOB and Oracle issue
 	* 64-bit workaround for Ubuntu

@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict</groupId>
@@ -51,6 +53,13 @@
 									<type>jar</type>
 									<classifier>javadoc</classifier>
 									<outputDirectory>target/service-signer-javadoc/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>be.fedict.eid-applet</groupId>
+									<artifactId>eid-applet-service-cdi</artifactId>
+									<type>jar</type>
+									<classifier>javadoc</classifier>
+									<outputDirectory>target/service-cdi-javadoc/</outputDirectory>
 								</artifactItem>
 							</artifactItems>
 						</configuration>
@@ -122,6 +131,16 @@
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
+			<artifactId>eid-applet-js</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.fedict.eid-applet</groupId>
+			<artifactId>eid-applet-service-cdi</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service</artifactId>
 			<classifier>javadoc</classifier>
 			<version>${project.version}</version>
@@ -137,6 +156,13 @@
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service-signer</artifactId>
+			<classifier>javadoc</classifier>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>be.fedict.eid-applet</groupId>
+			<artifactId>eid-applet-service-cdi</artifactId>
 			<classifier>javadoc</classifier>
 			<version>${project.version}</version>
 			<scope>provided</scope>

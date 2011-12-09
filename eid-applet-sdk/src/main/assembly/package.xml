@@ -53,6 +53,13 @@
 				<exclude>META-INF/**</exclude>
 			</excludes>
 		</fileSet>
+		<fileSet>
+			<directory>target/service-cdi-javadoc</directory>
+			<outputDirectory>eid-applet-service-cdi-javadoc</outputDirectory>
+			<excludes>
+				<exclude>META-INF/**</exclude>
+			</excludes>
+		</fileSet>
 	</fileSets>
 	<dependencySets>
 		<dependencySet>

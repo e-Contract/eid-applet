@@ -16,12 +16,19 @@ primary artifacts:
 - eid-applet-service-signer-x.y.z.jar
 				The eID Applet Service Signer JAR.
 - eid-applet-shared-x.y.z.jar	Required JAR for the eID Applet Service.
+- eid-applet-service-cdi-x.y.z.jar
+				CDI helper classes JAR.
+- eid-applet-js-x.y.z.jar
+				JavaScript for loading the eID Applet.
 - lib/				Contains the 3rd party JAR artifacts.
 - eid-applet-service-javadoc/	The javadoc of the eID Applet Service.
 - eid-applet-service-spi-javadoc/
 				The javadoc of the eID Applet Service SPI.
 - eid-applet-service-signer-javadoc/
 				The javadoc of the eID Applet Service Signer.
+- eid-applet-service-cdi-javadoc/
+				The javadoc of the eID Applet Service CDI.
+
 
 We suggest to start by reading the eID Applet developer's guide.
 

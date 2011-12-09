@@ -12,7 +12,7 @@
 			<year>2008-2011</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>20 June 2011</releaseinfo>
+		<releaseinfo>9 December 2011</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -84,7 +84,16 @@
 				branding reasons) one needs to take all aspects of branching into
 				consideration. If you branch you will lose all official bug fixes
 				unless you back-port them manually which can be quite time
-				consuming.  
+				consuming.
+			</para>
+		</warning>
+		<warning>
+			<title>eID Applet License</title>
+			<para>
+				The eID Applet has been released under the GNU LGPL 3.0 open
+				source software license. This implies that, in case you alter the
+				eID Applet, you have to make the eID Applet source code available
+				yourself.
 			</para>
 		</warning>
 		<tip>
@@ -149,7 +158,8 @@
 					generation Java plugin (libnpjp2.so). So for Firefox you can
 					configure the Java plugin as follows:
 					<prompt>sudo ln -s $JAVA_HOME/jre/lib/i386/libnpjp2.so
-						/usr/lib/mozilla/plugins/</prompt>
+						/usr/lib/mozilla/plugins/
+					</prompt>
 				</para>
 			</section>
 			<section>
@@ -211,7 +221,15 @@
 			<para>
 				For Google Chrome to be able to load the eID Applet using the
 				Deployment Toolkit Javascript you should host the deployJava.js
-				Javascript locally. 
+				Javascript locally.
+			</para>
+		</tip>
+		<tip>
+			<title>eID Applet JavaScript</title>
+			<para>
+				The eID Applet SDK contains an
+				<code>eid-applet-js</code>
+				artifact that offers a default JavaScript to load the eID Applet.
 			</para>
 		</tip>
 		<para>
@@ -468,7 +486,8 @@
 				eID Applet screen flow by adding the following HTTP parameter to the
 				TargetPage applet parameter:
 				<code>TargetPage
-					:'your-target-page.seam?conversationId=#{conversation.id}',</code>
+					:'your-target-page.seam?conversationId=#{conversation.id}',
+				</code>
 			</para>
 		</tip>
 		<section>
@@ -496,7 +515,7 @@
 			<para>
 				The eID Applet Service, which can be found in the
 				<code>eid-applet-service-x.x.x.jar
-					</code>
+				</code>
 				artifact, has some 3rd party dependencies. These artifacts are
 				located under the
 				<code>lib/</code>
@@ -550,6 +569,14 @@
 					<code>eid</code>
 					session attribute. This way we cover as much Java web frameworks as
 					possible.
+				</para>
+			</tip>
+			<tip>
+				<title>CDI Support</title>
+				<para>
+					The eID Applet SDK contains an
+					<code>eid-applet-service-cdi</code>
+					artifact that offers initial support for CDI containers.
 				</para>
 			</tip>
 			<section>
@@ -715,7 +742,8 @@
 </servlet-mapping>]]></programlisting>
 				<para>After a successful eID identification, the Google Earth KMZ
 					file is available
-					via:</para>
+					via:
+				</para>
 				<programlisting language="XML"><![CDATA[<a href="identity.kmz" target="_blank">View in Google Earth</a>]]></programlisting>
 			</section>
 			<section>
@@ -1380,7 +1408,7 @@
 			</itemizedlist>
 			<para>
 				Besides different signature service implementations we also
-				provide a XAdES-X-L v1.4.1 implementation as an XML signature
+				provide a XAdES-X-L v1.4.2 implementation as an XML signature
 				service facet.
 			</para>
 			<note>
@@ -1627,12 +1655,14 @@
 					<itemizedlist>
 						<listitem>
 							<para>show an error message and abort the requested eID
-								operation.</para>
+								operation.
+							</para>
 						</listitem>
 						<listitem>
 							<para>show a warning message and ask the citizen whether
 								he/she
-								wants to continue or not.</para>
+								wants to continue or not.
+							</para>
 						</listitem>
 					</itemizedlist>
 				</para>
@@ -1924,7 +1954,7 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 			You can deploy your eID Applet enabled web application over a
 			lot of different network topologies, depending on the setup of your
 			infrastructure. The easiest configuration is a setup where you
-			terminate the SSL on the Application Server itself. 
+			terminate the SSL on the Application Server itself.
 		</para>
 		<section>
 			<title>AJP proxy</title>
@@ -2057,7 +2087,8 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 					Windows, available for free from
 					<ulink
 						url="http://www.oracle.com/technetwork/java/javase/tech/index-jsp-136191.html">
-						Oracle's website.</ulink>
+						Oracle's website.
+					</ulink>
 				</para>
 			</section>
 			<section>
@@ -2070,10 +2101,12 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 					See also the documentation on the current and future accessibility
 					architecture of
 					<ulink url="http://live.gnome.org/Accessibility/BonoboDeprecation">
-						GNOME</ulink>
+						GNOME
+					</ulink>
 					and
 					<ulink url="http://accessibility.kde.org/developer/bridge.php">
-						KDE</ulink>
+						KDE
+					</ulink>
 					.
 				</para>
 			</section>
@@ -2085,7 +2118,7 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 				to read out the dialog boxes and status messages of the eID applet,
 				the exact behavior depends on operating system, screen reader
 				software and browser version.
-            </para>
+			</para>
 			<para>
 				For instance, some configurations do not automatically read out
 				non-focusable text inside dialog boxes. However, it is often
@@ -2317,6 +2350,11 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 						<entry>20 Jun 2011</entry>
 						<entry>Frank Cornelis</entry>
 						<entry>1.0.3.GA</entry>
+					</row>
+					<row>
+						<entry>9 Dec 2011</entry>
+						<entry>Frank Cornelis</entry>
+						<entry>1.0.4.GA</entry>
 					</row>
 				</tbody>
 			</tgroup>
