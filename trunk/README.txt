@@ -10,7 +10,7 @@ The source code is hosted at: http://code.google.com/p/eid-applet/
 === 2. Requirements
 
 The following is required for compiling the eID Applet software:
-* Sun Java 1.6.0_21, 1.6.0_22, 1.6.0_23, 1.6.0_26
+* Oracle Java 1.6.0_21, 1.6.0_22, 1.6.0_23, 1.6.0_26, 1.6.0_29
 * Apache Maven 3.0.3
 
 
@@ -77,7 +77,7 @@ repository location. Do this via:
 
 === 6. NetBeans IDE
 
-As of NetBeans version 6.7 this free IDE from Sun has native Maven 2 support.
+As of NetBeans version 6.7 this free IDE from Sun has native Maven 3 support.
 
 
 === 7. License
