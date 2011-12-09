@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.4-SNAPSHOT</version>
+		<version>1.0.4.GA</version>
 	</parent>
 	<name>FedICT eID Applet Core</name>
 	<description>Core classes of the eID applet.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-core</artifactId>
-	<version>1.0.4-SNAPSHOT</version>
+	<version>1.0.4.GA</version>
 	<packaging>jar</packaging>
 	<url>http://code.google.com/p/eid-applet/</url>
 	<build>
