@@ -323,9 +323,9 @@ public class AuthenticationDataMessageHandler implements
 				if (exception instanceof CertificateSecurityException) {
 					return new FinishedMessage(ErrorCode.CERTIFICATE);
 				}
-				throw new SecurityException("authn service error: "
-						+ e.getMessage());
 			}
+			throw new SecurityException("authn service error: "
+					+ e.getMessage());
 		}
 
 		String userId = UserIdentifierUtil.getUserId(message.authnCert);
