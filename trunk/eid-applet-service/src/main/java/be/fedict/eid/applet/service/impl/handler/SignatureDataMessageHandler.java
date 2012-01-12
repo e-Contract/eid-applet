@@ -170,9 +170,9 @@ public class SignatureDataMessageHandler implements
 				if (exception instanceof CertificateSecurityException) {
 					return new FinishedMessage(ErrorCode.CERTIFICATE);
 				}
-				throw new SecurityException("signature service error: "
-						+ e.getMessage(), e);
 			}
+			throw new SecurityException("signature service error: "
+					+ e.getMessage(), e);
 		}
 
 		return new FinishedMessage();
