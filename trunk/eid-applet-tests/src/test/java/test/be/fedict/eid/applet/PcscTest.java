@@ -788,7 +788,23 @@ public class PcscTest {
 			fail("get challenge failure: "
 					+ Integer.toHexString(responseApdu.getSW()));
 		}
+		LOG.debug("challenge: " + Hex.encodeHexString(responseApdu.getData()));
 		assertEquals(size, responseApdu.getData().length);
+
+		pcscEid.close();
+	}
+
+	@Test
+	public void testGetChallengePcscEid() throws Exception {
+		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEid.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEid.waitForEidPresent();
+		}
+
+		int size = 20;
+		byte[] result = pcscEid.getChallenge(size);
+		assertEquals(size, result.length);
 
 		pcscEid.close();
 	}
