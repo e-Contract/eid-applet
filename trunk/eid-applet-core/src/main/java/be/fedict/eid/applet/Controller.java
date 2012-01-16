@@ -54,7 +54,6 @@ import javax.security.auth.login.LoginException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import sun.security.pkcs11.wrapper.PKCS11Exception;
 import be.fedict.eid.applet.Messages.MESSAGE_ID;
 import be.fedict.eid.applet.io.AppletSSLSocketFactory;
 import be.fedict.eid.applet.io.HttpURLConnectionHttpReceiver;
@@ -663,8 +662,8 @@ public class Controller {
 	}
 
 	private void kioskMode() throws IllegalArgumentException,
-			SecurityException, IOException, PKCS11Exception,
-			InterruptedException, NoSuchFieldException, IllegalAccessException,
+			SecurityException, IOException, InterruptedException,
+			NoSuchFieldException, IllegalAccessException,
 			InvocationTargetException, NoSuchMethodException, Exception {
 		addDetailMessage("entering Kiosk Mode...");
 		this.view.setStatusMessage(Status.NORMAL,
@@ -812,12 +811,10 @@ public class Controller {
 		boolean logoff = signRequestMessage.logoff;
 		boolean removeCard = signRequestMessage.removeCard;
 		boolean requireSecureReader = signRequestMessage.requireSecureReader;
-		boolean noPkcs11 = signRequestMessage.noPkcs11;
 		addDetailMessage("logoff: " + logoff);
 		addDetailMessage("remove card: " + removeCard);
 		addDetailMessage("require secure smart card reader: "
 				+ requireSecureReader);
-		addDetailMessage("no PKCS11: " + noPkcs11);
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
 
 		waitForEIdCardPcsc();
@@ -927,7 +924,6 @@ public class Controller {
 		boolean includePhoto = authnRequest.includePhoto;
 		boolean includeIntegrityData = authnRequest.includeIntegrityData;
 		boolean requireSecureReader = authnRequest.requireSecureReader;
-		boolean noPkcs11 = authnRequest.noPkcs11;
 		if (challenge.length < 20) {
 			throw new SecurityException(
 					"challenge should be at least 20 bytes long.");
@@ -948,7 +944,6 @@ public class Controller {
 		addDetailMessage("include integrity data: " + includeIntegrityData);
 		addDetailMessage("require secure smart card reader: "
 				+ requireSecureReader);
-		addDetailMessage("no PKCS11: " + noPkcs11);
 
 		String hostname;
 		if (includeHostname) {
