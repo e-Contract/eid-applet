@@ -97,7 +97,7 @@ public class AuthenticationRequestMessage extends AbstractProtocolMessage {
 			boolean serverCertificateChannelBinding, boolean includeIdentity,
 			boolean includeCertificates, boolean includeAddress,
 			boolean includePhoto, boolean includeIntegrityData,
-			boolean requireSecureReader, boolean noPkcs11) {
+			boolean requireSecureReader) {
 		this.challenge = challenge;
 		this.includeHostname = includeHostname;
 		this.includeInetAddress = includeInetAddress;
@@ -112,6 +112,6 @@ public class AuthenticationRequestMessage extends AbstractProtocolMessage {
 		this.includePhoto = includePhoto;
 		this.includeIntegrityData = includeIntegrityData;
 		this.requireSecureReader = requireSecureReader;
-		this.noPkcs11 = noPkcs11;
+		this.noPkcs11 = true;
 	}
 }

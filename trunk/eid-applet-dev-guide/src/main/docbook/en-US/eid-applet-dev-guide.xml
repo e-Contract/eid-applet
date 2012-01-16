@@ -9,10 +9,10 @@
 			Integrating the eID Applet within your web applications.
 		</subtitle>
 		<copyright>
-			<year>2008-2011</year>
+			<year>2008-2012</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>9 December 2011</releaseinfo>
+		<releaseinfo>12 January 2012</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -114,10 +114,8 @@
 			<para>
 				The strategy is to no longer support operating systems, but to
 				support a specific Java platform. For the eID Applet this is the
-				Java 6 platform (for eID identification that is. eID authentication
-				and eID signature creation can also run using a Java 1.5 JRE). We
-				can only give advice on how to configure Java 6 on your operatings
-				system.
+				Java 6 platform. We can only give advice on how to configure Java 6
+				on your operatings system.
 			</para>
 		</section>
 		<section>
@@ -973,36 +971,16 @@
 			<note>
 				<title>Mac OS X</title>
 				<para>
-					Because not every version of Mac OS X supports the Java 6
-					runtime, we made the eID Applet to also operate on a Java 5 runtime
-					for the basic eID authentication (and eID signature) operations.
-				</para>
-			</note>
-			<note>
-				<title>Sun JRE</title>
-				<para>
-					Because the eID Applet is using the
-					<code>SunPKCS11</code>
-					security provider we need the Sun JRE as browser applet runtime for
-					eID authentication (and eID signature) via the eID Applet. These
-					days the OpenJDK JRE also comes with an
-					<code>SunPKCS11</code>
-					security provider.
+					You need a version of Mac OS X that supports Java 6.
 				</para>
 			</note>
 			<note>
 				<title>eID Middleware</title>
 				<para>
-					The eID Applet is using the PKCS#11 library for eID
-					authentication (and eID signatures). This requires that the eID
-					Middleware has been installed on the client system.
-				</para>
-				<para>
-					If no PKCS#11 library has been found and the applet browser
-					runtime is Java 6, then the eID Applet will fallback to the Java 6
-					Smart Card I/O API to generate the authentication (or in case of
-					eID signature the non-repudiation) digital signature via the direct
-					PC/SC smart card interface.
+					The eID Applet is using not using the eID Middleware to
+					perform eID operations. The eID Applet is directly accessing the
+					eID card via the PC/SC interface. This requires a Java 6 client
+					runtime.
 				</para>
 			</note>
 			<para>
@@ -1525,7 +1503,7 @@
 		AppletService :'applet-kiosk-service',
 		RemoveCardCallback :'removeCardCallback'
 	};
-	var version = '1.5';
+	var version = '1.6';
 	deployJava.runApplet(attributes, parameters, version);
 </script>
 <script>
@@ -1590,7 +1568,7 @@
 		DiagnosticTestCallback :'diagnosticTestCallback',
 		TargetPage : 'javascript:diagnoseDone();'
 	};
-	var version = '1.5';
+	var version = '1.6';
 	deployJava.runApplet(attributes, parameters, version);
 </script>
 <script>
@@ -1697,13 +1675,6 @@
 				<programlisting language="XML"><![CDATA[NavigatorUserAgent : navigator.userAgent,
 NavigatorAppName : navigator.appName,
 NavigatorAppVersion : navigator.appVersion]]></programlisting>
-				<note>
-					<title>Java 6</title>
-					<para>
-						This eID Applet feature requires a Java 6 browser runtime or
-						an installed eID Middleware PKCS#11 library.
-					</para>
-				</note>
 			</section>
 			<section>
 				<title>eID Card Removal</title>
@@ -1749,12 +1720,6 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 	<param-name>Logoff</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
-				<para>
-					This feature requires a Java 6 browser runtime as it is using
-					the Smart Card I/O API. If no Java 6 runtime is available this
-					feature will default to an eID card removal as this yields the same
-					result.
-				</para>
 				<warning>
 					<title>Enable eID card logoff</title>
 					<para>
@@ -1890,24 +1855,6 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 						audience indeed has access to a secure pinpad reader.
 					</para>
 				</warning>
-			</section>
-			<section>
-				<title>Disabling the eID Middleware usage</title>
-				<para>
-					The eID Applet Service can be configured to make the eID Applet to
-					avoid using the eID Middleware for crypto operations
-					(authentication or signing). This feature can be useful for some
-					environments in which the eID Middleware yields unstable eID
-					operations. This feature can be enabled by setting the following
-					<code>init-param</code>
-					on the
-					<code>AppletServiceServlet</code>
-					:
-				</para>
-				<programlisting language="XML"><![CDATA[<init-param>
-	<param-name>NoPKCS11</param-name>
-	<param-value>true</param-value>
-</init-param>]]></programlisting>
 			</section>
 			<section>
 				<title>Run-time selection of required eID identity data</title>
