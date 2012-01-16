@@ -79,9 +79,6 @@ public class SignCertificatesDataMessageHandler implements
 	@InitParam(HelloMessageHandler.REQUIRE_SECURE_READER_INIT_PARAM_NAME)
 	private boolean requireSecureReader;
 
-	@InitParam(HelloMessageHandler.NO_PKCS11_INIT_PARAM_NAME)
-	private boolean noPkcs11;
-
 	@InitParam(HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<IdentityIntegrityService> identityIntegrityServiceLocator;
 
@@ -218,7 +215,7 @@ public class SignCertificatesDataMessageHandler implements
 		SignRequestMessage signRequestMessage = new SignRequestMessage(
 				digestInfo.digestValue, digestInfo.digestAlgo,
 				digestInfo.description, this.logoff, this.removeCard,
-				this.requireSecureReader, this.noPkcs11);
+				this.requireSecureReader);
 		return signRequestMessage;
 	}
 

@@ -68,13 +68,13 @@ public class SignRequestMessage extends AbstractProtocolMessage {
 
 	public SignRequestMessage(byte[] digestValue, String digestAlgo,
 			String description, boolean logoff, boolean removeCard,
-			boolean requireSecureReader, boolean noPkcs11) {
+			boolean requireSecureReader) {
 		this.digestValue = digestValue;
 		this.digestAlgo = digestAlgo;
 		this.description = description;
 		this.logoff = logoff;
 		this.removeCard = removeCard;
 		this.requireSecureReader = requireSecureReader;
-		this.noPkcs11 = noPkcs11;
+		this.noPkcs11 = true;
 	}
 }

@@ -121,9 +121,6 @@ public class ClientEnvironmentMessageHandler implements
 	@InitParam(HelloMessageHandler.SIGNATURE_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<SignatureService> signatureServiceLocator;
 
-	@InitParam(HelloMessageHandler.NO_PKCS11_INIT_PARAM_NAME)
-	private boolean noPkcs11;
-
 	@InitParam(HelloMessageHandler.IDENTITY_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<IdentityService> identityServiceLocator;
 
@@ -214,7 +211,7 @@ public class ClientEnvironmentMessageHandler implements
 			SignRequestMessage signRequestMessage = new SignRequestMessage(
 					digestInfo.digestValue, digestInfo.digestAlgo,
 					digestInfo.description, this.logoff, this.removeCard,
-					this.requireSecureReader, this.noPkcs11);
+					this.requireSecureReader);
 			return signRequestMessage;
 		}
 		AuthenticationService authenticationService = this.authenticationServiceLocator
@@ -255,8 +252,7 @@ public class ClientEnvironmentMessageHandler implements
 					this.sessionIdChannelBinding,
 					this.serverCertificateChannelBinding, includeIdentity,
 					includeCertificates, includeAddress, includePhoto,
-					includeIntegrityData, this.requireSecureReader,
-					this.noPkcs11);
+					includeIntegrityData, this.requireSecureReader);
 			return authenticationRequestMessage;
 		} else {
 			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
