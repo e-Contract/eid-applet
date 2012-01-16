@@ -39,7 +39,6 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Enumeration;
@@ -951,10 +950,6 @@ public class Controller {
 				+ requireSecureReader);
 		addDetailMessage("no PKCS11: " + noPkcs11);
 
-		SecureRandom secureRandom = new SecureRandom();
-		byte[] salt = new byte[20];
-		secureRandom.nextBytes(salt);
-
 		String hostname;
 		if (includeHostname) {
 			/*
@@ -992,15 +987,17 @@ public class Controller {
 			encodedServerCertificate = null;
 		}
 
-		AuthenticationContract authenticationContract = new AuthenticationContract(
-				salt, hostname, inetAddress, sessionId,
-				encodedServerCertificate, challenge);
-		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
-
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
 		waitForEIdCardPcsc();
 
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.AUTHENTICATING);
+
+		byte[] salt = this.pcscEidSpi.getChallenge(20);
+
+		AuthenticationContract authenticationContract = new AuthenticationContract(
+				salt, hostname, inetAddress, sessionId,
+				encodedServerCertificate, challenge);
+		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
 
 		if (includeIdentity || includeAddress || includePhoto) {
 			boolean response = this.view.privacyQuestion(includeAddress,

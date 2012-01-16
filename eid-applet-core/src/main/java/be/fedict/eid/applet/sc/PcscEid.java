@@ -18,6 +18,8 @@
 
 package be.fedict.eid.applet.sc;
 
+import static org.junit.Assert.fail;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -61,6 +63,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
+
+import org.apache.commons.codec.binary.Hex;
 
 import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Dialogs;
@@ -1773,5 +1777,23 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
 				true, null);
 		return authnCertificate;
+	}
+
+	public byte[] getChallenge(int size) throws CardException {
+		CommandAPDU getChallengeApdu = new CommandAPDU(0x00, 0x84, 0x00, 0x00,
+				new byte[] {}, 0, 0, size);
+		ResponseAPDU responseApdu;
+		responseApdu = this.cardChannel.transmit(getChallengeApdu);
+		if (0x9000 != responseApdu.getSW()) {
+			this.view.addDetailMessage("get challenge failure: "
+					+ Integer.toHexString(responseApdu.getSW()));
+			throw new RuntimeException("get challenge failure: "
+					+ Integer.toHexString(responseApdu.getSW()));
+		}
+		if (size != responseApdu.getData().length) {
+			throw new RuntimeException("challenge size incorrect: "
+					+ responseApdu.getData().length);
+		}
+		return responseApdu.getData();
 	}
 }
