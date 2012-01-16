@@ -34,6 +34,8 @@ import org.apache.commons.codec.binary.Hex;
 
 import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.spi.DigestInfo;
+import be.fedict.eid.applet.service.spi.IdentityRequest;
+import be.fedict.eid.applet.service.spi.IdentityService;
 import be.fedict.eid.applet.service.spi.SignatureService;
 import be.fedict.eid.applet.shared.FileDigestsDataMessage;
 import be.fedict.eid.applet.shared.SignRequestMessage;
@@ -59,6 +61,9 @@ public class FileDigestsDataMessageHandler implements
 
 	@InitParam(HelloMessageHandler.REQUIRE_SECURE_READER_INIT_PARAM_NAME)
 	private boolean requireSecureReader;
+
+	@InitParam(HelloMessageHandler.IDENTITY_SERVICE_INIT_PARAM_NAME)
+	private ServiceLocator<IdentityService> identityServiceLocator;
 
 	public Object handleMessage(FileDigestsDataMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
@@ -97,9 +102,20 @@ public class FileDigestsDataMessageHandler implements
 		SignatureDataMessageHandler.setDigestValue(digestInfo.digestValue,
 				session);
 
+		IdentityService identityService = this.identityServiceLocator
+				.locateService();
+		boolean removeCard;
+		if (null != identityService) {
+			IdentityRequest identityRequest = identityService
+					.getIdentityRequest();
+			removeCard = identityRequest.removeCard();
+		} else {
+			removeCard = this.removeCard;
+		}
+
 		SignRequestMessage signRequestMessage = new SignRequestMessage(
 				digestInfo.digestValue, digestInfo.digestAlgo,
-				digestInfo.description, this.logoff, this.removeCard,
+				digestInfo.description, this.logoff, removeCard,
 				this.requireSecureReader);
 		return signRequestMessage;
 	}
