@@ -18,8 +18,6 @@
 
 package be.fedict.eid.applet.sc;
 
-import static org.junit.Assert.fail;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -63,8 +61,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
-
-import org.apache.commons.codec.binary.Hex;
 
 import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Dialogs;
