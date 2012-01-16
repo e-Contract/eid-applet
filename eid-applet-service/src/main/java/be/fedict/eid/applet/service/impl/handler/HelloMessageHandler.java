@@ -329,6 +329,7 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 		boolean includeAddress;
 		boolean includePhoto;
 		boolean includeCertificates;
+		boolean removeCard;
 		IdentityService identityService = this.identityServiceLocator
 				.locateService();
 		if (null != identityService) {
@@ -337,10 +338,12 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 			includeAddress = identityRequest.includeAddress();
 			includePhoto = identityRequest.includePhoto();
 			includeCertificates = identityRequest.includeCertificates();
+			removeCard = identityRequest.removeCard();
 		} else {
 			includeAddress = this.includeAddress;
 			includePhoto = this.includePhoto;
 			includeCertificates = this.includeCertificates;
+			removeCard = this.removeCard;
 		}
 		RequestContext requestContext = new RequestContext(session);
 		requestContext.setIncludeAddress(includeAddress);
@@ -348,7 +351,7 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 		requestContext.setIncludeCertificates(includeCertificates);
 		IdentificationRequestMessage responseMessage = new IdentificationRequestMessage(
 				includeAddress, includePhoto, includeIntegrityData,
-				includeCertificates, this.removeCard, identityDataUsage);
+				includeCertificates, removeCard, identityDataUsage);
 		return responseMessage;
 	}
 
