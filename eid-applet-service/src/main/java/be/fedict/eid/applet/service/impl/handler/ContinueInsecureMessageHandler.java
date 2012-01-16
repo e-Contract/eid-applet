@@ -149,9 +149,20 @@ public class ContinueInsecureMessageHandler implements
 			SignatureDataMessageHandler.setDigestValue(digestInfo.digestValue,
 					session);
 
+			IdentityService identityService = this.identityServiceLocator
+					.locateService();
+			boolean removeCard;
+			if (null != identityService) {
+				IdentityRequest identityRequest = identityService
+						.getIdentityRequest();
+				removeCard = identityRequest.removeCard();
+			} else {
+				removeCard = this.removeCard;
+			}
+
 			SignRequestMessage signRequestMessage = new SignRequestMessage(
 					digestInfo.digestValue, digestInfo.digestAlgo,
-					digestInfo.description, this.logoff, this.removeCard,
+					digestInfo.description, this.logoff, removeCard,
 					this.requireSecureReader);
 			return signRequestMessage;
 		}
@@ -167,6 +178,7 @@ public class ContinueInsecureMessageHandler implements
 			boolean includeAddress;
 			boolean includePhoto;
 			boolean includeCertificates;
+			boolean removeCard;
 			IdentityService identityService = this.identityServiceLocator
 					.locateService();
 			if (null != identityService) {
@@ -176,11 +188,13 @@ public class ContinueInsecureMessageHandler implements
 				includeAddress = identityRequest.includeAddress();
 				includePhoto = identityRequest.includePhoto();
 				includeCertificates = identityRequest.includeCertificates();
+				removeCard = identityRequest.removeCard();
 			} else {
 				includeIdentity = this.includeIdentity;
 				includeAddress = this.includeAddress;
 				includePhoto = this.includePhoto;
 				includeCertificates = this.includeCertificates;
+				removeCard = this.removeCard;
 			}
 			RequestContext requestContext = new RequestContext(session);
 			requestContext.setIncludeIdentity(includeIdentity);
@@ -189,7 +203,7 @@ public class ContinueInsecureMessageHandler implements
 			requestContext.setIncludeCertificates(includeCertificates);
 			AuthenticationRequestMessage authenticationRequestMessage = new AuthenticationRequestMessage(
 					challenge, this.includeHostname, this.includeInetAddress,
-					this.logoff, this.preLogoff, this.removeCard,
+					this.logoff, this.preLogoff, removeCard,
 					this.sessionIdChannelBinding,
 					this.serverCertificateChannelBinding, includeIdentity,
 					includeCertificates, includeAddress, includePhoto,
@@ -213,6 +227,7 @@ public class ContinueInsecureMessageHandler implements
 			boolean includeAddress;
 			boolean includePhoto;
 			boolean includeCertificates;
+			boolean removeCard;
 			IdentityService identityService = this.identityServiceLocator
 					.locateService();
 			if (null != identityService) {
@@ -221,10 +236,12 @@ public class ContinueInsecureMessageHandler implements
 				includeAddress = identityRequest.includeAddress();
 				includePhoto = identityRequest.includePhoto();
 				includeCertificates = identityRequest.includeCertificates();
+				removeCard = identityRequest.removeCard();
 			} else {
 				includeAddress = this.includeAddress;
 				includePhoto = this.includePhoto;
 				includeCertificates = this.includeCertificates;
+				removeCard = this.removeCard;
 			}
 			RequestContext requestContext = new RequestContext(session);
 			requestContext.setIncludeAddress(includeAddress);
@@ -232,7 +249,7 @@ public class ContinueInsecureMessageHandler implements
 			requestContext.setIncludeCertificates(includeCertificates);
 			IdentificationRequestMessage responseMessage = new IdentificationRequestMessage(
 					includeAddress, includePhoto, includeIntegrityData,
-					includeCertificates, this.removeCard, identityDataUsage);
+					includeCertificates, removeCard, identityDataUsage);
 			return responseMessage;
 		}
 	}

@@ -49,6 +49,8 @@ import be.fedict.eid.applet.service.spi.AuditService;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 import be.fedict.eid.applet.service.spi.IdentityDTO;
 import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
+import be.fedict.eid.applet.service.spi.IdentityRequest;
+import be.fedict.eid.applet.service.spi.IdentityService;
 import be.fedict.eid.applet.service.spi.SignatureService;
 import be.fedict.eid.applet.service.spi.SignatureServiceEx;
 import be.fedict.eid.applet.shared.SignCertificatesDataMessage;
@@ -56,9 +58,9 @@ import be.fedict.eid.applet.shared.SignRequestMessage;
 
 /**
  * Sign Certificate Data Message Handler.
- *
+ * 
  * @author Frank Cornelis
- *
+ * 
  */
 @HandlesMessage(SignCertificatesDataMessage.class)
 public class SignCertificatesDataMessageHandler implements
@@ -84,6 +86,9 @@ public class SignCertificatesDataMessageHandler implements
 
 	@InitParam(AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<AuditService> auditServiceLocator;
+
+	@InitParam(HelloMessageHandler.IDENTITY_SERVICE_INIT_PARAM_NAME)
+	private ServiceLocator<IdentityService> identityServiceLocator;
 
 	public Object handleMessage(SignCertificatesDataMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
@@ -166,13 +171,13 @@ public class SignCertificatesDataMessageHandler implements
 					}
 				}
 
-                LOG.debug("checking national registration certificate: "
-                        + message.rrnCertificate.getSubjectX500Principal());
-                List<X509Certificate> rrnCertificateChain = new LinkedList<X509Certificate>();
-                rrnCertificateChain.add(message.rrnCertificate);
-                rrnCertificateChain.add(message.rootCertificate);
-                identityIntegrityService
-                        .checkNationalRegistrationCertificate(rrnCertificateChain);
+				LOG.debug("checking national registration certificate: "
+						+ message.rrnCertificate.getSubjectX500Principal());
+				List<X509Certificate> rrnCertificateChain = new LinkedList<X509Certificate>();
+				rrnCertificateChain.add(message.rrnCertificate);
+				rrnCertificateChain.add(message.rootCertificate);
+				identityIntegrityService
+						.checkNationalRegistrationCertificate(rrnCertificateChain);
 			}
 		}
 
@@ -212,9 +217,20 @@ public class SignCertificatesDataMessageHandler implements
 		SignatureDataMessageHandler.setDigestValue(digestInfo.digestValue,
 				session);
 
+		IdentityService identityService = this.identityServiceLocator
+				.locateService();
+		boolean removeCard;
+		if (null != identityService) {
+			IdentityRequest identityRequest = identityService
+					.getIdentityRequest();
+			removeCard = identityRequest.removeCard();
+		} else {
+			removeCard = this.removeCard;
+		}
+
 		SignRequestMessage signRequestMessage = new SignRequestMessage(
 				digestInfo.digestValue, digestInfo.digestAlgo,
-				digestInfo.description, this.logoff, this.removeCard,
+				digestInfo.description, this.logoff, removeCard,
 				this.requireSecureReader);
 		return signRequestMessage;
 	}

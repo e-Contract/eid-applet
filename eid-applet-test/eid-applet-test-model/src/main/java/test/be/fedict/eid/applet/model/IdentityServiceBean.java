@@ -38,7 +38,7 @@ public class IdentityServiceBean implements IdentityService {
 	public IdentityRequest getIdentityRequest() {
 		LOG.debug("getIdentityRequest");
 		IdentityRequest identityRequest = new IdentityRequest(true, true, true,
-				true);
+				true, true);
 		return identityRequest;
 	}
 }

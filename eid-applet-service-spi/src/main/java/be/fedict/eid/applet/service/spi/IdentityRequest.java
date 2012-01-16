@@ -34,6 +34,37 @@ public class IdentityRequest implements Serializable {
 	private final boolean includeAddress;
 	private final boolean includePhoto;
 	private final boolean includeCertificates;
+	private final boolean removeCard;
+
+	/**
+	 * Main constructor.
+	 * 
+	 * @param includeIdentity
+	 *            Marks whether the eID operation should also deliver the eID
+	 *            identity data.
+	 * @param includeAddress
+	 *            Marks whether the eID operation should also deliver the eID
+	 *            address data.
+	 * @param includePhoto
+	 *            Marks whether the eID operation should also deliver the eID
+	 *            photo.
+	 * @param includeCertificates
+	 *            Marks whether the eID operation should also deliver the eID
+	 *            certificates.
+	 * @param removeCard
+	 *            Marks whether the eID card should be removed after eID
+	 *            operation.
+	 */
+	public IdentityRequest(boolean includeIdentity, boolean includeAddress,
+			boolean includePhoto, boolean includeCertificates,
+			boolean removeCard) {
+		super();
+		this.includeIdentity = includeIdentity;
+		this.includeAddress = includeAddress;
+		this.includePhoto = includePhoto;
+		this.includeCertificates = includeCertificates;
+		this.removeCard = removeCard;
+	}
 
 	/**
 	 * Main constructor.
@@ -53,11 +84,8 @@ public class IdentityRequest implements Serializable {
 	 */
 	public IdentityRequest(boolean includeIdentity, boolean includeAddress,
 			boolean includePhoto, boolean includeCertificates) {
-		super();
-		this.includeIdentity = includeIdentity;
-		this.includeAddress = includeAddress;
-		this.includePhoto = includePhoto;
-		this.includeCertificates = includeCertificates;
+		this(includeIdentity, includeAddress, includePhoto,
+				includeCertificates, false);
 	}
 
 	public boolean includeIdentity() {
@@ -74,5 +102,9 @@ public class IdentityRequest implements Serializable {
 
 	public boolean includeCertificates() {
 		return this.includeCertificates;
+	}
+
+	public boolean removeCard() {
+		return this.removeCard;
 	}
 }
