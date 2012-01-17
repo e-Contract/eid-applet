@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>be.fedict.eid-applet</groupId>
 		<artifactId>eid-applet-test</artifactId>
-		<version>1.0.5-SNAPSHOT</version>
+		<version>1.0.5.Beta1</version>
 	</parent>
 	<name>FedICT eID Applet Test EAR</name>
 	<description>JavaEE 5 EAR for Test eID Applet Web App.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-test-deploy</artifactId>
-	<version>1.0.5-SNAPSHOT</version>
+	<version>1.0.5.Beta1</version>
 	<packaging>ear</packaging>
 	<build>
 		<plugins>
