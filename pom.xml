@@ -34,6 +34,7 @@
 		<module>eid-applet-service-signer</module>
 		<module>eid-applet-service-cdi</module>
 		<module>eid-applet-test</module>
+		<module>eid-applet-test-war</module>
 		<module>eid-applet-sql-ddl-plugin</module>
 	</modules>
 	<profiles>
