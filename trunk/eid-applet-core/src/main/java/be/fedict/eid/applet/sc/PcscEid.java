@@ -86,6 +86,10 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	public static final int PUK_SIZE = 6;
 
+	public static final byte AUTHN_KEY_ID = (byte) 0x82;
+
+	public static final byte NON_REP_KEY_ID = (byte) 0x83;
+
 	private final static byte[] ATR_PATTERN = new byte[] { 0x3b, (byte) 0x98,
 			0x00, 0x40, 0x00, (byte) 0x00, 0x00, 0x00, 0x01, 0x01, (byte) 0xad,
 			0x13, 0x10 };
@@ -668,6 +672,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	public static final byte FEATURE_GET_KEY_PRESSED_TAG = 0x05;
 	public static final byte FEATURE_VERIFY_PIN_DIRECT_TAG = 0x06;
 	public static final byte FEATURE_MODIFY_PIN_DIRECT_TAG = 0x07;
+	public static final byte FEATURE_EID_PIN_PAD_READER_TAG = (byte) 0x80;
 
 	private Integer getFeature(byte featureTag) {
 		this.view.addDetailMessage("CCID GET_FEATURE IOCTL...");
@@ -720,6 +725,12 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		Integer directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
 		Integer verifyPinStartFeature = getFeature(FEATURE_VERIFY_PIN_START_TAG);
 
+		Integer eIDPINPadReaderFeature = getFeature(FEATURE_EID_PIN_PAD_READER_TAG);
+		if (null != eIDPINPadReaderFeature) {
+			this.view
+					.addDetailMessage("eID-aware secure PIN pad reader detected");
+		}
+
 		if (requireSecureReader && null == directPinVerifyFeature
 				&& null == verifyPinStartFeature) {
 			throw new SecurityException("not a secure reader");
@@ -736,6 +747,12 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		ResponseAPDU responseApdu = transmit(setApdu);
 		if (0x9000 != responseApdu.getSW()) {
 			throw new RuntimeException("SELECT error");
+		}
+
+		if (NON_REP_KEY_ID == keyId) {
+			this.view
+					.addDetailMessage("non-repudiation key detected, immediate PIN verify");
+			verifyPin(directPinVerifyFeature, verifyPinStartFeature);
 		}
 
 		ByteArrayOutputStream digestInfo = new ByteArrayOutputStream();
@@ -1151,7 +1168,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			InterruptedException {
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
 		byte[] digest = messageDigest.digest(toBeSigned);
-		byte keyId = (byte) 0x82; // authentication key
+		byte keyId = AUTHN_KEY_ID;
 
 		byte[] signatureValue = sign(digest, "SHA-1", keyId,
 				requireSecureReader);
@@ -1447,7 +1464,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	public byte[] sign(byte[] digestValue, String digestAlgo,
 			boolean requireSecureReader) throws NoSuchAlgorithmException,
 			CardException, IOException, InterruptedException {
-		byte keyId = (byte) 0x83; // non-repudiation key
+		byte keyId = NON_REP_KEY_ID;
 		byte[] signatureValue = sign(digestValue, digestAlgo, keyId,
 				requireSecureReader);
 		return signatureValue;
