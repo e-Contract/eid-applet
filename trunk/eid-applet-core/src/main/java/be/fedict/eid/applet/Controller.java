@@ -59,6 +59,7 @@ import be.fedict.eid.applet.io.AppletSSLSocketFactory;
 import be.fedict.eid.applet.io.HttpURLConnectionHttpReceiver;
 import be.fedict.eid.applet.io.HttpURLConnectionHttpTransmitter;
 import be.fedict.eid.applet.io.LocalAppletProtocolContext;
+import be.fedict.eid.applet.sc.Constants;
 import be.fedict.eid.applet.sc.DiagnosticCallbackHandler;
 import be.fedict.eid.applet.sc.PcscEid;
 import be.fedict.eid.applet.sc.PcscEidSpi;
@@ -924,6 +925,7 @@ public class Controller {
 		boolean includePhoto = authnRequest.includePhoto;
 		boolean includeIntegrityData = authnRequest.includeIntegrityData;
 		boolean requireSecureReader = authnRequest.requireSecureReader;
+		String transactionMessage = authnRequest.transactionMessage;
 		if (challenge.length < 20) {
 			throw new SecurityException(
 					"challenge should be at least 20 bytes long.");
@@ -944,6 +946,7 @@ public class Controller {
 		addDetailMessage("include integrity data: " + includeIntegrityData);
 		addDetailMessage("require secure smart card reader: "
 				+ requireSecureReader);
+		addDetailMessage("transaction message: " + transactionMessage);
 
 		String hostname;
 		if (includeHostname) {
@@ -1015,6 +1018,7 @@ public class Controller {
 		byte[] signCertFile = null;
 		byte[] citCaCertFile = null;
 		byte[] rootCaCertFile = null;
+		byte[] signedTransactionMessage = null;
 		try {
 			if (preLogoff) {
 				/*
@@ -1026,6 +1030,13 @@ public class Controller {
 			}
 			signatureValue = this.pcscEidSpi.signAuthn(toBeSigned,
 					requireSecureReader);
+
+			if (null != transactionMessage) {
+				signedTransactionMessage = this.pcscEidSpi.sign(
+						transactionMessage.getBytes(),
+						Constants.PLAIN_TEXT_DIGEST_ALGO_OID, (byte) 0x82,
+						false);
+			}
 
 			int maxProgress = 0;
 			maxProgress += (1050 / 255) + 1; // authn cert file
@@ -1156,7 +1167,7 @@ public class Controller {
 				salt, sessionId, signatureValue, authnCertFile, citCaCertFile,
 				rootCaCertFile, signCertFile, identityData, addressData,
 				photoData, identitySignatureData, addressSignatureData,
-				rrnCertData, encodedServerCertificate);
+				rrnCertData, encodedServerCertificate, signedTransactionMessage);
 		Object responseMessage = sendMessage(authenticationDataMessage);
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");

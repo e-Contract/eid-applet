@@ -69,6 +69,33 @@ public class DerTest {
 	}
 
 	@Test
+	public void digestInfoPlainText() throws Exception {
+		{
+			byte[] message = "hello world".getBytes();
+			LOG.debug("message: " + new String(Hex.encodeHex(message)));
+			DERObjectIdentifier hashAlgoId = new DERObjectIdentifier(
+					"2.16.56.1.2.1.3.1");
+			DigestInfo digestInfo = new DigestInfo(new AlgorithmIdentifier(
+					hashAlgoId), message);
+			byte[] encodedDigestInfo = digestInfo.getEncoded();
+			LOG.debug("Digest Info: "
+					+ new String(Hex.encodeHex(encodedDigestInfo)));
+		}
+		{
+			byte[] message = "Hello world 2".getBytes();
+			LOG.debug("message: " + new String(Hex.encodeHex(message)));
+			DERObjectIdentifier hashAlgoId = new DERObjectIdentifier(
+					"2.16.56.1.2.1.3.1");
+			DigestInfo digestInfo = new DigestInfo(new AlgorithmIdentifier(
+					hashAlgoId), message);
+			byte[] encodedDigestInfo = digestInfo.getEncoded();
+			LOG.debug("Digest Info: "
+					+ new String(Hex.encodeHex(encodedDigestInfo)));
+		}
+
+	}
+
+	@Test
 	public void digestInfoSha256() throws Exception {
 		byte[] message = "hello world".getBytes();
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");

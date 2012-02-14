@@ -182,6 +182,10 @@ public interface PcscEidSpi {
 			boolean requireSecureReader) throws NoSuchAlgorithmException,
 			CardException, IOException, InterruptedException;
 
+	byte[] sign(byte[] digestValue, String digestAlgo, byte keyId,
+			boolean requireSecureReader) throws CardException, IOException,
+			InterruptedException;
+
 	List<X509Certificate> getAuthnCertificateChain() throws CardException,
 			IOException, CertificateException;
 
