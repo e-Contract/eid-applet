@@ -18,6 +18,7 @@
 
 package test.be.fedict.eid.applet;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -26,7 +27,9 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -91,12 +94,20 @@ public class SecurePinPadReaderTest {
 		/**
 		 * Second test sample provided at 13/10/2011.
 		 */
-		V010Z
+		V010Z,
+		/**
+		 * Fourth test sample provided at 14/02/2012.
+		 */
+		V012Z,
+		/**
+		 * Not applicable.
+		 */
+		NA
 	}
 
 	@Before
 	public void beforeTest() throws Exception {
-		this.messages = new Messages(Locale.FRENCH);
+		this.messages = new Messages(new Locale("nl"));
 		this.pcscEid = new PcscEid(new TestView(), this.messages);
 		if (false == this.pcscEid.isEidPresent()) {
 			LOG.debug("insert eID card");
@@ -119,12 +130,16 @@ public class SecurePinPadReaderTest {
 	 * verification data structure yet. V010Z still does not honor the wLangId
 	 * <p/>
 	 * V010Z: the reader first displays "Sign Hash?", then it requests the
-	 * "Authentication PIN?" and then it asks to "Sign Hash?" again.
+	 * "Authentication PIN?" and then it asks to "Sign Hash?" again. This is due
+	 * to the way the eID Applet code has been constructed.
+	 * <p/>
+	 * V012Z still does not honor the wLangId.
+	 * 
 	 * 
 	 * @throws Exception
 	 */
 	@Test
-	@QualityAssurance(firmware = Firmware.V010Z, approved = false)
+	@QualityAssurance(firmware = Firmware.V012Z, approved = false)
 	public void testRegularDigestValueWithNonRepudiation() throws Exception {
 		this.pcscEid.sign("hello world".getBytes(), "SHA1");
 	}
@@ -141,14 +156,14 @@ public class SecurePinPadReaderTest {
 	 * software UI could display some info message that you have to check the
 	 * reader display to be able to continue.
 	 * <p/>
-	 * V010Z still has no such feature indication.
+	 * V012Z indicates ffffff80, so 0x80.
 	 * 
 	 * @see http
 	 *      ://www.pcscworkgroup.com/specifications/files/pcsc10_v2.02.08.pdf
 	 * @throws Exception
 	 */
 	@Test
-	@QualityAssurance(firmware = Firmware.V010Z, approved = false)
+	@QualityAssurance(firmware = Firmware.V012Z, approved = true)
 	public void testGetCCIDFeatures() throws Exception {
 		int ioctl;
 		String osName = System.getProperty("os.name");
@@ -171,7 +186,7 @@ public class SecurePinPadReaderTest {
 
 	@Test
 	@QualityAssurance(firmware = Firmware.V010Z, approved = true)
-	public void testRegularDigestValueWithAuthRepudiation() throws Exception {
+	public void testRegularDigestValueWithAuth() throws Exception {
 		byte[] signatureValue = this.pcscEid
 				.signAuthn("hello world".getBytes());
 		LOG.debug("signature value size: " + signatureValue.length);
@@ -185,11 +200,13 @@ public class SecurePinPadReaderTest {
 	 * <p/>
 	 * V006Z: Remark: without the SET APDU the secure smart card reader won't
 	 * display the plain text message. Fixed in V010Z.
+	 * <p/>
+	 * V012Z: language support is still shaky.
 	 * 
 	 * @throws Exception
 	 */
 	@Test
-	@QualityAssurance(firmware = Firmware.V010Z, approved = true)
+	@QualityAssurance(firmware = Firmware.V012Z, approved = false)
 	public void testAuthnSignPlainText() throws Exception {
 		CardChannel cardChannel = this.pcscEid.getCardChannel();
 
@@ -247,7 +264,7 @@ public class SecurePinPadReaderTest {
 	 * @throws Exception
 	 */
 	@Test
-	@QualityAssurance(firmware = Firmware.V010Z, approved = true)
+	@QualityAssurance(firmware = Firmware.V012Z, approved = true)
 	public void testNonRepSignPlainText() throws Exception {
 		CardChannel cardChannel = this.pcscEid.getCardChannel();
 
@@ -289,5 +306,29 @@ public class SecurePinPadReaderTest {
 				.getObjectId().getId());
 		assertArrayEquals(textMessage.getBytes(),
 				signatureDigestInfo.getDigest());
+	}
+
+	@Test
+	@QualityAssurance(firmware = Firmware.NA, approved = true)
+	public void testQualityAssurance() throws Exception {
+		LOG.debug("Quality Assurance report");
+		LOG.debug("Date: " + new Date());
+		LOG.debug("Tester: " + System.getProperty("user.name"));
+		Method[] methods = SecurePinPadReaderTest.class.getMethods();
+		for (Method method : methods) {
+			Test testAnnotation = method.getAnnotation(Test.class);
+			if (null == testAnnotation) {
+				continue;
+			}
+			QualityAssurance qualityAssuranceAnnotation = method
+					.getAnnotation(QualityAssurance.class);
+			if (null == qualityAssuranceAnnotation) {
+				throw new RuntimeException("missing QualityAssurance status");
+			}
+			LOG.debug("Test: " + method.getName());
+			LOG.debug("\tFirmware version: "
+					+ qualityAssuranceAnnotation.firmware());
+			LOG.debug("\tApproved: " + qualityAssuranceAnnotation.approved());
+		}
 	}
 }
