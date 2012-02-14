@@ -32,5 +32,5 @@ public interface SecureCardReaderService {
 	 * 
 	 * @return the ASCII string message.
 	 */
-	String getMessage();
+	String getTransactionMessage();
 }
