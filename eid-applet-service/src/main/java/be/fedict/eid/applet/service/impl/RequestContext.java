@@ -41,20 +41,19 @@ public class RequestContext implements ProtocolStateListener {
 	private final HttpSession httpSession;
 
 	public final static String INCLUDE_IDENTITY_SESSION_ATTRIBUTE = RequestContext.class
-			.getName()
-			+ ".IncludeIdentity";
+			.getName() + ".IncludeIdentity";
 
 	public final static String INCLUDE_ADDRESS_SESSION_ATTRIBUTE = RequestContext.class
-			.getName()
-			+ ".IncludeAddress";
+			.getName() + ".IncludeAddress";
 
 	public final static String INCLUDE_PHOTO_SESSION_ATTRIBUTE = RequestContext.class
-			.getName()
-			+ ".IncludePhoto";
+			.getName() + ".IncludePhoto";
 
 	public final static String INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE = RequestContext.class
-			.getName()
-			+ ".IncludeCertificates";
+			.getName() + ".IncludeCertificates";
+
+	public static final String TRANSACTION_MESSAGE_SESSION_ATTRIBUTE = RequestContext.class
+			.getName() + ".TransactionMessage";
 
 	public RequestContext(HttpServletRequest request) {
 		this(request.getSession());
@@ -82,6 +81,7 @@ public class RequestContext implements ProtocolStateListener {
 		this.httpSession.removeAttribute(INCLUDE_PHOTO_SESSION_ATTRIBUTE);
 		this.httpSession
 				.removeAttribute(INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE);
+		this.httpSession.removeAttribute(TRANSACTION_MESSAGE_SESSION_ATTRIBUTE);
 	}
 
 	public void setIncludeIdentity(boolean includeIdentity) {
@@ -102,6 +102,11 @@ public class RequestContext implements ProtocolStateListener {
 	public void setIncludeCertificates(boolean includeCertificates) {
 		this.httpSession.setAttribute(INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE,
 				includeCertificates);
+	}
+
+	public void setTransactionMessage(String transactionMessage) {
+		this.httpSession.setAttribute(TRANSACTION_MESSAGE_SESSION_ATTRIBUTE,
+				transactionMessage);
 	}
 
 	public boolean includeIdentity() {
@@ -126,5 +131,11 @@ public class RequestContext implements ProtocolStateListener {
 			return false;
 		}
 		return (Boolean) attributeValue;
+	}
+
+	public String getTransactionMessage() {
+		String transactionMessage = (String) this.httpSession
+				.getAttribute(TRANSACTION_MESSAGE_SESSION_ATTRIBUTE);
+		return transactionMessage;
 	}
 }

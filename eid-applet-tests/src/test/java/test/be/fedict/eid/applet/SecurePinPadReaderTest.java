@@ -18,7 +18,6 @@
 
 package test.be.fedict.eid.applet;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -191,6 +190,32 @@ public class SecurePinPadReaderTest {
 				.signAuthn("hello world".getBytes());
 		LOG.debug("signature value size: " + signatureValue.length);
 		assertEquals(128, signatureValue.length);
+	}
+
+	@Test
+	@QualityAssurance(firmware = Firmware.V012Z, approved = true)
+	public void testPlainTextAuthn() throws Exception {
+		// operate
+		String testMessage = "Test Application @ 14/2/2012 14:48:21";
+		byte[] signatureValue = this.pcscEid.sign(testMessage.getBytes(),
+				"2.16.56.1.2.1.3.1", (byte) 0x82, false);
+
+		// verify
+		List<X509Certificate> authnCertChain = this.pcscEid
+				.getAuthnCertificateChain();
+
+		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+		cipher.init(Cipher.DECRYPT_MODE, authnCertChain.get(0));
+		byte[] signatureDigestInfoValue = cipher.doFinal(signatureValue);
+		ASN1InputStream aIn = new ASN1InputStream(signatureDigestInfoValue);
+		DigestInfo signatureDigestInfo = new DigestInfo(
+				(ASN1Sequence) aIn.readObject());
+		LOG.debug("result algo Id: "
+				+ signatureDigestInfo.getAlgorithmId().getObjectId().getId());
+		assertEquals("2.16.56.1.2.1.3.1", signatureDigestInfo.getAlgorithmId()
+				.getObjectId().getId());
+		assertArrayEquals(testMessage.getBytes(),
+				signatureDigestInfo.getDigest());
 	}
 
 	/**

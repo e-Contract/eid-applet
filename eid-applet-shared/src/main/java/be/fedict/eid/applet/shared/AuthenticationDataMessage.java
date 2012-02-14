@@ -98,6 +98,9 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	@HttpHeader(HTTP_HEADER_PREFIX + "ServerCertFileSize")
 	public Integer serverCertFileSize;
 
+	@HttpHeader(HTTP_HEADER_PREFIX + "TransactionMessageSignatureSize")
+	public Integer transactionMessageSignatureSize;
+
 	@HttpBody
 	@NotNull
 	@Description("Contains concatenation of salt value, optional session id, signature value, and authn cert chain.")
@@ -122,6 +125,8 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	 *            the applet also needs to communicate the server SSL
 	 *            certificate in case of channel binding as the server not
 	 *            always knows its own identity.
+	 * @param transactionMessageSignature
+	 *            the optional signed transaction message.
 	 * @throws IOException
 	 * @throws CertificateEncodingException
 	 */
@@ -130,13 +135,14 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 			byte[] rootCaCertFile, byte[] signCertFile, byte[] identityData,
 			byte[] addressData, byte[] photoData, byte[] identitySignatureData,
 			byte[] addressSignatureData, byte[] rrnCertData,
-			byte[] serverCertData) throws IOException,
-			CertificateEncodingException {
+			byte[] serverCertData, byte[] transactionMessageSignature)
+			throws IOException, CertificateEncodingException {
 		this.saltValueSize = saltValue.length;
 		this.signatureValueSize = signatureValue.length;
 		this.authnCertFileSize = authnCertFile.length;
 		this.caCertFileSize = citCaCertFile.length;
 		this.rootCertFileSize = rootCaCertFile.length;
+
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		baos.write(saltValue);
 		if (null != sessionId) {
@@ -182,6 +188,10 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 			baos.write(serverCertData);
 			this.serverCertFileSize = serverCertData.length;
 		}
+		if (null != transactionMessageSignature) {
+			baos.write(transactionMessageSignature);
+			this.transactionMessageSignatureSize = transactionMessageSignature.length;
+		}
 		this.body = baos.toByteArray();
 	}
 
@@ -190,13 +200,14 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 			byte[] signCertFile, byte[] identityData, byte[] addressData,
 			byte[] photoData, byte[] identitySignatureData,
 			byte[] addressSignatureData, byte[] rrnCertData,
-			byte[] serverCertData) throws IOException,
-			CertificateEncodingException {
+			byte[] serverCertData, byte[] transactionMessageSignature)
+			throws IOException, CertificateEncodingException {
 		this(saltValue, sessionId, signatureValue, authnCertChain.get(0)
 				.getEncoded(), authnCertChain.get(1).getEncoded(),
 				authnCertChain.get(2).getEncoded(), signCertFile, identityData,
 				addressData, photoData, identitySignatureData,
-				addressSignatureData, rrnCertData, serverCertData);
+				addressSignatureData, rrnCertData, serverCertData,
+				transactionMessageSignature);
 	}
 
 	private byte[] copy(byte[] source, int idx, int count) {
@@ -282,6 +293,12 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 			this.serverCertificate = getCertificate(serverCertData);
 			idx += this.serverCertFileSize;
 		}
+
+		if (null != this.transactionMessageSignatureSize) {
+			this.transactionMessageSignature = copy(this.body, idx,
+					this.transactionMessageSignatureSize);
+			idx += this.transactionMessageSignatureSize;
+		}
 	}
 
 	private X509Certificate getCertificate(byte[] certData) {
@@ -332,4 +349,6 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	public X509Certificate rrnCertificate;
 
 	public X509Certificate serverCertificate;
+
+	public byte[] transactionMessageSignature;
 }

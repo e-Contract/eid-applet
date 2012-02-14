@@ -772,6 +772,13 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			digestInfo.write(Constants.RIPEMD128_DIGEST_INFO_PREFIX);
 		} else if ("RIPEMD256".equals(digestAlgo)) {
 			digestInfo.write(Constants.RIPEMD256_DIGEST_INFO_PREFIX);
+		} else if (Constants.PLAIN_TEXT_DIGEST_ALGO_OID.equals(digestAlgo)) {
+			byte[] digestInfoPrefix = Arrays.copyOf(
+					Constants.PLAIN_TEXT_DIGEST_INFO_PREFIX,
+					Constants.PLAIN_TEXT_DIGEST_INFO_PREFIX.length);
+			digestInfoPrefix[1] = (byte) (digestValue.length + 13);
+			digestInfoPrefix[14] = (byte) digestValue.length;
+			digestInfo.write(digestInfoPrefix);
 		} else {
 			throw new RuntimeException("digest also not supported: "
 					+ digestAlgo);

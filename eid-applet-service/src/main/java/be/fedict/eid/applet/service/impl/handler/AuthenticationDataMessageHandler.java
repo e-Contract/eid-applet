@@ -38,6 +38,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.crypto.Cipher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +47,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.x509.DigestInfo;
 import org.bouncycastle.util.encoders.Hex;
 
 import be.fedict.eid.applet.service.Address;
@@ -81,6 +85,8 @@ public class AuthenticationDataMessageHandler implements
 		MessageHandler<AuthenticationDataMessage> {
 
 	public static final String AUTHENTICATED_USER_IDENTIFIER_SESSION_ATTRIBUTE = "eid.identifier";
+
+	public static String PLAIN_TEXT_DIGEST_ALGO_OID = "2.16.56.1.2.1.3.1";
 
 	private static final Log LOG = LogFactory
 			.getLog(AuthenticationDataMessageHandler.class);
@@ -154,8 +160,7 @@ public class AuthenticationDataMessageHandler implements
 		if (this.sessionIdChannelBinding) {
 			checkSessionIdChannelBinding(message, request);
 			if (null == this.serverCertificate) {
-				LOG
-						.warn("adviced to use in combination with server certificate channel binding");
+				LOG.warn("adviced to use in combination with server certificate channel binding");
 			}
 		}
 
@@ -234,6 +239,51 @@ public class AuthenticationDataMessageHandler implements
 			throw new SecurityException("signature error");
 		}
 
+		RequestContext requestContext = new RequestContext(session);
+		String transactionMessage = requestContext.getTransactionMessage();
+		if (null != transactionMessage) {
+			LOG.debug("verifying TransactionMessage signature");
+			byte[] transactionMessageSignature = message.transactionMessageSignature;
+			if (null == transactionMessageSignature) {
+				throw new SecurityException(
+						"missing TransactionMessage signature");
+			}
+			try {
+				Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+				cipher.init(Cipher.DECRYPT_MODE, signingKey);
+				byte[] signatureDigestInfoValue = cipher
+						.doFinal(transactionMessageSignature);
+				ASN1InputStream aIn = new ASN1InputStream(
+						signatureDigestInfoValue);
+				DigestInfo signatureDigestInfo = new DigestInfo(
+						(ASN1Sequence) aIn.readObject());
+				if (false == PLAIN_TEXT_DIGEST_ALGO_OID
+						.equals(signatureDigestInfo.getAlgorithmId()
+								.getObjectId().getId())) {
+					throw new SecurityException(
+							"TransactionMessage signature algo OID incorrect");
+				}
+				if (false == Arrays.equals(transactionMessage.getBytes(),
+						signatureDigestInfo.getDigest())) {
+					throw new SecurityException(
+							"signed TransactionMessage incorrect");
+				}
+				LOG.debug("TransactionMessage signature validated");
+			} catch (Exception e) {
+				LOG.error("error verifying TransactionMessage signature", e);
+				AuditService auditService = this.auditServiceLocator
+						.locateService();
+				if (null != auditService) {
+					String remoteAddress = request.getRemoteAddr();
+					auditService.authenticationError(remoteAddress,
+							message.authnCert);
+				}
+				throw new SecurityException(
+						"error verifying TransactionMessage signature: "
+								+ e.getMessage());
+			}
+		}
+
 		/*
 		 * Secure channel binding verification.
 		 */
@@ -241,8 +291,7 @@ public class AuthenticationDataMessageHandler implements
 			X509Certificate serverCertificate = channelBindingService
 					.getServerCertificate();
 			if (null == serverCertificate) {
-				LOG
-						.warn("could not verify secure channel binding as the server does not know its identity yet");
+				LOG.warn("could not verify secure channel binding as the server does not know its identity yet");
 			} else {
 				if (false == serverCertificate
 						.equals(message.serverCertificate)) {
@@ -361,7 +410,6 @@ public class AuthenticationDataMessageHandler implements
 			auditService.authenticated(userId);
 		}
 
-		RequestContext requestContext = new RequestContext(session);
 		boolean includeIdentity = requestContext.includeIdentity();
 		boolean includeAddress = requestContext.includeAddress();
 		boolean includeCertificates = requestContext.includeCertificates();

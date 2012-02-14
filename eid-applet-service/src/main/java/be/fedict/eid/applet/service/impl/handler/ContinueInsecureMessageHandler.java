@@ -40,6 +40,7 @@ import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
 import be.fedict.eid.applet.service.spi.IdentityRequest;
 import be.fedict.eid.applet.service.spi.IdentityService;
 import be.fedict.eid.applet.service.spi.PrivacyService;
+import be.fedict.eid.applet.service.spi.SecureCardReaderService;
 import be.fedict.eid.applet.service.spi.SignatureService;
 import be.fedict.eid.applet.shared.AdministrationMessage;
 import be.fedict.eid.applet.shared.AuthenticationRequestMessage;
@@ -116,6 +117,9 @@ public class ContinueInsecureMessageHandler implements
 
 	@InitParam(HelloMessageHandler.IDENTITY_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<IdentityService> identityServiceLocator;
+
+	@InitParam(HelloMessageHandler.SECURE_CARD_READER_SERVICE_INIT_PARAM_NAME)
+	private ServiceLocator<SecureCardReaderService> secureCardReaderServiceLocator;
 
 	public Object handleMessage(ContinueInsecureMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
@@ -201,13 +205,24 @@ public class ContinueInsecureMessageHandler implements
 			requestContext.setIncludeAddress(includeAddress);
 			requestContext.setIncludePhoto(includePhoto);
 			requestContext.setIncludeCertificates(includeCertificates);
+
+			String transactionMessage = null;
+			SecureCardReaderService secureCardReaderService = this.secureCardReaderServiceLocator
+					.locateService();
+			if (null != secureCardReaderService) {
+				transactionMessage = secureCardReaderService.getMessage();
+				LOG.debug("transaction message: " + transactionMessage);
+			}
+			requestContext.setTransactionMessage(transactionMessage);
+
 			AuthenticationRequestMessage authenticationRequestMessage = new AuthenticationRequestMessage(
 					challenge, this.includeHostname, this.includeInetAddress,
 					this.logoff, this.preLogoff, removeCard,
 					this.sessionIdChannelBinding,
 					this.serverCertificateChannelBinding, includeIdentity,
 					includeCertificates, includeAddress, includePhoto,
-					includeIntegrityData, this.requireSecureReader);
+					includeIntegrityData, this.requireSecureReader,
+					transactionMessage);
 			return authenticationRequestMessage;
 		} else {
 			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
