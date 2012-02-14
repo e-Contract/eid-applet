@@ -315,7 +315,7 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 			SecureCardReaderService secureCardReaderService = this.secureCardReaderServiceLocator
 					.locateService();
 			if (null != secureCardReaderService) {
-				transactionMessage = secureCardReaderService.getMessage();
+				transactionMessage = secureCardReaderService.getTransactionMessage();
 				LOG.debug("transaction message: " + transactionMessage);
 			}
 			requestContext.setTransactionMessage(transactionMessage);

@@ -67,9 +67,9 @@ public class Constants {
 	public static String PLAIN_TEXT_DIGEST_ALGO_OID = "2.16.56.1.2.1.3.1";
 
 	/**
-	 * Second 0xff (offset 1) is the size of the message.
+	 * Second 0xff (offset 14) is the size of the message.
 	 * 
-	 * First 0xff (offset 14) is the size of the message + 13
+	 * First 0xff (offset 1) is the size of the message + 13
 	 */
 	public static final byte[] PLAIN_TEXT_DIGEST_INFO_PREFIX = new byte[] {
 			0x30, (byte) 0xff, 0x30, 0x09, 0x06, 0x07, 0x60, 0x38, 0x01, 0x02,

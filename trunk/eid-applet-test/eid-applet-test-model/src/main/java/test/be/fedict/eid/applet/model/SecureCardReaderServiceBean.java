@@ -32,7 +32,7 @@ import be.fedict.eid.applet.service.spi.SecureCardReaderService;
 @LocalBinding(jndiBinding = "test/eid/applet/model/SecureCardReaderServiceBean")
 public class SecureCardReaderServiceBean implements SecureCardReaderService {
 
-	public String getMessage() {
+	public String getTransactionMessage() {
 		Calendar calendar = Calendar.getInstance();
 		String message = "Test Application @ "
 				+ calendar.get(Calendar.DAY_OF_MONTH) + "/"
