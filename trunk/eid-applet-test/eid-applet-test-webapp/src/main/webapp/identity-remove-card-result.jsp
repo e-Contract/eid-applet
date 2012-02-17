@@ -70,6 +70,14 @@
 		<td>Gender</td>
 		<td><%=((Identity) session.getAttribute("eid.identity")).gender%></td>
 	</tr>
+	<tr>
+		<td>Identity data size</td>
+		<td><%=((byte[]) session.getAttribute("eid.data.identity")).length%></td>
+	</tr>
+	<tr>
+		<td>Address data size</td>
+		<td><%=((byte[]) session.getAttribute("eid.data.address")).length%></td>
+	</tr>
 </table>
 <a href="identify-remove-card.jsp">Again</a>
 |

@@ -88,10 +88,16 @@ public class IdentityDataMessageHandler implements
 	 * Please use ROOT_CERT_SESSION_ATTRIBUTE instead.
 	 */
 	public static final String ROOT_CERT_SESSION_ATTRIBTUE = "eid.certs.root";
-	
+
 	public static final String ROOT_CERT_SESSION_ATTRIBUTE = "eid.certs.root";
 
 	public static final String SKIP_NATIONAL_NUMBER_CHECK_INIT_PARAM_NAME = "SkipNationalNumberCheck";
+
+	public static final String INCLUDE_DATA_FILES = "IncludeDataFiles";
+
+	public static final String EID_DATA_IDENTITY_SESSION_ATTRIBUTE = "eid.data.identity";
+
+	public static final String EID_DATA_ADDRESS_SESSION_ATTRIBUTE = "eid.data.address";
 
 	@InitParam(SKIP_NATIONAL_NUMBER_CHECK_INIT_PARAM_NAME)
 	private boolean skipNationalNumberCheck;
@@ -101,6 +107,9 @@ public class IdentityDataMessageHandler implements
 
 	@InitParam(AuthenticationDataMessageHandler.AUDIT_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<AuditService> auditServiceLocator;
+
+	@InitParam(INCLUDE_DATA_FILES)
+	private boolean includeDataFiles;
 
 	public Object handleMessage(IdentityDataMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
@@ -281,6 +290,13 @@ public class IdentityDataMessageHandler implements
 			session.setAttribute(ROOT_CERT_SESSION_ATTRIBUTE, rootCert);
 		}
 
+		if (this.includeDataFiles) {
+			session.setAttribute(EID_DATA_IDENTITY_SESSION_ATTRIBUTE,
+					message.idFile);
+			session.setAttribute(EID_DATA_ADDRESS_SESSION_ATTRIBUTE,
+					message.addressFile);
+		}
+
 		AuditService auditService = this.auditServiceLocator.locateService();
 		if (null != auditService) {
 			String userId = identity.nationalNumber;
@@ -366,8 +382,7 @@ public class IdentityDataMessageHandler implements
 					}
 				}
 				if (missingCertificate) {
-					LOG
-							.debug("the certificate data indicates a missing certificate");
+					LOG.debug("the certificate data indicates a missing certificate");
 				}
 			}
 			return null;

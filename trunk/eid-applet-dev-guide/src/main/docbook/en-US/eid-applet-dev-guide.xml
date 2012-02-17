@@ -1880,7 +1880,7 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 					component needs to be set via the following
 					<code>init-param</code>
 					on the
-					<code>IdentityService</code>
+					<code>AppletServiceServlet</code>
 					:
 				</para>
 				<programlisting language="XML"><![CDATA[<init-param>
@@ -1891,6 +1891,35 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 					The Javadoc documentation of the
 					<code>IdentityService</code>
 					SPI is part of the eID Applet SDK package.
+				</para>
+			</section>
+			<section>
+				<title>Identity Data Files</title>
+				<para>
+					Some applications might require access to the actual raw identity
+					data files.
+					You can configure the eID Applet Service to push the raw
+					identity data files (if available as specified during the request)
+					into the HTTP session via the following
+					<code>init-param</code>
+					on the
+					<code>AppletServiceServlet</code>
+					:
+				</para>
+				<programlisting language="XML"><![CDATA[<init-param>
+	<param-name>IncludeDataFiles</param-name>
+	<param-value>true</param-value>
+</init-param>]]></programlisting>
+				<para>
+					This will make the eID identity file available within the HTTP
+					session under the
+					<code>eid.data.identity</code>
+					session attribute as byte array.
+					The eID address file will be
+					available within the
+					HTTP session under the
+					<code>eid.data.address</code>
+					session attribute as byte array.
 				</para>
 			</section>
 		</section>
