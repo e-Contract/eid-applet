@@ -8,7 +8,7 @@
 		<format>zip</format>
 		<format>tar.gz</format>
 	</formats>
-	<baseDirectory>eid-applet-sdk</baseDirectory>
+	<baseDirectory>eid-applet-sdk-${project.version}</baseDirectory>
 	<files>
 		<file>
 			<source>src/main/assembly/README.txt</source>
@@ -27,7 +27,7 @@
 			<fileMode>0644</fileMode>
 		</file>
 		<file>
-			<source>target/dev-guide/eid-applet-dev-guide.pdf</source>
+			<source>target/dev-guide/eid-applet-dev-guide-${project.version}.pdf</source>
 			<fileMode>0644</fileMode>
 		</file>
 	</files>

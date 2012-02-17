@@ -74,7 +74,7 @@
 						<format>
 							<formatName>pdf</formatName>
 							<stylesheetResource>classpath:/xslt/org/jboss/pdf.xsl</stylesheetResource>
-							<finalName>${project.artifactId}.pdf</finalName>
+							<finalName>${project.artifactId}-${project.version}.pdf</finalName>
 						</format>
 					</formats>
 					<sourceDocumentName>eid-applet-dev-guide.xml</sourceDocumentName>
