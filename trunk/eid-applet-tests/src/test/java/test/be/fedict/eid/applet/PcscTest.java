@@ -131,7 +131,14 @@ public class PcscTest {
 			// pcscEid.logoff();
 			// pcscEid.selectBelpicJavaCardApplet();
 			signatureValue = pcscEid.signAuthn(challenge);
+
+			long t0 = System.currentTimeMillis();
+			pcscEid.signAuthn(challenge);
+			long t1 = System.currentTimeMillis();
+			LOG.debug("dt: " + (t1 - t0));
+
 			authnCertChain = pcscEid.getAuthnCertificateChain();
+			LOG.debug("key size: " + authnCertChain.get(0).getPublicKey().getEncoded().length * 8);
 			// pcscEid.logoff();
 		} finally {
 			pcscEid.close();

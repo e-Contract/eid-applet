@@ -230,9 +230,6 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 			idx += this.sessionIdSize;
 		}
 
-		if (this.signatureValueSize != 128) {
-			throw new RuntimeException("signature value size invalid");
-		}
 		this.signatureValue = copy(this.body, idx, this.signatureValueSize);
 		idx += this.signatureValueSize;
 
