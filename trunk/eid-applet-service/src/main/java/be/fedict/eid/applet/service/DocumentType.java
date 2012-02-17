@@ -73,7 +73,13 @@ public enum DocumentType implements Serializable {
 	/**
 	 * Duurzame verblijfskaart van een familielid van een burger van de Unie
 	 */
-	FOREIGNER_F_PLUS("18");
+	FOREIGNER_F_PLUS("18"),
+
+	/**
+	 * H. Europese blauwe kaart. Toegang en verblijf voor onderdanen van derde
+	 * landen.
+	 */
+	EUROPEAN_BLUE_CARD_H("19");
 
 	private final int key;
 

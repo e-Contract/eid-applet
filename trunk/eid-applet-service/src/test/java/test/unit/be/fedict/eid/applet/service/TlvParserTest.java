@@ -433,4 +433,19 @@ public class TlvParserTest {
 		assertNull(identity.getDuplicate());
 	}
 
+	@Test
+	public void testHCard() throws Exception {
+		// setup
+		InputStream inputStream = TlvParserTest.class
+				.getResourceAsStream("/h-card.tlv");
+		byte[] identityData = IOUtils.toByteArray(inputStream);
+
+		// operate
+		Identity identity = TlvParser.parse(identityData, Identity.class);
+
+		// verify
+		LOG.debug("document type: " + identity.getDocumentType());
+		assertEquals(DocumentType.EUROPEAN_BLUE_CARD_H,
+				identity.getDocumentType());
+	}
 }
