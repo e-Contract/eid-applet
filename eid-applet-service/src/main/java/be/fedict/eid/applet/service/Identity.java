@@ -30,6 +30,7 @@ import be.fedict.eid.applet.service.impl.tlv.ConvertData;
 import be.fedict.eid.applet.service.impl.tlv.DateOfBirthDataConvertor;
 import be.fedict.eid.applet.service.impl.tlv.DocumentTypeConvertor;
 import be.fedict.eid.applet.service.impl.tlv.GenderDataConvertor;
+import be.fedict.eid.applet.service.impl.tlv.SpecialOrganisationConvertor;
 import be.fedict.eid.applet.service.impl.tlv.SpecialStatusConvertor;
 import be.fedict.eid.applet.service.impl.tlv.TlvField;
 import be.fedict.eid.applet.service.impl.tlv.ValidityDateDataConvertor;
@@ -136,7 +137,8 @@ public class Identity implements Serializable {
 	public String duplicate;
 
 	@TlvField(19)
-	public String specialOrganisation;
+	@ConvertData(SpecialOrganisationConvertor.class)
+	public SpecialOrganisation specialOrganisation;
 
 	@TlvField(20)
 	public boolean memberOfFamily;
@@ -222,7 +224,7 @@ public class Identity implements Serializable {
 		return this.memberOfFamily;
 	}
 
-	public String getSpecialOrganisation() {
+	public SpecialOrganisation getSpecialOrganisation() {
 		return this.specialOrganisation;
 	}
 
