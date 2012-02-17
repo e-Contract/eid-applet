@@ -41,6 +41,7 @@ import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.DocumentType;
 import be.fedict.eid.applet.service.Gender;
 import be.fedict.eid.applet.service.Identity;
+import be.fedict.eid.applet.service.SpecialOrganisation;
 import be.fedict.eid.applet.service.SpecialStatus;
 import be.fedict.eid.applet.service.impl.tlv.TlvField;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
@@ -93,6 +94,7 @@ public class TlvParserTest {
 		assertEquals(new GregorianCalendar(1971, 0, 1), identity.dateOfBirth);
 		LOG.debug("special status: " + identity.specialStatus);
 		assertEquals(SpecialStatus.NO_STATUS, identity.specialStatus);
+		assertNull(identity.getSpecialOrganisation());
 	}
 
 	@Test
@@ -137,6 +139,7 @@ public class TlvParserTest {
 		assertNotNull(identity.dateOfBirth);
 		LOG.debug("date of birth: " + identity.dateOfBirth.getTime());
 		assertEquals(new GregorianCalendar(1971, 0, 1), identity.dateOfBirth);
+		assertNull(identity.getSpecialOrganisation());
 	}
 
 	@Test
@@ -187,6 +190,9 @@ public class TlvParserTest {
 		assertEquals(SpecialStatus.EXTENDED_MINORITY, identity.specialStatus);
 		assertFalse(identity.specialStatus.hasBadSight());
 		assertTrue(identity.specialStatus.hasExtendedMinority());
+		LOG.debug("special organisation: \""
+				+ identity.getSpecialOrganisation() + "\"");
+		assertNull(identity.getSpecialOrganisation());
 	}
 
 	@Test
@@ -353,6 +359,10 @@ public class TlvParserTest {
 		assertEquals(DocumentType.FOREIGNER_E_PLUS, identity.getDocumentType());
 		assertNotNull(identity.getDuplicate());
 		LOG.debug("duplicate: " + identity.getDuplicate());
+		LOG.debug("special organisation: \""
+				+ identity.getSpecialOrganisation() + "\"");
+		assertEquals(SpecialOrganisation.UNSPECIFIED,
+				identity.getSpecialOrganisation());
 	}
 
 	@Test
@@ -453,6 +463,8 @@ public class TlvParserTest {
 		assertTrue(identity.isMemberOfFamily());
 		LOG.debug("special organisation: \""
 				+ identity.getSpecialOrganisation() + "\"");
+		assertEquals(SpecialOrganisation.UNSPECIFIED,
+				identity.getSpecialOrganisation());
 	}
 
 	@Test
@@ -474,5 +486,7 @@ public class TlvParserTest {
 		assertTrue(identity.isMemberOfFamily());
 		LOG.debug("special organisation: \""
 				+ identity.getSpecialOrganisation() + "\"");
+		assertEquals(SpecialOrganisation.RESEARCHER,
+				identity.getSpecialOrganisation());
 	}
 }
