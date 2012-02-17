@@ -59,7 +59,6 @@ import be.fedict.eid.applet.io.AppletSSLSocketFactory;
 import be.fedict.eid.applet.io.HttpURLConnectionHttpReceiver;
 import be.fedict.eid.applet.io.HttpURLConnectionHttpTransmitter;
 import be.fedict.eid.applet.io.LocalAppletProtocolContext;
-import be.fedict.eid.applet.sc.Constants;
 import be.fedict.eid.applet.sc.DiagnosticCallbackHandler;
 import be.fedict.eid.applet.sc.PcscEid;
 import be.fedict.eid.applet.sc.PcscEidSpi;
@@ -1032,10 +1031,9 @@ public class Controller {
 					requireSecureReader);
 
 			if (null != transactionMessage) {
-				signedTransactionMessage = this.pcscEidSpi.sign(
-						transactionMessage.getBytes(),
-						Constants.PLAIN_TEXT_DIGEST_ALGO_OID, (byte) 0x82,
-						false);
+				signedTransactionMessage = this.pcscEidSpi
+						.signTransactionMessage(transactionMessage,
+								requireSecureReader);
 			}
 
 			int maxProgress = 0;

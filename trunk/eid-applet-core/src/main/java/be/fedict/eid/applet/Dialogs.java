@@ -233,6 +233,8 @@ public class Dialogs {
 
 	private JFrame pinPadFrame;
 
+	private JFrame secureReaderTransactionFrame;
+
 	public void showPINPadFrame(int retriesLeft) {
 		showPINPadFrame(retriesLeft, "PIN",
 				this.messages.getMessage(MESSAGE_ID.PIN_PAD));
@@ -439,5 +441,38 @@ public class Dialogs {
 	public void showPINModifyNewPINAgainFrame(int retriesLeft) {
 		showPINPadFrame(retriesLeft, "eID PIN change",
 				this.messages.getMessage(MESSAGE_ID.PIN_PAD_MODIFY_NEW_AGAIN));
+	}
+
+	public void showSecureReaderTransactionFrame() {
+		if (null != this.secureReaderTransactionFrame) {
+			disposeSecureReaderTransactionFrame();
+		}
+		this.secureReaderTransactionFrame = new JFrame(
+				"Transaction Confirmation");
+		JPanel panel = new JPanel() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Insets getInsets() {
+				return new Insets(10, 30, 10, 30);
+			}
+		};
+		BoxLayout boxLayout = new BoxLayout(panel, BoxLayout.PAGE_AXIS);
+		panel.setLayout(boxLayout);
+		panel.add(new JLabel(
+				"Check the transaction message on the secure card reader."));
+
+		this.secureReaderTransactionFrame.getContentPane().add(panel);
+		this.secureReaderTransactionFrame.pack();
+		this.secureReaderTransactionFrame.setLocationRelativeTo(this.view
+				.getParentComponent());
+		this.secureReaderTransactionFrame.setVisible(true);
+	}
+
+	public void disposeSecureReaderTransactionFrame() {
+		if (null != this.secureReaderTransactionFrame) {
+			this.secureReaderTransactionFrame.dispose();
+			this.secureReaderTransactionFrame = null;
+		}
 	}
 }
