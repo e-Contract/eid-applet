@@ -186,6 +186,10 @@ public interface PcscEidSpi {
 			boolean requireSecureReader) throws CardException, IOException,
 			InterruptedException;
 
+	byte[] signTransactionMessage(String transactionMessage,
+			boolean requireSecureReader) throws CardException, IOException,
+			InterruptedException;
+
 	List<X509Certificate> getAuthnCertificateChain() throws CardException,
 			IOException, CertificateException;
 

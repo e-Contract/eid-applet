@@ -1816,4 +1816,24 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		}
 		return responseApdu.getData();
 	}
+
+	public byte[] signTransactionMessage(String transactionMessage,
+			boolean requireSecureReader) throws CardException, IOException,
+			InterruptedException {
+		Integer eIDPINPadReaderFeature = getFeature(FEATURE_EID_PIN_PAD_READER_TAG);
+		if (null != eIDPINPadReaderFeature) {
+			this.dialogs.showSecureReaderTransactionFrame();
+		}
+		byte[] signature;
+		try {
+			signature = sign(transactionMessage.getBytes(),
+					Constants.PLAIN_TEXT_DIGEST_ALGO_OID, AUTHN_KEY_ID,
+					requireSecureReader);
+		} finally {
+			if (null != eIDPINPadReaderFeature) {
+				this.dialogs.disposeSecureReaderTransactionFrame();
+			}
+		}
+		return signature;
+	}
 }
