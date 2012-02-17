@@ -82,35 +82,35 @@ public class IdentityDataMessageHandlerTest {
 				.andStubReturn(null);
 		EasyMock.expect(mockServletConfig.getInitParameter("AuditService"))
 				.andStubReturn(null);
-		EasyMock
-				.expect(mockServletConfig.getInitParameter("AuditServiceClass"))
+		EasyMock.expect(mockServletConfig.getInitParameter("AuditServiceClass"))
 				.andStubReturn(null);
 		EasyMock.expect(
 				mockServletConfig.getInitParameter("SkipNationalNumberCheck"))
 				.andStubReturn(null);
 
-		mockHttpSession.setAttribute(EasyMock.eq("eid.identity"), EasyMock
-				.isA(Identity.class));
+		mockHttpSession.setAttribute(EasyMock.eq("eid.identity"),
+				EasyMock.isA(Identity.class));
 		EasyMock.expect(mockHttpSession.getAttribute("eid"))
 				.andStubReturn(null);
-		mockHttpSession.setAttribute(EasyMock.eq("eid"), EasyMock
-				.isA(EIdData.class));
+		mockHttpSession.setAttribute(EasyMock.eq("eid"),
+				EasyMock.isA(EIdData.class));
 
-		EasyMock
-				.expect(
-						mockHttpSession
-								.getAttribute(RequestContext.INCLUDE_ADDRESS_SESSION_ATTRIBUTE))
+		EasyMock.expect(
+				mockHttpSession
+						.getAttribute(RequestContext.INCLUDE_ADDRESS_SESSION_ATTRIBUTE))
 				.andStubReturn(false);
-		EasyMock
-				.expect(
-						mockHttpSession
-								.getAttribute(RequestContext.INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE))
+		EasyMock.expect(
+				mockHttpSession
+						.getAttribute(RequestContext.INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE))
 				.andStubReturn(false);
-		EasyMock
-				.expect(
-						mockHttpSession
-								.getAttribute(RequestContext.INCLUDE_PHOTO_SESSION_ATTRIBUTE))
+		EasyMock.expect(
+				mockHttpSession
+						.getAttribute(RequestContext.INCLUDE_PHOTO_SESSION_ATTRIBUTE))
 				.andStubReturn(false);
+		EasyMock.expect(
+				mockServletConfig
+						.getInitParameter(IdentityDataMessageHandler.INCLUDE_DATA_FILES))
+				.andReturn(null);
 
 		byte[] idFile = "foobar-id-file".getBytes();
 		IdentityDataMessage message = new IdentityDataMessage();
@@ -161,8 +161,7 @@ public class IdentityDataMessageHandlerTest {
 				.andStubReturn(IdentityIntegrityTestService.class.getName());
 		EasyMock.expect(mockServletConfig.getInitParameter("AuditService"))
 				.andStubReturn(null);
-		EasyMock
-				.expect(mockServletConfig.getInitParameter("AuditServiceClass"))
+		EasyMock.expect(mockServletConfig.getInitParameter("AuditServiceClass"))
 				.andStubReturn(null);
 		EasyMock.expect(
 				mockServletConfig.getInitParameter("SkipNationalNumberCheck"))
@@ -171,28 +170,29 @@ public class IdentityDataMessageHandlerTest {
 		EasyMock.expect(mockHttpSession.getAttribute("eid.identifier"))
 				.andStubReturn(null);
 
-		mockHttpSession.setAttribute(EasyMock.eq("eid.identity"), EasyMock
-				.isA(Identity.class));
+		mockHttpSession.setAttribute(EasyMock.eq("eid.identity"),
+				EasyMock.isA(Identity.class));
 		EasyMock.expect(mockHttpSession.getAttribute("eid"))
 				.andStubReturn(null);
-		mockHttpSession.setAttribute(EasyMock.eq("eid"), EasyMock
-				.isA(EIdData.class));
+		mockHttpSession.setAttribute(EasyMock.eq("eid"),
+				EasyMock.isA(EIdData.class));
 
-		EasyMock
-				.expect(
-						mockHttpSession
-								.getAttribute(RequestContext.INCLUDE_ADDRESS_SESSION_ATTRIBUTE))
+		EasyMock.expect(
+				mockHttpSession
+						.getAttribute(RequestContext.INCLUDE_ADDRESS_SESSION_ATTRIBUTE))
 				.andStubReturn(false);
-		EasyMock
-				.expect(
-						mockHttpSession
-								.getAttribute(RequestContext.INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE))
+		EasyMock.expect(
+				mockHttpSession
+						.getAttribute(RequestContext.INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE))
 				.andStubReturn(false);
-		EasyMock
-				.expect(
-						mockHttpSession
-								.getAttribute(RequestContext.INCLUDE_PHOTO_SESSION_ATTRIBUTE))
+		EasyMock.expect(
+				mockHttpSession
+						.getAttribute(RequestContext.INCLUDE_PHOTO_SESSION_ATTRIBUTE))
 				.andStubReturn(false);
+		EasyMock.expect(
+				mockServletConfig
+						.getInitParameter(IdentityDataMessageHandler.INCLUDE_DATA_FILES))
+				.andReturn(null);
 
 		byte[] idFile = "foobar-id-file".getBytes();
 		IdentityDataMessage message = new IdentityDataMessage();
@@ -218,8 +218,8 @@ public class IdentityDataMessageHandlerTest {
 
 		// verify
 		EasyMock.verify(mockServletConfig, mockHttpSession, mockServletRequest);
-		assertEquals(rrnCertificate, IdentityIntegrityTestService
-				.getCertificate());
+		assertEquals(rrnCertificate,
+				IdentityIntegrityTestService.getCertificate());
 	}
 
 	@Test
@@ -228,8 +228,8 @@ public class IdentityDataMessageHandlerTest {
 		KeyPair keyPair = MiscTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = MiscTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=TestNationalRegistration", notBefore,
+		X509Certificate certificate = MiscTestUtils.generateCertificate(
+				keyPair.getPublic(), "CN=TestNationalRegistration", notBefore,
 				notAfter, null, keyPair.getPrivate(), true, 0, null, null);
 
 		ServletConfig mockServletConfig = EasyMock
@@ -248,8 +248,7 @@ public class IdentityDataMessageHandlerTest {
 				.andStubReturn(IdentityIntegrityTestService.class.getName());
 		EasyMock.expect(mockServletConfig.getInitParameter("AuditService"))
 				.andStubReturn(null);
-		EasyMock
-				.expect(mockServletConfig.getInitParameter("AuditServiceClass"))
+		EasyMock.expect(mockServletConfig.getInitParameter("AuditServiceClass"))
 				.andStubReturn(AuditTestService.class.getName());
 		EasyMock.expect(
 				mockServletConfig.getInitParameter("SkipNationalNumberCheck"))
@@ -258,21 +257,22 @@ public class IdentityDataMessageHandlerTest {
 		EasyMock.expect(mockServletRequest.getRemoteAddr()).andStubReturn(
 				"remote-address");
 
-		EasyMock
-				.expect(
-						mockHttpSession
-								.getAttribute(RequestContext.INCLUDE_ADDRESS_SESSION_ATTRIBUTE))
+		EasyMock.expect(
+				mockHttpSession
+						.getAttribute(RequestContext.INCLUDE_ADDRESS_SESSION_ATTRIBUTE))
 				.andStubReturn(false);
-		EasyMock
-				.expect(
-						mockHttpSession
-								.getAttribute(RequestContext.INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE))
+		EasyMock.expect(
+				mockHttpSession
+						.getAttribute(RequestContext.INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE))
 				.andStubReturn(false);
-		EasyMock
-				.expect(
-						mockHttpSession
-								.getAttribute(RequestContext.INCLUDE_PHOTO_SESSION_ATTRIBUTE))
+		EasyMock.expect(
+				mockHttpSession
+						.getAttribute(RequestContext.INCLUDE_PHOTO_SESSION_ATTRIBUTE))
 				.andStubReturn(false);
+		EasyMock.expect(
+				mockServletConfig
+						.getInitParameter(IdentityDataMessageHandler.INCLUDE_DATA_FILES))
+				.andReturn(null);
 
 		byte[] idFile = "foobar-id-file".getBytes();
 		IdentityDataMessage message = new IdentityDataMessage();
@@ -303,8 +303,8 @@ public class IdentityDataMessageHandlerTest {
 			EasyMock.verify(mockServletConfig, mockHttpSession,
 					mockServletRequest);
 			assertNull(IdentityIntegrityTestService.getCertificate());
-			assertEquals("remote-address", AuditTestService
-					.getAuditIntegrityRemoteAddress());
+			assertEquals("remote-address",
+					AuditTestService.getAuditIntegrityRemoteAddress());
 		}
 	}
 
@@ -314,8 +314,8 @@ public class IdentityDataMessageHandlerTest {
 		KeyPair keyPair = MiscTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = MiscTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=TestNationalRegistration", notBefore,
+		X509Certificate certificate = MiscTestUtils.generateCertificate(
+				keyPair.getPublic(), "CN=TestNationalRegistration", notBefore,
 				notAfter, null, keyPair.getPrivate(), true, 0, null, null);
 
 		ServletConfig mockServletConfig = EasyMock
@@ -334,28 +334,28 @@ public class IdentityDataMessageHandlerTest {
 				.andStubReturn(IdentityIntegrityTestService.class.getName());
 		EasyMock.expect(mockServletConfig.getInitParameter("AuditService"))
 				.andStubReturn(null);
-		EasyMock
-				.expect(mockServletConfig.getInitParameter("AuditServiceClass"))
+		EasyMock.expect(mockServletConfig.getInitParameter("AuditServiceClass"))
 				.andStubReturn(AuditTestService.class.getName());
 		EasyMock.expect(
 				mockServletConfig.getInitParameter("SkipNationalNumberCheck"))
 				.andStubReturn(null);
 
-		EasyMock
-				.expect(
-						mockHttpSession
-								.getAttribute(RequestContext.INCLUDE_ADDRESS_SESSION_ATTRIBUTE))
+		EasyMock.expect(
+				mockHttpSession
+						.getAttribute(RequestContext.INCLUDE_ADDRESS_SESSION_ATTRIBUTE))
 				.andStubReturn(false);
-		EasyMock
-				.expect(
-						mockHttpSession
-								.getAttribute(RequestContext.INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE))
+		EasyMock.expect(
+				mockHttpSession
+						.getAttribute(RequestContext.INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE))
 				.andStubReturn(false);
-		EasyMock
-				.expect(
-						mockHttpSession
-								.getAttribute(RequestContext.INCLUDE_PHOTO_SESSION_ATTRIBUTE))
+		EasyMock.expect(
+				mockHttpSession
+						.getAttribute(RequestContext.INCLUDE_PHOTO_SESSION_ATTRIBUTE))
 				.andStubReturn(false);
+		EasyMock.expect(
+				mockServletConfig
+						.getInitParameter(IdentityDataMessageHandler.INCLUDE_DATA_FILES))
+				.andReturn(null);
 
 		EasyMock.expect(mockServletRequest.getRemoteAddr()).andStubReturn(
 				"remote-address");
@@ -384,8 +384,8 @@ public class IdentityDataMessageHandlerTest {
 			EasyMock.verify(mockServletConfig, mockHttpSession,
 					mockServletRequest);
 			assertNull(IdentityIntegrityTestService.getCertificate());
-			assertEquals("remote-address", AuditTestService
-					.getAuditIntegrityRemoteAddress());
+			assertEquals("remote-address",
+					AuditTestService.getAuditIntegrityRemoteAddress());
 		}
 	}
 

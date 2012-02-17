@@ -70,6 +70,10 @@ public class CleanSessionProtocolStateListener implements ProtocolStateListener 
 					.removeAttribute(IdentityDataMessageHandler.PHOTO_SESSION_ATTRIBUTE);
 			this.httpSession
 					.removeAttribute(IdentityDataMessageHandler.EID_CERTS_SESSION_ATTRIBUTE);
+			this.httpSession
+					.removeAttribute(IdentityDataMessageHandler.EID_DATA_IDENTITY_SESSION_ATTRIBUTE);
+			this.httpSession
+					.removeAttribute(IdentityDataMessageHandler.EID_DATA_ADDRESS_SESSION_ATTRIBUTE);
 			EIdData eidData = (EIdData) this.httpSession
 					.getAttribute(IdentityDataMessageHandler.EID_SESSION_ATTRIBUTE);
 			if (null != eidData) {
@@ -93,6 +97,10 @@ public class CleanSessionProtocolStateListener implements ProtocolStateListener 
 					.removeAttribute(IdentityDataMessageHandler.ADDRESS_SESSION_ATTRIBUTE);
 			this.httpSession
 					.removeAttribute(IdentityDataMessageHandler.PHOTO_SESSION_ATTRIBUTE);
+			this.httpSession
+					.removeAttribute(IdentityDataMessageHandler.EID_DATA_IDENTITY_SESSION_ATTRIBUTE);
+			this.httpSession
+					.removeAttribute(IdentityDataMessageHandler.EID_DATA_ADDRESS_SESSION_ATTRIBUTE);
 			EIdData eidData = (EIdData) this.httpSession
 					.getAttribute(IdentityDataMessageHandler.EID_SESSION_ATTRIBUTE);
 			if (null != eidData) {

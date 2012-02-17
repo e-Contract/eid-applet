@@ -138,6 +138,9 @@ public class AuthenticationDataMessageHandler implements
 	@InitParam(HelloMessageHandler.IDENTITY_INTEGRITY_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<IdentityIntegrityService> identityIntegrityServiceLocator;
 
+	@InitParam(IdentityDataMessageHandler.INCLUDE_DATA_FILES)
+	private boolean includeDataFiles;
+
 	public Object handleMessage(AuthenticationDataMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
 			HttpSession session) throws ServletException {
@@ -525,6 +528,15 @@ public class AuthenticationDataMessageHandler implements
 			session.setAttribute(
 					IdentityDataMessageHandler.SIGN_CERT_SESSION_ATTRIBUTE,
 					message.signCert);
+		}
+
+		if (this.includeDataFiles) {
+			session.setAttribute(
+					IdentityDataMessageHandler.EID_DATA_IDENTITY_SESSION_ATTRIBUTE,
+					message.identityData);
+			session.setAttribute(
+					IdentityDataMessageHandler.EID_DATA_ADDRESS_SESSION_ATTRIBUTE,
+					message.addressData);
 		}
 
 		return new FinishedMessage();
