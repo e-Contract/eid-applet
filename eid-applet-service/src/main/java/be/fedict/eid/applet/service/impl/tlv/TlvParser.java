@@ -117,6 +117,8 @@ public class TlvParser {
 					fieldValue = dataConvertor.convert(tlvValue);
 				} else if (String.class == tlvType) {
 					fieldValue = new String(tlvValue, "UTF-8");
+				} else if (Boolean.TYPE == tlvType) {
+					fieldValue = true;
 				} else if (tlvType.isArray()
 						&& Byte.TYPE == tlvType.getComponentType()) {
 					fieldValue = tlvValue;
@@ -125,7 +127,8 @@ public class TlvParser {
 							"unsupported field type: " + tlvType.getName());
 				}
 				LOG.debug("setting field: " + tlvField.getName());
-				if (null != tlvField.get(tlvObject)) {
+				if (null != tlvField.get(tlvObject)
+						&& false == tlvField.getType().isPrimitive()) {
 					throw new RuntimeException("field was already set: "
 							+ tlvField.getName());
 				}
