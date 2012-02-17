@@ -108,7 +108,7 @@ public class Identity implements Serializable {
 
 	@TlvField(13)
 	@ConvertData(GenderDataConvertor.class)
-	@Mapping( {
+	@Mapping({
 			@MapsTo(value = IdentityDTO.class, field = "male", convertor = GenderToMaleValueConvertor.class),
 			@MapsTo(value = IdentityDTO.class, field = "female", convertor = GenderToFemaleValueConvertor.class) })
 	public Gender gender;
@@ -134,6 +134,12 @@ public class Identity implements Serializable {
 	@TlvField(18)
 	@Mapping(@MapsTo(IdentityDTO.class))
 	public String duplicate;
+
+	@TlvField(19)
+	public String specialOrganisation;
+
+	@TlvField(20)
+	public boolean memberOfFamily;
 
 	/*
 	 * We're also providing getters and a toString to make this class more
@@ -210,6 +216,14 @@ public class Identity implements Serializable {
 
 	public String getDuplicate() {
 		return this.duplicate;
+	}
+
+	public boolean isMemberOfFamily() {
+		return this.memberOfFamily;
+	}
+
+	public String getSpecialOrganisation() {
+		return this.specialOrganisation;
 	}
 
 	@Override

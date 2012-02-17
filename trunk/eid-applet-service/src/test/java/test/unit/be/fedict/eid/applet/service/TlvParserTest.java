@@ -431,6 +431,7 @@ public class TlvParserTest {
 		LOG.debug("document type: " + identity.getDocumentType());
 		assertEquals(DocumentType.BELGIAN_CITIZEN, identity.getDocumentType());
 		assertNull(identity.getDuplicate());
+		assertFalse(identity.isMemberOfFamily());
 	}
 
 	@Test
@@ -447,5 +448,31 @@ public class TlvParserTest {
 		LOG.debug("document type: " + identity.getDocumentType());
 		assertEquals(DocumentType.EUROPEAN_BLUE_CARD_H,
 				identity.getDocumentType());
+		LOG.debug("duplicate: " + identity.getDuplicate());
+		assertEquals("01", identity.getDuplicate());
+		assertTrue(identity.isMemberOfFamily());
+		LOG.debug("special organisation: \""
+				+ identity.getSpecialOrganisation() + "\"");
+	}
+
+	@Test
+	public void testDuplicate02() throws Exception {
+		// setup
+		InputStream inputStream = TlvParserTest.class
+				.getResourceAsStream("/duplicate-02.tlv");
+		byte[] identityData = IOUtils.toByteArray(inputStream);
+
+		// operate
+		Identity identity = TlvParser.parse(identityData, Identity.class);
+
+		// verify
+		LOG.debug("document type: " + identity.getDocumentType());
+		assertEquals(DocumentType.FOREIGNER_A, identity.getDocumentType());
+		LOG.debug("duplicate: " + identity.getDuplicate());
+		assertEquals("02", identity.getDuplicate());
+		LOG.debug("member of family: " + identity.isMemberOfFamily());
+		assertTrue(identity.isMemberOfFamily());
+		LOG.debug("special organisation: \""
+				+ identity.getSpecialOrganisation() + "\"");
 	}
 }

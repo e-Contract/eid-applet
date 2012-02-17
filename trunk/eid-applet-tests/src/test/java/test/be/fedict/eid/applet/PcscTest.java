@@ -741,6 +741,7 @@ public class PcscTest {
 		LOG.debug("document type: " + identity.getDocumentType());
 		LOG.debug("noble condition: " + identity.getNobleCondition());
 		LOG.debug("special status: " + identity.getSpecialStatus());
+		LOG.debug("duplicate: " + identity.getDuplicate());
 	}
 
 	@Test
