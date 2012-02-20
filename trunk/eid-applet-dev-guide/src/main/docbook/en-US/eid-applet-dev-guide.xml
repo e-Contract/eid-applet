@@ -1244,6 +1244,44 @@
 					session attribute.
 				</para>
 			</section>
+			<section>
+				<title>eID secure PIN pad card reader</title>
+				<para>
+					FedICT developed a new secure PIN pad card reader that features eID
+					transaction confirmation on the hardware device itself. Basically
+					this secure card reader intercepts signature (both authentication
+					and non-repudiation) computations that use a specific hash
+					algorithm. The OID for this hash algorithm is
+					<code>2.16.56.1.2.1.3.1</code>
+					.
+					For this specific hash algorithm the digest value is considered as
+					being plain text that can be visualized by the hardware device.
+					This allows for hardware based transaction confirmation. This
+					feature gives applications additional means of ensuring the user
+					consent in the context of a certain application level transaction.
+				</para>
+				<para>
+					The eID Applet has explicit support for such transaction messages
+					as part of the authentication process. To enable this feature you
+					have to implement the
+					<code>SecureCardReaderService</code>
+					SPI. The JNDI location of this service component needs to be set
+					via the following
+					<code>init-param</code>
+					on the
+					<code>AppletServiceServlet</code>
+					:
+				</para>
+				<programlisting language="XML"><![CDATA[<init-param>
+	<param-name>SecureCardReaderService</param-name>
+	<param-value>your/location/in/jndi/SecureCardReaderServiceBean</param-value>
+</init-param>]]></programlisting>
+				<para>
+					Smart card readers that do not offer support for this plain
+					text hash algorithm can of course not visualize the transaction
+					message.
+				</para>
+			</section>
 		</section>
 		<section>
 			<title>eID Signatures</title>
