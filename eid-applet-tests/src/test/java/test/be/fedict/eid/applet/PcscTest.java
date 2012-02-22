@@ -138,7 +138,9 @@ public class PcscTest {
 			LOG.debug("dt: " + (t1 - t0));
 
 			authnCertChain = pcscEid.getAuthnCertificateChain();
-			LOG.debug("key size: " + authnCertChain.get(0).getPublicKey().getEncoded().length * 8);
+			LOG.debug("key size: "
+					+ authnCertChain.get(0).getPublicKey().getEncoded().length
+					* 8);
 			// pcscEid.logoff();
 		} finally {
 			pcscEid.close();
@@ -149,6 +151,35 @@ public class PcscTest {
 		signature.update(challenge);
 		boolean result = signature.verify(signatureValue);
 		assertTrue(result);
+	}
+
+	@Test
+	public void pcscMSE_SET() throws Exception {
+		this.messages = new Messages(Locale.GERMAN);
+		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEid.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEid.waitForEidPresent();
+		}
+		CardChannel cardChannel = pcscEid.getCardChannel();
+		try {
+			CommandAPDU setApdu = new CommandAPDU(0x00, 0x22, 0x41, 0xB6,
+					new byte[] { 0x04, // length of following data
+							(byte) 0x80, // algo ref
+							//0x01, // rsa pkcs#1
+							//0x02, // PKCS1-SHA1
+							//0x04, // PKCS1-MD5
+							//0x08, // PKCS1-SHA256
+							//0x10, // PKCS1-PSS-SHA1
+							0x20, // PKCS1-PSS-SHA256
+							//(byte) 0xfb, // foobar
+							(byte) 0x84, // tag for private key ref
+							PcscEid.AUTHN_KEY_ID });
+			ResponseAPDU responseAPDU = cardChannel.transmit(setApdu);
+			assertEquals(0x9000, responseAPDU.getSW());
+		} finally {
+			pcscEid.close();
+		}
 	}
 
 	@Test

@@ -20,6 +20,7 @@
 package be.fedict.eid.applet.service.impl.handler;
 
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.Method;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -51,7 +52,12 @@ import be.fedict.eid.applet.service.impl.RequestContext;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
 import be.fedict.eid.applet.service.spi.AuditService;
+import be.fedict.eid.applet.service.spi.CertificateSecurityException;
+import be.fedict.eid.applet.service.spi.ExpiredCertificateSecurityException;
 import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
+import be.fedict.eid.applet.service.spi.RevokedCertificateSecurityException;
+import be.fedict.eid.applet.service.spi.TrustCertificateSecurityException;
+import be.fedict.eid.applet.shared.ErrorCode;
 import be.fedict.eid.applet.shared.FinishedMessage;
 import be.fedict.eid.applet.shared.IdentityDataMessage;
 
@@ -227,8 +233,52 @@ public class IdentityDataMessageHandler implements
 			List<X509Certificate> rrnCertificateChain = new LinkedList<X509Certificate>();
 			rrnCertificateChain.add(rrnCertificate);
 			rrnCertificateChain.add(rootCertificate);
-			identityIntegrityService
-					.checkNationalRegistrationCertificate(rrnCertificateChain);
+			try {
+				identityIntegrityService
+						.checkNationalRegistrationCertificate(rrnCertificateChain);
+			} catch (ExpiredCertificateSecurityException e) {
+				return new FinishedMessage(ErrorCode.CERTIFICATE_EXPIRED);
+			} catch (RevokedCertificateSecurityException e) {
+				return new FinishedMessage(ErrorCode.CERTIFICATE_REVOKED);
+			} catch (TrustCertificateSecurityException e) {
+				return new FinishedMessage(ErrorCode.CERTIFICATE_NOT_TRUSTED);
+			} catch (CertificateSecurityException e) {
+				return new FinishedMessage(ErrorCode.CERTIFICATE);
+			} catch (Exception e) {
+				if ("javax.ejb.EJBException".equals(e.getClass().getName())) {
+					Exception exception;
+					try {
+						Method getCausedByExceptionMethod = e.getClass()
+								.getMethod("getCausedByException",
+										new Class[] {});
+						exception = (Exception) getCausedByExceptionMethod
+								.invoke(e, new Object[] {});
+					} catch (Exception e2) {
+						LOG.debug("error: " + e.getMessage(), e);
+						throw new SecurityException(
+								"error retrieving the root cause: "
+										+ e2.getMessage());
+					}
+					if (exception instanceof ExpiredCertificateSecurityException) {
+						return new FinishedMessage(
+								ErrorCode.CERTIFICATE_EXPIRED);
+					}
+					if (exception instanceof RevokedCertificateSecurityException) {
+						return new FinishedMessage(
+								ErrorCode.CERTIFICATE_REVOKED);
+					}
+					if (exception instanceof TrustCertificateSecurityException) {
+						return new FinishedMessage(
+								ErrorCode.CERTIFICATE_NOT_TRUSTED);
+					}
+					if (exception instanceof CertificateSecurityException) {
+						return new FinishedMessage(ErrorCode.CERTIFICATE);
+					}
+				}
+				throw new SecurityException(
+						"error checking the NRN certificate: " + e.getMessage(),
+						e);
+			}
 		}
 
 		if (null != message.photoFile) {

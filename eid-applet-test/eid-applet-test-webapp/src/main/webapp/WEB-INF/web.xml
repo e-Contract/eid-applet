@@ -230,6 +230,19 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>AppletIntegrityServiceErrorServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+		<init-param>
+			<param-name>IdentityIntegrityService</param-name>
+			<param-value>test/eid/applet/model/IdentityIntegrityServiceErrorBean</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AppletIntegrityServiceErrorServlet</servlet-name>
+		<url-pattern>/applet-service-integrity-error</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>AppletAllServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
 		<init-param>
