@@ -349,7 +349,7 @@ public class Controller {
 				addDetailMessage("identity data usage: "
 						+ identificationRequestMessage.identityDataUsage);
 
-				performEidIdentificationOperation(
+				resultMessage = performEidIdentificationOperation(
 						identificationRequestMessage.includeAddress,
 						identificationRequestMessage.includePhoto,
 						identificationRequestMessage.includeIntegrityData,
@@ -1222,10 +1222,10 @@ public class Controller {
 		}
 	}
 
-	private void performEidIdentificationOperation(boolean includeAddress,
-			boolean includePhoto, boolean includeIntegrityData,
-			boolean includeCertificates, boolean removeCard,
-			String identityDataUsage) throws Exception {
+	private FinishedMessage performEidIdentificationOperation(
+			boolean includeAddress, boolean includePhoto,
+			boolean includeIntegrityData, boolean includeCertificates,
+			boolean removeCard, String identityDataUsage) throws Exception {
 		waitForEIdCardPcsc();
 
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.READING_IDENTITY);
@@ -1404,7 +1404,9 @@ public class Controller {
 				addressFile, photoFile, identitySignatureFile,
 				addressSignatureFile, rrnCertFile, rootCertFile, authnCertFile,
 				signCertFile, caCertFile);
-		sendMessage(identityData, FinishedMessage.class);
+		FinishedMessage finishedMessage = sendMessage(identityData,
+				FinishedMessage.class);
+		return finishedMessage;
 	}
 
 	private void waitForEIdCardPcsc() throws Exception {
