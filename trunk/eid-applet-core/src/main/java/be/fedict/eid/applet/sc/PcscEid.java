@@ -738,11 +738,18 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 		// select the key
 		this.view.addDetailMessage("selecting key...");
+		byte algoRef;
+		if ("SHA-1-PSS".equals(digestAlgo)) {
+			algoRef = 0x10;
+		} else if ("SHA-256-PSS".equals(digestAlgo)) {
+			algoRef = 0x20;
+		} else {
+			algoRef = 0x01; // PKCS#1
+		}
 		CommandAPDU setApdu = new CommandAPDU(0x00, 0x22, 0x41, 0xB6,
 				new byte[] { 0x04, // length of following data
 						(byte) 0x80, // algo ref
-						0x01, // rsa pkcs#1
-						(byte) 0x84, // tag for private key ref
+						algoRef, (byte) 0x84, // tag for private key ref
 						keyId });
 		ResponseAPDU responseApdu = transmit(setApdu);
 		if (0x9000 != responseApdu.getSW()) {
@@ -779,6 +786,10 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			digestInfoPrefix[1] = (byte) (digestValue.length + 13);
 			digestInfoPrefix[14] = (byte) digestValue.length;
 			digestInfo.write(digestInfoPrefix);
+		} else if ("SHA-1-PSS".equals(digestAlgo)) {
+			// no prefix required
+		} else if ("SHA-256-PSS".equals(digestAlgo)) {
+			// no prefix required
 		} else {
 			throw new RuntimeException("digest also not supported: "
 					+ digestAlgo);

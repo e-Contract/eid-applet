@@ -51,21 +51,11 @@ public class SignatureServiceImpl implements SignatureService {
 			List<X509Certificate> signingCertificateChain) {
 		LOG.debug("postSign");
 
-		HttpServletRequest httpServletRequest;
-		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
-		} catch (PolicyContextException e) {
-			throw new RuntimeException("JACC error: " + e.getMessage());
-		}
-
 		String signatureValueStr = new String(Hex.encodeHex(signatureValue));
 
-		HttpSession session = httpServletRequest.getSession();
+		HttpSession session = getHttpSession();
 		session.setAttribute("SignatureValue", signatureValueStr);
-		session
-				.setAttribute("SigningCertificateChain",
-						signingCertificateChain);
+		session.setAttribute("SigningCertificateChain", signingCertificateChain);
 	}
 
 	public DigestInfo preSign(List<DigestInfo> digestInfos,
@@ -73,6 +63,27 @@ public class SignatureServiceImpl implements SignatureService {
 			throws NoSuchAlgorithmException {
 		LOG.debug("preSign");
 
+		HttpSession session = getHttpSession();
+		String toBeSigned = (String) session.getAttribute("toBeSigned");
+		String digestAlgo = (String) session.getAttribute("digestAlgo");
+		LOG.debug("digest algo: " + digestAlgo);
+
+		String javaDigestAlgo = digestAlgo;
+		if (digestAlgo.endsWith("-PSS")) {
+			LOG.debug("RSA/PSS detected");
+			javaDigestAlgo = digestAlgo
+					.substring(0, digestAlgo.indexOf("-PSS"));
+			LOG.debug("java digest algo: " + javaDigestAlgo);
+		}
+		MessageDigest messageDigest = MessageDigest.getInstance(javaDigestAlgo,
+				new BouncyCastleProvider());
+		byte[] digestValue = messageDigest.digest(toBeSigned.getBytes());
+
+		String description = "Test Text Document";
+		return new DigestInfo(digestValue, digestAlgo, description);
+	}
+
+	private HttpSession getHttpSession() {
 		HttpServletRequest httpServletRequest;
 		try {
 			httpServletRequest = (HttpServletRequest) PolicyContext
@@ -82,16 +93,7 @@ public class SignatureServiceImpl implements SignatureService {
 		}
 
 		HttpSession session = httpServletRequest.getSession();
-		String toBeSigned = (String) session.getAttribute("toBeSigned");
-		String digestAlgo = (String) session.getAttribute("digestAlgo");
-		LOG.debug("digest algo: " + digestAlgo);
-
-		MessageDigest messageDigest = MessageDigest.getInstance(digestAlgo,
-				new BouncyCastleProvider());
-		byte[] digestValue = messageDigest.digest(toBeSigned.getBytes());
-
-		String description = "Test Text Document";
-		return new DigestInfo(digestValue, digestAlgo, description);
+		return session;
 	}
 
 	public String getFilesDigestAlgorithm() {

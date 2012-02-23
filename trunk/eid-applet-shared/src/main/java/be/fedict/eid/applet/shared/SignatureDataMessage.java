@@ -108,9 +108,6 @@ public class SignatureDataMessage extends AbstractProtocolMessage {
 
 	@PostConstruct
 	public void postConstruct() {
-		if (this.signatureValueSize != 128) {
-			throw new RuntimeException("signature value size invalid");
-		}
 		int idx = 0;
 		this.signatureValue = copy(this.body, idx, this.signatureValueSize);
 		idx += this.signatureValueSize;
