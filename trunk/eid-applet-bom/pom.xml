@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>be.fedict</groupId>
+		<artifactId>eid-applet</artifactId>
+		<version>1.0.5-SNAPSHOT</version>
+	</parent>
+	<name>FedICT eID Applet BOM</name>
+	<description>eID Applet Bill Of Materials.</description>
+	<groupId>be.fedict.eid-applet</groupId>
+	<artifactId>eid-applet-bom</artifactId>
+	<version>1.0.5-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<url>http://code.google.com/p/eid-applet/</url>
+	<properties>
+		<eid-applet.version>${project.version}</eid-applet.version>
+	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>be.fedict.eid-applet</groupId>
+				<artifactId>eid-applet-package</artifactId>
+				<version>${eid-applet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>be.fedict.eid-applet</groupId>
+				<artifactId>eid-applet-js</artifactId>
+				<version>${eid-applet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>be.fedict.eid-applet</groupId>
+				<artifactId>eid-applet-jboss-as</artifactId>
+				<version>${eid-applet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>be.fedict.eid-applet</groupId>
+				<artifactId>eid-applet-docbook-plugin</artifactId>
+				<version>${eid-applet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>be.fedict.eid-applet</groupId>
+				<artifactId>eid-applet-service</artifactId>
+				<version>${eid-applet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>be.fedict.eid-applet</groupId>
+				<artifactId>eid-applet-service-spi</artifactId>
+				<version>${eid-applet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>be.fedict.eid-applet</groupId>
+				<artifactId>eid-applet-service-signer</artifactId>
+				<version>${eid-applet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>be.fedict.eid-applet</groupId>
+				<artifactId>eid-applet-service-cdi</artifactId>
+				<version>${eid-applet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>be.fedict.eid-applet</groupId>
+				<artifactId>eid-applet-sql-ddl-plugin</artifactId>
+				<version>${eid-applet.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>
