@@ -18,6 +18,8 @@
 	<option value="RIPEMD128">RIPEMD128 with RSA</option>
 	<option value="RIPEMD160">RIPEMD160 with RSA</option>
 	<option value="RIPEMD256">RIPEMD256 with RSA</option>
+	<option value="SHA-1-PSS">SHA-1 with RSA/PSS</option>
+	<option value="SHA-256-PSS">SHA-256 with RSA/PSS</option>
 </select></p>
 <p><input type="submit" value="Sign" /></p>
 </form>
