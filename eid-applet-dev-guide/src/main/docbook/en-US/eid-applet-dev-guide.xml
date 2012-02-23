@@ -522,6 +522,47 @@
 				<code>META-INF/lib</code>
 				directory of your web application.
 			</para>
+			<para>
+				In case that you use Maven as build-system, you can configure
+				the following Maven repository:
+			</para>
+			<programlisting language="XML"><![CDATA[<repository>
+	<id>e-contract</id>
+	<url>https://www.e-contract.be/maven2/</url>
+		<releases>
+			<enabled>true</enabled>
+		</releases>
+		<snapshots>
+			<enabled>false</enabled>
+		</snapshots>
+</repository>]]></programlisting>
+			<para>
+				The eID Applet project comes with a BOM that can be included in
+				your POM file as follows:
+			</para>
+			<programlisting language="XML"><![CDATA[<dependencyManagement>
+	<dependencies>
+		<dependency>
+			<groupId>be.fedict.eid-applet</groupId>
+			<artifactId>eid-applet-bom</artifactId>
+			<version>1.0.5.GA</version>
+			<type>pom</type>
+			<scope>import</scope>
+		</dependency>
+	</dependencies>
+</dependencyManagement>]]></programlisting>
+			<para>
+				Now you can simply add the eID Applet Service dependency as
+				follows:
+			</para>
+			<programlisting language="XML"><![CDATA[<dependency>
+	<groupId>be.fedict.eid-applet</groupId>
+	<artifactId>eid-applet-service</artifactId>
+</dependency>]]></programlisting>
+			<para>
+				Depending on the Servlet container that you use, you might need
+				to exclude certain transitive dependencies.
+			</para>
 			<tip>
 				<title>eID Applet Service availability</title>
 				<para>
