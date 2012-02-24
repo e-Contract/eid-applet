@@ -20,6 +20,7 @@ package test.be.fedict.eid.applet;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -27,6 +28,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
+import java.security.MessageDigest;
+import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
@@ -331,6 +334,50 @@ public class SecurePinPadReaderTest {
 				.getObjectId().getId());
 		assertArrayEquals(textMessage.getBytes(),
 				signatureDigestInfo.getDigest());
+	}
+
+	/**
+	 * When creating a non-repudiation signature using PKCS#1-SHA1 (non-naked)
+	 * the digest value should also be confirmed via the secure pinpad reader.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	@QualityAssurance(firmware = Firmware.V012Z, approved = false)
+	public void testNonRepSignPKCS1_SHA1() throws Exception {
+		CardChannel cardChannel = this.pcscEid.getCardChannel();
+
+		List<X509Certificate> signCertChain = this.pcscEid
+				.getSignCertificateChain();
+
+		CommandAPDU setApdu = new CommandAPDU(0x00, 0x22, 0x41, 0xB6,
+				new byte[] { 0x04, // length of following data
+						(byte) 0x80, // algo ref
+						0x02, // RSA PKCS#1 SHA1
+						(byte) 0x84, // tag for private key ref
+						(byte) 0x83 }); // non-rep key
+		ResponseAPDU responseApdu = cardChannel.transmit(setApdu);
+		assertEquals(0x9000, responseApdu.getSW());
+
+		this.pcscEid.verifyPin();
+
+		byte[] data = "My Testcase".getBytes();
+		MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
+		byte[] digestValue = messageDigest.digest(data);
+
+		CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A,
+				0x9E, 0x9A, digestValue);
+
+		responseApdu = cardChannel.transmit(computeDigitalSignatureApdu);
+		assertEquals(0x9000, responseApdu.getSW());
+		byte[] signatureValue = responseApdu.getData();
+		LOG.debug("signature value size: " + signatureValue.length);
+
+		Signature signature = Signature.getInstance("SHA1withRSA");
+		signature.initVerify(signCertChain.get(0).getPublicKey());
+		signature.update(data);
+		boolean result = signature.verify(signatureValue);
+		assertTrue(result);
 	}
 
 	@Test
