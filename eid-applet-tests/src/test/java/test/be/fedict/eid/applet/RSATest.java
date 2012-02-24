@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Provider.Service;
@@ -30,6 +31,8 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
+import java.security.spec.MGF1ParameterSpec;
+import java.security.spec.PSSParameterSpec;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.Arrays;
 import java.util.Set;
@@ -102,5 +105,17 @@ public class RSATest {
 				+ new String(Hex.encodeHex(signatureValue2)));
 
 		assertFalse(Arrays.equals(signatureValue, signatureValue2));
+
+		MessageDigest messageDigest = MessageDigest
+				.getInstance("SHA-256", "BC");
+		byte[] digest = messageDigest.digest(data);
+
+		signature = Signature.getInstance("RAWRSASSA-PSS", "BC");
+		signature.setParameter(new PSSParameterSpec("SHA-256", "MGF1",
+				new MGF1ParameterSpec("SHA-256"), 32, 1));
+		signature.initVerify(publicKey);
+		signature.update(digest);
+		result = signature.verify(signatureValue);
+		assertTrue(result);
 	}
 }

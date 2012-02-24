@@ -601,6 +601,7 @@ public class PcscTest {
 		String issuerName = PrincipalUtil.getIssuerX509Principal(certificate)
 				.getName().replace(",", ", ");
 		LOG.debug("issuer name: " + issuerName);
+		LOG.debug("certificate: " + certificate);
 
 		pcscEidSpi.close();
 	}

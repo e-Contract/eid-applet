@@ -1343,8 +1343,13 @@
 				<code>RIPEMD128-RSA-PKCS1</code>
 				,
 				<code>RIPEMD160-RSA-PKCS1</code>
-				, and
+				,
 				<code>RIPEMD256-RSA-PKCS1</code>
+				,
+				<code>SHA1-RSA/PSS-PKCS1</code>
+				,
+				and
+				<code>SHA256-RSA/PSS-PKCS1</code>
 				.
 			</para>
 			<warning>

@@ -210,7 +210,7 @@ public class ClientEnvironmentMessageHandler implements
 
 			// also save it in the session for later verification
 			SignatureDataMessageHandler.setDigestValue(digestInfo.digestValue,
-					session);
+					digestInfo.digestAlgo, session);
 
 			IdentityService identityService = this.identityServiceLocator
 					.locateService();
@@ -269,7 +269,8 @@ public class ClientEnvironmentMessageHandler implements
 			SecureCardReaderService secureCardReaderService = this.secureCardReaderServiceLocator
 					.locateService();
 			if (null != secureCardReaderService) {
-				transactionMessage = secureCardReaderService.getTransactionMessage();
+				transactionMessage = secureCardReaderService
+						.getTransactionMessage();
 				LOG.debug("transaction message: " + transactionMessage);
 			}
 			requestContext.setTransactionMessage(transactionMessage);
