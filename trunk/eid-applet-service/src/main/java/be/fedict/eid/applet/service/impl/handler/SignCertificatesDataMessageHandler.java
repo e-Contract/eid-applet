@@ -215,7 +215,7 @@ public class SignCertificatesDataMessageHandler implements
 
 		// also save it in the session for later verification
 		SignatureDataMessageHandler.setDigestValue(digestInfo.digestValue,
-				session);
+				digestInfo.digestAlgo, session);
 
 		IdentityService identityService = this.identityServiceLocator
 				.locateService();

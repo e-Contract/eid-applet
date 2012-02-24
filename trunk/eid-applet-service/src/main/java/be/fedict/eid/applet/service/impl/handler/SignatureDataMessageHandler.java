@@ -20,7 +20,10 @@ package be.fedict.eid.applet.service.impl.handler;
 
 import java.lang.reflect.Method;
 import java.security.PublicKey;
+import java.security.Signature;
 import java.security.cert.X509Certificate;
+import java.security.spec.MGF1ParameterSpec;
+import java.security.spec.PSSParameterSpec;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +38,7 @@ import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.DigestInfo;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Arrays;
 
 import be.fedict.eid.applet.service.impl.ServiceLocator;
@@ -69,8 +73,10 @@ public class SignatureDataMessageHandler implements
 	private ServiceLocator<AuditService> auditServiceLocator;
 
 	public static final String DIGEST_VALUE_SESSION_ATTRIBUTE = SignatureDataMessageHandler.class
-			.getName()
-			+ ".digestValue";
+			.getName() + ".digestValue";
+
+	public static final String DIGEST_ALGO_SESSION_ATTRIBUTE = SignatureDataMessageHandler.class
+			.getName() + ".digestAlgo";
 
 	public Object handleMessage(SignatureDataMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
@@ -93,33 +99,60 @@ public class SignatureDataMessageHandler implements
 		/*
 		 * Verify the signature.
 		 */
+		String digestAlgo = SignatureDataMessageHandler.getDigestAlgo(session);
 		byte[] expectedDigestValue = SignatureDataMessageHandler
 				.getDigestValue(session);
-		byte[] signatureDigestValue;
-		try {
-			Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-			cipher.init(Cipher.DECRYPT_MODE, signingPublicKey);
-			byte[] signatureDigestInfoValue = cipher.doFinal(signatureValue);
-			ASN1InputStream aIn = new ASN1InputStream(signatureDigestInfoValue);
-			DigestInfo signatureDigestInfo = new DigestInfo((ASN1Sequence) aIn
-					.readObject());
-			signatureDigestValue = signatureDigestInfo.getDigest();
-		} catch (Exception e) {
-			LOG.debug("signature verification error: " + e.getMessage());
-			throw new ServletException("signature verification error: "
-					+ e.getMessage(), e);
-		}
-
-		if (false == Arrays.areEqual(expectedDigestValue, signatureDigestValue)) {
-			AuditService auditService = this.auditServiceLocator
-					.locateService();
-			if (null != auditService) {
-				String remoteAddress = request.getRemoteAddr();
-				auditService.signatureError(remoteAddress, signingCertificate);
+		if (digestAlgo.endsWith("-PSS")) {
+			LOG.debug("verifying RSA/PSS signature");
+			try {
+				Signature signature = Signature.getInstance("RAWRSASSA-PSS",
+						BouncyCastleProvider.PROVIDER_NAME);
+				if ("SHA-256-PSS".equals(digestAlgo)) {
+					LOG.debug("RSA/PSS SHA256");
+					signature.setParameter(new PSSParameterSpec("SHA-256",
+							"MGF1", new MGF1ParameterSpec("SHA-256"), 32, 1));
+				}
+				signature.initVerify(signingPublicKey);
+				signature.update(expectedDigestValue);
+				boolean result = signature.verify(signatureValue);
+				if (false == result) {
+					throw new SecurityException("signature incorrect");
+				}
+			} catch (Exception e) {
+				LOG.debug("signature verification error: " + e.getMessage(), e);
+				throw new ServletException("signature verification error: "
+						+ e.getMessage(), e);
 			}
-			throw new ServletException("signature incorrect");
+		} else {
+			byte[] signatureDigestValue;
+			try {
+				Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+				cipher.init(Cipher.DECRYPT_MODE, signingPublicKey);
+				byte[] signatureDigestInfoValue = cipher
+						.doFinal(signatureValue);
+				ASN1InputStream aIn = new ASN1InputStream(
+						signatureDigestInfoValue);
+				DigestInfo signatureDigestInfo = new DigestInfo(
+						(ASN1Sequence) aIn.readObject());
+				signatureDigestValue = signatureDigestInfo.getDigest();
+			} catch (Exception e) {
+				LOG.debug("signature verification error: " + e.getMessage());
+				throw new ServletException("signature verification error: "
+						+ e.getMessage(), e);
+			}
+
+			if (false == Arrays.areEqual(expectedDigestValue,
+					signatureDigestValue)) {
+				AuditService auditService = this.auditServiceLocator
+						.locateService();
+				if (null != auditService) {
+					String remoteAddress = request.getRemoteAddr();
+					auditService.signatureError(remoteAddress,
+							signingCertificate);
+				}
+				throw new ServletException("signature incorrect");
+			}
 		}
-		// no need to also check the digest algo
 
 		AuditService auditService = this.auditServiceLocator.locateService();
 		if (null != auditService) {
@@ -186,7 +219,15 @@ public class SignatureDataMessageHandler implements
 		return (byte[]) session.getAttribute(DIGEST_VALUE_SESSION_ATTRIBUTE);
 	}
 
-	public static void setDigestValue(byte[] digestValue, HttpSession session) {
+	public static void setDigestValue(byte[] digestValue, String digestAlgo,
+			HttpSession session) {
 		session.setAttribute(DIGEST_VALUE_SESSION_ATTRIBUTE, digestValue);
+		session.setAttribute(DIGEST_ALGO_SESSION_ATTRIBUTE, digestAlgo);
+	}
+
+	public static String getDigestAlgo(HttpSession session) {
+		String digestAlgo = (String) session
+				.getAttribute(DIGEST_ALGO_SESSION_ATTRIBUTE);
+		return digestAlgo;
 	}
 }

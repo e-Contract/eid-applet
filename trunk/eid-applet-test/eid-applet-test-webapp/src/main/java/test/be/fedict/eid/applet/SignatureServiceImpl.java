@@ -20,6 +20,7 @@ package test.be.fedict.eid.applet;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
@@ -46,6 +47,12 @@ public class SignatureServiceImpl implements SignatureService {
 
 	private static final Log LOG = LogFactory
 			.getLog(SignatureServiceImpl.class);
+
+	static {
+		if (null == Security.getProvider(BouncyCastleProvider.PROVIDER_NAME)) {
+			Security.addProvider(new BouncyCastleProvider());
+		}
+	}
 
 	public void postSign(byte[] signatureValue,
 			List<X509Certificate> signingCertificateChain) {
