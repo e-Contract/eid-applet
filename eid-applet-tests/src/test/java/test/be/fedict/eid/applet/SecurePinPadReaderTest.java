@@ -29,6 +29,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -334,6 +335,56 @@ public class SecurePinPadReaderTest {
 				.getObjectId().getId());
 		assertArrayEquals(textMessage.getBytes(),
 				signatureDigestInfo.getDigest());
+	}
+
+	@Test
+	@QualityAssurance(firmware = Firmware.V012Z, approved = false)
+	public void testLargePlainTextMessage() throws Exception {
+		CardChannel cardChannel = this.pcscEid.getCardChannel();
+
+		List<X509Certificate> signCertChain = this.pcscEid
+				.getSignCertificateChain();
+
+		CommandAPDU setApdu = new CommandAPDU(0x00, 0x22, 0x41, 0xB6,
+				new byte[] { 0x04, // length of following data
+						(byte) 0x80, // algo ref
+						0x01, // rsa pkcs#1
+						(byte) 0x84, // tag for private key ref
+						(byte) 0x83 }); // non-rep key
+		ResponseAPDU responseApdu = cardChannel.transmit(setApdu);
+		assertEquals(0x9000, responseApdu.getSW());
+
+		this.pcscEid.verifyPin();
+
+		byte[] data = new byte[115];
+		/*
+		 * If the length of the plain text message is >= 115, the message is not
+		 * visualized by the secure pinpad reader.
+		 */
+		SecureRandom secureRandom = new SecureRandom();
+		secureRandom.nextBytes(data);
+		AlgorithmIdentifier algoId = new AlgorithmIdentifier(
+				"2.16.56.1.2.1.3.1");
+		DigestInfo digestInfo = new DigestInfo(algoId, data);
+		CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A,
+				0x9E, 0x9A, digestInfo.getDEREncoded());
+
+		responseApdu = cardChannel.transmit(computeDigitalSignatureApdu);
+		assertEquals(0x9000, responseApdu.getSW());
+		byte[] signatureValue = responseApdu.getData();
+		LOG.debug("signature value size: " + signatureValue.length);
+
+		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+		cipher.init(Cipher.DECRYPT_MODE, signCertChain.get(0));
+		byte[] signatureDigestInfoValue = cipher.doFinal(signatureValue);
+		ASN1InputStream aIn = new ASN1InputStream(signatureDigestInfoValue);
+		DigestInfo signatureDigestInfo = new DigestInfo(
+				(ASN1Sequence) aIn.readObject());
+		LOG.debug("result algo Id: "
+				+ signatureDigestInfo.getAlgorithmId().getObjectId().getId());
+		assertEquals("2.16.56.1.2.1.3.1", signatureDigestInfo.getAlgorithmId()
+				.getObjectId().getId());
+		assertArrayEquals(data, signatureDigestInfo.getDigest());
 	}
 
 	/**
