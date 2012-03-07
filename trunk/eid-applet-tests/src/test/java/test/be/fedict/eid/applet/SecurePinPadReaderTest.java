@@ -337,6 +337,11 @@ public class SecurePinPadReaderTest {
 				signatureDigestInfo.getDigest());
 	}
 
+	/**
+	 * Only applicable for 2048 bit keys.
+	 * 
+	 * @throws Exception
+	 */
 	@Test
 	@QualityAssurance(firmware = Firmware.V012Z, approved = false)
 	public void testLargePlainTextMessage() throws Exception {
