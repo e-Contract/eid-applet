@@ -787,6 +787,9 @@ public class PcscTest {
 		LOG.debug("sign cert size: " + signCertData.length);
 		LOG.debug("citizen CA certificate: " + citizenCaCert);
 		LOG.debug("root CA certificate: " + rootCaCert);
+		LOG.debug("authn cert serial number: " + authnCert.getSerialNumber());
+		LOG.debug("authn certificate issuer: "
+				+ authnCert.getIssuerX500Principal());
 
 		File rootCaFile = File.createTempFile("test-root-ca-", ".pem");
 		FileWriter rootCaFileWriter = new FileWriter(rootCaFile);
