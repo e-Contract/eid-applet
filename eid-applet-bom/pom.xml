@@ -31,11 +31,6 @@
 			</dependency>
 			<dependency>
 				<groupId>be.fedict.eid-applet</groupId>
-				<artifactId>eid-applet-jboss-as</artifactId>
-				<version>${eid-applet.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>be.fedict.eid-applet</groupId>
 				<artifactId>eid-applet-docbook-plugin</artifactId>
 				<version>${eid-applet.version}</version>
 			</dependency>
