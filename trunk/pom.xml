@@ -67,7 +67,6 @@
 				<module>eid-applet-docbook-plugin</module>
 				<module>eid-applet-sdk</module>
 				<module>eid-applet-beta</module>
-				<module>eid-applet-demo</module>
 			</modules>
 		</profile>
 	</profiles>
