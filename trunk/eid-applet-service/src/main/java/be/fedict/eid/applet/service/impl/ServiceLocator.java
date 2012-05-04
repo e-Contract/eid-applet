@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2008-2012 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -20,6 +20,7 @@ package be.fedict.eid.applet.service.impl;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
@@ -41,6 +42,11 @@ public class ServiceLocator<T> {
 
 	public ServiceLocator(String initParam, ServletConfig config)
 			throws ServletException {
+		this.jndiLocation = config.getInitParameter(initParam);
+		this.className = config.getInitParameter(initParam + "Class");
+	}
+
+	public ServiceLocator(String initParam, FilterConfig config) {
 		this.jndiLocation = config.getInitParameter(initParam);
 		this.className = config.getInitParameter(initParam + "Class");
 	}
