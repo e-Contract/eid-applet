@@ -68,7 +68,6 @@
 				<module>eid-applet-sdk</module>
 				<module>eid-applet-beta</module>
 				<module>eid-applet-demo</module>
-				<module>eid-applet-jboss-as</module>
 			</modules>
 		</profile>
 	</profiles>
