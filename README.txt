@@ -10,8 +10,8 @@ The source code is hosted at: http://code.google.com/p/eid-applet/
 === 2. Requirements
 
 The following is required for compiling the eID Applet software:
-* Oracle Java 1.6.0_21, 1.6.0_22, 1.6.0_23, 1.6.0_26, 1.6.0_29
-* Apache Maven 3.0.3
+* Oracle Java 1.6.0_32
+* Apache Maven 3.0.4
 
 
 === 3. Build
@@ -22,16 +22,14 @@ The project can be build via:
 This will also build a test web application EAR artifact named:
 	eid-applet-test-deploy
 
-Deploy the test web application to a local running JBoss AS 6.0.x via:
+Deploy the test web application to a local running JBoss AS 6.1.x via:
 	cd eid-applet-test/eid-applet-test-deploy
 	mvn jboss:undeploy jboss:deploy
 
 Please notice that the JavaEE applications will not run on a vanilla JBoss
-Application Server. You'll need to use the JBoss AS distribution that comes
-with this project.
-
-We provide a JBoss AS 6.0.x package artifact named:
-	eid-applet-jboss-as
+Application Server. You'll need to use the eID specific JBoss AS distribution.
+This application server is available from:
+	http://code.google.com/p/eid-as/
 
 During the build process a token is required to sign the applet JAR.
 By default the Maven build will use a software token to sign the applet JAR.
