@@ -195,6 +195,8 @@ public class AuthenticationDataMessageHandlerTest {
 				mockServletRequest
 						.getAttribute("javax.servlet.request.ssl_session"))
 				.andStubReturn(new String(Hex.encodeHex(sessionId)));
+		EasyMock.expect(mockServletRequest.getRemoteAddr()).andStubReturn(
+				"1.2.3.4");
 
 		// prepare
 		EasyMock.replay(mockServletRequest, mockServletConfig);
@@ -346,6 +348,8 @@ public class AuthenticationDataMessageHandlerTest {
 				mockServletConfig
 						.getInitParameter(IdentityDataMessageHandler.INCLUDE_DATA_FILES))
 				.andReturn(null);
+		EasyMock.expect(mockServletRequest.getRemoteAddr()).andStubReturn(
+				"1.2.3.4");
 
 		// prepare
 		EasyMock.replay(mockServletRequest, mockServletConfig);
@@ -815,6 +819,8 @@ public class AuthenticationDataMessageHandlerTest {
 				mockServletConfig
 						.getInitParameter(IdentityDataMessageHandler.INCLUDE_DATA_FILES))
 				.andReturn(null);
+		EasyMock.expect(mockServletRequest.getRemoteAddr()).andStubReturn(
+				"1.2.3.4");
 
 		// prepare
 		EasyMock.replay(mockServletRequest, mockServletConfig);
