@@ -381,6 +381,7 @@ public class AuthenticationDataMessageHandler implements
 		}
 
 		String userId = UserIdentifierUtil.getUserId(message.authnCert);
+		LOG.info("authenticated: " + userId + " @ " + request.getRemoteAddr());
 		if (null != this.nrcidSecret) {
 			userId = UserIdentifierUtil.getNonReversibleCitizenIdentifier(
 					userId, this.nrcidOrgId, this.nrcidAppId, this.nrcidSecret);
