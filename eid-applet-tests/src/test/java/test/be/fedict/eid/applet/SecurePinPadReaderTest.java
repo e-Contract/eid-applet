@@ -103,6 +103,10 @@ public class SecurePinPadReaderTest {
 		 */
 		V012Z,
 		/**
+		 * Fifth test sample provided at 05/2012.
+		 */
+		V015Z,
+		/**
 		 * Not applicable.
 		 */
 		NA
@@ -110,7 +114,8 @@ public class SecurePinPadReaderTest {
 
 	@Before
 	public void beforeTest() throws Exception {
-		this.messages = new Messages(new Locale("nl"));
+		this.messages = new Messages(Locale.ENGLISH);
+		LOG.debug("locale: " + this.messages.getLocale());
 		this.pcscEid = new PcscEid(new TestView(), this.messages);
 		if (false == this.pcscEid.isEidPresent()) {
 			LOG.debug("insert eID card");
@@ -127,22 +132,21 @@ public class SecurePinPadReaderTest {
 	 * Creates a regular SHA1 signature using the non-repudiation key.
 	 * <p/>
 	 * Remark: right now you have to wait until the digest value has been
-	 * scrolled completely before being able to continue.
+	 * scrolled completely before being able to continue. Fixed in V015Z.
 	 * <p/>
 	 * Remark: The smart card reader does not honor the wLangId of the CCID pin
-	 * verification data structure yet. V010Z still does not honor the wLangId
+	 * verification data structure yet. V010Z still does not honor the wLangId.
+	 * V015Z fixes this, except for dutch. (0x13, 0x04)
 	 * <p/>
 	 * V010Z: the reader first displays "Sign Hash?", then it requests the
 	 * "Authentication PIN?" and then it asks to "Sign Hash?" again. This is due
-	 * to the way the eID Applet code has been constructed.
-	 * <p/>
-	 * V012Z still does not honor the wLangId.
-	 * 
+	 * to the way the eID Applet code has been constructed. Fixed in recent
+	 * version of the eID Applet.
 	 * 
 	 * @throws Exception
 	 */
 	@Test
-	@QualityAssurance(firmware = Firmware.V012Z, approved = false)
+	@QualityAssurance(firmware = Firmware.V015Z, approved = false)
 	public void testRegularDigestValueWithNonRepudiation() throws Exception {
 		this.pcscEid.sign("hello world".getBytes(), "SHA1");
 	}
@@ -160,13 +164,15 @@ public class SecurePinPadReaderTest {
 	 * reader display to be able to continue.
 	 * <p/>
 	 * V012Z indicates ffffff80, so 0x80.
+	 * <p/>
+	 * V015Z no longer indicates this.
 	 * 
 	 * @see http
 	 *      ://www.pcscworkgroup.com/specifications/files/pcsc10_v2.02.08.pdf
 	 * @throws Exception
 	 */
 	@Test
-	@QualityAssurance(firmware = Firmware.V012Z, approved = true)
+	@QualityAssurance(firmware = Firmware.V015Z, approved = false)
 	public void testGetCCIDFeatures() throws Exception {
 		int ioctl;
 		String osName = System.getProperty("os.name");
@@ -188,7 +194,7 @@ public class SecurePinPadReaderTest {
 	}
 
 	@Test
-	@QualityAssurance(firmware = Firmware.V010Z, approved = true)
+	@QualityAssurance(firmware = Firmware.V015Z, approved = true)
 	public void testRegularDigestValueWithAuth() throws Exception {
 		byte[] signatureValue = this.pcscEid
 				.signAuthn("hello world".getBytes());
@@ -197,7 +203,7 @@ public class SecurePinPadReaderTest {
 	}
 
 	@Test
-	@QualityAssurance(firmware = Firmware.V012Z, approved = true)
+	@QualityAssurance(firmware = Firmware.V015Z, approved = true)
 	public void testPlainTextAuthn() throws Exception {
 		// operate
 		String testMessage = "Test Application @ 14/2/2012 14:48:21";
@@ -231,11 +237,13 @@ public class SecurePinPadReaderTest {
 	 * display the plain text message. Fixed in V010Z.
 	 * <p/>
 	 * V012Z: language support is still shaky.
+	 * <p/>
+	 * V015Z also performs a logoff in case of plain text. Good.
 	 * 
 	 * @throws Exception
 	 */
 	@Test
-	@QualityAssurance(firmware = Firmware.V012Z, approved = false)
+	@QualityAssurance(firmware = Firmware.V015Z, approved = true)
 	public void testAuthnSignPlainText() throws Exception {
 		CardChannel cardChannel = this.pcscEid.getCardChannel();
 
@@ -293,7 +301,7 @@ public class SecurePinPadReaderTest {
 	 * @throws Exception
 	 */
 	@Test
-	@QualityAssurance(firmware = Firmware.V012Z, approved = true)
+	@QualityAssurance(firmware = Firmware.V015Z, approved = true)
 	public void testNonRepSignPlainText() throws Exception {
 		CardChannel cardChannel = this.pcscEid.getCardChannel();
 
@@ -343,7 +351,7 @@ public class SecurePinPadReaderTest {
 	 * @throws Exception
 	 */
 	@Test
-	@QualityAssurance(firmware = Firmware.V012Z, approved = false)
+	@QualityAssurance(firmware = Firmware.V015Z, approved = true)
 	public void testLargePlainTextMessage() throws Exception {
 		CardChannel cardChannel = this.pcscEid.getCardChannel();
 
@@ -399,7 +407,7 @@ public class SecurePinPadReaderTest {
 	 * @throws Exception
 	 */
 	@Test
-	@QualityAssurance(firmware = Firmware.V012Z, approved = false)
+	@QualityAssurance(firmware = Firmware.V015Z, approved = true)
 	public void testNonRepSignPKCS1_SHA1() throws Exception {
 		CardChannel cardChannel = this.pcscEid.getCardChannel();
 
