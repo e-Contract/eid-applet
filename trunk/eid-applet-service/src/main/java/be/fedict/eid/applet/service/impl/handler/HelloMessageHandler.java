@@ -317,6 +317,12 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 			if (null != secureCardReaderService) {
 				transactionMessage = secureCardReaderService
 						.getTransactionMessage();
+				if (transactionMessage.length() > SecureCardReaderService.TRANSACTION_MESSAGE_MAX_SIZE) {
+					transactionMessage = transactionMessage
+							.substring(
+									0,
+									SecureCardReaderService.TRANSACTION_MESSAGE_MAX_SIZE);
+				}
 				LOG.debug("transaction message: " + transactionMessage);
 			}
 			requestContext.setTransactionMessage(transactionMessage);
