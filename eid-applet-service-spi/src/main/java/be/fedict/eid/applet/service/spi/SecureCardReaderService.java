@@ -26,6 +26,8 @@ package be.fedict.eid.applet.service.spi;
  */
 public interface SecureCardReaderService {
 
+	public static final int TRANSACTION_MESSAGE_MAX_SIZE = 64;
+
 	/**
 	 * Gives back the message that should be displayed on the secure PIN pad
 	 * reader as part of the authentication transaction.
