@@ -5,13 +5,13 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.5.Beta4</version>
+		<version>1.0.5-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet BOM</name>
 	<description>eID Applet Bill Of Materials.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-bom</artifactId>
-	<version>1.0.5.Beta4</version>
+	<version>1.0.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>http://code.google.com/p/eid-applet/</url>
 	<properties>
