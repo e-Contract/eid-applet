@@ -317,7 +317,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 			if (null != secureCardReaderService) {
 				transactionMessage = secureCardReaderService
 						.getTransactionMessage();
-				if (transactionMessage.length() > SecureCardReaderService.TRANSACTION_MESSAGE_MAX_SIZE) {
+				if (null != transactionMessage
+						&& transactionMessage.length() > SecureCardReaderService.TRANSACTION_MESSAGE_MAX_SIZE) {
 					transactionMessage = transactionMessage
 							.substring(
 									0,
