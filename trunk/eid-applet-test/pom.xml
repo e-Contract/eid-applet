@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.5.Beta5</version>
+		<version>1.0.5-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet Test Project</name>
 	<description>Contains an eID Applet Test Java EE web
 		application.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-test</artifactId>
-	<version>1.0.5.Beta5</version>
+	<version>1.0.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<dependencyManagement>
 		<dependencies>
