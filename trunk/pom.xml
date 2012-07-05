@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>FedICT eID Applet Project</name>
 	<groupId>be.fedict</groupId>
@@ -711,20 +713,6 @@
 			</snapshots>
 		</pluginRepository>
 		<pluginRepository>
-			<id>codehaus</id>
-			<url>https://nexus.codehaus.org/content/repositories/releases/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</pluginRepository>
-		<pluginRepository>
-			<id>codehaus-snapshots</id>
-			<url>https://nexus.codehaus.org/content/repositories/snapshots/</url>
-		</pluginRepository>
-		<pluginRepository>
 			<id>jboss-public</id>
 			<name>JBoss public nexus</name>
 			<url>http://repository.jboss.org/nexus/content/groups/public-jboss/
@@ -766,14 +754,6 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>openqa-snapshots</id>
-			<name>OpenQA Snapshots</name>
-			<url>http://archiva.openqa.org/repository/snapshots</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		<repository>
 			<id>caucho</id>
 			<name>Caucho Repository</name>
 			<url>http://caucho.com/m2/</url>
@@ -790,7 +770,10 @@
 		</repository>
 		<repository>
 			<id>shibboleth</id>
-			<url>http://shibboleth.internet2.edu/downloads/maven2/</url>
+			<url>https://shibboleth.net/nexus/content/repositories/releases/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
 		</repository>
 		<repository>
 			<id>jboss-snapshot</id>
@@ -810,7 +793,7 @@
 		</repository>
 		<repository>
 			<id>ow2-maven-repo</id>
-			<url>http://maven.ow2.org/maven2/</url>
+			<url>http://repository.ow2.org/nexus/content/repositories/releases/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
