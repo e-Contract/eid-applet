@@ -404,7 +404,7 @@ public class PcscTest {
 		ResponseAPDU responseApdu = cardChannel.transmit(setApdu);
 		assertEquals(0x9000, responseApdu.getSW());
 
-		// pcscEid.verifyPin();
+		pcscEid.verifyPin();
 
 		// CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A,
 		// 0x9E, 0x9A, new byte[] {
