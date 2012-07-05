@@ -8,11 +8,14 @@
 		<subtitle>
 			Integrating the eID Applet within your web applications.
 		</subtitle>
+		<subtitle>
+			Version &project.version;
+		</subtitle>
 		<copyright>
 			<year>2008-2012</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>12 January 2012</releaseinfo>
+		<releaseinfo>5 July 2012</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -615,7 +618,8 @@
 				<para>
 					The eID Applet SDK contains an
 					<code>eid-applet-service-cdi</code>
-					artifact that offers initial support for CDI containers.
+					artifact that offers initial support for CDI containers. The
+					artifact does not require JBoss Seam 3.1 at run-time.
 				</para>
 			</tip>
 			<section>

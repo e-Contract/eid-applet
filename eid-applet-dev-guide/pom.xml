@@ -89,6 +89,12 @@
 						<!-- could also locate the docbook dependency and inspect its version... -->
 						<docbookVersion>1.72.0</docbookVersion>
 					</options>
+					<injections>
+						<injection>
+							<name>project.version</name>
+							<value>${project.version}</value>
+						</injection>
+					</injections>
 				</configuration>
 				<executions>
 					<execution>
