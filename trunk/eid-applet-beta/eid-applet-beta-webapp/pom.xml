@@ -7,9 +7,7 @@
 	</parent>
 	<name>FedICT eID Applet Beta Web Application</name>
 	<description>Beta Web Application for eID Applet.</description>
-	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-beta-webapp</artifactId>
-	<version>1.0.5-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<build>
 		<plugins>
@@ -74,24 +72,20 @@
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-package</artifactId>
-			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-js</artifactId>
-			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service-spi</artifactId>
-			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

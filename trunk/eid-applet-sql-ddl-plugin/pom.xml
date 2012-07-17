@@ -9,7 +9,6 @@
 	<description>SQL Data Definition Language Maven2 plugin, in sync with JBoss AS Hibernate.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-sql-ddl-plugin</artifactId>
-	<version>1.0.5-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 	<url>http://code.google.com/p/eid-applet/</url>
 	<build>
