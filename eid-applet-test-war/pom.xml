@@ -11,7 +11,6 @@
 	<description>Self-contained test Web Application for eID Applet. Targets Servlet 3.0 containers.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-test-war</artifactId>
-	<version>1.0.5-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<build>
 		<plugins>

@@ -9,9 +9,7 @@
 	</parent>
 	<name>FedICT eID Applet Test EAR</name>
 	<description>JavaEE 5 EAR for Test eID Applet Web App.</description>
-	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-test-deploy</artifactId>
-	<version>1.0.5-SNAPSHOT</version>
 	<packaging>ear</packaging>
 	<build>
 		<plugins>

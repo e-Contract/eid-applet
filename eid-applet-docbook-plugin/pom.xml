@@ -10,7 +10,6 @@
 		documentation.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-docbook-plugin</artifactId>
-	<version>1.0.5-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 	<build>
 		<plugins>

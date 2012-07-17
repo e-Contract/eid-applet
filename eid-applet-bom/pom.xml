@@ -11,7 +11,6 @@
 	<description>eID Applet Bill Of Materials.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-bom</artifactId>
-	<version>1.0.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>http://code.google.com/p/eid-applet/</url>
 	<properties>
