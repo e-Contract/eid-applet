@@ -114,7 +114,8 @@ public class SecurePinPadReaderTest {
 
 	@Before
 	public void beforeTest() throws Exception {
-		this.messages = new Messages(Locale.ENGLISH);
+		this.messages = new Messages(new Locale("fr")); 
+				//new Messages(new Locale("nl"));
 		LOG.debug("locale: " + this.messages.getLocale());
 		this.pcscEid = new PcscEid(new TestView(), this.messages);
 		if (false == this.pcscEid.isEidPresent()) {
@@ -146,7 +147,7 @@ public class SecurePinPadReaderTest {
 	 * @throws Exception
 	 */
 	@Test
-	@QualityAssurance(firmware = Firmware.V015Z, approved = false)
+	@QualityAssurance(firmware = Firmware.V015Z, approved = true)
 	public void testRegularDigestValueWithNonRepudiation() throws Exception {
 		this.pcscEid.sign("hello world".getBytes(), "SHA1");
 	}
@@ -172,7 +173,7 @@ public class SecurePinPadReaderTest {
 	 * @throws Exception
 	 */
 	@Test
-	@QualityAssurance(firmware = Firmware.V015Z, approved = false)
+	@QualityAssurance(firmware = Firmware.V015Z, approved = true)
 	public void testGetCCIDFeatures() throws Exception {
 		int ioctl;
 		String osName = System.getProperty("os.name");
