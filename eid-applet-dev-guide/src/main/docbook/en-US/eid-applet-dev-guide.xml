@@ -874,13 +874,26 @@
 				<note>
 					<title>Java EE 6 Web Profile support</title>
 					<para>
-						To support the Java EE 6 Web Profile we have foreseen the usage of
-						two types of service component lookups. The first one is JNDI
-						based. This type of service lookup allows you to utilize EJB3
-						session beans as service provider interface implementation. The
-						second type is via simple Java class name references. This type of
-						service lookup is meant for lightweight servlet container
-						environment. For example the
+						To support the Java EE 6 Web Profile we have foreseen the
+						usage of two types of service component lookups.
+					</para>
+					<para>
+						The first one is JNDI based. This type of service lookup allows
+						you to utilize EJB3 session beans as service provider interface
+						implementation. Since Java EE 6 the JNDI naming of EJB3 session
+						beans has been standardized. Refering to your component can now be
+						done via, for example,
+						<code>java:module/AuthenticationRequestServiceBean</code>
+					</para>
+					<para>
+						The second type is via simple Java class name references.
+						This type of service lookup is meant for lightweight servlet
+						container environment. The implementing class needs a default
+						constructor in order for the eID Applet Service to be able to
+						instantiate it.
+					</para>
+					<para>
+						For example the
 						<code>SignatureService</code>
 						interface implementing component can be referred to via both
 						<code>SignatureService</code>
