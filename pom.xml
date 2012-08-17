@@ -317,7 +317,7 @@
 			<dependency>
 				<groupId>org.apache.xalan</groupId>
 				<artifactId>xalan</artifactId>
-				<version>2.7.1</version>
+				<version>2.7.1-1.jbossorg</version>
 			</dependency>
 			<dependency>
 				<groupId>com.sun.xml.ws</groupId>
@@ -752,7 +752,10 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<execute>
+											<runOnIncremental>false</runOnIncremental>
+											<runOnConfiguration>true</runOnConfiguration>
+										</execute>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -836,7 +839,7 @@
 		</repository>
 		<repository>
 			<id>shibboleth</id>
-			<url>https://shibboleth.net/nexus/content/repositories/releases/</url>
+			<url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
