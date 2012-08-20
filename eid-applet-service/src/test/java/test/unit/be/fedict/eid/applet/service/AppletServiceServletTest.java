@@ -35,6 +35,7 @@ import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
@@ -110,8 +111,8 @@ public class AppletServiceServletTest {
 
 	private SubjectKeyIdentifier createSubjectKeyId(PublicKey publicKey)
 			throws IOException {
-		ByteArrayInputStream bais = new ByteArrayInputStream(publicKey
-				.getEncoded());
+		ByteArrayInputStream bais = new ByteArrayInputStream(
+				publicKey.getEncoded());
 		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo(
 				(ASN1Sequence) new ASN1InputStream(bais).readObject());
 		return new SubjectKeyIdentifier(info);
@@ -120,8 +121,8 @@ public class AppletServiceServletTest {
 	private AuthorityKeyIdentifier createAuthorityKeyId(PublicKey publicKey)
 			throws IOException {
 
-		ByteArrayInputStream bais = new ByteArrayInputStream(publicKey
-				.getEncoded());
+		ByteArrayInputStream bais = new ByteArrayInputStream(
+				publicKey.getEncoded());
 		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo(
 				(ASN1Sequence) new ASN1InputStream(bais).readObject());
 
@@ -131,9 +132,13 @@ public class AppletServiceServletTest {
 	private void persistKey(File pkcs12keyStore, PrivateKey privateKey,
 			X509Certificate certificate, char[] keyStorePassword,
 			char[] keyEntryPassword) throws KeyStoreException,
-			NoSuchAlgorithmException, CertificateException, IOException {
-		KeyStore keyStore = KeyStore.getInstance("pkcs12");
+			NoSuchAlgorithmException, CertificateException, IOException,
+			NoSuchProviderException {
+		KeyStore keyStore = KeyStore.getInstance("pkcs12",
+				BouncyCastleProvider.PROVIDER_NAME);
 		keyStore.load(null, keyStorePassword);
+		LOG.debug("keystore security provider: "
+				+ keyStore.getProvider().getName());
 		keyStore.setKeyEntry("default", privateKey, keyEntryPassword,
 				new Certificate[] { certificate });
 		FileOutputStream keyStoreOut = new FileOutputStream(pkcs12keyStore);
@@ -209,8 +214,8 @@ public class AppletServiceServletTest {
 				"CN=localhost", notBefore, notAfter);
 		File tmpP12File = File.createTempFile("ssl-", ".p12");
 		LOG.debug("p12 file: " + tmpP12File.getAbsolutePath());
-		persistKey(tmpP12File, keyPair.getPrivate(), certificate, "secret"
-				.toCharArray(), "secret".toCharArray());
+		persistKey(tmpP12File, keyPair.getPrivate(), certificate,
+				"secret".toCharArray(), "secret".toCharArray());
 
 		SslSocketConnector sslSocketConnector = new SslSocketConnector();
 		sslSocketConnector.setKeystore(tmpP12File.getAbsolutePath());
@@ -223,8 +228,8 @@ public class AppletServiceServletTest {
 		sslSocketConnector.setMaxIdleTime(30000);
 		int sslPort = getFreePort();
 		sslSocketConnector.setPort(sslPort);
-		this.servletTester.getContext().getServer().addConnector(
-				sslSocketConnector);
+		this.servletTester.getContext().getServer()
+				.addConnector(sslSocketConnector);
 		this.sslLocation = "https://localhost:" + sslPort + "/";
 
 		this.servletTester.start();
@@ -338,8 +343,8 @@ public class AppletServiceServletTest {
 		assertEquals(HttpServletResponse.SC_OK, result);
 
 		HttpSession httpSession = this.servletTester.getContext()
-				.getSessionHandler().getSessionManager().getHttpSession(
-						sessionId);
+				.getSessionHandler().getSessionManager()
+				.getHttpSession(sessionId);
 		Identity identity = (Identity) httpSession.getAttribute("eid.identity");
 		assertNotNull(identity);
 		assertEquals("Alice Geldigekaart2266", identity.firstName);
@@ -387,8 +392,8 @@ public class AppletServiceServletTest {
 		assertEquals(HttpServletResponse.SC_OK, result);
 
 		HttpSession httpSession = this.servletTester.getContext()
-				.getSessionHandler().getSessionManager().getHttpSession(
-						sessionId);
+				.getSessionHandler().getSessionManager()
+				.getHttpSession(sessionId);
 		Identity identity = (Identity) httpSession.getAttribute("eid.identity");
 		assertNotNull(identity);
 		assertEquals("Alice Geldigekaart2266", identity.firstName);
