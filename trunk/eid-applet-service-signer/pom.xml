@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.5-SNAPSHOT</version>
+		<version>1.0.5.RC1</version>
 	</parent>
 	<name>FedICT eID Applet Service Signer</name>
 	<description>Various Signer eID Applet Service implementations.</description>
