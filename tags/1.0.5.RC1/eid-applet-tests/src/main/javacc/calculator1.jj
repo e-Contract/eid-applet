@@ -1,0 +1,60 @@
+options {
+	STATIC = false;
+}
+
+PARSER_BEGIN(Calculator1)
+package be.fedict.eid.applet.tests.javacc.calc1;
+
+import java.io.PrintStream;
+	
+public class Calculator1 {
+	double previousValue = 0.0;
+}
+PARSER_END(Calculator1)
+
+SKIP : { " " }
+TOKEN : { < EOL : "\n" | "\r" | "\r\n" > }
+TOKEN : { < PLUS : "+" > }
+TOKEN : { < MINUS : "-" > }
+
+TOKEN : { < NUMBER : <DIGITS> | <DIGITS> "." <DIGITS> | <DIGITS> "." | "." <DIGITS> > }
+TOKEN : { < #DIGITS : (["0"-"9"])+ > }
+
+void Start(PrintStream printStream) throws NumberFormatException :
+{}
+{
+	(
+		previousValue = Expression()
+		<EOL>
+		{ printStream.println(previousValue); }
+	)*
+	<EOF>
+}
+
+double Expression() throws NumberFormatException :
+{
+	double i;
+	double value;
+}
+{
+	value = Primary()
+	(
+		<PLUS>
+		i = Primary()
+		{ value += i; }
+	|
+		<MINUS>
+		i = Primary()
+		{ value -= i; }
+	)*
+	{ return value; }
+}
+
+double Primary() throws NumberFormatException :
+{
+	Token t;
+}
+{
+	t = <NUMBER>
+	{ return Double.parseDouble(t.image); }
+}
