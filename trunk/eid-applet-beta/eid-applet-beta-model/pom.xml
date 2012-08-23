@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>be.fedict.eid-applet</groupId>
 		<artifactId>eid-applet-beta</artifactId>
-		<version>1.0.5.RC1</version>
+		<version>1.0.5-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet Beta Model</name>
 	<description>EJB3 Model for eID Applet Beta Web Application</description>
