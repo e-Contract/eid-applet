@@ -40,6 +40,7 @@
   * [http://www.rfc-editor.org/rfc/rfc3163.txt RFC3163 - ISO/IEC 9798-3 Authentication SASL Mechanism]
   * [http://tools.ietf.org/html/rfc5056 On the Use of Channel Bindings to Secure Channels]
   * [http://www.owasp.org/ OWASP]
+  * [http://www.w3.org/2012/webcrypto/WebCryptoAPI/ W3C Web Crypto API]
 
 
 == Belgian eID Card ==
