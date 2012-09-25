@@ -18,7 +18,8 @@ retrieved during pre-sign phase.</p>
 	};
 	var parameters = {
 		TargetPage :'sign-identity-result.jsp',
-		AppletService :'applet-service-sign-identity'
+		AppletService :'applet-service-sign-identity',
+		Language : 'nl'
 	};
 	var version = '1.6';
 	deployJava.runApplet(attributes, parameters, version);
