@@ -68,7 +68,9 @@ public class Messages {
 				"identityPhoto"), DETAILS_BUTTON("detailsButtonText"), CANCEL_BUTTON(
 				"cancelButtonText"), NO_BUTTON("noButtonText"), OK_BUTTON(
 				"okButtonText"), YES_BUTTON("yesButtonText"), CERTIFICATE_NOT_TRUSTED(
-				"certificateNotTrusted");
+				"certificateNotTrusted"), SIGNATURE_CREATION(
+				"signatureCreation"), SIGN_QUESTION("signQuestion"), SIGNATURE_ALGO(
+				"signatureAlgo");
 
 		private final String id;
 

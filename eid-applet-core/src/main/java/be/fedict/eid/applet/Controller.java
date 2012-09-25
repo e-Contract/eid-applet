@@ -825,18 +825,18 @@ public class Controller {
 		byte[] citizenCaCertFile;
 		byte[] rootCaCertFile;
 		try {
-			/*
-			 * Via next dialog we try to implement WYSIWYS using the digest
-			 * description. Also showing the digest value is pointless.
-			 */
-			// TODO DRY refactoring
+			String signatureCreationLabel = this.messages
+					.getMessage(MESSAGE_ID.SIGNATURE_CREATION);
+			String signQuestionLabel = this.messages
+					.getMessage(MESSAGE_ID.SIGN_QUESTION);
+			String signatureAlgoLabel = this.messages
+					.getMessage(MESSAGE_ID.SIGNATURE_ALGO);
 			int response = JOptionPane.showConfirmDialog(
-					this.getParentComponent(), "OK to sign \""
+					this.getParentComponent(), signQuestionLabel + " \""
 							+ signRequestMessage.description + "\"?\n"
-							+ "Signature algorithm: "
+							+ signatureAlgoLabel + ": "
 							+ signRequestMessage.digestAlgo + " with RSA",
-					"Signature creation", JOptionPane.YES_NO_OPTION);
-			// TODO i18n
+					signatureCreationLabel, JOptionPane.YES_NO_OPTION);
 			if (JOptionPane.OK_OPTION != response) {
 				throw new SecurityException("sign operation aborted");
 			}

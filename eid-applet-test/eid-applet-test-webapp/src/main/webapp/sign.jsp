@@ -21,7 +21,7 @@
 		TargetPage :'sign-result.jsp',
 		AppletService :'applet-service-sign',
 		BackgroundColor :'#ffffff',
-		Language :'en'
+		Language :'fr'
 	};
 	var version = '1.5';
 	deployJava.runApplet(attributes, parameters, version);
