@@ -88,6 +88,7 @@ import be.fedict.eid.applet.service.signer.jaxb.opc.contenttypes.CTTypes;
 import be.fedict.eid.applet.service.signer.jaxb.opc.relationships.CTRelationship;
 import be.fedict.eid.applet.service.signer.jaxb.opc.relationships.CTRelationships;
 import be.fedict.eid.applet.service.signer.jaxb.opc.relationships.ObjectFactory;
+import be.fedict.eid.applet.service.signer.jaxb.opc.relationships.STTargetMode;
 
 /**
  * Signature verifier util class for Office Open XML file format.
@@ -231,6 +232,20 @@ public class OOXMLSignatureVerifier {
 				boolean includeRelationshipInSignature = false;
 				for (CTRelationship relationship : relationshipList) {
 					String relationshipType = relationship.getType();
+					STTargetMode targetMode = relationship.getTargetMode();
+					if (null != targetMode) {
+						LOG.debug("TargetMode: " + targetMode.name());
+						if (targetMode == STTargetMode.EXTERNAL) {
+							/*
+							 * ECMA-376 Part 2 - 3rd edition
+							 * 
+							 * 13.2.4.16 Manifest Element
+							 * 
+							 * "The producer shall not create a Manifest element that references any data outside of the package."
+							 */
+							continue;
+						}
+					}
 					if (false == OOXMLSignatureFacet
 							.isSignedRelationship(relationshipType)) {
 						continue;

@@ -87,7 +87,7 @@ public class AbstractOOXMLSignatureServiceTest {
 		private final ByteArrayOutputStream signedOOXMLOutputStream;
 
 		public OOXMLTestSignatureService(URL ooxmlUrl) {
-            super(DigestAlgo.SHA1);
+			super(DigestAlgo.SHA1);
 			this.temporaryDataStorage = new TemporaryTestDataStorage();
 			this.signedOOXMLOutputStream = new ByteArrayOutputStream();
 			this.ooxmlUrl = ooxmlUrl;
@@ -166,6 +166,11 @@ public class AbstractOOXMLSignatureServiceTest {
 	@Test
 	public void testSignOffice2010() throws Exception {
 		sign("/ms-office-2010.docx");
+	}
+
+	@Test
+	public void testHyperlinkExample() throws Exception {
+		sign("/hyperlink-example.docx");
 	}
 
 	@Test
