@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.5.GA</version>
+		<version>1.0.6-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Applet Test Project</name>
 	<description>Contains an eID Applet Test Java EE web
