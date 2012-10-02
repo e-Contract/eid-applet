@@ -1,3 +1,17 @@
+1.0.5.GA - 2 Oct 2012
+	* improved exception and error handling
+	* removed PKCS#11 usage (only direct PC/SC from now on)
+	* deployJava script improvements
+	* support for new eID secure pinpad reader (transaction msg signing)
+	* support for blue card
+	* support for extra field of foreigner eID cards
+	* 2048 bit RSA support
+	* RSA-PSS support
+	* HSTS support
+	* various build system improvements
+	* i18n fixes and improvements
+	* OOXML signature fix (external targets)
+
 1.0.4.GA - 9 Dec 2011
 	* XAdES digest algo configuration
 	* XAdES c14n, namespace, XML schema fixes
