@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2008-2012 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -44,6 +44,7 @@ import be.fedict.eid.applet.service.impl.HttpServletRequestHttpReceiver;
 import be.fedict.eid.applet.service.impl.HttpServletResponseHttpTransmitter;
 import be.fedict.eid.applet.service.impl.RequestContext;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
+import be.fedict.eid.applet.service.impl.handler.AuthSignResponseMessageHandler;
 import be.fedict.eid.applet.service.impl.handler.AuthenticationDataMessageHandler;
 import be.fedict.eid.applet.service.impl.handler.ClientEnvironmentMessageHandler;
 import be.fedict.eid.applet.service.impl.handler.ContinueInsecureMessageHandler;
@@ -107,7 +108,8 @@ public class AppletServiceServlet extends HttpServlet {
 			SignatureDataMessageHandler.class,
 			FileDigestsDataMessageHandler.class,
 			ContinueInsecureMessageHandler.class,
-			SignCertificatesDataMessageHandler.class };
+			SignCertificatesDataMessageHandler.class,
+			AuthSignResponseMessageHandler.class };
 
 	private Map<Class<?>, MessageHandler<?>> messageHandlers;
 
@@ -247,8 +249,7 @@ public class AppletServiceServlet extends HttpServlet {
 		out.println("<head><title>eID Applet Service</title></head>");
 		out.println("<body>");
 		out.println("<h1>eID Applet Service</h1>");
-		out
-				.println("<p>The eID Applet Service should not be accessed directly.</p>");
+		out.println("<p>The eID Applet Service should not be accessed directly.</p>");
 		out.println("</body></html>");
 		out.close();
 	}

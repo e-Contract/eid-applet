@@ -43,7 +43,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
  * @author Frank Cornelis
  * 
  */
-@ResponsesAllowed(FinishedMessage.class)
+@ResponsesAllowed({ FinishedMessage.class, AuthSignRequestMessage.class })
 @ProtocolStateAllowed(ProtocolState.AUTHENTICATE)
 public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	@HttpHeader(TYPE_HTTP_HEADER)

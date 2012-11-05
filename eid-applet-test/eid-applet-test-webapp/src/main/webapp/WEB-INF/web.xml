@@ -637,6 +637,27 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>AuthnSignAppletServiceServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+		<init-param>
+			<param-name>AuthenticationService</param-name>
+			<param-value>test/eid/applet/model/AuthenticationServiceBean</param-value>
+		</init-param>
+		<init-param>
+			<param-name>AuthenticationSignatureService</param-name>
+			<param-value>test/eid/applet/model/AuthenticationSignatureServiceBean</param-value>
+		</init-param>
+		<init-param>
+			<param-name>IncludeCertificates</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AuthnSignAppletServiceServlet</servlet-name>
+		<url-pattern>/applet-service-authn-sign</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>PhotoServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.PhotoServlet</servlet-class>
 	</servlet>

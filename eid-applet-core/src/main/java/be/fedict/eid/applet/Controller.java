@@ -66,6 +66,8 @@ import be.fedict.eid.applet.sc.Task;
 import be.fedict.eid.applet.sc.TaskRunner;
 import be.fedict.eid.applet.shared.AdministrationMessage;
 import be.fedict.eid.applet.shared.AppletProtocolMessageCatalog;
+import be.fedict.eid.applet.shared.AuthSignRequestMessage;
+import be.fedict.eid.applet.shared.AuthSignResponseMessage;
 import be.fedict.eid.applet.shared.AuthenticationContract;
 import be.fedict.eid.applet.shared.AuthenticationDataMessage;
 import be.fedict.eid.applet.shared.AuthenticationRequestMessage;
@@ -334,6 +336,10 @@ public class Controller {
 				AuthenticationRequestMessage authnRequest = (AuthenticationRequestMessage) resultMessage;
 				resultMessage = performEidAuthnOperation(authnRequest);
 			}
+			if (resultMessage instanceof AuthSignRequestMessage) {
+				AuthSignRequestMessage authSignRequestMessage = (AuthSignRequestMessage) resultMessage;
+				resultMessage = performAuthnSignOperation(authSignRequestMessage);
+			}
 			if (resultMessage instanceof IdentificationRequestMessage) {
 				IdentificationRequestMessage identificationRequestMessage = (IdentificationRequestMessage) resultMessage;
 				addDetailMessage("include address: "
@@ -445,6 +451,37 @@ public class Controller {
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DONE);
 		this.runtime.gotoTargetPage();
 		return null;
+	}
+
+	private Object performAuthnSignOperation(
+			AuthSignRequestMessage authSignRequestMessage) throws Exception {
+		addDetailMessage("auth sign request...");
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
+		waitForEIdCardPcsc();
+
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.AUTHENTICATING);
+
+		byte[] digestValue = authSignRequestMessage.computedDigestValue;
+		String digestAlgo = authSignRequestMessage.digestAlgo;
+		String message = authSignRequestMessage.message;
+
+		int response = JOptionPane.showConfirmDialog(this.getParentComponent(),
+				message, "eID Authentication Signature",
+				JOptionPane.YES_NO_OPTION);
+		if (response != JOptionPane.YES_OPTION) {
+			throw new SecurityException("user cancelled");
+		}
+
+		try {
+			byte[] signatureValue = this.pcscEidSpi.sign(digestValue,
+					digestAlgo, PcscEid.AUTHN_KEY_ID, false);
+			AuthSignResponseMessage authSignResponseMessage = new AuthSignResponseMessage(
+					signatureValue);
+			Object responseMessage = sendMessage(authSignResponseMessage);
+			return responseMessage;
+		} finally {
+			this.pcscEidSpi.close();
+		}
 	}
 
 	private void diagnosticMode() {
@@ -908,7 +945,7 @@ public class Controller {
 		}
 	}
 
-	private FinishedMessage performEidAuthnOperation(
+	private Object performEidAuthnOperation(
 			AuthenticationRequestMessage authnRequest) throws Exception {
 		byte[] challenge = authnRequest.challenge;
 		boolean removeCard = authnRequest.removeCard;
@@ -942,6 +979,7 @@ public class Controller {
 		addDetailMessage("include certificates: " + includeCertificates);
 		addDetailMessage("include address: " + includeAddress);
 		addDetailMessage("include photo: " + includePhoto);
+
 		addDetailMessage("include integrity data: " + includeIntegrityData);
 		addDetailMessage("require secure smart card reader: "
 				+ requireSecureReader);
@@ -1167,11 +1205,7 @@ public class Controller {
 				photoData, identitySignatureData, addressSignatureData,
 				rrnCertData, encodedServerCertificate, signedTransactionMessage);
 		Object responseMessage = sendMessage(authenticationDataMessage);
-		if (false == (responseMessage instanceof FinishedMessage)) {
-			throw new RuntimeException("finish expected");
-		}
-		FinishedMessage finishedMessage = (FinishedMessage) responseMessage;
-		return finishedMessage;
+		return responseMessage;
 	}
 
 	private void printEnvironment() {

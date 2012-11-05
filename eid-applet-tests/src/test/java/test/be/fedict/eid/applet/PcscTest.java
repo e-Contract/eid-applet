@@ -214,6 +214,8 @@ public class PcscTest {
 			assertEquals(0x9000, responseAPDU.getSW());
 
 			byte[] signatureValue = responseAPDU.getData();
+			
+			LOG.debug("signature value length: " + signatureValue.length);
 
 			List<X509Certificate> authnCertificateChain = pcscEid
 					.getAuthnCertificateChain();

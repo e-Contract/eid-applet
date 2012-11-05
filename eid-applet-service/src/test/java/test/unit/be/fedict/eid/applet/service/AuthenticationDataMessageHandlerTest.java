@@ -188,6 +188,14 @@ public class AuthenticationDataMessageHandlerTest {
 				.andReturn(null);
 		EasyMock.expect(
 				mockServletConfig
+						.getInitParameter(AuthenticationDataMessageHandler.AUTHN_SIGNATURE_SERVICE_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock.expect(
+				mockServletConfig
+						.getInitParameter(AuthenticationDataMessageHandler.AUTHN_SIGNATURE_SERVICE_INIT_PARAM_NAME
+								+ "Class")).andReturn(null);
+		EasyMock.expect(
+				mockServletConfig
 						.getInitParameter(IdentityDataMessageHandler.INCLUDE_DATA_FILES))
 				.andReturn(null);
 
@@ -350,6 +358,14 @@ public class AuthenticationDataMessageHandlerTest {
 				.andReturn(null);
 		EasyMock.expect(mockServletRequest.getRemoteAddr()).andStubReturn(
 				"1.2.3.4");
+		EasyMock.expect(
+				mockServletConfig
+						.getInitParameter(AuthenticationDataMessageHandler.AUTHN_SIGNATURE_SERVICE_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock.expect(
+				mockServletConfig
+						.getInitParameter(AuthenticationDataMessageHandler.AUTHN_SIGNATURE_SERVICE_INIT_PARAM_NAME
+								+ "Class")).andReturn(null);
 
 		// prepare
 		EasyMock.replay(mockServletRequest, mockServletConfig);
@@ -506,6 +522,14 @@ public class AuthenticationDataMessageHandlerTest {
 				mockServletConfig
 						.getInitParameter(IdentityDataMessageHandler.INCLUDE_DATA_FILES))
 				.andReturn(null);
+		EasyMock.expect(
+				mockServletConfig
+						.getInitParameter(AuthenticationDataMessageHandler.AUTHN_SIGNATURE_SERVICE_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock.expect(
+				mockServletConfig
+						.getInitParameter(AuthenticationDataMessageHandler.AUTHN_SIGNATURE_SERVICE_INIT_PARAM_NAME
+								+ "Class")).andReturn(null);
 
 		// prepare
 		EasyMock.replay(mockServletRequest, mockServletConfig);
@@ -655,6 +679,14 @@ public class AuthenticationDataMessageHandlerTest {
 				mockServletConfig
 						.getInitParameter(IdentityDataMessageHandler.INCLUDE_DATA_FILES))
 				.andReturn(null);
+		EasyMock.expect(
+				mockServletConfig
+						.getInitParameter(AuthenticationDataMessageHandler.AUTHN_SIGNATURE_SERVICE_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock.expect(
+				mockServletConfig
+						.getInitParameter(AuthenticationDataMessageHandler.AUTHN_SIGNATURE_SERVICE_INIT_PARAM_NAME
+								+ "Class")).andReturn(null);
 
 		EasyMock.expect(
 				mockServletRequest
@@ -810,6 +842,14 @@ public class AuthenticationDataMessageHandlerTest {
 				mockServletConfig
 						.getInitParameter(AuthenticationDataMessageHandler.NRCID_APP_ID_INIT_PARAM_NAME))
 				.andReturn(null);
+		EasyMock.expect(
+				mockServletConfig
+						.getInitParameter(AuthenticationDataMessageHandler.AUTHN_SIGNATURE_SERVICE_INIT_PARAM_NAME))
+				.andReturn(null);
+		EasyMock.expect(
+				mockServletConfig
+						.getInitParameter(AuthenticationDataMessageHandler.AUTHN_SIGNATURE_SERVICE_INIT_PARAM_NAME
+								+ "Class")).andReturn(null);
 
 		EasyMock.expect(
 				mockServletRequest
