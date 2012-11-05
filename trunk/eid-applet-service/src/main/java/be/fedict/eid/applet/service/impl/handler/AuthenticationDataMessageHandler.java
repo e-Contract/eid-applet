@@ -63,12 +63,14 @@ import be.fedict.eid.applet.service.impl.UserIdentifierUtil;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
 import be.fedict.eid.applet.service.spi.AuditService;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
+import be.fedict.eid.applet.service.spi.AuthenticationSignatureService;
 import be.fedict.eid.applet.service.spi.CertificateSecurityException;
 import be.fedict.eid.applet.service.spi.ChannelBindingService;
 import be.fedict.eid.applet.service.spi.ExpiredCertificateSecurityException;
 import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
 import be.fedict.eid.applet.service.spi.RevokedCertificateSecurityException;
 import be.fedict.eid.applet.service.spi.TrustCertificateSecurityException;
+import be.fedict.eid.applet.shared.AuthSignRequestMessage;
 import be.fedict.eid.applet.shared.AuthenticationContract;
 import be.fedict.eid.applet.shared.AuthenticationDataMessage;
 import be.fedict.eid.applet.shared.ErrorCode;
@@ -116,6 +118,8 @@ public class AuthenticationDataMessageHandler implements
 
 	public static final String AUTHN_SERVICE_INIT_PARAM_NAME = "AuthenticationService";
 
+	public static final String AUTHN_SIGNATURE_SERVICE_INIT_PARAM_NAME = "AuthenticationSignatureService";
+
 	public static final String AUDIT_SERVICE_INIT_PARAM_NAME = "AuditService";
 
 	public static final String CHALLENGE_MAX_MATURITY_INIT_PARAM_NAME = "ChallengeMaxMaturity";
@@ -140,6 +144,9 @@ public class AuthenticationDataMessageHandler implements
 
 	@InitParam(IdentityDataMessageHandler.INCLUDE_DATA_FILES)
 	private boolean includeDataFiles;
+
+	@InitParam(AUTHN_SIGNATURE_SERVICE_INIT_PARAM_NAME)
+	private ServiceLocator<AuthenticationSignatureService> authenticationSignatureServiceLocator;
 
 	public Object handleMessage(AuthenticationDataMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
@@ -586,6 +593,30 @@ public class AuthenticationDataMessageHandler implements
 					message.addressData);
 		}
 
+		AuthenticationSignatureService authenticationSignatureService = this.authenticationSignatureServiceLocator
+				.locateService();
+		if (null != authenticationSignatureService) {
+			List<X509Certificate> authnCertificateChain;
+			if (null != message.authnCert) {
+				authnCertificateChain = new LinkedList<X509Certificate>();
+				authnCertificateChain.add(message.authnCert);
+				authnCertificateChain.add(message.citizenCaCert);
+				authnCertificateChain.add(message.rootCaCert);
+			} else {
+				authnCertificateChain = null;
+			}
+			be.fedict.eid.applet.service.spi.DigestInfo digestInfo = authenticationSignatureService
+					.preSign(authnCertificateChain);
+			if (null == digestInfo) {
+				return new FinishedMessage();
+			}
+			byte[] computedDigestValue = digestInfo.digestValue;
+			String digestAlgo = digestInfo.digestAlgo;
+			String authnMessage = digestInfo.description;
+			AuthSignRequestMessage authSignRequestMessage = new AuthSignRequestMessage(
+					computedDigestValue, digestAlgo, authnMessage);
+			return authSignRequestMessage;
+		}
 		return new FinishedMessage();
 	}
 

@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2008-2012 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -25,5 +25,5 @@ package be.fedict.eid.applet.shared.protocol;
  * 
  */
 public enum ProtocolState {
-	INIT, IDENTIFY, ENV_CHECK, AUTHENTICATE, SIGN, DIGEST, INSECURE, SIGN_CERTS
+	INIT, IDENTIFY, ENV_CHECK, AUTHENTICATE, SIGN, DIGEST, INSECURE, SIGN_CERTS, AUTH_SIGN
 }
