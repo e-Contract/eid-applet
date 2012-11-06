@@ -6,8 +6,7 @@
 </head>
 <body>
 <h1>eID Applet Authentication Demo</h1>
-<p>eID authentication that will also push the eID certificates into
-the HTTP session.</p>
+<p>eID authentication that will also create some additional protocol signature.</p>
 <script src="https://www.java.com/js/deployJava.js"></script>
 <script>
 	var attributes = {

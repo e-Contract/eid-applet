@@ -52,6 +52,10 @@
 			<artifactId>jboss-ejb3-ext-api</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.jboss.spec.javax.ejb</groupId>
+			<artifactId>jboss-ejb-api_3.1_spec</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>javax.security</groupId>
 			<artifactId>jacc</artifactId>
 		</dependency>
@@ -70,6 +74,10 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>be.fedict.commons-eid</groupId>
+			<artifactId>commons-eid-consumer</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

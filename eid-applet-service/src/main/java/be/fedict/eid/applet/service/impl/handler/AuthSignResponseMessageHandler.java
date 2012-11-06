@@ -28,7 +28,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import be.fedict.eid.applet.service.impl.AuthenticationSignatureContextImpl;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
+import be.fedict.eid.applet.service.spi.AuthenticationSignatureContext;
 import be.fedict.eid.applet.service.spi.AuthenticationSignatureService;
 import be.fedict.eid.applet.shared.AuthSignResponseMessage;
 import be.fedict.eid.applet.shared.FinishedMessage;
@@ -58,7 +60,10 @@ public class AuthSignResponseMessageHandler implements
 
 		AuthenticationSignatureService authenticationSignatureService = this.authenticationSignatureServiceLocator
 				.locateService();
-		authenticationSignatureService.postSign(signatureValue, null);
+		AuthenticationSignatureContext authenticationSignatureContext = new AuthenticationSignatureContextImpl(
+				session);
+		authenticationSignatureService.postSign(signatureValue, null,
+				authenticationSignatureContext);
 
 		FinishedMessage finishedMessage = new FinishedMessage();
 		return finishedMessage;

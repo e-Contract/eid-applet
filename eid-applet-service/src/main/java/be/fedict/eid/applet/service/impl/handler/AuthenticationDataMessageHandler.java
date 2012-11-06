@@ -57,12 +57,14 @@ import be.fedict.eid.applet.service.EIdCertsData;
 import be.fedict.eid.applet.service.EIdData;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.impl.AuthenticationChallenge;
+import be.fedict.eid.applet.service.impl.AuthenticationSignatureContextImpl;
 import be.fedict.eid.applet.service.impl.RequestContext;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.impl.UserIdentifierUtil;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
 import be.fedict.eid.applet.service.spi.AuditService;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
+import be.fedict.eid.applet.service.spi.AuthenticationSignatureContext;
 import be.fedict.eid.applet.service.spi.AuthenticationSignatureService;
 import be.fedict.eid.applet.service.spi.CertificateSecurityException;
 import be.fedict.eid.applet.service.spi.ChannelBindingService;
@@ -605,8 +607,11 @@ public class AuthenticationDataMessageHandler implements
 			} else {
 				authnCertificateChain = null;
 			}
+			AuthenticationSignatureContext authenticationSignatureContext = new AuthenticationSignatureContextImpl(
+					session);
 			be.fedict.eid.applet.service.spi.DigestInfo digestInfo = authenticationSignatureService
-					.preSign(authnCertificateChain);
+					.preSign(authnCertificateChain,
+							authenticationSignatureContext);
 			if (null == digestInfo) {
 				return new FinishedMessage();
 			}

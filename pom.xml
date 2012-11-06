@@ -204,6 +204,11 @@
 				<version>1.1.1</version>
 			</dependency>
 			<dependency>
+                <groupId>org.jboss.spec.javax.ejb</groupId>
+                <artifactId>jboss-ejb-api_3.1_spec</artifactId>
+                <version>1.0.0.Beta2</version>
+            </dependency>
+			<dependency>
 				<groupId>javax.security</groupId>
 				<artifactId>jacc</artifactId>
 				<version>1.1</version>
@@ -505,6 +510,11 @@
 				<groupId>javax.enterprise</groupId>
 				<artifactId>cdi-api</artifactId>
 				<version>1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>be.fedict.commons-eid</groupId>
+				<artifactId>commons-eid-consumer</artifactId>
+				<version>0.2.1</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -870,6 +880,13 @@
 		<repository>
 			<id>ow2-legacy-maven-repo</id>
 			<url>http://repository.ow2.org/nexus/content/repositories/ow2-legacy/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>e-contract-maven-repo</id>
+			<url>https://www.e-contract.be/maven2/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>

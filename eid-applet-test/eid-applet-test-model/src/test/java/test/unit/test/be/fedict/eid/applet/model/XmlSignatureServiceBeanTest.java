@@ -101,15 +101,10 @@ import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
 import org.apache.xpath.XPathAPI;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.DistributionPoint;
-import org.bouncycastle.asn1.x509.DistributionPointName;
 import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -225,7 +220,7 @@ public class XmlSignatureServiceBeanTest {
 		DateTime notAfter = notBefore.plusYears(1);
 		X509Certificate certificate = generateCertificate(keyPair.getPublic(),
 				"CN=Test", notBefore, notAfter, null, keyPair.getPrivate(),
-				true, 0, null, null, new KeyUsage(KeyUsage.nonRepudiation));
+				true, 0, null, new KeyUsage(KeyUsage.nonRepudiation));
 
 		xmlSignature.addKeyInfo(certificate);
 
@@ -332,7 +327,7 @@ public class XmlSignatureServiceBeanTest {
 		DateTime notAfter = notBefore.plusYears(1);
 		X509Certificate certificate = generateCertificate(keyPair.getPublic(),
 				"CN=Test", notBefore, notAfter, null, keyPair.getPrivate(),
-				true, 0, null, null, new KeyUsage(KeyUsage.nonRepudiation));
+				true, 0, null, new KeyUsage(KeyUsage.nonRepudiation));
 
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
 				.newInstance();
@@ -444,8 +439,8 @@ public class XmlSignatureServiceBeanTest {
 
 	private SubjectKeyIdentifier createSubjectKeyId(PublicKey publicKey)
 			throws IOException {
-		ByteArrayInputStream bais = new ByteArrayInputStream(publicKey
-				.getEncoded());
+		ByteArrayInputStream bais = new ByteArrayInputStream(
+				publicKey.getEncoded());
 		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo(
 				(ASN1Sequence) new ASN1InputStream(bais).readObject());
 		return new SubjectKeyIdentifier(info);
@@ -454,8 +449,8 @@ public class XmlSignatureServiceBeanTest {
 	private AuthorityKeyIdentifier createAuthorityKeyId(PublicKey publicKey)
 			throws IOException {
 
-		ByteArrayInputStream bais = new ByteArrayInputStream(publicKey
-				.getEncoded());
+		ByteArrayInputStream bais = new ByteArrayInputStream(
+				publicKey.getEncoded());
 		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo(
 				(ASN1Sequence) new ASN1InputStream(bais).readObject());
 
@@ -465,10 +460,9 @@ public class XmlSignatureServiceBeanTest {
 	private X509Certificate generateCertificate(PublicKey subjectPublicKey,
 			String subjectDn, DateTime notBefore, DateTime notAfter,
 			X509Certificate issuerCertificate, PrivateKey issuerPrivateKey,
-			boolean caFlag, int pathLength, String crlUri, String ocspUri,
-			KeyUsage keyUsage) throws IOException, InvalidKeyException,
-			IllegalStateException, NoSuchAlgorithmException,
-			SignatureException, CertificateException {
+			boolean caFlag, int pathLength, String ocspUri, KeyUsage keyUsage)
+			throws IOException, InvalidKeyException, IllegalStateException,
+			NoSuchAlgorithmException, SignatureException, CertificateException {
 		String signatureAlgorithm = "SHA1withRSA";
 		X509V3CertificateGenerator certificateGenerator = new X509V3CertificateGenerator();
 		certificateGenerator.reset();
@@ -506,18 +500,6 @@ public class XmlSignatureServiceBeanTest {
 						X509Extensions.BasicConstraints, false,
 						new BasicConstraints(pathLength));
 			}
-		}
-
-		if (null != crlUri) {
-			GeneralName gn = new GeneralName(
-					GeneralName.uniformResourceIdentifier, new DERIA5String(
-							crlUri));
-			GeneralNames gns = new GeneralNames(new DERSequence(gn));
-			DistributionPointName dpn = new DistributionPointName(0, gns);
-			DistributionPoint distp = new DistributionPoint(dpn, null, null);
-			certificateGenerator.addExtension(
-					X509Extensions.CRLDistributionPoints, false,
-					new DERSequence(distp));
 		}
 
 		if (null != ocspUri) {
@@ -560,7 +542,7 @@ public class XmlSignatureServiceBeanTest {
 		DateTime notAfter = notBefore.plusYears(1);
 		X509Certificate certificate = generateCertificate(keyPair.getPublic(),
 				"CN=Test", notBefore, notAfter, null, keyPair.getPrivate(),
-				true, 0, null, null, new KeyUsage(KeyUsage.nonRepudiation));
+				true, 0, null, new KeyUsage(KeyUsage.nonRepudiation));
 
 		byte[] toBeSigned = "hello world".getBytes();
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
@@ -584,8 +566,8 @@ public class XmlSignatureServiceBeanTest {
 				handler, false);
 
 		Capture<String> xmlDocumentCapture = new Capture<String>();
-		mockHttpSession.setAttribute(EasyMock.eq("xmlDocument"), EasyMock
-				.capture(xmlDocumentCapture));
+		mockHttpSession.setAttribute(EasyMock.eq("xmlDocument"),
+				EasyMock.capture(xmlDocumentCapture));
 
 		// prepare
 		EasyMock.replay(mockHttpServletRequest, mockHttpSession);
@@ -621,8 +603,8 @@ public class XmlSignatureServiceBeanTest {
 				mockHttpSession);
 		EasyMock.expect(mockHttpSession.getAttribute("xmlDocument")).andReturn(
 				xmlDocumentCapture.getValue());
-		mockHttpSession.setAttribute(EasyMock.eq("xmlDocument"), EasyMock
-				.capture(xmlDocumentCapture));
+		mockHttpSession.setAttribute(EasyMock.eq("xmlDocument"),
+				EasyMock.capture(xmlDocumentCapture));
 
 		// prepare
 		EasyMock.replay(mockHttpServletRequest, mockHttpSession);
