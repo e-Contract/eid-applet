@@ -19,6 +19,11 @@
 				<configuration>
 					<modules>
 						<jarModule>
+							<groupId>be.fedict.commons-eid</groupId>
+							<artifactId>commons-eid-consumer</artifactId>
+							<includeInApplicationXml>true</includeInApplicationXml>
+						</jarModule>
+						<jarModule>
 							<groupId>be.fedict.eid-applet</groupId>
 							<artifactId>eid-applet-service-spi</artifactId>
 							<includeInApplicationXml>true</includeInApplicationXml>
@@ -49,6 +54,10 @@
 		</plugins>
 	</build>
 	<dependencies>
+		<dependency>
+			<groupId>be.fedict.commons-eid</groupId>
+			<artifactId>commons-eid-consumer</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service-spi</artifactId>
@@ -83,6 +92,11 @@
 		<dependency>
 			<groupId>org.jboss.ejb3</groupId>
 			<artifactId>jboss-ejb3-ext-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.spec.javax.ejb</groupId>
+			<artifactId>jboss-ejb-api_3.1_spec</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

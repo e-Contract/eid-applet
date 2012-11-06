@@ -36,9 +36,12 @@ public interface AuthenticationSignatureService {
 	 * 
 	 * @param authnCertificateChain
 	 *            the authentication certificate chain.
+	 * @param authenticationSignatureContext
+	 *            the context
 	 * @return the digest info structure.
 	 */
-	DigestInfo preSign(List<X509Certificate> authnCertificateChain);
+	DigestInfo preSign(List<X509Certificate> authnCertificateChain,
+			AuthenticationSignatureContext authenticationSignatureContext);
 
 	/**
 	 * Via this method your receive the signature as created via the eID Applet
@@ -49,7 +52,10 @@ public interface AuthenticationSignatureService {
 	 *            the signature value.
 	 * @param authnCertificateChain
 	 *            the authentication certificate chain.
+	 * @param authenticationSignatureContext
+	 *            the context.
 	 */
 	void postSign(byte[] signatureValue,
-			List<X509Certificate> authnCertificateChain);
+			List<X509Certificate> authnCertificateChain,
+			AuthenticationSignatureContext authenticationSignatureContext);
 }

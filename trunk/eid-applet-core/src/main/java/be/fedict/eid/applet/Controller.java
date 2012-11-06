@@ -463,7 +463,8 @@ public class Controller {
 
 		byte[] digestValue = authSignRequestMessage.computedDigestValue;
 		String digestAlgo = authSignRequestMessage.digestAlgo;
-		String message = authSignRequestMessage.message;
+		String stdMsg = this.messages.getMessage(MESSAGE_ID.PROTOCOL_SIGNATURE);
+		String message = stdMsg + "\n" + authSignRequestMessage.message;
 
 		int response = JOptionPane.showConfirmDialog(this.getParentComponent(),
 				message, "eID Authentication Signature",

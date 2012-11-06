@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2010 FedICT.
+ * Copyright (C) 2008-2012 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -70,7 +70,7 @@ public class Messages {
 				"okButtonText"), YES_BUTTON("yesButtonText"), CERTIFICATE_NOT_TRUSTED(
 				"certificateNotTrusted"), SIGNATURE_CREATION(
 				"signatureCreation"), SIGN_QUESTION("signQuestion"), SIGNATURE_ALGO(
-				"signatureAlgo");
+				"signatureAlgo"), PROTOCOL_SIGNATURE("protocolSignature");
 
 		private final String id;
 

@@ -18,10 +18,15 @@
 
 package test.be.fedict.eid.applet.model;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.KeyStore;
+import java.security.Security;
+import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 
 import javax.ejb.Local;
 import javax.ejb.Stateless;
@@ -30,11 +35,13 @@ import javax.security.jacc.PolicyContextException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.ejb3.annotation.LocalBinding;
 
+import be.fedict.commons.eid.consumer.jca.ProxyPrivateKey;
+import be.fedict.commons.eid.consumer.jca.ProxyProvider;
+import be.fedict.eid.applet.service.spi.AuthenticationSignatureContext;
 import be.fedict.eid.applet.service.spi.AuthenticationSignatureService;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 
@@ -47,25 +54,80 @@ public class AuthenticationSignatureServiceBean implements
 	private static final Log LOG = LogFactory
 			.getLog(AuthenticationSignatureServiceBean.class);
 
-	public DigestInfo preSign(List<X509Certificate> authnCertificateChain) {
+	static {
+		/*
+		 * Quick-and-dirty work-around. We should explicitly handle the
+		 * lifecycle of this security provider so we can redeploy the
+		 * application multiple times.
+		 */
+		Security.addProvider(new ProxyProvider());
+	}
+
+	public DigestInfo preSign(List<X509Certificate> authnCertificateChain,
+			AuthenticationSignatureContext authenticationSignatureContext) {
 		LOG.debug("preSign");
 		LOG.debug("authn cert chain size: " + authnCertificateChain.size());
-		byte[] wsSecurityData = "ws-security".getBytes();
-		MessageDigest messageDigest;
+
+		KeyStore proxyKeyStore;
+		final ProxyPrivateKey proxyPrivateKey;
 		try {
-			messageDigest = MessageDigest.getInstance("SHA-1");
-		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("SHA-1 error: " + e.getMessage(), e);
+			proxyKeyStore = KeyStore.getInstance("ProxyBeID");
+			proxyKeyStore.load(null);
+			proxyPrivateKey = (ProxyPrivateKey) proxyKeyStore.getKey(
+					"Signature", null);
+		} catch (Exception e) {
+			throw new RuntimeException("error loading ProxyBeID keystore");
 		}
-		byte[] digestValue = messageDigest.digest(wsSecurityData);
-		DigestInfo digestInfo = new DigestInfo(digestValue, "SHA-1",
+
+		FutureTask<String> signTask = new FutureTask<String>(
+				new Callable<String>() {
+					public String call() throws Exception {
+						final Signature signature = Signature
+								.getInstance("SHA256withRSA");
+						signature.initSign(proxyPrivateKey);
+
+						final byte[] toBeSigned = "hello world".getBytes();
+						signature.update(toBeSigned);
+						final byte[] signatureValue = signature.sign();
+						LOG.debug("received signature value");
+						return "signature result";
+					}
+
+				});
+		final ExecutorService executor = Executors.newFixedThreadPool(1);
+		executor.execute(signTask);
+
+		authenticationSignatureContext.store("key", proxyPrivateKey);
+		authenticationSignatureContext.store("signTask", signTask);
+
+		byte[] digestValue;
+		try {
+			digestValue = proxyPrivateKey.getDigestInfo().getDigestValue();
+		} catch (InterruptedException e) {
+			throw new RuntimeException("signature error: " + e.getMessage(), e);
+		}
+		DigestInfo digestInfo = new DigestInfo(digestValue, "SHA-256",
 				"WS-Security message");
 		return digestInfo;
 	}
 
 	public void postSign(byte[] signatureValue,
-			List<X509Certificate> authnCertificateChain) {
+			List<X509Certificate> authnCertificateChain,
+			AuthenticationSignatureContext authenticationSignatureContext) {
 		LOG.debug("postSign: " + (signatureValue != null));
+
+		ProxyPrivateKey proxyPrivateKey = (ProxyPrivateKey) authenticationSignatureContext
+				.load("key");
+		proxyPrivateKey.setSignatureValue(signatureValue);
+
+		FutureTask<String> signTask = (FutureTask<String>) authenticationSignatureContext
+				.load("signTask");
+		String signatureResult;
+		try {
+			signatureResult = signTask.get();
+		} catch (Exception e) {
+			throw new RuntimeException("sign task error: " + e.getMessage(), e);
+		}
 
 		HttpServletRequest httpServletRequest;
 		try {
@@ -77,6 +139,6 @@ public class AuthenticationSignatureServiceBean implements
 
 		HttpSession httpSession = httpServletRequest.getSession();
 		httpSession.setAttribute("AuthenticationSignatureValue",
-				Hex.encodeHexString(signatureValue));
+				signatureResult);
 	}
 }
