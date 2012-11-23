@@ -80,9 +80,9 @@ public class PKCS11Test {
 		configWriter.println("library=/usr/lib/libbeidpkcs11.so.0");
 		configWriter.println("slotListIndex=1");
 
+		SunPKCS11 provider = new SunPKCS11(tmpConfigFile.getAbsolutePath());
+		Security.addProvider(provider);
 		{
-			SunPKCS11 provider = new SunPKCS11(tmpConfigFile.getAbsolutePath());
-			Security.addProvider(provider);
 			KeyStore keyStore = KeyStore.getInstance("PKCS11", provider);
 			keyStore.load(null, null);
 			PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore
@@ -92,15 +92,15 @@ public class PKCS11Test {
 			byte[] toBeSigned = "hello world".getBytes();
 			signature.update(toBeSigned);
 			byte[] signatureValue = signature.sign();
-			Security.removeProvider(provider.getName());
 
 		}
 		JOptionPane.showMessageDialog(null,
 				"Please remove and re-insert the token...");
+		Security.removeProvider(provider.getName());
 		{
-			SunPKCS11 provider = new SunPKCS11(tmpConfigFile.getAbsolutePath());
-			Security.addProvider(provider);
-			KeyStore keyStore = KeyStore.getInstance("PKCS11", provider);
+			SunPKCS11 provider2 = new SunPKCS11(tmpConfigFile.getAbsolutePath());
+			Security.addProvider(provider2);
+			KeyStore keyStore = KeyStore.getInstance("PKCS11", provider2);
 			keyStore.load(null, null);
 			PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore
 					.getEntry("Authentication", null);
@@ -109,8 +109,7 @@ public class PKCS11Test {
 			byte[] toBeSigned = "hello world".getBytes();
 			signature.update(toBeSigned);
 			byte[] signatureValue = signature.sign();
-			Security.removeProvider(provider.getName());
+			Security.removeProvider(provider2.getName());
 		}
 	}
-
 }
