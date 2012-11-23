@@ -50,6 +50,7 @@ import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -151,6 +152,9 @@ public class PcscTest {
 		signature.update(challenge);
 		boolean result = signature.verify(signatureValue);
 		assertTrue(result);
+		LOG.debug("sha1 hex: "
+				+ DigestUtils.shaHex(authnCertChain.get(0).getPublicKey()
+						.getEncoded()));
 	}
 
 	@Test
@@ -214,7 +218,7 @@ public class PcscTest {
 			assertEquals(0x9000, responseAPDU.getSW());
 
 			byte[] signatureValue = responseAPDU.getData();
-			
+
 			LOG.debug("signature value length: " + signatureValue.length);
 
 			List<X509Certificate> authnCertificateChain = pcscEid
@@ -818,14 +822,40 @@ public class PcscTest {
 			pcscEidSpi.waitForEidPresent();
 		}
 		byte[] identityFile;
+		File tmpIdentitySignatureFile;
+		File tmpRRNCertFile;
+		File tmpPhotoFile;
+		File tmpAddressFile;
+		File tmpAddressSignatureFile;
 		try {
 			identityFile = pcscEidSpi.readFile(PcscEid.IDENTITY_FILE_ID);
+			byte[] identitySignatureData = pcscEidSpi
+					.readFile(PcscEid.IDENTITY_SIGN_FILE_ID);
+			tmpIdentitySignatureFile = File.createTempFile("identity-sign-",
+					".der");
+			FileUtils.writeByteArrayToFile(tmpIdentitySignatureFile,
+					identitySignatureData);
+			byte[] rrnCertData = pcscEidSpi.readFile(PcscEid.RRN_CERT_FILE_ID);
+			tmpRRNCertFile = File.createTempFile("rrn-cert-", ".der");
+			FileUtils.writeByteArrayToFile(tmpRRNCertFile, rrnCertData);
+
+			tmpPhotoFile = File.createTempFile("test-photo-", ".jpg");
+			FileUtils.writeByteArrayToFile(tmpPhotoFile,
+					pcscEidSpi.readFile(PcscEid.PHOTO_FILE_ID));
+
+			tmpAddressFile = File.createTempFile("test-address-", ".tlv");
+			FileUtils.writeByteArrayToFile(tmpAddressFile,
+					pcscEidSpi.readFile(PcscEid.ADDRESS_FILE_ID));
+
+			tmpAddressSignatureFile = File.createTempFile("test-address-sign-",
+					".der");
+			FileUtils.writeByteArrayToFile(tmpAddressSignatureFile,
+					pcscEidSpi.readFile(PcscEid.ADDRESS_SIGN_FILE_ID));
 		} finally {
 			pcscEidSpi.close();
 		}
 		LOG.debug("identity file size: " + identityFile.length);
 		File tmpIdentityFile = File.createTempFile("identity-", ".tlv");
-		LOG.debug("tmp identity file: " + tmpIdentityFile.getAbsolutePath());
 		FileUtils.writeByteArrayToFile(tmpIdentityFile, identityFile);
 		Identity identity = TlvParser.parse(identityFile, Identity.class);
 		LOG.debug("DoB: " + identity.getDateOfBirth().getTime());
@@ -833,6 +863,14 @@ public class PcscTest {
 		LOG.debug("noble condition: " + identity.getNobleCondition());
 		LOG.debug("special status: " + identity.getSpecialStatus());
 		LOG.debug("duplicate: " + identity.getDuplicate());
+		LOG.debug("tmp identity file: " + tmpIdentityFile.getAbsolutePath());
+		LOG.debug("tmp identity signature file: "
+				+ tmpIdentitySignatureFile.getAbsolutePath());
+		LOG.debug("tmp RRN cert file: " + tmpRRNCertFile.getAbsolutePath());
+		LOG.debug("tmp photo file: " + tmpPhotoFile.getAbsolutePath());
+		LOG.debug("tmp address file: " + tmpAddressFile.getAbsolutePath());
+		LOG.debug("tmp address signature file: "
+				+ tmpAddressSignatureFile.getAbsolutePath());
 	}
 
 	@Test
