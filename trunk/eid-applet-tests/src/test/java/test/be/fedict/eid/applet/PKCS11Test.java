@@ -57,7 +57,8 @@ public class PKCS11Test {
 			signature.update(toBeSigned);
 			byte[] signatureValue = signature.sign();
 		}
-		JOptionPane.showMessageDialog(null, "Please remove and re-insert the token...");
+		JOptionPane.showMessageDialog(null,
+				"Please remove and re-insert the token...");
 		{
 			PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore
 					.getEntry("Authentication", null);
@@ -66,6 +67,49 @@ public class PKCS11Test {
 			byte[] toBeSigned = "hello world".getBytes();
 			signature.update(toBeSigned);
 			byte[] signatureValue = signature.sign();
+		}
+	}
+
+	@Test
+	public void testTokenHasBeenRemovedWorkaround() throws Exception {
+		File tmpConfigFile = File.createTempFile("pkcs11-", "conf");
+		tmpConfigFile.deleteOnExit();
+		PrintWriter configWriter = new PrintWriter(new FileOutputStream(
+				tmpConfigFile), true);
+		configWriter.println("name=SmartCard");
+		configWriter.println("library=/usr/lib/libbeidpkcs11.so.0");
+		configWriter.println("slotListIndex=1");
+
+		{
+			SunPKCS11 provider = new SunPKCS11(tmpConfigFile.getAbsolutePath());
+			Security.addProvider(provider);
+			KeyStore keyStore = KeyStore.getInstance("PKCS11", provider);
+			keyStore.load(null, null);
+			PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore
+					.getEntry("Authentication", null);
+			Signature signature = Signature.getInstance("SHA1withRSA");
+			signature.initSign(privateKeyEntry.getPrivateKey());
+			byte[] toBeSigned = "hello world".getBytes();
+			signature.update(toBeSigned);
+			byte[] signatureValue = signature.sign();
+			Security.removeProvider(provider.getName());
+
+		}
+		JOptionPane.showMessageDialog(null,
+				"Please remove and re-insert the token...");
+		{
+			SunPKCS11 provider = new SunPKCS11(tmpConfigFile.getAbsolutePath());
+			Security.addProvider(provider);
+			KeyStore keyStore = KeyStore.getInstance("PKCS11", provider);
+			keyStore.load(null, null);
+			PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore
+					.getEntry("Authentication", null);
+			Signature signature = Signature.getInstance("SHA1withRSA");
+			signature.initSign(privateKeyEntry.getPrivateKey());
+			byte[] toBeSigned = "hello world".getBytes();
+			signature.update(toBeSigned);
+			byte[] signatureValue = signature.sign();
+			Security.removeProvider(provider.getName());
 		}
 	}
 
