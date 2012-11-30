@@ -379,7 +379,8 @@ public class IdentityDataMessageHandlerTest {
 					mockServletRequest, mockHttpSession);
 			fail();
 		} catch (ServletException e) {
-			LOG.debug("expected exception: " + e.getMessage());
+			LOG.debug("expected exception: " + e.getMessage(), e);
+			LOG.debug("exception type: " + e.getClass().getName());
 			// verify
 			EasyMock.verify(mockServletConfig, mockHttpSession,
 					mockServletRequest);

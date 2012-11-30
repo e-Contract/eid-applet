@@ -396,6 +396,12 @@ public class IdentityDataMessageHandler implements
 				throw new ServletException("signature incorrect");
 			}
 		} catch (SignatureException e) {
+			AuditService auditService = this.auditServiceLocator
+					.locateService();
+			if (null != auditService) {
+				String remoteAddress = request.getRemoteAddr();
+				auditService.identityIntegrityError(remoteAddress);
+			}
 			throw new ServletException("signature error: " + e.getMessage(), e);
 		}
 	}
