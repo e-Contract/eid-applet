@@ -85,6 +85,9 @@ import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jcp.xml.dsig.internal.dom.DOMReference;
+import org.apache.jcp.xml.dsig.internal.dom.DOMXMLSignature;
+import org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI;
 import org.apache.xml.security.Init;
 import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -97,8 +100,6 @@ import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xpath.XPathAPI;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.jcp.xml.dsig.internal.dom.DOMReference;
-import org.jcp.xml.dsig.internal.dom.DOMXMLSignature;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.w3c.dom.Attr;
@@ -210,6 +211,7 @@ public class AbstractXmlSignatureServiceTest {
 		document.appendChild(rootElement);
 		Element dataElement = document.createElementNS("urn:test", "tns:data");
 		dataElement.setAttributeNS(null, "Id", "id-1234");
+		dataElement.setIdAttribute("Id", true);
 		dataElement.setTextContent("data to be signed");
 		rootElement.appendChild(dataElement);
 
@@ -642,11 +644,12 @@ public class AbstractXmlSignatureServiceTest {
 		document.appendChild(rootElement);
 		Element dataElement = document.createElementNS("urn:test", "tns:data");
 		dataElement.setAttributeNS(null, "Id", "id-1234");
+		dataElement.setIdAttribute("Id", true);
 		dataElement.setTextContent("data to be signed");
 		rootElement.appendChild(dataElement);
 
 		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
-				"DOM", new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
+				"DOM", new XMLDSigRI());
 
 		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(),
 				document.getDocumentElement());
@@ -712,7 +715,7 @@ public class AbstractXmlSignatureServiceTest {
 		rootElement.appendChild(dataElement);
 
 		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
-				"DOM", new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
+				"DOM", new XMLDSigRI());
 
 		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(),
 				document.getDocumentElement());
@@ -786,7 +789,7 @@ public class AbstractXmlSignatureServiceTest {
 		rootElement.appendChild(dataElement);
 
 		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
-				"DOM", new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
+				"DOM", new XMLDSigRI());
 
 		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(),
 				document.getDocumentElement());

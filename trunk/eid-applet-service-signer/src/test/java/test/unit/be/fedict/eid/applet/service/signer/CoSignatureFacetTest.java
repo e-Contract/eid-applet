@@ -39,6 +39,7 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -61,7 +62,7 @@ public class CoSignatureFacetTest {
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 
 		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
-				"DOM", new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
+				"DOM", new XMLDSigRI());
 
 		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(),
 				document.getDocumentElement());
@@ -119,7 +120,7 @@ public class CoSignatureFacetTest {
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 
 		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
-				"DOM", new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
+				"DOM", new XMLDSigRI());
 
 		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(),
 				document.getDocumentElement());
@@ -179,7 +180,7 @@ public class CoSignatureFacetTest {
 		KeyPair keyPair2 = PkiTestUtils.generateKeyPair();
 
 		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
-				"DOM", new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
+				"DOM", new XMLDSigRI());
 		List<Reference> references = new LinkedList<Reference>();
 
 		CoSignatureFacet testedInstance = new CoSignatureFacet();
