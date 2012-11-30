@@ -24,10 +24,12 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.DERInteger;
+import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
+import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import org.bouncycastle.asn1.util.ASN1Dump;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.DigestInfo;
@@ -64,8 +66,16 @@ public class DerTest {
 		DigestInfo digestInfo = new DigestInfo(new AlgorithmIdentifier(
 				hashAlgoId), digest);
 		byte[] encodedDigestInfo = digestInfo.getEncoded();
+		String strValue = new String(Hex.encodeHex(encodedDigestInfo));
 		LOG.debug("Digest Info: "
-				+ new String(Hex.encodeHex(encodedDigestInfo)));
+				+ strValue.substring(0, strValue.length() - 20 * 2));
+
+		DigestInfo nullParamDigestInfo = new DigestInfo(
+				new AlgorithmIdentifier(hashAlgoId, DERNull.INSTANCE), digest);
+		String nullStrValue = new String(Hex.encodeHex(nullParamDigestInfo
+				.getEncoded()));
+		LOG.debug("Digest Info: "
+				+ nullStrValue.substring(0, nullStrValue.length() - 20 * 2));
 	}
 
 	@Test
@@ -103,7 +113,7 @@ public class DerTest {
 		LOG.debug("Digest: " + new String(Hex.encodeHex(digest)));
 		DERObjectIdentifier hashAlgoId = NISTObjectIdentifiers.id_sha256;
 		DigestInfo digestInfo = new DigestInfo(new AlgorithmIdentifier(
-				hashAlgoId), digest);
+				hashAlgoId, DERNull.INSTANCE), digest);
 		byte[] encodedDigestInfo = digestInfo.getEncoded();
 		LOG.debug("Digest Info: "
 				+ new String(Hex.encodeHex(encodedDigestInfo)));
@@ -117,7 +127,7 @@ public class DerTest {
 		LOG.debug("Digest: " + new String(Hex.encodeHex(digest)));
 		DERObjectIdentifier hashAlgoId = NISTObjectIdentifiers.id_sha384;
 		DigestInfo digestInfo = new DigestInfo(new AlgorithmIdentifier(
-				hashAlgoId), digest);
+				hashAlgoId, DERNull.INSTANCE), digest);
 		byte[] encodedDigestInfo = digestInfo.getEncoded();
 		LOG.debug("Digest Info: "
 				+ new String(Hex.encodeHex(encodedDigestInfo)));
@@ -131,7 +141,7 @@ public class DerTest {
 		LOG.debug("Digest: " + new String(Hex.encodeHex(digest)));
 		DERObjectIdentifier hashAlgoId = NISTObjectIdentifiers.id_sha512;
 		DigestInfo digestInfo = new DigestInfo(new AlgorithmIdentifier(
-				hashAlgoId), digest);
+				hashAlgoId, DERNull.INSTANCE), digest);
 		byte[] encodedDigestInfo = digestInfo.getEncoded();
 		LOG.debug("Digest Info: "
 				+ new String(Hex.encodeHex(encodedDigestInfo)));
@@ -146,7 +156,7 @@ public class DerTest {
 		LOG.debug("Digest: " + new String(Hex.encodeHex(digest)));
 		DERObjectIdentifier hashAlgoId = NISTObjectIdentifiers.id_sha224;
 		DigestInfo digestInfo = new DigestInfo(new AlgorithmIdentifier(
-				hashAlgoId), digest);
+				hashAlgoId, DERNull.INSTANCE), digest);
 		byte[] encodedDigestInfo = digestInfo.getEncoded();
 		LOG.debug("Digest Info: "
 				+ new String(Hex.encodeHex(encodedDigestInfo)));
@@ -161,7 +171,7 @@ public class DerTest {
 		LOG.debug("Digest: " + new String(Hex.encodeHex(digest)));
 		DERObjectIdentifier hashAlgoId = X509ObjectIdentifiers.ripemd160;
 		DigestInfo digestInfo = new DigestInfo(new AlgorithmIdentifier(
-				hashAlgoId), digest);
+				hashAlgoId, DERNull.INSTANCE), digest);
 		byte[] encodedDigestInfo = digestInfo.getEncoded();
 		LOG.debug("Digest Info: "
 				+ new String(Hex.encodeHex(encodedDigestInfo)));
@@ -174,9 +184,9 @@ public class DerTest {
 				new BouncyCastleProvider());
 		byte[] digest = messageDigest.digest(message);
 		LOG.debug("Digest: " + new String(Hex.encodeHex(digest)));
-		DERObjectIdentifier hashAlgoId = new DERObjectIdentifier("1.3.36.3.2.2");
+		DERObjectIdentifier hashAlgoId = TeleTrusTObjectIdentifiers.ripemd128;
 		DigestInfo digestInfo = new DigestInfo(new AlgorithmIdentifier(
-				hashAlgoId), digest);
+				hashAlgoId, DERNull.INSTANCE), digest);
 		byte[] encodedDigestInfo = digestInfo.getEncoded();
 		LOG.debug("Digest Info: "
 				+ new String(Hex.encodeHex(encodedDigestInfo)));
@@ -191,7 +201,7 @@ public class DerTest {
 		LOG.debug("Digest: " + new String(Hex.encodeHex(digest)));
 		DERObjectIdentifier hashAlgoId = new DERObjectIdentifier("1.3.36.3.2.3");
 		DigestInfo digestInfo = new DigestInfo(new AlgorithmIdentifier(
-				hashAlgoId), digest);
+				hashAlgoId, DERNull.INSTANCE), digest);
 		byte[] encodedDigestInfo = digestInfo.getEncoded();
 		LOG.debug("Digest Info: "
 				+ new String(Hex.encodeHex(encodedDigestInfo)));

@@ -57,6 +57,12 @@
 		<dependency>
 			<groupId>be.fedict.commons-eid</groupId>
 			<artifactId>commons-eid-consumer</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bcprov-jdk15on</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>

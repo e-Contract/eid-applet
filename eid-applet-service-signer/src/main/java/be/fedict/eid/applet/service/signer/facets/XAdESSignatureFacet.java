@@ -413,8 +413,13 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
 		}
-		Node qualifyingPropertiesNode = marshallNode.getFirstChild();
-		return qualifyingPropertiesNode;
+		Element qualifyingPropertiesElement = (Element) marshallNode
+				.getFirstChild();
+		Element signedPropertiesElement = (Element) qualifyingPropertiesElement
+				.getElementsByTagNameNS("http://uri.etsi.org/01903/v1.3.2#",
+						"SignedProperties").item(0);
+		signedPropertiesElement.setIdAttribute("Id", true);
+		return qualifyingPropertiesElement;
 	}
 
 	/**

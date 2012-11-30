@@ -57,7 +57,8 @@ import javax.xml.crypto.dsig.keyinfo.X509Data;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jcp.xml.dsig.internal.dom.DOMKeyInfo;
+import org.apache.jcp.xml.dsig.internal.dom.DOMKeyInfo;
+import org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -118,7 +119,8 @@ public class KeyInfoSignatureFacet implements SignatureFacet {
 		/*
 		 * Construct the ds:KeyInfo element using JSR 105.
 		 */
-		KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance();
+		KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM",
+				new XMLDSigRI());
 		List<Object> x509DataObjects = new LinkedList<Object>();
 		X509Certificate signingCertificate = signingCertificateChain.get(0);
 

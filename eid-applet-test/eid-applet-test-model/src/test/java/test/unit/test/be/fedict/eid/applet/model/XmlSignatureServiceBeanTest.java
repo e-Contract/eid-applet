@@ -87,6 +87,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jcp.xml.dsig.internal.dom.DOMSignedInfo;
+import org.apache.jcp.xml.dsig.internal.dom.DOMXMLSignature;
+import org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI;
 import org.apache.xml.security.Init;
 import org.apache.xml.security.algorithms.MessageDigestAlgorithm;
 import org.apache.xml.security.c14n.Canonicalizer;
@@ -114,8 +117,6 @@ import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.jcp.xml.dsig.internal.dom.DOMSignedInfo;
-import org.jcp.xml.dsig.internal.dom.DOMXMLSignature;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
@@ -289,7 +290,7 @@ public class XmlSignatureServiceBeanTest {
 		Document document = documentBuilder.newDocument();
 
 		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
-				"DOM", new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
+				"DOM", new XMLDSigRI());
 
 		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(),
 				document);
@@ -337,7 +338,7 @@ public class XmlSignatureServiceBeanTest {
 		Document document = documentBuilder.newDocument();
 
 		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
-				"DOM", new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
+				"DOM", new XMLDSigRI());
 
 		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(),
 				document);

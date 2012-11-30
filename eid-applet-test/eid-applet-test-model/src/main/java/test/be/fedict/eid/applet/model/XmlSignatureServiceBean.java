@@ -65,11 +65,12 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jcp.xml.dsig.internal.dom.DOMSignedInfo;
+import org.apache.jcp.xml.dsig.internal.dom.DOMXMLSignature;
+import org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.utils.Base64;
 import org.jboss.ejb3.annotation.LocalBinding;
-import org.jcp.xml.dsig.internal.dom.DOMSignedInfo;
-import org.jcp.xml.dsig.internal.dom.DOMXMLSignature;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -197,7 +198,7 @@ public class XmlSignatureServiceBean implements SignatureService {
 		Document document = documentBuilder.newDocument();
 
 		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
-				"DOM", new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
+				"DOM", new XMLDSigRI());
 
 		Key key = new Key() {
 			private static final long serialVersionUID = 1L;
