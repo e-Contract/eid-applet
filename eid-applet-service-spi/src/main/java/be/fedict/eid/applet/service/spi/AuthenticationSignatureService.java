@@ -40,7 +40,7 @@ public interface AuthenticationSignatureService {
 	 *            the context
 	 * @return the digest info structure.
 	 */
-	DigestInfo preSign(List<X509Certificate> authnCertificateChain,
+	PreSignResult preSign(List<X509Certificate> authnCertificateChain,
 			AuthenticationSignatureContext authenticationSignatureContext);
 
 	/**

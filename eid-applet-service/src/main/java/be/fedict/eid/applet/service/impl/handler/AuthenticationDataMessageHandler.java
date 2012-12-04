@@ -70,6 +70,7 @@ import be.fedict.eid.applet.service.spi.CertificateSecurityException;
 import be.fedict.eid.applet.service.spi.ChannelBindingService;
 import be.fedict.eid.applet.service.spi.ExpiredCertificateSecurityException;
 import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
+import be.fedict.eid.applet.service.spi.PreSignResult;
 import be.fedict.eid.applet.service.spi.RevokedCertificateSecurityException;
 import be.fedict.eid.applet.service.spi.TrustCertificateSecurityException;
 import be.fedict.eid.applet.shared.AuthSignRequestMessage;
@@ -609,17 +610,18 @@ public class AuthenticationDataMessageHandler implements
 			}
 			AuthenticationSignatureContext authenticationSignatureContext = new AuthenticationSignatureContextImpl(
 					session);
-			be.fedict.eid.applet.service.spi.DigestInfo digestInfo = authenticationSignatureService
+			PreSignResult preSignResult = authenticationSignatureService
 					.preSign(authnCertificateChain,
 							authenticationSignatureContext);
-			if (null == digestInfo) {
+			if (null == preSignResult) {
 				return new FinishedMessage();
 			}
-			byte[] computedDigestValue = digestInfo.digestValue;
-			String digestAlgo = digestInfo.digestAlgo;
-			String authnMessage = digestInfo.description;
+			boolean logoff = preSignResult.getLogoff();
+			byte[] computedDigestValue = preSignResult.getDigestInfo().digestValue;
+			String digestAlgo = preSignResult.getDigestInfo().digestAlgo;
+			String authnMessage = preSignResult.getDigestInfo().description;
 			AuthSignRequestMessage authSignRequestMessage = new AuthSignRequestMessage(
-					computedDigestValue, digestAlgo, authnMessage);
+					computedDigestValue, digestAlgo, authnMessage, logoff);
 			return authSignRequestMessage;
 		}
 		return new FinishedMessage();
