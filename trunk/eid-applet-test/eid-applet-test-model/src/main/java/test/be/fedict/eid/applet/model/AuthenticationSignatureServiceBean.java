@@ -44,6 +44,7 @@ import be.fedict.commons.eid.consumer.jca.ProxyProvider;
 import be.fedict.eid.applet.service.spi.AuthenticationSignatureContext;
 import be.fedict.eid.applet.service.spi.AuthenticationSignatureService;
 import be.fedict.eid.applet.service.spi.DigestInfo;
+import be.fedict.eid.applet.service.spi.PreSignResult;
 
 @Stateless
 @Local(AuthenticationSignatureService.class)
@@ -63,7 +64,7 @@ public class AuthenticationSignatureServiceBean implements
 		Security.addProvider(new ProxyProvider());
 	}
 
-	public DigestInfo preSign(List<X509Certificate> authnCertificateChain,
+	public PreSignResult preSign(List<X509Certificate> authnCertificateChain,
 			AuthenticationSignatureContext authenticationSignatureContext) {
 		LOG.debug("preSign");
 		LOG.debug("authn cert chain size: " + authnCertificateChain.size());
@@ -108,7 +109,8 @@ public class AuthenticationSignatureServiceBean implements
 		}
 		DigestInfo digestInfo = new DigestInfo(digestValue, "SHA-256",
 				"WS-Security message");
-		return digestInfo;
+		PreSignResult preSignResult = new PreSignResult(digestInfo, true);
+		return preSignResult;
 	}
 
 	public void postSign(byte[] signatureValue,

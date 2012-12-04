@@ -49,6 +49,9 @@ public class AuthSignRequestMessage extends AbstractProtocolMessage {
 	@NotNull
 	public String message;
 
+	@HttpHeader(HTTP_HEADER_PREFIX + "Logoff")
+	public boolean logoff;
+
 	@HttpBody
 	@NotNull
 	@Description("The computed digest value to be signed using the authentication certificate.")
@@ -59,9 +62,10 @@ public class AuthSignRequestMessage extends AbstractProtocolMessage {
 	}
 
 	public AuthSignRequestMessage(byte[] computedDigestValue,
-			String digestAlgo, String message) {
+			String digestAlgo, String message, boolean logoff) {
 		this.computedDigestValue = computedDigestValue;
 		this.digestAlgo = digestAlgo;
 		this.message = message;
+		this.logoff = logoff;
 	}
 }

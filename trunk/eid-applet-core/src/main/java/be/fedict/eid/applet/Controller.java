@@ -463,6 +463,7 @@ public class Controller {
 
 		byte[] digestValue = authSignRequestMessage.computedDigestValue;
 		String digestAlgo = authSignRequestMessage.digestAlgo;
+		boolean logoff = authSignRequestMessage.logoff;
 		String stdMsg = this.messages.getMessage(MESSAGE_ID.PROTOCOL_SIGNATURE);
 		String message = stdMsg + "\n" + authSignRequestMessage.message;
 
@@ -476,6 +477,9 @@ public class Controller {
 		try {
 			byte[] signatureValue = this.pcscEidSpi.sign(digestValue,
 					digestAlgo, PcscEid.AUTHN_KEY_ID, false);
+			if (logoff) {
+				this.pcscEidSpi.logoff();
+			}
 			AuthSignResponseMessage authSignResponseMessage = new AuthSignResponseMessage(
 					signatureValue);
 			Object responseMessage = sendMessage(authSignResponseMessage);
