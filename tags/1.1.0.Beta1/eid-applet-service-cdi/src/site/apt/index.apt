@@ -1,0 +1,5 @@
+eID Applet Service CDI
+
+  This artifact holds CDI components to ease access to the eID data produced by the eID Applet Service.
+  
+  {{{./apidocs/index.html}Javadoc}}

@@ -1,0 +1,81 @@
+options {
+	STATIC = false;
+}
+
+PARSER_BEGIN(Calculator2)
+package be.fedict.eid.applet.tests.javacc.calc2;
+
+import java.io.PrintStream;
+	
+public class Calculator2 {
+	double previousValue = 0.0;
+}
+PARSER_END(Calculator2)
+
+SKIP : { " " }
+TOKEN : { < EOL : "\n" | "\r" | "\r\n" > }
+TOKEN : { < PLUS : "+" > }
+TOKEN : { < MINUS : "-" > }
+TOKEN : { < TIMES : "*" > }
+TOKEN : { < DIVIDE : "/" > }
+
+TOKEN : { < NUMBER : <DIGITS> | <DIGITS> "." <DIGITS> | <DIGITS> "." | "." <DIGITS> > }
+TOKEN : { < #DIGITS : (["0"-"9"])+ > }
+
+void Start(PrintStream printStream) throws NumberFormatException :
+{}
+{
+	(
+		previousValue = Expression()
+		<EOL>
+		{ printStream.println(previousValue); }
+	)*
+	<EOF>
+}
+
+double Expression() throws NumberFormatException :
+{
+	double i;
+	double value;
+}
+{
+	value = Term()
+	(
+		<PLUS>
+		i = Term()
+		{ value += i; }
+	|
+		<MINUS>
+		i = Term()
+		{ value -= i; }
+	)*
+	{ return value; }
+}
+
+double Term() throws NumberFormatException :
+{
+	double i;
+	double value;
+}
+{
+	value = Primary()
+	(
+		<TIMES>
+		i = Primary()
+		{ value *= i; }
+	|
+		<DIVIDE>
+		i = Primary()
+		{ value /= i; }
+	)*
+	{ return value; }
+}
+
+double Primary() throws NumberFormatException :
+{
+	Token t;
+}
+{
+	t = <NUMBER>
+	{ return Double.parseDouble(t.image); }
+}
