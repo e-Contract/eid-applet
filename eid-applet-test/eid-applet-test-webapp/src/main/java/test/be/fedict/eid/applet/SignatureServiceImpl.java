@@ -20,9 +20,13 @@ package test.be.fedict.eid.applet;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.Security;
+import java.security.Signature;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.security.jacc.PolicyContext;
 import javax.security.jacc.PolicyContextException;
@@ -48,10 +52,21 @@ public class SignatureServiceImpl implements SignatureService {
 	private static final Log LOG = LogFactory
 			.getLog(SignatureServiceImpl.class);
 
+	private static Map<String, String> digestAlgoToSignAlgo;
+
 	static {
 		if (null == Security.getProvider(BouncyCastleProvider.PROVIDER_NAME)) {
 			Security.addProvider(new BouncyCastleProvider());
 		}
+		digestAlgoToSignAlgo = new HashMap<String, String>();
+		digestAlgoToSignAlgo.put("SHA-1", "SHA1withRSA");
+		digestAlgoToSignAlgo.put("SHA-224", "SHA224withRSA");
+		digestAlgoToSignAlgo.put("SHA-256", "SHA256withRSA");
+		digestAlgoToSignAlgo.put("SHA-384", "SHA384withRSA");
+		digestAlgoToSignAlgo.put("SHA-512", "SHA512withRSA");
+		digestAlgoToSignAlgo.put("RIPEMD128", "RIPEMD128withRSA");
+		digestAlgoToSignAlgo.put("RIPEMD160", "RIPEMD160withRSA");
+		digestAlgoToSignAlgo.put("RIPEMD256", "RIPEMD256withRSA");
 	}
 
 	public void postSign(byte[] signatureValue,
@@ -63,6 +78,24 @@ public class SignatureServiceImpl implements SignatureService {
 		HttpSession session = getHttpSession();
 		session.setAttribute("SignatureValue", signatureValueStr);
 		session.setAttribute("SigningCertificateChain", signingCertificateChain);
+
+		boolean signatureValid = false;
+		String toBeSigned = (String) session.getAttribute("toBeSigned");
+		LOG.debug("to be signed: " + toBeSigned);
+		String digestAlgo = (String) session.getAttribute("digestAlgo");
+		String signAlgo = digestAlgoToSignAlgo.get(digestAlgo);
+
+		try {
+			Signature signature = Signature.getInstance(signAlgo,
+					BouncyCastleProvider.PROVIDER_NAME);
+			signature.initVerify(signingCertificateChain.get(0).getPublicKey());
+			signature.update(toBeSigned.getBytes());
+			signatureValid = signature.verify(signatureValue);
+		} catch (Exception e) {
+			LOG.error("error validating the signature: " + e.getMessage(), e);
+		}
+
+		session.setAttribute("SignatureValid", signatureValid);
 	}
 
 	public DigestInfo preSign(List<DigestInfo> digestInfos,
@@ -72,6 +105,7 @@ public class SignatureServiceImpl implements SignatureService {
 
 		HttpSession session = getHttpSession();
 		String toBeSigned = (String) session.getAttribute("toBeSigned");
+		LOG.debug("to be signed: " + toBeSigned);
 		String digestAlgo = (String) session.getAttribute("digestAlgo");
 		LOG.debug("digest algo: " + digestAlgo);
 
@@ -82,8 +116,14 @@ public class SignatureServiceImpl implements SignatureService {
 					.substring(0, digestAlgo.indexOf("-PSS"));
 			LOG.debug("java digest algo: " + javaDigestAlgo);
 		}
-		MessageDigest messageDigest = MessageDigest.getInstance(javaDigestAlgo,
-				new BouncyCastleProvider());
+		MessageDigest messageDigest;
+		try {
+			messageDigest = MessageDigest.getInstance(javaDigestAlgo,
+					BouncyCastleProvider.PROVIDER_NAME);
+		} catch (NoSuchProviderException e) {
+			throw new RuntimeException("bouncycastle error: " + e.getMessage(),
+					e);
+		}
 		byte[] digestValue = messageDigest.digest(toBeSigned.getBytes());
 
 		String description = "Test Text Document";

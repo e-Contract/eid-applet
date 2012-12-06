@@ -11,6 +11,7 @@
 <pre>
 <%=session.getAttribute("SignatureValue")%>
 </pre>
+<p>Signature Valid: <%=session.getAttribute("SignatureValid")%></p>
 <p>Signing Certificate Chain:</p>
 <pre>
 <%=session.getAttribute("SigningCertificateChain")%>
