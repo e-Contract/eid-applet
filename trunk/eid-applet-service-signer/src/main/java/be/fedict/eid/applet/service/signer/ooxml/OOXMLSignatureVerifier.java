@@ -621,6 +621,9 @@ public class OOXMLSignatureVerifier {
 				if (null == findReferenceFromURI(refs, relationshipReferenceURI)) {
 					LOG.error("Did not find relationship ref: \""
 							+ relationshipReferenceURI + "\"");
+					if (relationshipReferenceURI.startsWith("/customXml")) {
+						continue;
+					}
 					return false;
 				}
 			}
