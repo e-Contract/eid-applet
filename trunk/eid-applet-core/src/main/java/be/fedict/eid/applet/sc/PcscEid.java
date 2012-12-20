@@ -888,6 +888,9 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	private void verifyPin(Integer directPinVerifyFeature,
 			Integer verifyPinStartFeature) throws IOException, CardException,
 			InterruptedException {
+		if (isWindows8()) {
+			this.card.endExclusive();
+		}
 		ResponseAPDU responseApdu;
 		int retriesLeft = -1;
 		do {
@@ -915,6 +918,9 @@ public class PcscEid extends Observable implements PcscEidSpi {
 				this.view.addDetailMessage("retries left: " + retriesLeft);
 			}
 		} while (0x9000 != responseApdu.getSW());
+		if (isWindows8()) {
+			this.card.beginExclusive();
+		}
 	}
 
 	private ResponseAPDU verifyPin(int retriesLeft,
@@ -1246,6 +1252,10 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			throw new SecurityException("not a secure reader");
 		}
 
+		if (isWindows8()) {
+			this.card.endExclusive();
+		}
+		
 		int retriesLeft = -1;
 		ResponseAPDU responseApdu;
 		do {
@@ -1280,6 +1290,10 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			}
 		} while (0x9000 != responseApdu.getSW());
 		this.dialogs.showPinChanged();
+		
+		if (isWindows8()) {
+			this.card.beginExclusive();
+		}
 	}
 
 	private ResponseAPDU doChangePinStartFinish(int retriesLeft,
@@ -1431,6 +1445,10 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		if (requireSecureReader && null == directPinVerifyFeature) {
 			throw new SecurityException("not a secure reader");
 		}
+		
+		if (isWindows8()) {
+			this.card.endExclusive();
+		}
 
 		ResponseAPDU responseApdu;
 		int retriesLeft = -1;
@@ -1461,6 +1479,10 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			}
 		} while (0x9000 != responseApdu.getSW());
 		this.dialogs.showPinUnblocked();
+		
+		if (isWindows8()) {
+			this.card.beginExclusive();
+		}
 	}
 
 	private ResponseAPDU doUnblockPin(int retriesLeft) throws CardException {
@@ -1892,8 +1914,13 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		return signature;
 	}
 
-	public static boolean isOSX() {
+	public boolean isOSX() {
 		String osName = System.getProperty("os.name");
 		return osName.contains("OS X");
+	}
+	
+	public boolean isWindows8() {
+		String osName = System.getProperty("os.name");
+		return osName.contains("Windows 8");
 	}
 }
