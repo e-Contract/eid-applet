@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2008-2012 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -139,7 +139,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	private final TerminalFactory terminalFactory;
 
-	private final CardTerminals cardTerminals;
+	private List<CardTerminal> cardTerminalList;
 
 	private Dialogs dialogs;
 
@@ -149,7 +149,6 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		this.view = view;
 		linuxPcscliteLibraryConfig();
 		this.terminalFactory = TerminalFactory.getDefault();
-		this.cardTerminals = this.terminalFactory.terminals();
 		this.dialogs = new Dialogs(this.view, messages);
 		this.locale = messages.getLocale();
 	}
@@ -331,8 +330,14 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	public boolean hasCardReader() {
 		try {
-			List<CardTerminal> cardTerminalList = this.cardTerminals.list();
-			return false == cardTerminalList.isEmpty();
+			TerminalFactory factory = TerminalFactory.getDefault();
+			CardTerminals cardTerminals = factory.terminals();
+			List<CardTerminal> terminalList = cardTerminals.list();
+			if (!terminalList.isEmpty()) {
+				cardTerminalList = terminalList;
+				return true;
+			}
+			return false;
 		} catch (CardException e) {
 			this.view.addDetailMessage("card terminals list error: "
 					+ e.getMessage());
@@ -341,47 +346,71 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	}
 
 	public void waitForCardReader() {
-		while (false == hasCardReader()) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
+
+		try {
+			TerminalFactory terminalFactory = TerminalFactory.getDefault();
+			CardTerminals terminals = terminalFactory.terminals();
+
+			List<CardTerminal> terminalList = terminals.list();
+			while (terminalList.isEmpty()) {
+				view.addDetailMessage("no reader found yet, wait a bit...");
+				Thread.sleep(2000);
+				terminals = terminalFactory.terminals();
+				terminalList = terminals.list();
 			}
+
+			cardTerminalList = terminalList;
+			view.addDetailMessage("reader found...");
+		} catch (CardException e) {
+			this.view.addDetailMessage("card terminals list error: "
+					+ e.getMessage());
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
 	public boolean isEidPresent() throws CardException {
-		List<CardTerminal> cardTerminalList;
-		try {
-			cardTerminalList = this.cardTerminals.list();
-		} catch (CardException e) {
-			this.view.addDetailMessage("card terminals list error: "
-					+ e.getMessage());
-			this.view.addDetailMessage("no card readers connected?");
-			Throwable cause = e.getCause();
-			if (null != cause) {
-				/*
-				 * Windows can give us a sun.security.smartcardio.PCSCException
-				 * SCARD_E_NO_READERS_AVAILABLE when no card readers are
-				 * connected to the system.
-				 */
-				this.view.addDetailMessage("cause: " + cause.getMessage());
-				this.view.addDetailMessage("cause type: "
-						+ cause.getClass().getName());
-				if ("SCARD_E_NO_READERS_AVAILABLE".equals(cause.getMessage())) {
+
+		if (null == cardTerminalList || cardTerminalList.isEmpty()) {
+
+			try {
+				cardTerminalList = terminalFactory.terminals().list();
+			} catch (CardException e) {
+				this.view.addDetailMessage("card terminals list error: "
+						+ e.getMessage());
+				this.view.addDetailMessage("no card readers connected?");
+				Throwable cause = e.getCause();
+				if (null != cause) {
 					/*
-					 * Windows platform.
+					 * Windows can give us a
+					 * sun.security.smartcardio.PCSCException
+					 * SCARD_E_NO_READERS_AVAILABLE when no card readers are
+					 * connected to the system.
 					 */
-					this.view.addDetailMessage("no reader available");
+					this.view.addDetailMessage("cause: " + cause.getMessage());
+					this.view.addDetailMessage("cause type: "
+							+ cause.getClass().getName());
+					if ("SCARD_E_NO_READERS_AVAILABLE".equals(cause
+							.getMessage())) {
+						/*
+						 * Windows platform.
+						 */
+						this.view.addDetailMessage("no reader available");
+					}
 				}
+				return false;
 			}
-			return false;
+
 		}
+
 		Set<CardTerminal> eIDCardTerminals = new HashSet<CardTerminal>();
 		for (CardTerminal cardTerminal : cardTerminalList) {
 			this.view.addDetailMessage("Scanning card terminal: "
 					+ cardTerminal.getName());
-			if (cardTerminal.isCardPresent()) {
+			// on OS X isCardPresent or waitForxxx calls on the card terminal
+			// don't work
+			// you need to connect to it to see if there is a card present...
+			if (cardTerminal.isCardPresent() || isOSX()) {
 				Card card;
 				try {
 					/*
@@ -577,37 +606,52 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	public void waitForEidPresent() throws CardException, InterruptedException {
 		while (true) {
-			try {
-				this.cardTerminals.waitForChange();
-			} catch (CardException e) {
-				this.view.addDetailMessage("card error: " + e.getMessage());
-				Throwable cause = e.getCause();
-				if (null != cause) {
-					if ("SCARD_E_NO_READERS_AVAILABLE".equals(cause
-							.getMessage())) {
-						/*
-						 * sun.security.smartcardio.PCSCException
-						 * 
-						 * Windows platform.
-						 */
-						this.view.addDetailMessage("no readers available.");
-					}
-				}
+
+			if (isOSX()) {
+
+				// on OS X, waitForChange does not work to detect a card, only
+				// way is to try to connect to it and see what happens
 				this.view.addDetailMessage("sleeping...");
 				Thread.sleep(1000);
-			} catch (IllegalStateException e) {
-				this.view.addDetailMessage("no terminals at all. sleeping...");
-				this.view
-						.addDetailMessage("Maybe you should connect a smart card reader?");
-				if (System.getProperty("os.name").startsWith("Linux")) {
-					this.view
-							.addDetailMessage("Maybe the pcscd service is not running?");
+				if (isEidPresent()) {
+					return;
 				}
-				Thread.sleep(1000);
-			}
-			Thread.sleep(50); // SCARD_E_SHARING_VIOLATION fix
-			if (isEidPresent()) {
-				return;
+
+			} else {
+
+				try {
+					terminalFactory.terminals().waitForChange();
+				} catch (CardException e) {
+					this.view.addDetailMessage("card error: " + e.getMessage());
+					Throwable cause = e.getCause();
+					if (null != cause) {
+						if ("SCARD_E_NO_READERS_AVAILABLE".equals(cause
+								.getMessage())) {
+							/*
+							 * sun.security.smartcardio.PCSCException
+							 * 
+							 * Windows platform.
+							 */
+							this.view.addDetailMessage("no readers available.");
+						}
+					}
+					this.view.addDetailMessage("sleeping...");
+					Thread.sleep(1000);
+				} catch (IllegalStateException e) {
+					this.view
+							.addDetailMessage("no terminals at all. sleeping...");
+					this.view
+							.addDetailMessage("Maybe you should connect a smart card reader?");
+					if (System.getProperty("os.name").startsWith("Linux")) {
+						this.view
+								.addDetailMessage("Maybe the pcscd service is not running?");
+					}
+					Thread.sleep(1000);
+				}
+				Thread.sleep(50); // SCARD_E_SHARING_VIOLATION fix
+				if (isEidPresent()) {
+					return;
+				}
 			}
 		}
 	}
@@ -1846,5 +1890,10 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			}
 		}
 		return signature;
+	}
+
+	public static boolean isOSX() {
+		String osName = System.getProperty("os.name");
+		return osName.contains("OS X");
 	}
 }
