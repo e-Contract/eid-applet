@@ -28,6 +28,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.Arrays;
 
 import javax.swing.Box;
@@ -84,7 +87,7 @@ public class Dialogs {
 			mainPanel.add(Box.createVerticalStrut(5));
 		}
 
-		JPasswordField puk1Field = new JPasswordField(8);
+		final JPasswordField puk1Field = new JPasswordField(8);
 		{
 			Box puk1Panel = Box.createHorizontalBox();
 			JLabel puk1Label = new JLabel("eID PUK1:");
@@ -382,6 +385,14 @@ public class Dialogs {
 
 		dialog.pack();
 		dialog.setLocationRelativeTo(this.view.getParentComponent());
+		
+		dialog.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent e) {
+				passwordField.requestFocus();
+			}
+		});
+		
 		dialog.setVisible(true);
 		// setVisible will wait until some button or so has been pressed
 
