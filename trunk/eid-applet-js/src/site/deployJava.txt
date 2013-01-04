@@ -70,6 +70,52 @@ var deployJava = function() {
         hattrs.events);
     var applet_valid_attrs = hattrs.applet.concat(hattrs.core);
 
+    // generic log function, use console.log unless it isn't available
+    // then revert to alert()
+    function log(message) {
+        if ( ! rv.debug ) {return};
+
+        if (console.log) {
+            console.log(message);
+        } else {
+            alert(message);
+        }
+    }
+
+    //checks where given version string matches query
+    //
+    //NB: assume format is correct. Can add format check later if needed
+    // from dtjava.js
+    function versionCheckEx(query, version) {
+        if (query == null || query.length == 0) return true;
+
+        var c = query.charAt(query.length - 1);
+
+        //if it is not explicit pattern but does not have update version then need to append *
+        if (c != '+' && c != '*' && (query.indexOf('_') != -1 && c != '_')) {
+            query = query + "*";
+            c = '*';
+        }
+
+        query = query.substring(0, query.length - 1);
+        //if query ends with ".", "_" then we want to strip it to allow match of "1.6.*" to shorter form such as "1.6"
+        //TODO: add support for match of "1.7.0*" to "1.7"?
+        if (query.length > 0) {
+            var z = query.charAt(query.length - 1);
+            if (z == '.' || z == '_') {
+                query = query.substring(0, query.length - 1);
+            }
+        }
+        if (c == '*') {
+            //it is match if version starts from it
+            return (version.indexOf(query) == 0);
+        } else if (c == '+') {
+            //match if query string is lexicographically smaller
+            return query <= version;
+        }
+        return false;
+    }
+
     function getWebStartLaunchIconURL() {
         var imageUrl = '//java.com/js/webstart.png';
         try {
@@ -96,11 +142,55 @@ var deployJava = function() {
     function isValidObjectAttr(attr) {
         return arHas(object_valid_attrs, attr.toLowerCase());
     }
+
+    /** 
+     * returns true if we can enable DT plugin auto-install without chance of
+     * deadlock on cert mismatch dialog
+     *
+     * requestedJREVersion param is optional - if null, it will be
+     * treated as installing any JRE version
+     * 
+     * DT plugin for 6uX only knows about JRE installer signed by SUN cert.
+     * If it encounter Oracle signed JRE installer, it will have chance of
+     * deadlock when running with IE.  This function is to guard against this.
+     */
+    function enableWithoutCertMisMatchWorkaround(requestedJREVersion) {
+
+       // Non-IE browser are okay
+       if ('MSIE' != deployJava.browserName) return true;
+
+       // if DT plugin is 10.0.0 or above, return true
+       // This is because they are aware of both SUN and Oracle signature and
+       // will not show cert mismatch dialog that might cause deadlock
+       if (deployJava.compareVersionToPattern(deployJava.getPlugin().version, 
+                                     ["10", "0", "0"], false, true)) {
+          return true;
+       }
+
+       // If we got there, DT plugin is 6uX
+
+       if (requestedJREVersion  == null) {
+          // if requestedJREVersion is not defined - it means ANY.
+          // can not guarantee it is safe to install ANY version because 6uX 
+          // DT does not know about Oracle certificates and may deadlock
+          return false;
+       }
+
+       // 6u32 or earlier JRE installer used Sun certificate
+       // 6u33+ uses Oracle's certificate
+       // DT in JRE6 does not know about Oracle certificate => can only 
+       // install 6u32 or earlier without risk of deadlock
+       return !versionCheckEx("1.6.0_33+", requestedJREVersion);
+    }
+
     /* HTML attribute filters */
 
     var rv = {
 
     debug: null,
+
+    /* version of deployJava.js */
+    version: "20120801",
 
     firefoxJavaVersion: null,
 
@@ -116,9 +206,6 @@ var deployJava = function() {
 
     // GetJava page
     getJavaURL: 'http://jdl.sun.com/webapps/getjava/BrowserRedirect?host=java.com',
-
-    // Apple redirect page
-    appleRedirectPage: 'http://www.apple.com/support/downloads/',
 
     // mime-type of the DeployToolkit plugin object
     oldMimeType: 'application/npruntime-scriptable-plugin;DeploymentToolkit',
@@ -196,7 +283,7 @@ var deployJava = function() {
 
         if (this.debug) {
             for (var i = 0; i < list.length; ++i) {
-                alert('We claim to have detected Java SE ' + list[i]);
+                log('[getJREs()] We claim to have detected Java SE ' + list[i]);
             }
         }
 
@@ -223,7 +310,8 @@ var deployJava = function() {
      */
     installJRE: function(requestVersion, installCallback) {
         var ret = false;
-        if (this.isPluginInstalled() && this.isAutoInstallEnabled()) {
+        if (this.isPluginInstalled() && 
+            this.isAutoInstallEnabled(requestVersion)) {
             var installSucceeded = false;
             if (this.isCallbackSupported()) {
                installSucceeded = 
@@ -243,20 +331,28 @@ var deployJava = function() {
             return this.installLatestJRE();
         }
     },
- 
+
     /** 
-     * returns true if jre auto install is enabled for the local system; 
-     * false otherwise
+     * returns true if jre auto install for the requestedJREVersion is enabled 
+     * for the local system; false otherwise
+     *
+     * requestedJREVersion param is optional - if not specified, it will be
+     * treated as installing any JRE version
      * 
-     * we disabled auto install for IE browser and DT plugin version before 
-     * 10.0.0 due to a bug in old DT plugin (missing Oracle signature check
-     * that leads to possible deadlock when trying to show warning dialog)
+     * DT plugin for 6uX only knows about JRE installer signed by SUN cert.
+     * If it encounter Oracle signed JRE installer, it will have chance of
+     * deadlock when running with IE.  This function is to guard against this.
      */
-    isAutoInstallEnabled: function() {
-       return this.isPluginInstalled() && 
-          ('MSIE' != this.browserName ||
-          this.compareVersionToPattern(this.getPlugin().version, 
-                                       ["10", "0", "0"], false, true));
+    isAutoInstallEnabled: function(requestedJREVersion) {
+       // if no DT plugin, return false
+       if (!this.isPluginInstalled()) return false;
+
+       if (typeof requestedJREVersion  == 'undefined') {
+           requestedJREVersion = null;
+       }
+
+       return enableWithoutCertMisMatchWorkaround(requestedJREVersion);
+
     },
 
     /** 
@@ -378,11 +474,11 @@ var deployJava = function() {
 
         if (matchData != null) {
             var browser = this.getBrowser();
-            if ((browser != '?') && ('Safari' != this.browserName2)) {
+            if (browser != '?') {
                 if (this.versionCheck(minimumVersion + '+')) {
                     this.writeAppletTag(attributes, parameters);
                 } else if (this.installJRE(minimumVersion + '+')) {
-                    // after successfull install we need to refresh page to pick
+                    // after successful install we need to refresh page to pick
                     // pick up new plugin
                     this.refresh();
                     location.href = document.location;
@@ -393,10 +489,8 @@ var deployJava = function() {
                 this.writeAppletTag(attributes, parameters);
             }
         } else {
-            if (this.debug) {
-                alert('Invalid minimumVersion argument to runApplet():' +
+            log('[runApplet()] Invalid minimumVersion argument to runApplet():' +
                       minimumVersion);
-            }
         }
     },
 
@@ -460,7 +554,7 @@ var deployJava = function() {
 
         document.write(startApplet + '\n' + params + '\n' + endApplet);
     },
-
+  
 
      /**
       * Returns true if there is a matching JRE version currently installed
@@ -542,8 +636,10 @@ var deployJava = function() {
 
             return false;
         } else {
-            alert('Invalid versionPattern passed to versionCheck: ' +
-                  versionPattern);
+            var msg = 'Invalid versionPattern passed to versionCheck: ' +
+                  versionPattern;
+            log('[versionCheck()] ' + msg);
+            alert(msg);
             return false;
         }
     },
@@ -558,7 +654,7 @@ var deployJava = function() {
     isWebStartInstalled: function(minimumVersion) {
 
         var browser = this.getBrowser();
-        if ((browser == '?') || ('Safari' == this.browserName2)) {
+        if (browser == '?') {
             // we really don't know - better to try to use it than reinstall
             return true;
         }
@@ -574,9 +670,7 @@ var deployJava = function() {
         if (matchData != null) {
             retval = this.versionCheck(minimumVersion + '+');
         } else {
-            if (this.debug) {
-                alert('Invalid minimumVersion argument to isWebStartInstalled(): ' + minimumVersion);
-            }
+            log('[isWebStartInstaller()] Invalid minimumVersion argument to isWebStartInstalled(): ' + minimumVersion);
             retval = this.versionCheck('1.4.2+');
         }
         return retval;
@@ -820,6 +914,7 @@ var deployJava = function() {
         return false;
     },
 
+    //support native DT plugin?
     allowPlugin: function() {
         this.getBrowser();
 
@@ -895,26 +990,24 @@ var deployJava = function() {
         }
     },
 
-
     getBrowser: function() {
 
         if (this.browserName == null) {
             var browser = navigator.userAgent.toLowerCase();
 
-            if (this.debug) {
-                alert('userAgent -> ' + browser);
-            }
+            log('[getBrowser()] navigator.userAgent.toLowerCase() -> ' + browser);
+
 
             // order is important here.  Safari userAgent contains mozilla,
             // and Chrome userAgent contains both mozilla and safari.
-            if (browser.indexOf('msie') != -1) {
+            if ((browser.indexOf('msie') != -1) && (browser.indexOf('opera') == -1)) {
                 this.browserName = 'MSIE';
                 this.browserName2 = 'MSIE';
             } else if (browser.indexOf('iphone') != -1) {
                 // this included both iPhone and iPad
                 this.browserName = 'Netscape Family';
                 this.browserName2 = 'iPhone';
-            } else if (browser.indexOf('firefox') != -1) {
+            } else if ((browser.indexOf('firefox') != -1) && (browser.indexOf('opera') == -1)) {
                 this.browserName = 'Netscape Family';
                 this.browserName2 = 'Firefox';
             } else if (browser.indexOf('chrome') != -1) {
@@ -923,7 +1016,7 @@ var deployJava = function() {
             } else if (browser.indexOf('safari') != -1) {
                 this.browserName = 'Netscape Family';
                 this.browserName2 = 'Safari';
-            } else if (browser.indexOf('mozilla') != -1) {
+            } else if ((browser.indexOf('mozilla') != -1) && (browser.indexOf('opera') == -1)) {
                 this.browserName = 'Netscape Family';
                 this.browserName2 = 'Other';
             } else if (browser.indexOf('opera') != -1) {
@@ -934,10 +1027,8 @@ var deployJava = function() {
                 this.browserName2 = 'unknown';
             }
 
-            if (this.debug) {
-                alert ('Detected browser name:'+ this.browserName +
+            log('[getBrowser()] Detected browser name:'+ this.browserName +
                        ', ' + this.browserName2);
-            }
         }
         return this.browserName;
     },
@@ -950,9 +1041,7 @@ var deployJava = function() {
         // the check needs to be in place here - cannot even pass ActiveXObject
         // as arg to another function
         if (typeof ActiveXObject == 'undefined' || !ActiveXObject) {
-            if (this.debug) {
-              alert ('Browser claims to be IE, but no ActiveXObject object?');
-            }
+            log('[testUsingActiveX()] Browser claims to be IE, but no ActiveXObject object?');
             return false;
         }
 
@@ -982,9 +1071,7 @@ var deployJava = function() {
 
     testUsingMimeTypes: function(version) {
         if (!navigator.mimeTypes) {
-            if (this.debug) {
-                alert ('Browser claims to be Netscape family, but no mimeTypes[] array?');
-            }
+            log ('[testUsingMimeTypes()] Browser claims to be Netscape family, but no mimeTypes[] array?');
             return false;
         }
 
@@ -1093,7 +1180,6 @@ var deployJava = function() {
 
         return true;
     },
-
 
     enableAlerts: function() {
         // reset this so we can show the browser detection
