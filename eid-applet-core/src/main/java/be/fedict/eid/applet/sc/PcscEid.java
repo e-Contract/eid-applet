@@ -37,6 +37,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -346,24 +347,29 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	}
 
 	public void waitForCardReader() {
-
 		try {
 			TerminalFactory terminalFactory = TerminalFactory.getDefault();
 			CardTerminals terminals = terminalFactory.terminals();
 
-			List<CardTerminal> terminalList = terminals.list();
+			List<CardTerminal> terminalList;
+			try {
+				terminalList = terminals.list();
+			} catch (CardException e) {
+				terminalList = Collections.emptyList();
+			}
 			while (terminalList.isEmpty()) {
-				view.addDetailMessage("no reader found yet, wait a bit...");
+				this.view.addDetailMessage("no reader found yet, wait a bit...");
 				Thread.sleep(2000);
 				terminals = terminalFactory.terminals();
-				terminalList = terminals.list();
+				try {
+					terminalList = terminals.list();
+				} catch (CardException e) {
+					terminalList = Collections.emptyList();
+				}
 			}
 
-			cardTerminalList = terminalList;
-			view.addDetailMessage("reader found...");
-		} catch (CardException e) {
-			this.view.addDetailMessage("card terminals list error: "
-					+ e.getMessage());
+			this.cardTerminalList = terminalList;
+			this.view.addDetailMessage("reader found...");
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
@@ -1255,7 +1261,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		if (isWindows8()) {
 			this.card.endExclusive();
 		}
-		
+
 		int retriesLeft = -1;
 		ResponseAPDU responseApdu;
 		do {
@@ -1290,7 +1296,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			}
 		} while (0x9000 != responseApdu.getSW());
 		this.dialogs.showPinChanged();
-		
+
 		if (isWindows8()) {
 			this.card.beginExclusive();
 		}
@@ -1445,7 +1451,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		if (requireSecureReader && null == directPinVerifyFeature) {
 			throw new SecurityException("not a secure reader");
 		}
-		
+
 		if (isWindows8()) {
 			this.card.endExclusive();
 		}
@@ -1479,7 +1485,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			}
 		} while (0x9000 != responseApdu.getSW());
 		this.dialogs.showPinUnblocked();
-		
+
 		if (isWindows8()) {
 			this.card.beginExclusive();
 		}
@@ -1918,7 +1924,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		String osName = System.getProperty("os.name");
 		return osName.contains("OS X");
 	}
-	
+
 	public boolean isWindows8() {
 		String osName = System.getProperty("os.name");
 		return osName.contains("Windows 8");
