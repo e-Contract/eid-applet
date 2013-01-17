@@ -33,6 +33,7 @@
   * [http://www.usb.org/developers/devclass_docs/DWG_Smart-Card_CCID_Rev110.pdf CCID]
   * [http://www.pcscworkgroup.com/specifications/specdownload.php PC/SC specifications]
   * [http://www.etsi.org/deliver/etsi_ts/102200_102299/102221/08.02.00_60/ts_102221v080200p.pdf ETSI TS 102 221 V8.2.0 (2009-06)]
+  * [http://www.fi.muni.cz/~xsvenda/apduinspect.html APDUPlay]
 
 
 == Security ==
