@@ -42,6 +42,7 @@
   * [http://tools.ietf.org/html/rfc5056 On the Use of Channel Bindings to Secure Channels]
   * [http://www.owasp.org/ OWASP]
   * [http://www.w3.org/2012/webcrypto/WebCryptoAPI/ W3C Web Crypto API]
+  * https://github.com/polycrypt/polycrypt/
 
 
 == Belgian eID Card ==
