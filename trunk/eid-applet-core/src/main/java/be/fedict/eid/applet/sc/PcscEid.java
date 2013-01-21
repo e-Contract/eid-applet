@@ -358,7 +358,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 				terminalList = Collections.emptyList();
 			}
 			while (terminalList.isEmpty()) {
-				this.view.addDetailMessage("no reader found yet, wait a bit...");
+				this.view
+						.addDetailMessage("no reader found yet, wait a bit...");
 				Thread.sleep(2000);
 				terminals = terminalFactory.terminals();
 				try {
@@ -416,7 +417,14 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			// on OS X isCardPresent or waitForxxx calls on the card terminal
 			// don't work
 			// you need to connect to it to see if there is a card present...
-			if (cardTerminal.isCardPresent() || isOSX()) {
+			boolean cardPresent;
+			try {
+				cardPresent = cardTerminal.isCardPresent();
+			} catch (CardException e) {
+				this.view.addDetailMessage("card exception: " + e.getMessage());
+				cardPresent = false;
+			}
+			if (cardPresent || isOSX()) {
 				Card card;
 				try {
 					/*
