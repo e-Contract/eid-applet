@@ -409,6 +409,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			}
 
 		}
+		
+		this.view.setStatusMessage(Status.NORMAL, MESSAGE_ID.INSERT_CARD_QUESTION);
 
 		Set<CardTerminal> eIDCardTerminals = new HashSet<CardTerminal>();
 		for (CardTerminal cardTerminal : cardTerminalList) {
@@ -647,6 +649,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 							 * Windows platform.
 							 */
 							this.view.addDetailMessage("no readers available.");
+							this.view.setStatusMessage(Status.NORMAL, MESSAGE_ID.CONNECT_READER);
 						}
 					}
 					this.view.addDetailMessage("sleeping...");
