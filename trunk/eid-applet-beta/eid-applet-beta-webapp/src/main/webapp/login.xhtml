@@ -26,7 +26,7 @@
 				};
 				var parameters = {
 					TargetPage : 'postLogin.seam?conversationId=#{conversation.id}',
-					AppletService : 'applet-administrator-service',
+					AppletService : 'applet-administrator-service;jsessionid=#{facesContext.externalContext.getSession(false).id}',
 					Language : 'en'
 				};
 				deployJavaEIDApplet.runApplet(attributes, parameters);
