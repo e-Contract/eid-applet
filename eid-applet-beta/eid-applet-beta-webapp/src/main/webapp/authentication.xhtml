@@ -23,7 +23,7 @@
 				};
 				var parameters = {
 					TargetPage : 'authentication-results.seam',
-					AppletService : 'applet-authentication-service',
+					AppletService : 'applet-authentication-service;jsessionid=#{facesContext.externalContext.getSession(false).id}',
 					Language : 'en',
 					NavigatorUserAgent : navigator.userAgent,
 					NavigatorAppName : navigator.appName,
