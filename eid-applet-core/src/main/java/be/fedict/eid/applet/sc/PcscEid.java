@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2012 FedICT.
+ * Copyright (C) 2008-2013 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -409,8 +409,9 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			}
 
 		}
-		
-		this.view.setStatusMessage(Status.NORMAL, MESSAGE_ID.INSERT_CARD_QUESTION);
+
+		this.view.setStatusMessage(Status.NORMAL,
+				MESSAGE_ID.INSERT_CARD_QUESTION);
 
 		Set<CardTerminal> eIDCardTerminals = new HashSet<CardTerminal>();
 		for (CardTerminal cardTerminal : cardTerminalList) {
@@ -649,7 +650,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 							 * Windows platform.
 							 */
 							this.view.addDetailMessage("no readers available.");
-							this.view.setStatusMessage(Status.NORMAL, MESSAGE_ID.CONNECT_READER);
+							this.view.setStatusMessage(Status.NORMAL,
+									MESSAGE_ID.CONNECT_READER);
 						}
 					}
 					this.view.addDetailMessage("sleeping...");
@@ -735,7 +737,30 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	public static final byte FEATURE_MODIFY_PIN_DIRECT_TAG = 0x07;
 	public static final byte FEATURE_EID_PIN_PAD_READER_TAG = (byte) 0x80;
 
-	private Integer getFeature(byte featureTag) {
+	private static class CCIDFeature {
+		boolean ppdu;
+		Integer feature;
+
+		public CCIDFeature(Integer feature) {
+			this.ppdu = false;
+			this.feature = feature;
+		}
+
+		public CCIDFeature(boolean ppdu, Integer feature) {
+			this.ppdu = ppdu;
+			this.feature = feature;
+		}
+
+		public boolean isPPDU() {
+			return this.ppdu;
+		}
+
+		public Integer getFeature() {
+			return this.feature;
+		}
+	}
+
+	private CCIDFeature getFeature(byte featureTag) {
 		this.view.addDetailMessage("CCID GET_FEATURE IOCTL...");
 		int ioctl;
 		String osName = System.getProperty("os.name");
@@ -750,13 +775,40 @@ public class PcscEid extends Observable implements PcscEidSpi {
 		} catch (CardException e) {
 			this.view.addDetailMessage("GET_FEATURES IOCTL error: "
 					+ e.getMessage());
-			return null;
+			// try pseudo-APDU = PPDU interface
+			this.view.addDetailMessage("trying PPDU interface...");
+			try {
+				ResponseAPDU responseAPDU = this.cardChannel
+						.transmit(new CommandAPDU((byte) 0xff, (byte) 0xc2,
+								0x01, 0x00, new byte[] {}, 32));
+				this.view.addDetailMessage("PPDU response: "
+						+ Integer.toHexString(responseAPDU.getSW()));
+				if (0x9000 == responseAPDU.getSW()) {
+					features = responseAPDU.getData();
+					for (byte feature : features) {
+						if (feature == featureTag) {
+							return new CCIDFeature(true, new Integer(feature));
+						}
+					}
+					return null;
+				} else {
+					return null;
+				}
+			} catch (CardException e2) {
+				this.view.addDetailMessage("PPDU failed: " + e2.getMessage());
+				return null;
+			}
 		}
 		if (0 == features.length) {
 			return null;
 		}
 		Integer feature = findFeature(featureTag, features);
-		return feature;
+		if (null != feature) {
+			this.view.addDetailMessage("feature: "
+					+ Integer.toHexString(feature));
+			return new CCIDFeature(feature);
+		}
+		return null;
 	}
 
 	private Integer findFeature(byte featureTag, byte[] features) {
@@ -783,10 +835,10 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	public byte[] sign(byte[] digestValue, String digestAlgo, byte keyId,
 			boolean requireSecureReader) throws CardException, IOException,
 			InterruptedException {
-		Integer directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
-		Integer verifyPinStartFeature = getFeature(FEATURE_VERIFY_PIN_START_TAG);
+		CCIDFeature directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
+		CCIDFeature verifyPinStartFeature = getFeature(FEATURE_VERIFY_PIN_START_TAG);
 
-		Integer eIDPINPadReaderFeature = getFeature(FEATURE_EID_PIN_PAD_READER_TAG);
+		CCIDFeature eIDPINPadReaderFeature = getFeature(FEATURE_EID_PIN_PAD_READER_TAG);
 		if (null != eIDPINPadReaderFeature) {
 			this.view
 					.addDetailMessage("eID-aware secure PIN pad reader detected");
@@ -897,14 +949,14 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	public void verifyPin() throws IOException, CardException,
 			InterruptedException {
-		Integer directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
-		Integer verifyPinStartFeature = getFeature(FEATURE_VERIFY_PIN_START_TAG);
+		CCIDFeature directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
+		CCIDFeature verifyPinStartFeature = getFeature(FEATURE_VERIFY_PIN_START_TAG);
 		verifyPin(directPinVerifyFeature, verifyPinStartFeature);
 	}
 
-	private void verifyPin(Integer directPinVerifyFeature,
-			Integer verifyPinStartFeature) throws IOException, CardException,
-			InterruptedException {
+	private void verifyPin(CCIDFeature directPinVerifyFeature,
+			CCIDFeature verifyPinStartFeature) throws IOException,
+			CardException, InterruptedException {
 		if (isWindows8()) {
 			this.card.endExclusive();
 		}
@@ -941,36 +993,55 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	}
 
 	private ResponseAPDU verifyPin(int retriesLeft,
-			Integer verifyPinStartFeature) throws IOException, CardException,
-			InterruptedException {
+			CCIDFeature verifyPinStartFeature) throws IOException,
+			CardException, InterruptedException {
 		this.view.addDetailMessage("CCID verify PIN start/end sequence...");
 		byte[] verifyCommandData = createPINVerificationDataStructure(0x20);
 		this.dialogs.showPINPadFrame(retriesLeft);
 		try {
-			int getKeyPressedFeature = getFeature(FEATURE_GET_KEY_PRESSED_TAG);
-			this.card.transmitControlCommand(verifyPinStartFeature,
-					verifyCommandData);
+			CCIDFeature getKeyPressedFeature = getFeature(FEATURE_GET_KEY_PRESSED_TAG);
+			if (false == verifyPinStartFeature.isPPDU()) {
+				this.card.transmitControlCommand(
+						verifyPinStartFeature.getFeature(), verifyCommandData);
+			} else {
+				this.cardChannel.transmit(new CommandAPDU(0xff, 0xc2, 0x01,
+						FEATURE_VERIFY_PIN_START_TAG, verifyCommandData));
+			}
 
 			ccidWaitForOK(getKeyPressedFeature);
 		} finally {
 			this.dialogs.disposePINPadFrame();
 		}
-		int verifyPinFinishIoctl = getFeature(FEATURE_VERIFY_PIN_FINISH_TAG);
-		byte[] verifyPinFinishResult = this.card.transmitControlCommand(
-				verifyPinFinishIoctl, new byte[0]);
-		ResponseAPDU responseApdu = new ResponseAPDU(verifyPinFinishResult);
-		return responseApdu;
+		CCIDFeature verifyPinFinishIoctl = getFeature(FEATURE_VERIFY_PIN_FINISH_TAG);
+		if (false == verifyPinFinishIoctl.isPPDU()) {
+			byte[] verifyPinFinishResult = this.card.transmitControlCommand(
+					verifyPinFinishIoctl.getFeature(), new byte[0]);
+			ResponseAPDU responseApdu = new ResponseAPDU(verifyPinFinishResult);
+			return responseApdu;
+		} else {
+			return this.cardChannel.transmit(new CommandAPDU(0xff, 0xc2, 0x01,
+					FEATURE_VERIFY_PIN_FINISH_TAG, new byte[0]));
+		}
 	}
 
 	private ResponseAPDU verifyPinDirect(int retriesLeft,
-			Integer directPinVerifyFeature) throws IOException, CardException {
+			CCIDFeature directPinVerifyFeature) throws IOException,
+			CardException {
 		this.view.addDetailMessage("direct PIN verification...");
 		byte[] verifyCommandData = createPINVerificationDataStructure(0x20);
 		this.dialogs.showPINPadFrame(retriesLeft);
 		byte[] result;
 		try {
-			result = this.card.transmitControlCommand(directPinVerifyFeature,
-					verifyCommandData);
+			if (false == directPinVerifyFeature.isPPDU()) {
+				result = this.card.transmitControlCommand(
+						directPinVerifyFeature.getFeature(), verifyCommandData);
+			} else {
+				ResponseAPDU responseApdu = this.cardChannel
+						.transmit(new CommandAPDU(0xff, 0xc2, 0x01,
+								FEATURE_VERIFY_PIN_DIRECT_TAG,
+								verifyCommandData));
+				return responseApdu;
+			}
 		} finally {
 			this.dialogs.disposePINPadFrame();
 		}
@@ -985,14 +1056,22 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	}
 
 	private ResponseAPDU verifyPukDirect(int retriesLeft,
-			Integer directPinVerifyFeature) throws IOException, CardException {
+			CCIDFeature directPinVerifyFeature) throws IOException,
+			CardException {
 		this.view.addDetailMessage("direct PUK verification...");
 		byte[] verifyCommandData = createPINVerificationDataStructure(0x2C);
 		this.dialogs.showPUKPadFrame(retriesLeft);
 		byte[] result;
 		try {
-			result = this.card.transmitControlCommand(directPinVerifyFeature,
-					verifyCommandData);
+			if (directPinVerifyFeature.isPPDU()) {
+				result = this.card.transmitControlCommand(
+						directPinVerifyFeature.getFeature(), verifyCommandData);
+			} else {
+				return this.cardChannel
+						.transmit(new CommandAPDU(0xff, 0xc2, 0x01,
+								FEATURE_VERIFY_PIN_DIRECT_TAG,
+								verifyCommandData));
+			}
 		} finally {
 			this.dialogs.disposePINPadFrame();
 		}
@@ -1261,8 +1340,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	}
 
 	public void changePin(boolean requireSecureReader) throws Exception {
-		Integer directPinModifyFeature = getFeature(FEATURE_MODIFY_PIN_DIRECT_TAG);
-		Integer modifyPinStartFeature = getFeature(FEATURE_MODIFY_PIN_START_TAG);
+		CCIDFeature directPinModifyFeature = getFeature(FEATURE_MODIFY_PIN_DIRECT_TAG);
+		CCIDFeature modifyPinStartFeature = getFeature(FEATURE_MODIFY_PIN_START_TAG);
 
 		if (requireSecureReader && null == directPinModifyFeature
 				&& null == modifyPinStartFeature) {
@@ -1314,12 +1393,17 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	}
 
 	private ResponseAPDU doChangePinStartFinish(int retriesLeft,
-			Integer modifyPinStartFeature) throws IOException, CardException,
-			InterruptedException {
+			CCIDFeature modifyPinStartFeature) throws IOException,
+			CardException, InterruptedException {
 		byte[] modifyCommandData = createPINModificationDataStructure(0x24);
-		this.card.transmitControlCommand(modifyPinStartFeature,
-				modifyCommandData);
-		int getKeyPressedFeature = getFeature(FEATURE_GET_KEY_PRESSED_TAG);
+		if (false == modifyPinStartFeature.isPPDU()) {
+			this.card.transmitControlCommand(
+					modifyPinStartFeature.getFeature(), modifyCommandData);
+		} else {
+			this.cardChannel.transmit(new CommandAPDU(0xff, 0xc2, 0x01,
+					FEATURE_MODIFY_PIN_START_TAG, modifyCommandData));
+		}
+		CCIDFeature getKeyPressedFeature = getFeature(FEATURE_GET_KEY_PRESSED_TAG);
 
 		try {
 			this.view.addDetailMessage("enter old PIN...");
@@ -1339,20 +1423,34 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			this.dialogs.disposePINPadFrame();
 		}
 
-		int modifyPinFinishIoctl = getFeature(FEATURE_MODIFY_PIN_FINISH_TAG);
-		byte[] modifyPinFinishResult = this.card.transmitControlCommand(
-				modifyPinFinishIoctl, new byte[0]);
-		ResponseAPDU responseApdu = new ResponseAPDU(modifyPinFinishResult);
-		return responseApdu;
+		CCIDFeature modifyPinFinishIoctl = getFeature(FEATURE_MODIFY_PIN_FINISH_TAG);
+		if (false == modifyPinFinishIoctl.isPPDU()) {
+			byte[] modifyPinFinishResult = this.card.transmitControlCommand(
+					modifyPinFinishIoctl.getFeature(), new byte[0]);
+			ResponseAPDU responseApdu = new ResponseAPDU(modifyPinFinishResult);
+			return responseApdu;
+		} else {
+			return this.cardChannel.transmit(new CommandAPDU(0xff, 0xc2, 0x01,
+					FEATURE_MODIFY_PIN_FINISH_TAG, new byte[0]));
+		}
 	}
 
-	private void ccidWaitForOK(int getKeyPressedFeature) throws CardException,
-			InterruptedException {
+	private void ccidWaitForOK(CCIDFeature getKeyPressedFeature)
+			throws CardException, InterruptedException {
 		// wait for key pressed
 		loop: while (true) {
-			byte[] getKeyPressedResult = this.card.transmitControlCommand(
-					getKeyPressedFeature, new byte[0]);
-			byte key = getKeyPressedResult[0];
+			byte key;
+			if (false == getKeyPressedFeature.isPPDU()) {
+				byte[] getKeyPressedResult = this.card.transmitControlCommand(
+						getKeyPressedFeature.getFeature(), new byte[0]);
+				key = getKeyPressedResult[0];
+			} else {
+				byte[] getKeyPressedResult = this.cardChannel.transmit(
+						new CommandAPDU(0xff, 0xc2, 0x01,
+								FEATURE_GET_KEY_PRESSED_TAG, new byte[0]))
+						.getData();
+				key = getKeyPressedResult[0];
+			}
 			switch (key) {
 			case 0x00:
 				// this.view.addDetailMessage("waiting for CCID...");
@@ -1383,14 +1481,22 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	}
 
 	private ResponseAPDU doChangePinDirect(int retriesLeft,
-			Integer directPinModifyFeature) throws IOException, CardException {
+			CCIDFeature directPinModifyFeature) throws IOException,
+			CardException {
 		this.view.addDetailMessage("direct PIN modification...");
 		byte[] modifyCommandData = createPINModificationDataStructure(0x24);
 		this.dialogs.showPINChangePadFrame(retriesLeft);
 		byte[] result;
 		try {
-			result = this.card.transmitControlCommand(directPinModifyFeature,
-					modifyCommandData);
+			if (false == directPinModifyFeature.isPPDU()) {
+				result = this.card.transmitControlCommand(
+						directPinModifyFeature.getFeature(), modifyCommandData);
+			} else {
+				return this.cardChannel
+						.transmit(new CommandAPDU(0xff, 0xc2, 0x01,
+								FEATURE_MODIFY_PIN_DIRECT_TAG,
+								modifyCommandData));
+			}
 		} finally {
 			this.dialogs.disposePINPadFrame();
 		}
@@ -1457,7 +1563,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	}
 
 	public void unblockPin(boolean requireSecureReader) throws Exception {
-		Integer directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
+		CCIDFeature directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
 
 		if (requireSecureReader && null == directPinVerifyFeature) {
 			throw new SecurityException("not a secure reader");
@@ -1720,8 +1826,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 		this.view.setStatusMessage(Status.NORMAL, MESSAGE_ID.DIAGNOSTIC_MODE);
 
-		Integer directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
-		Integer verifyPinStartFeature = getFeature(FEATURE_VERIFY_PIN_START_TAG);
+		CCIDFeature directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
+		CCIDFeature verifyPinStartFeature = getFeature(FEATURE_VERIFY_PIN_START_TAG);
 
 		String terminalName = this.cardTerminal.getName();
 		String cardReaderInformation = terminalName;
@@ -1914,7 +2020,7 @@ public class PcscEid extends Observable implements PcscEidSpi {
 	public byte[] signTransactionMessage(String transactionMessage,
 			boolean requireSecureReader) throws CardException, IOException,
 			InterruptedException {
-		Integer eIDPINPadReaderFeature = getFeature(FEATURE_EID_PIN_PAD_READER_TAG);
+		CCIDFeature eIDPINPadReaderFeature = getFeature(FEATURE_EID_PIN_PAD_READER_TAG);
 		if (null != eIDPINPadReaderFeature) {
 			this.dialogs.showSecureReaderTransactionFrame();
 		}
