@@ -12,10 +12,10 @@
 			Version &project.version;
 		</subtitle>
 		<copyright>
-			<year>2008-2012</year>
+			<year>2008-2013</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>5 July 2012</releaseinfo>
+		<releaseinfo>27 Feb 2013</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -405,6 +405,20 @@
 				</tbody>
 			</tgroup>
 		</table>
+		<warning>
+			<title>Third-party cookies</title>
+			<para>
+				Recent browsers might disable third-party cookies by default. As the
+				Java web browser plugin is a third-party component, it's possible
+				that the session cookie is no longer communicated to the Java
+				runtime. A work-around for JSF is given by appending the following
+				to the
+				<code>AppletService</code>
+				parameter:
+				<code>;jsessionid=#{facesContext.externalContext.getSession(false).id}
+				</code>
+			</para>
+		</warning>
 		<note>
 			<title>Javascript</title>
 			<para>
