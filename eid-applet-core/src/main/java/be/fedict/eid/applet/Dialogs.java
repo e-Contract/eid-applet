@@ -30,7 +30,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.Arrays;
 
 import javax.swing.Box;
@@ -389,6 +388,7 @@ public class Dialogs {
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent e) {
+				dialog.requestFocusInWindow();
 				passwordField.requestFocus();
 			}
 		});
