@@ -381,8 +381,8 @@ public class Applet extends JApplet {
 				"Detailed log messages");
 
 		JPopupMenu popupMenu = new JPopupMenu();
-		JMenuItem copyMenuItem = new JMenuItem(
-				this.messages.getMessage(MESSAGE_ID.COPY_ALL));
+		JMenuItem copyMenuItem = new JMenuItem(this.messages
+				.getMessage(MESSAGE_ID.COPY_ALL));
 		copyMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -465,8 +465,8 @@ public class Applet extends JApplet {
 			Method getDesktopMethod = desktopClass.getMethod("getDesktop");
 			final Object desktop = getDesktopMethod.invoke(null);
 			final Method mailMethod = desktopClass.getMethod("mail", URI.class);
-			JMenuItem emailMenuItem = new JMenuItem(
-					this.messages.getMessage(MESSAGE_ID.MAIL));
+			JMenuItem emailMenuItem = new JMenuItem(this.messages
+					.getMessage(MESSAGE_ID.MAIL));
 			emailMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					String message = Applet.this.detailMessages.getText();
@@ -496,7 +496,7 @@ public class Applet extends JApplet {
 	private class AppletThread implements Runnable {
 		@SuppressWarnings("unchecked")
 		public void run() {
-			addDetailMessage("eID Applet - Copyright (C) 2008-2013 FedICT and others.");
+			addDetailMessage("eID Applet - Copyright (C) 2008-2012 FedICT.");
 			addDetailMessage("Released under GNU LGPL version 3.0 license.");
 			addDetailMessage("More info: http://code.google.com/p/eid-applet/");
 			/*
@@ -731,9 +731,7 @@ public class Applet extends JApplet {
 			if (null == jsObject) {
 				throw new RuntimeException("no jsObject available");
 			}
-			callMethod.invoke(
-					jsObject,
-					this.diagnosticTestCallbackParam,
+			callMethod.invoke(jsObject, this.diagnosticTestCallbackParam,
 					new Object[] { diagnosticTest.name(),
 							diagnosticTest.getDescription(), success,
 							description });
