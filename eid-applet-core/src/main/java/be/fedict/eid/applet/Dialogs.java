@@ -279,24 +279,6 @@ public class Dialogs {
 			this.pinPadFrame = null;
 		}
 	}
-	
-	private boolean isOSX() {
-		String osName = System.getProperty("os.name");
-		return osName.contains("OS X");
-	}
-	
-	private void macFocusFix() {
-		if (false == isOSX()) {
-			return;
-		}
-		JOptionPane jOptionPane = new JOptionPane();
-		final JDialog jDialog = jOptionPane.createDialog("Mac OS X Focus Fix");
-		Timer timer = new Timer(200, null);
-		KillDialogActionListener killDialogActionListener = new KillDialogActionListener(timer, jDialog);
-		timer.addActionListener(killDialogActionListener);
-		timer.start();
-		jDialog.setVisible(true);
-	}
 
 	public char[] getPin(int retriesLeft) {
 		// main panel
@@ -407,12 +389,14 @@ public class Dialogs {
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent e) {
-				dialog.requestFocusInWindow();
 				passwordField.requestFocus();
 			}
 		});
 		
-		macFocusFix();
+		Timer timer = new Timer(200, null);
+		FocusDialogActionListener focusDialogActionListener = new FocusDialogActionListener(timer, passwordField);
+		timer.addActionListener(focusDialogActionListener);
+		timer.start();
 		
 		dialog.setVisible(true);
 		// setVisible will wait until some button or so has been pressed
