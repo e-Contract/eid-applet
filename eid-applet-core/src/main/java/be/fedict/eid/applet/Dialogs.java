@@ -41,6 +41,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.Timer;
 
 import be.fedict.eid.applet.Messages.MESSAGE_ID;
 
@@ -278,6 +279,24 @@ public class Dialogs {
 			this.pinPadFrame = null;
 		}
 	}
+	
+	private boolean isOSX() {
+		String osName = System.getProperty("os.name");
+		return osName.contains("OS X");
+	}
+	
+	private void macFocusFix() {
+		if (false == isOSX()) {
+			return;
+		}
+		JOptionPane jOptionPane = new JOptionPane();
+		final JDialog jDialog = jOptionPane.createDialog("Mac OS X Focus Fix");
+		Timer timer = new Timer(200, null);
+		KillDialogActionListener killDialogActionListener = new KillDialogActionListener(timer, jDialog);
+		timer.addActionListener(killDialogActionListener);
+		timer.start();
+		jDialog.setVisible(true);
+	}
 
 	public char[] getPin(int retriesLeft) {
 		// main panel
@@ -392,6 +411,8 @@ public class Dialogs {
 				passwordField.requestFocus();
 			}
 		});
+		
+		macFocusFix();
 		
 		dialog.setVisible(true);
 		// setVisible will wait until some button or so has been pressed
