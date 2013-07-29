@@ -256,7 +256,7 @@ public class OOXMLSignatureVerifier {
 									relsEntryName.indexOf("_rels/"));
 					String streamEntry = baseUri + relationshipTarget;
 					LOG.debug("stream entry: " + streamEntry);
-					streamEntry = FilenameUtils.normalize(streamEntry);
+					streamEntry = FilenameUtils.separatorsToUnix(FilenameUtils.normalize(streamEntry));
 					LOG.debug("normalized stream entry: " + streamEntry);
 					String contentType = getContentType(contentTypes,
 							streamEntry);

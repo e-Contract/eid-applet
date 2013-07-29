@@ -218,8 +218,9 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 						+ relsEntryName.substring(0,
 								relsEntryName.indexOf("_rels/"));
 				String relationshipTarget = relationship.getTarget();
-				String partName = FilenameUtils.normalize(baseUri
-						+ relationshipTarget);
+				String partName = FilenameUtils.separatorsToUnix( 
+						FilenameUtils.normalize(baseUri
+						+ relationshipTarget));
 				LOG.debug("part name: " + partName);
 				String relationshipId = relationship.getId();
 				parameterSpec.addRelationshipReference(relationshipId);
