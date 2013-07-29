@@ -136,11 +136,10 @@ public class DocbookMojo extends AbstractMojo {
 			throws FileNotFoundException, IllegalAccessException {
 		PrintWriter writer = new PrintWriter(docbookFile);
 		writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		writer.println("<!DOCTYPE section PUBLIC ");
-		writer.println("\"-//OASIS//DTD DocBook XML V4.5//EN\"");
+		writer.println("<section version=\"5.0\" ");
+		writer.println("xsi:schemaLocation=\"http://docbook.org/ns/docbook http://www.docbook.org/xml/5.0/xsd/docbook.xsd\"");
 		writer
-				.println("\"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd\">");
-		writer.println("<section>");
+				.println("xmlns=\"http://docbook.org/ns/docbook\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">");
 		writer.println("<title>eID Applet Protocol Messages</title>");
 		writer
 				.println("<para>The following documentation has been generated automatically.</para>");
