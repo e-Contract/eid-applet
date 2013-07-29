@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE article PUBLIC 
-	"-//OASIS//DTD DocBook XML V4.5//EN"
-	"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
-<article lang="en">
+<article version="5.0"
+	xsi:schemaLocation="http://docbook.org/ns/docbook http://www.docbook.org/xml/5.0/xsd/docbook.xsd"
+	xmlns="http://docbook.org/ns/docbook" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<articleinfo>
-		<title>Fedict eID Applet Developer's Guide</title>
+		<title>eID Applet Developer's Guide</title>
 		<subtitle>
 			Integrating the eID Applet within your web applications.
 		</subtitle>
@@ -15,7 +14,7 @@
 			<year>2008-2013</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>27 Feb 2013</releaseinfo>
+		<releaseinfo>29 July 2013</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -34,8 +33,9 @@
 	<section>
 		<title>Introduction</title>
 		<para>
-			The Fedict eID Applet is a browser component that exposes the
-			functionality of an eID card to your web applications. In
+			The eID Applet is a browser component that exposes the
+			functionality
+			of an eID card to your web applications. In
 			<xref linkend="eid-applet-screenshot" />
 			you find a screen shot of the eID Applet.
 		</para>
@@ -521,7 +521,9 @@
 			</para>
 			<programlisting language="XML"><![CDATA[<servlet>
 	<servlet-name>AppletServiceServlet</servlet-name>
-	<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+	<servlet-class>
+		be.fedict.eid.applet.service.AppletServiceServlet
+	</servlet-class>
 </servlet>
 <servlet-mapping>
 	<servlet-name>AppletServiceServlet</servlet-name>
@@ -562,7 +564,7 @@
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-bom</artifactId>
-			<version>1.0.5.GA</version>
+			<version>]]>&project.version;<![CDATA[</version>
 			<type>pom</type>
 			<scope>import</scope>
 		</dependency>
@@ -634,6 +636,11 @@
 					<code>eid-applet-service-cdi</code>
 					artifact that offers initial support for CDI containers. The
 					artifact does not require JBoss Seam 3.1 at run-time.
+					When using Maven, include the CDI artifact via:
+					<programlisting language="XML"><![CDATA[<dependency>
+	<groupId>be.fedict.eid-applet</groupId>
+	<artifactId>eid-applet-service-cdi</artifactId>
+</dependency>]]></programlisting>
 				</para>
 			</tip>
 			<section>
@@ -862,7 +869,9 @@
 				</para>
 				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>IdentityIntegrityService</param-name>
-	<param-value>your/location/in/jndi/IdentityIntegrityServiceBean</param-value>
+	<param-value>
+		your/location/in/jndi/IdentityIntegrityServiceBean
+	</param-value>
 </init-param>]]></programlisting>
 				<para>
 					The Javadoc documentation of the
@@ -1346,7 +1355,9 @@
 				</para>
 				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>SecureCardReaderService</param-name>
-	<param-value>your/location/in/jndi/SecureCardReaderServiceBean</param-value>
+	<param-value>
+		your/location/in/jndi/SecureCardReaderServiceBean
+	</param-value>
 </init-param>]]></programlisting>
 				<para>
 					Smart card readers that do not offer support for this plain
@@ -1775,7 +1786,9 @@
 				</para>
 				<programlisting language="XML"><![CDATA[<init-param>
 	<param-name>SecureClientEnvironmentService</param-name>
-	<param-value>your/location/in/jndi/SecureClientEnvironmentServiceBean</param-value>
+	<param-value>
+		your/location/in/jndi/SecureClientEnvironmentServiceBean
+	</param-value>
 </init-param>]]></programlisting>
 				<para>
 					The Javadoc documentation of the
@@ -2038,6 +2051,136 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 				</para>
 			</section>
 		</section>
+	</section>
+	<section>
+		<title>Maven Integration</title>
+		<para>
+			In this section we'll discuss the different aspects related to
+			integrating the eID Applet within Maven based projects.
+		</para>
+		<para>
+			First of all, add the following repository configuration under
+			<code>&lt;repositories&gt;</code>
+			within you
+			<code>pom.xml</code>
+			Maven configuration file
+			:
+		</para>
+		<programlisting language="XML"><![CDATA[<repository>
+	<id>e-contract</id>
+	<url>https://www.e-contract.be/maven2/</url>
+	<releases>
+		<enabled>true</enabled>
+	</releases>
+</repository>]]></programlisting>
+		<para>
+			We assume that you're using a
+			<code>&lt;dependencyManagement&gt;</code>
+			element within your
+			<code>pom.xml</code>
+			Maven project file.
+			Put the following declaration:
+		</para>
+		<programlisting language="XML"><![CDATA[<dependency>
+	<groupId>be.fedict.eid-applet</groupId>
+	<artifactId>eid-applet-bom</artifactId>
+	<version>]]>&project.version;<![CDATA[</version>
+	<type>pom</type>
+	<scope>import</scope>
+</dependency>]]></programlisting>
+		<para>
+			Integration of the eID Applet within a Java EE web application
+			consists
+			out of two tasks. First we have to add the eID Applet itself
+			as web
+			resource to the web application. In order to do so, add the following
+			dependencies under
+			<code>&lt;dependencies&gt;</code>
+			:
+		</para>
+		<programlisting language="XML"><![CDATA[<dependency>
+	<groupId>be.fedict.eid-applet</groupId>
+	<artifactId>eid-applet-package</artifactId>
+	<scope>provided</scope>
+</dependency>
+<dependency>
+	<groupId>be.fedict.eid-applet</groupId>
+	<artifactId>eid-applet-js</artifactId>
+	<scope>provided</scope>
+</dependency>]]></programlisting>
+		<para>
+			Now you can include the eID Applet JAR and corresponding
+			Javascript as web resource via:
+		</para>
+		<programlisting language="XML"><![CDATA[<plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-dependency-plugin</artifactId>
+	<executions>
+		<execution>
+			<id>unpack</id>
+			<phase>process-resources</phase>
+			<goals>
+				<goal>unpack</goal>
+			</goals>
+			<configuration>
+				<artifactItems>
+					<artifactItem>
+						<groupId>be.fedict.eid-applet</groupId>
+						<artifactId>eid-applet-js</artifactId>
+						<outputDirectory>
+							${project.build.directory}/${project.artifactId}-${project.version}
+						</outputDirectory>
+					</artifactItem>
+				</artifactItems>
+				<includes>*.js</includes>
+			</configuration>
+		</execution>
+		<execution>
+			<id>copy</id>
+			<phase>process-resources</phase>
+			<goals>
+				<goal>copy</goal>
+			</goals>
+			<configuration>
+				<artifactItems>
+					<artifactItem>
+						<groupId>be.fedict.eid-applet</groupId>
+						<artifactId>eid-applet-package</artifactId>
+						<type>jar</type>
+						<outputDirectory>
+							${project.build.directory}/${project.artifactId}-${project.version}
+						</outputDirectory>
+					</artifactItem>
+				</artifactItems>
+			</configuration>
+		</execution>
+	</executions>
+</plugin>]]></programlisting>
+		<para>
+			The inclusion of the eID Applet Service depends somehow on what
+			the runtime already provided by itself and what functionality you
+			want to use exactly. However, most of the time the
+			following
+			dependency should suffice:
+		</para>
+		<programlisting language="XML"><![CDATA[<dependency>
+	<groupId>be.fedict.eid-applet</groupId>
+	<artifactId>eid-applet-service</artifactId>
+	<exclusions>
+		<exclusion>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+		</exclusion>
+		<exclusion>
+			<groupId>com.lowagie</groupId>
+			<artifactId>itext</artifactId>
+		</exclusion>
+		<exclusion>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+		</exclusion>
+	</exclusions>
+</dependency>]]></programlisting>
 	</section>
 	<section>
 		<title>eID Applet Web Application Deployment</title>

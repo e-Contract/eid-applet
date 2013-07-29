@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict</groupId>
@@ -57,15 +59,15 @@
 				<artifactId>maven-jdocbook-plugin</artifactId>
 				<dependencies>
 					<dependency>
-						<groupId>org.jboss</groupId>
-						<artifactId>jbossorg-docbook-xslt-ns</artifactId>
-						<version>1.1.2</version>
+						<groupId>org.jboss.pressgang</groupId>
+						<artifactId>pressgang-xslt-ns</artifactId>
+						<version>2.0.2</version>
 					</dependency>
 					<dependency>
-						<groupId>org.jboss</groupId>
-						<artifactId>jbossorg-jdocbook-style</artifactId>
-						<version>1.1.1</version>
+						<groupId>org.jboss.pressgang</groupId>
+						<artifactId>pressgang-jdocbook-style</artifactId>
 						<type>jdocbook-style</type>
+						<version>2.0.2</version>
 					</dependency>
 				</dependencies>
 				<configuration>
@@ -83,10 +85,6 @@
 					<options>
 						<xincludeSupported>true</xincludeSupported>
 						<xmlTransformerType>saxon</xmlTransformerType>
-						<!-- needed for uri-resolvers; can be ommitted if using 'current' uri 
-							scheme -->
-						<!-- could also locate the docbook dependency and inspect its version... -->
-						<docbookVersion>1.72.0</docbookVersion>
 					</options>
 					<injections>
 						<injection>
