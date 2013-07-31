@@ -636,7 +636,8 @@
 					<code>eid-applet-service-cdi</code>
 					artifact that offers initial support for CDI containers. The
 					artifact does not require JBoss Seam 3.1 at run-time.
-					When using Maven, include the CDI artifact via:
+					When using
+					Maven, include the CDI artifact via:
 					<programlisting language="XML"><![CDATA[<dependency>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-service-cdi</artifactId>
@@ -2093,7 +2094,8 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 			consists
 			out of two tasks. First we have to add the eID Applet itself
 			as web
-			resource to the web application. In order to do so, add the following
+			resource to the web application. In order to do so, add the
+			following
 			dependencies under
 			<code>&lt;dependencies&gt;</code>
 			:
@@ -2281,6 +2283,51 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 				<code>HttpOnly</code>
 				flag set. Else the eID Applet Service will push the eID identity
 				credentials in the wrong Application Server HTTP session.
+			</para>
+		</section>
+		<section>
+			<title>Tomcat 7</title>
+			<para>
+				When running the eID Applet Service on Tomcat 7, you might receive
+				the following error message within the eID Applet:
+				<programlisting>ERROR: no session cookie detected!</programlisting>
+				This error occurs because Tomcat 7 will per default set the
+				<code>HttpOnly</code>
+				flag on the
+				<code>JSESSIONID</code>
+				session cookie. This prevents Javascript and web browser plugins
+				like the Java runtime plugin to receive the session cookie. It is
+				important that the Java runtime plugin is capable of receiving the
+				session cookie as the eID Applet Service must be able to push the
+				eID data within the same web session as seen by the web browser.
+			</para>
+			<para>
+				There are several solutions:
+				<itemizedlist>
+					<listitem>
+						<para>
+							One can check the
+							<code>useHttpOnly</code>
+							attribute within the
+							<code>&lt;Context&gt;</code>
+							element and set it back to
+							<code>false</code>
+							.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Or you can add
+							<code>;jsessionid=...</code>
+							to the
+							<code>AppletService</code>
+							eID Applet parameter so that the eID Applet Service will receive
+							the correct
+							<code>JSESSIONID</code>
+							reference.
+						</para>
+					</listitem>
+				</itemizedlist>
 			</para>
 		</section>
 	</section>
