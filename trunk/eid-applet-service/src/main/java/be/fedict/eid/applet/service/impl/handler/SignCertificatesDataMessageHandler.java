@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2008-2013 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -136,7 +136,17 @@ public class SignCertificatesDataMessageHandler implements
 				}
 				if (null != identity) {
 					byte[] expectedPhotoDigest = identity.photoDigest;
-					byte[] actualPhotoDigest = digestPhoto(message.photoData);
+					byte[] actualPhotoDigest;
+
+					try {
+						actualPhotoDigest = digestPhoto(
+								getDigestAlgo(expectedPhotoDigest.length),
+								message.photoData);
+					} catch (NoSuchAlgorithmException e) {
+						throw new ServletException(
+								"photo signed with unsupported algorithm");
+					}
+
 					if (false == Arrays.equals(expectedPhotoDigest,
 							actualPhotoDigest)) {
 						throw new ServletException("photo digest incorrect");
@@ -157,16 +167,18 @@ public class SignCertificatesDataMessageHandler implements
 						throw new ServletException(
 								"missing identity data signature");
 					}
-					verifySignature(message.identitySignatureData,
-							rrnPublicKey, request, message.identityData);
+					verifySignature(message.rrnCertificate.getSigAlgName(),
+							message.identitySignatureData, rrnPublicKey,
+							request, message.identityData);
 					if (null != message.addressData) {
 						if (null == message.addressSignatureData) {
 							throw new ServletException(
 									"missing address data signature");
 						}
 						byte[] addressFile = trimRight(message.addressData);
-						verifySignature(message.addressSignatureData,
-								rrnPublicKey, request, addressFile,
+						verifySignature(message.rrnCertificate.getSigAlgName(),
+								message.addressSignatureData, rrnPublicKey,
+								request, addressFile,
 								message.identitySignatureData);
 					}
 				}
@@ -239,22 +251,23 @@ public class SignCertificatesDataMessageHandler implements
 		// empty
 	}
 
-	private byte[] digestPhoto(byte[] photoFile) {
+	private byte[] digestPhoto(String digestAlgoName, byte[] photoFile) {
 		MessageDigest messageDigest;
 		try {
-			messageDigest = MessageDigest.getInstance("SHA1");
+			messageDigest = MessageDigest.getInstance(digestAlgoName);
 		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("SHA1 error: " + e.getMessage(), e);
+			throw new RuntimeException("digest error: " + e.getMessage(), e);
 		}
 		byte[] photoDigest = messageDigest.digest(photoFile);
 		return photoDigest;
 	}
 
-	private void verifySignature(byte[] signatureData, PublicKey publicKey,
+	private void verifySignature(String signatureAlgoName,
+			byte[] signatureData, PublicKey publicKey,
 			HttpServletRequest request, byte[]... data) throws ServletException {
 		Signature signature;
 		try {
-			signature = Signature.getInstance("SHA1withRSA");
+			signature = Signature.getInstance(signatureAlgoName);
 		} catch (NoSuchAlgorithmException e) {
 			throw new ServletException("algo error: " + e.getMessage(), e);
 		}
@@ -292,5 +305,24 @@ public class SignCertificatesDataMessageHandler implements
 		byte[] result = new byte[idx];
 		System.arraycopy(addressFile, 0, result, 0, idx);
 		return result;
+	}
+
+	private String getDigestAlgo(final int hashSize)
+			throws NoSuchAlgorithmException {
+		switch (hashSize) {
+		case 20:
+			return "SHA-1";
+		case 28:
+			return "SHA-224";
+		case 32:
+			return "SHA-256";
+		case 48:
+			return "SHA-384";
+		case 64:
+			return "SHA-512";
+		}
+		throw new NoSuchAlgorithmException(
+				"Failed to find guess algorithm for hash size of " + hashSize
+						+ " bytes");
 	}
 }

@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2008-2013 FedICT.
  * Copyright (C) 2009 Frank Cornelis.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -211,8 +211,9 @@ public class IdentityDataMessageHandler implements
 			 */
 			X509Certificate rrnCertificate = getCertificate(message.rrnCertFile);
 			PublicKey rrnPublicKey = rrnCertificate.getPublicKey();
-			verifySignature(message.identitySignatureFile, rrnPublicKey,
-					request, message.idFile);
+			verifySignature(rrnCertificate.getSigAlgName(),
+					message.identitySignatureFile, rrnPublicKey, request,
+					message.idFile);
 			if (false == this.skipNationalNumberCheck) {
 				String authnUserId = (String) session
 						.getAttribute(AuthenticationDataMessageHandler.AUTHENTICATED_USER_IDENTIFIER_SESSION_ATTRIBUTE);
@@ -224,8 +225,9 @@ public class IdentityDataMessageHandler implements
 			}
 			if (includeAddress) {
 				byte[] addressFile = trimRight(message.addressFile);
-				verifySignature(message.addressSignatureFile, rrnPublicKey,
-						request, addressFile, message.identitySignatureFile);
+				verifySignature(rrnCertificate.getSigAlgName(),
+						message.addressSignatureFile, rrnPublicKey, request,
+						addressFile, message.identitySignatureFile);
 			}
 			LOG.debug("checking national registration certificate: "
 					+ rrnCertificate.getSubjectX500Principal());
@@ -290,7 +292,9 @@ public class IdentityDataMessageHandler implements
 			 * Photo integrity check.
 			 */
 			byte[] expectedPhotoDigest = identity.photoDigest;
-			byte[] actualPhotoDigest = digestPhoto(message.photoFile);
+			byte[] actualPhotoDigest = digestPhoto(
+					getDigestAlgo(expectedPhotoDigest.length),
+					message.photoFile);
 			if (false == Arrays.equals(expectedPhotoDigest, actualPhotoDigest)) {
 				throw new ServletException("photo digest incorrect");
 			}
@@ -368,11 +372,12 @@ public class IdentityDataMessageHandler implements
 		return result;
 	}
 
-	private void verifySignature(byte[] signatureData, PublicKey publicKey,
-			HttpServletRequest request, byte[]... data) throws ServletException {
+	private void verifySignature(String signAlgo, byte[] signatureData,
+			PublicKey publicKey, HttpServletRequest request, byte[]... data)
+			throws ServletException {
 		Signature signature;
 		try {
-			signature = Signature.getInstance("SHA1withRSA");
+			signature = Signature.getInstance(signAlgo);
 		} catch (NoSuchAlgorithmException e) {
 			throw new ServletException("algo error: " + e.getMessage(), e);
 		}
@@ -445,15 +450,33 @@ public class IdentityDataMessageHandler implements
 		}
 	}
 
-	private byte[] digestPhoto(byte[] photoFile) {
+	private byte[] digestPhoto(String digestAlgoName, byte[] photoFile) {
 		MessageDigest messageDigest;
 		try {
-			messageDigest = MessageDigest.getInstance("SHA1");
+			messageDigest = MessageDigest.getInstance(digestAlgoName);
 		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("SHA1 error: " + e.getMessage(), e);
+			throw new RuntimeException("digest error: " + e.getMessage(), e);
 		}
 		byte[] photoDigest = messageDigest.digest(photoFile);
 		return photoDigest;
+	}
+
+	private String getDigestAlgo(final int hashSize) throws RuntimeException {
+		switch (hashSize) {
+		case 20:
+			return "SHA-1";
+		case 28:
+			return "SHA-224";
+		case 32:
+			return "SHA-256";
+		case 48:
+			return "SHA-384";
+		case 64:
+			return "SHA-512";
+		}
+		throw new RuntimeException(
+				"Failed to find guess algorithm for hash size of " + hashSize
+						+ " bytes");
 	}
 
 	public void init(ServletConfig config) throws ServletException {
