@@ -31,6 +31,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -301,6 +303,20 @@ public class IdentityDataMessageHandler implements
 		} else {
 			if (true == includePhoto) {
 				throw new ServletException("photo not included while requested");
+			}
+		}
+
+		/*
+		 * Check the validity of the identity data as good as possible.
+		 */
+		GregorianCalendar cardValidityDateEndGregorianCalendar = identity
+				.getCardValidityDateEnd();
+		if (null != cardValidityDateEndGregorianCalendar) {
+			Date now = new Date();
+			Date cardValidityDateEndDate = cardValidityDateEndGregorianCalendar
+					.getTime();
+			if (now.after(cardValidityDateEndDate)) {
+				throw new SecurityException("eID card has expired");
 			}
 		}
 
