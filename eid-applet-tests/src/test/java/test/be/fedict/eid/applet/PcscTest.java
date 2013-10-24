@@ -46,8 +46,14 @@ import javax.imageio.ImageIO;
 import javax.smartcardio.Card;
 import javax.smartcardio.CardChannel;
 import javax.smartcardio.CardException;
+import javax.smartcardio.CardTerminal;
+import javax.smartcardio.CardTerminals;
 import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
+import javax.smartcardio.TerminalFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -553,6 +559,31 @@ public class PcscTest {
 		LOG.debug("dt: " + (t1 - t0) + " ms");
 
 		pcscEidSpi.close();
+	}
+
+	@Test
+	public void testReadPhoto() throws Exception {
+		TerminalFactory terminalFactory = TerminalFactory.getDefault();
+		CardTerminals cardTerminals = terminalFactory.terminals();
+		CardTerminal cardTerminal = cardTerminals.list().get(0);
+		Card card = cardTerminal.connect("T=0");
+		CardChannel cardChannel = card.getBasicChannel();
+		// select file
+		cardChannel.transmit(new CommandAPDU(0x00, 0xA4, 0x08, 0x0C,
+				new byte[] { 0x3F, 0x00, (byte) 0xDF, 0x01, 0x40, 0x35 }));
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		int offset = 0;
+		ResponseAPDU responseApdu;
+		do {
+			// read binary
+			responseApdu = cardChannel.transmit(new CommandAPDU(0x00, 0xB0,
+					offset >> 8, offset & 0xFF, 0xff));
+			baos.write(responseApdu.getData());
+			offset += responseApdu.getData().length;
+		} while (responseApdu.getData().length == 0xff);
+		BufferedImage photo = ImageIO.read(new ByteArrayInputStream(baos
+				.toByteArray()));
+		JOptionPane.showMessageDialog(null, new ImageIcon(photo));
 	}
 
 	@Test
