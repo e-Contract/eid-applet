@@ -1,9 +1,9 @@
-README for the FedICT eID Applet SDK
-====================================
+README for the eID Applet SDK
+=============================
 
 === 1. Introduction
 
-This package contains the FedICT eID Applet SDK. It includes the following
+This package contains the eID Applet SDK. It includes the following
 primary artifacts:
 
 - README.txt			This file.

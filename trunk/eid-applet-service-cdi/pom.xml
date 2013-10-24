@@ -7,7 +7,7 @@
 		<artifactId>eid-applet</artifactId>
 		<version>1.1.0-SNAPSHOT</version>
 	</parent>
-	<name>FedICT eID Applet Service CDI</name>
+	<name>eID Applet Service CDI</name>
 	<description>CDI extension for the eID Applet Service.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-service-cdi</artifactId>

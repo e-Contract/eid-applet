@@ -1,17 +1,17 @@
-README for FedICT eID Applet Project
-====================================
+README for eID Applet Project
+=============================
 
 === 1. Introduction
 
-This project contains the source code tree of the FedICT eID Applet.
+This project contains the source code tree of the eID Applet.
 The source code is hosted at: http://code.google.com/p/eid-applet/
 
 
 === 2. Requirements
 
 The following is required for compiling the eID Applet software:
-* Oracle Java 1.6.0_32
-* Apache Maven 3.0.4
+* Oracle Java 1.6.0_45
+* Apache Maven 3.0.4+, 3.1.1
 
 
 === 3. Build

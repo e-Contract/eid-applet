@@ -44,7 +44,6 @@ import org.joda.time.DateTime;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import test.unit.be.fedict.eid.applet.service.signer.AbstractOOXMLSignatureServiceTest;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.sc.PcscEid;
 import be.fedict.eid.applet.service.signer.DigestAlgo;
@@ -165,8 +164,7 @@ public class OOXMLTest {
 	@Test
 	public void testSign() throws Exception {
 		// setup
-		URL ooxmlUrl = AbstractOOXMLSignatureServiceTest.class
-				.getResource("/ms-office-2010.docx");
+		URL ooxmlUrl = OOXMLTest.class.getResource("/ms-office-2010.docx");
 
 		OOXMLTestSignatureService signatureService = new OOXMLTestSignatureService(
 				ooxmlUrl);
@@ -241,8 +239,7 @@ public class OOXMLTest {
 
 	private File sign(String documentResourceName, int signerCount)
 			throws Exception {
-		URL ooxmlUrl = AbstractOOXMLSignatureServiceTest.class
-				.getResource(documentResourceName);
+		URL ooxmlUrl = OOXMLTest.class.getResource(documentResourceName);
 		return sign(ooxmlUrl, signerCount);
 	}
 }

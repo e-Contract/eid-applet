@@ -7,7 +7,7 @@
 		<artifactId>eid-applet</artifactId>
 		<version>1.1.0-SNAPSHOT</version>
 	</parent>
-	<name>FedICT eID Applet Test Project</name>
+	<name>eID Applet Test Project</name>
 	<description>Contains an eID Applet Test Java EE web
 		application.</description>
 	<groupId>be.fedict.eid-applet</groupId>
