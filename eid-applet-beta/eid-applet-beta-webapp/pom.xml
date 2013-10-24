@@ -5,7 +5,7 @@
 		<artifactId>eid-applet-beta</artifactId>
 		<version>1.1.0-SNAPSHOT</version>
 	</parent>
-	<name>FedICT eID Applet Beta Web Application</name>
+	<name>eID Applet Beta Web Application</name>
 	<description>Beta Web Application for eID Applet.</description>
 	<artifactId>eid-applet-beta-webapp</artifactId>
 	<packaging>war</packaging>

@@ -7,7 +7,7 @@
 		<artifactId>eid-applet-test</artifactId>
 		<version>1.1.0-SNAPSHOT</version>
 	</parent>
-	<name>FedICT eID Applet Test Model</name>
+	<name>eID Applet Test Model</name>
 	<description>EJB3 Model for Test eID Applet Web App.</description>
 	<artifactId>eid-applet-test-model</artifactId>
 	<packaging>ejb</packaging>

@@ -5,7 +5,7 @@
 		<artifactId>eid-applet-beta</artifactId>
 		<version>1.1.0-SNAPSHOT</version>
 	</parent>
-	<name>FedICT eID Applet Beta Taglib</name>
+	<name>eID Applet Beta Taglib</name>
 	<description>Tag Library for eID Applet Beta Web Application</description>
 	<artifactId>eid-applet-beta-taglib</artifactId>
 	<packaging>jar</packaging>
