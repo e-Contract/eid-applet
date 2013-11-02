@@ -235,4 +235,10 @@ public class DerTest {
 		digest = messageDigest.digest(message);
 		LOG.debug("SHA-224 size: " + digest.length);
 	}
+	
+	@Test
+	public void testOids() throws Exception {
+		LOG.debug("SHA1: " + new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1,
+				DERNull.INSTANCE).getObjectId());
+	}
 }

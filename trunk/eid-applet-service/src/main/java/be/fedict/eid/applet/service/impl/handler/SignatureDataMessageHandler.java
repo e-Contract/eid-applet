@@ -18,6 +18,7 @@
 
 package be.fedict.eid.applet.service.impl.handler;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Method;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -27,7 +28,6 @@ import java.security.spec.PSSParameterSpec;
 import java.util.List;
 import java.util.Map;
 
-import javax.crypto.Cipher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,11 +35,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.x509.DigestInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.util.Arrays;
 
 import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.impl.UserIdentifierUtil;
@@ -65,6 +61,38 @@ public class SignatureDataMessageHandler implements
 
 	private static final Log LOG = LogFactory
 			.getLog(SignatureDataMessageHandler.class);
+
+	public static final byte[] SHA1_DIGEST_INFO_PREFIX = new byte[] { 0x30,
+			0x21, 0x30, 0x09, 0x06, 0x05, 0x2b, 0x0e, 0x03, 0x02, 0x1a, 0x05,
+			0x00, 0x04, 0x14 };
+
+	public static final byte[] SHA224_DIGEST_INFO_PREFIX = new byte[] { 0x30,
+			0x2d, 0x30, 0x0d, 0x06, 0x09, 0x60, (byte) 0x86, 0x48, 0x01, 0x65,
+			0x03, 0x04, 0x02, 0x04, 0x05, 0x00, 0x04, 0x1c };
+
+	public static final byte[] SHA256_DIGEST_INFO_PREFIX = new byte[] { 0x30,
+			0x31, 0x30, 0x0d, 0x06, 0x09, 0x60, (byte) 0x86, 0x48, 0x01, 0x65,
+			0x03, 0x04, 0x02, 0x01, 0x05, 0x00, 0x04, 0x20 };
+
+	public static final byte[] SHA384_DIGEST_INFO_PREFIX = new byte[] { 0x30,
+			0x41, 0x30, 0x0d, 0x06, 0x09, 0x60, (byte) 0x86, 0x48, 0x01, 0x65,
+			0x03, 0x04, 0x02, 0x02, 0x05, 0x00, 0x04, 0x30 };
+
+	public static final byte[] SHA512_DIGEST_INFO_PREFIX = new byte[] { 0x30,
+			0x51, 0x30, 0x0d, 0x06, 0x09, 0x60, (byte) 0x86, 0x48, 0x01, 0x65,
+			0x03, 0x04, 0x02, 0x03, 0x05, 0x00, 0x04, 0x40 };
+
+	public static final byte[] RIPEMD160_DIGEST_INFO_PREFIX = new byte[] {
+			0x30, 0x21, 0x30, 0x09, 0x06, 0x05, 0x2b, 0x24, 0x03, 0x02, 0x01,
+			0x05, 0x00, 0x04, 0x14 };
+
+	public static final byte[] RIPEMD128_DIGEST_INFO_PREFIX = new byte[] {
+			0x30, 0x1d, 0x30, 0x09, 0x06, 0x05, 0x2b, 0x24, 0x03, 0x02, 0x02,
+			0x05, 0x00, 0x04, 0x10 };
+
+	public static final byte[] RIPEMD256_DIGEST_INFO_PREFIX = new byte[] {
+			0x30, 0x2d, 0x30, 0x09, 0x06, 0x05, 0x2b, 0x24, 0x03, 0x02, 0x03,
+			0x05, 0x00, 0x04, 0x20 };
 
 	@InitParam(HelloMessageHandler.SIGNATURE_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<SignatureService> signatureServiceLocator;
@@ -124,33 +152,45 @@ public class SignatureDataMessageHandler implements
 						+ e.getMessage(), e);
 			}
 		} else {
-			byte[] signatureDigestValue;
 			try {
-				Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-				cipher.init(Cipher.DECRYPT_MODE, signingPublicKey);
-				byte[] signatureDigestInfoValue = cipher
-						.doFinal(signatureValue);
-				ASN1InputStream aIn = new ASN1InputStream(
-						signatureDigestInfoValue);
-				DigestInfo signatureDigestInfo = new DigestInfo(
-						(ASN1Sequence) aIn.readObject());
-				signatureDigestValue = signatureDigestInfo.getDigest();
+				Signature signature = Signature.getInstance("RawRSA",
+						BouncyCastleProvider.PROVIDER_NAME);
+				signature.initVerify(signingPublicKey);
+				ByteArrayOutputStream digestInfo = new ByteArrayOutputStream();
+				if ("SHA-1".equals(digestAlgo) || "SHA1".equals(digestAlgo)) {
+					digestInfo.write(SHA1_DIGEST_INFO_PREFIX);
+				} else if ("SHA-224".equals(digestAlgo)) {
+					digestInfo.write(SHA224_DIGEST_INFO_PREFIX);
+				} else if ("SHA-256".equals(digestAlgo)) {
+					digestInfo.write(SHA256_DIGEST_INFO_PREFIX);
+				} else if ("SHA-384".equals(digestAlgo)) {
+					digestInfo.write(SHA384_DIGEST_INFO_PREFIX);
+				} else if ("SHA-512".equals(digestAlgo)) {
+					digestInfo.write(SHA512_DIGEST_INFO_PREFIX);
+				} else if ("RIPEMD160".equals(digestAlgo)) {
+					digestInfo.write(RIPEMD160_DIGEST_INFO_PREFIX);
+				} else if ("RIPEMD128".equals(digestAlgo)) {
+					digestInfo.write(RIPEMD128_DIGEST_INFO_PREFIX);
+				} else if ("RIPEMD256".equals(digestAlgo)) {
+					digestInfo.write(RIPEMD256_DIGEST_INFO_PREFIX);
+				}
+				digestInfo.write(expectedDigestValue);
+				signature.update(digestInfo.toByteArray());
+				boolean result = signature.verify(signatureValue);
+				if (false == result) {
+					AuditService auditService = this.auditServiceLocator
+							.locateService();
+					if (null != auditService) {
+						String remoteAddress = request.getRemoteAddr();
+						auditService.signatureError(remoteAddress,
+								signingCertificate);
+					}
+					throw new SecurityException("signature incorrect");
+				}
 			} catch (Exception e) {
 				LOG.debug("signature verification error: " + e.getMessage());
 				throw new ServletException("signature verification error: "
 						+ e.getMessage(), e);
-			}
-
-			if (false == Arrays.areEqual(expectedDigestValue,
-					signatureDigestValue)) {
-				AuditService auditService = this.auditServiceLocator
-						.locateService();
-				if (null != auditService) {
-					String remoteAddress = request.getRemoteAddr();
-					auditService.signatureError(remoteAddress,
-							signingCertificate);
-				}
-				throw new ServletException("signature incorrect");
 			}
 		}
 
