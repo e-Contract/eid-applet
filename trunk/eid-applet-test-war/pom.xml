@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.1.0.GA</version>
+		<version>1.1.1-SNAPSHOT</version>
 	</parent>
 	<name>eID Applet Test Web Application</name>
 	<description>Self-contained test Web Application for eID Applet. Targets Servlet 3.0 containers.</description>
