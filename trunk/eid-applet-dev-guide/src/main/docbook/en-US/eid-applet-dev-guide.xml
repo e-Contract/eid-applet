@@ -14,12 +14,12 @@
 			<year>2008-2013</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>29 July 2013</releaseinfo>
+		<releaseinfo>4 November 2013</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
 				<surname>Cornelis</surname>
-				<email>frank.cornelis@fedict.be</email>
+				<email>info@e-contract.be</email>
 			</author>
 		</authorgroup>
 		<abstract>
@@ -2641,6 +2641,11 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 						<entry>2 Oct 2012</entry>
 						<entry>Frank Cornelis</entry>
 						<entry>1.0.5.GA</entry>
+					</row>
+					<row>
+						<entry>4 Nov 2013</entry>
+						<entry>Frank Cornelis</entry>
+						<entry>1.1.0.GA</entry>
 					</row>
 				</tbody>
 			</tgroup>

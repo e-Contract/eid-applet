@@ -1,3 +1,16 @@
+1.1.0.GA - 4 Nov 2013
+	* CDI support
+	* fix NULL DER parameter on AlgorithmIdentifiers
+	* Java 7 compilation fixes
+	* OOXML signature fixes
+	* Mac OS X fixes for both PC/SC and dialogs
+	* improved card reader handling
+	* work-around for disabled third party cookies
+	* documented Maven integration
+	* documented HttpOnly on Tomcat 7
+	* also check card validity interval on identification
+	* fix for BouncyCastle 1.49
+
 1.0.5.GA - 2 Oct 2012
 	* improved exception and error handling
 	* removed PKCS#11 usage (only direct PC/SC from now on)
