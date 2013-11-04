@@ -1,0 +1,45 @@
+options {
+	STATIC = false;
+}
+
+PARSER_BEGIN(Adder3)
+package be.fedict.eid.applet.tests.javacc.adder3;
+
+public class Adder3 {
+	public static void main(String[] args) throws ParseException, TokenMgrError {
+		Adder3 parser = new Adder3(System.in);
+		int result = parser.Start();
+		System.out.println("result: " + result);
+	}
+}
+PARSER_END(Adder3)
+
+SKIP : { " " }
+SKIP : { "\n" | "\r" | "\r\n" }
+TOKEN : { < PLUS : "+" > }
+TOKEN : { < NUMBER : (["0"-"9"])+ > }
+
+int Start() throws NumberFormatException :
+{
+	int i;
+	int value;
+}
+{
+	value = Primary()
+	(
+		<PLUS>
+		i = Primary()
+		{ value += i; }
+	)*
+	<EOF>
+	{ return value; }
+}
+
+int Primary() throws NumberFormatException :
+{
+	Token t;
+}
+{
+	t = <NUMBER>
+	{ return Integer.parseInt(t.image); }
+}
