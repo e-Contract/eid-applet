@@ -35,53 +35,13 @@
 
 package test.unit.be.fedict.eid.applet.service.signer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.KeyPair;
-import java.security.MessageDigest;
-import java.security.cert.X509Certificate;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javax.crypto.Cipher;
-import javax.xml.crypto.Data;
-import javax.xml.crypto.KeySelector;
-import javax.xml.crypto.OctetStreamData;
-import javax.xml.crypto.URIDereferencer;
-import javax.xml.crypto.URIReference;
-import javax.xml.crypto.URIReferenceException;
-import javax.xml.crypto.XMLCryptoContext;
-import javax.xml.crypto.dom.DOMCryptoContext;
-import javax.xml.crypto.dsig.CanonicalizationMethod;
-import javax.xml.crypto.dsig.DigestMethod;
-import javax.xml.crypto.dsig.Reference;
-import javax.xml.crypto.dsig.SignatureMethod;
-import javax.xml.crypto.dsig.SignedInfo;
-import javax.xml.crypto.dsig.Transform;
-import javax.xml.crypto.dsig.XMLSignContext;
-import javax.xml.crypto.dsig.XMLSignature;
-import javax.xml.crypto.dsig.XMLSignatureFactory;
-import javax.xml.crypto.dsig.dom.DOMSignContext;
-import javax.xml.crypto.dsig.dom.DOMValidateContext;
-import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
-import javax.xml.crypto.dsig.spec.TransformParameterSpec;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
+import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
 import be.fedict.eid.applet.service.signer.DigestAlgo;
+import be.fedict.eid.applet.service.signer.SignatureFacet;
+import be.fedict.eid.applet.service.signer.TemporaryDataStorage;
+import be.fedict.eid.applet.service.signer.facets.EnvelopedSignatureFacet;
+import be.fedict.eid.applet.service.signer.odf.ApacheNodeSetData;
+import be.fedict.eid.applet.service.spi.DigestInfo;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -102,22 +62,29 @@ import org.apache.xpath.XPathAPI;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
-import be.fedict.eid.applet.service.signer.SignatureFacet;
-import be.fedict.eid.applet.service.signer.TemporaryDataStorage;
-import be.fedict.eid.applet.service.signer.facets.EnvelopedSignatureFacet;
-import be.fedict.eid.applet.service.signer.odf.ApacheNodeSetData;
-import be.fedict.eid.applet.service.spi.DigestInfo;
+import javax.crypto.Cipher;
+import javax.xml.crypto.*;
+import javax.xml.crypto.dom.DOMCryptoContext;
+import javax.xml.crypto.dsig.*;
+import javax.xml.crypto.dsig.dom.DOMSignContext;
+import javax.xml.crypto.dsig.dom.DOMValidateContext;
+import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.crypto.dsig.spec.TransformParameterSpec;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.*;
+import java.security.KeyPair;
+import java.security.MessageDigest;
+import java.security.cert.X509Certificate;
+import java.util.*;
+
+import static org.junit.Assert.*;
 
 public class AbstractXmlSignatureServiceTest {
 
@@ -207,7 +174,7 @@ public class AbstractXmlSignatureServiceTest {
 		Document document = documentBuilder.newDocument();
 		Element rootElement = document.createElementNS("urn:test", "tns:root");
 		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
-				"urn:test");
+                "urn:test");
 		document.appendChild(rootElement);
 		Element dataElement = document.createElementNS("urn:test", "tns:data");
 		dataElement.setAttributeNS(null, "Id", "id-1234");
@@ -285,9 +252,10 @@ public class AbstractXmlSignatureServiceTest {
 		assertEquals(1, signatureNodeList.getLength());
 		Node signatureNode = signatureNodeList.item(0);
 
-		DOMValidateContext domValidateContext = new DOMValidateContext(
+        DOMValidateContext domValidateContext = new DOMValidateContext(
 				KeySelector.singletonKeySelector(keyPair.getPublic()),
 				signatureNode);
+        domValidateContext.setIdAttributeNS((Element) signedDocument.getDocumentElement().getFirstChild(), null, "Id");
 		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
 				.getInstance();
 		XMLSignature xmlSignature = xmlSignatureFactory
@@ -668,8 +636,8 @@ public class AbstractXmlSignatureServiceTest {
 				SignatureMethod.RSA_SHA1, null);
 		CanonicalizationMethod canonicalizationMethod = signatureFactory
 				.newCanonicalizationMethod(
-						CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
-						(C14NMethodParameterSpec) null);
+                        CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
+                        (C14NMethodParameterSpec) null);
 		SignedInfo signedInfo = signatureFactory.newSignedInfo(
 				canonicalizationMethod, signatureMethod, Collections
 						.singletonList(reference));
@@ -729,7 +697,7 @@ public class AbstractXmlSignatureServiceTest {
 		List<Transform> transforms = new LinkedList<Transform>();
 		Transform transform = signatureFactory
 				.newTransform(CanonicalizationMethod.INCLUSIVE,
-						(TransformParameterSpec) null);
+                        (TransformParameterSpec) null);
 		transforms.add(transform);
 		Reference reference = signatureFactory.newReference("/helloworld.xml",
 				digestMethod, transforms, null, null);
@@ -742,8 +710,8 @@ public class AbstractXmlSignatureServiceTest {
 				SignatureMethod.RSA_SHA1, null);
 		CanonicalizationMethod canonicalizationMethod = signatureFactory
 				.newCanonicalizationMethod(
-						CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
-						(C14NMethodParameterSpec) null);
+                        CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
+                        (C14NMethodParameterSpec) null);
 		SignedInfo signedInfo = signatureFactory.newSignedInfo(
 				canonicalizationMethod, signatureMethod, Collections
 						.singletonList(reference));
@@ -803,7 +771,7 @@ public class AbstractXmlSignatureServiceTest {
 		List<Transform> transforms = new LinkedList<Transform>();
 		Transform transform = signatureFactory
 				.newTransform(CanonicalizationMethod.INCLUSIVE,
-						(TransformParameterSpec) null);
+                        (TransformParameterSpec) null);
 		LOG.debug("transform type: " + transform.getClass().getName());
 		transforms.add(transform);
 		Reference reference = signatureFactory.newReference("/bookstore.xml",
@@ -817,8 +785,8 @@ public class AbstractXmlSignatureServiceTest {
 				SignatureMethod.RSA_SHA1, null);
 		CanonicalizationMethod canonicalizationMethod = signatureFactory
 				.newCanonicalizationMethod(
-						CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
-						(C14NMethodParameterSpec) null);
+                        CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
+                        (C14NMethodParameterSpec) null);
 		SignedInfo signedInfo = signatureFactory.newSignedInfo(
 				canonicalizationMethod, signatureMethod, Collections
 						.singletonList(reference));
@@ -1181,7 +1149,7 @@ public class AbstractXmlSignatureServiceTest {
 
 		NodeList signatureNodeList = document.getDocumentElement()
 				.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#",
-						"Signature");
+                        "Signature");
 		Element signatureElement = (Element) signatureNodeList.item(0);
 
 		// operate & verify
@@ -1243,7 +1211,7 @@ public class AbstractXmlSignatureServiceTest {
 
 		NodeList signatureNodeList = document.getDocumentElement()
 				.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#",
-						"Signature");
+                        "Signature");
 		Element signatureElement = (Element) signatureNodeList.item(0);
 
 		// operate & verify

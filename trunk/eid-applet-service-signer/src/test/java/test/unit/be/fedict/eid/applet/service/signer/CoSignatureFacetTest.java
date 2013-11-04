@@ -18,35 +18,29 @@
 
 package test.unit.be.fedict.eid.applet.service.signer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import be.fedict.eid.applet.service.signer.DigestAlgo;
+import be.fedict.eid.applet.service.signer.facets.CoSignatureFacet;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI;
+import org.apache.xml.security.utils.Constants;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+import javax.xml.crypto.dsig.*;
+import javax.xml.crypto.dsig.dom.DOMSignContext;
+import javax.xml.crypto.dsig.dom.DOMValidateContext;
+import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.security.KeyPair;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.crypto.dsig.CanonicalizationMethod;
-import javax.xml.crypto.dsig.Reference;
-import javax.xml.crypto.dsig.SignatureMethod;
-import javax.xml.crypto.dsig.SignedInfo;
-import javax.xml.crypto.dsig.XMLSignContext;
-import javax.xml.crypto.dsig.XMLSignature;
-import javax.xml.crypto.dsig.XMLSignatureFactory;
-import javax.xml.crypto.dsig.dom.DOMSignContext;
-import javax.xml.crypto.dsig.dom.DOMValidateContext;
-import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import be.fedict.eid.applet.service.signer.DigestAlgo;
-import be.fedict.eid.applet.service.signer.facets.CoSignatureFacet;
+import static org.junit.Assert.*;
 
 public class CoSignatureFacetTest {
 
@@ -172,10 +166,29 @@ public class CoSignatureFacetTest {
 
 	@Test
 	public void testMultipleCoSignatures() throws Exception {
+
 		// setup
-		Document document = PkiTestUtils
-				.loadDocument(CoSignatureFacetTest.class
-						.getResourceAsStream("/helloworld.xml"));
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
+                .newInstance();
+        documentBuilderFactory.setNamespaceAware(true);
+        DocumentBuilder documentBuilder = documentBuilderFactory
+                .newDocumentBuilder();
+        Document document = documentBuilder.newDocument();
+        Element rootElement = document.createElementNS("urn:test", "tns:root");
+        rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
+                "urn:test");
+        document.appendChild(rootElement);
+        Element dataElement = document.createElementNS("urn:test", "tns:data");
+        rootElement.appendChild(dataElement);
+
+        // add alot of nodes to test performance
+        // when using xpath v1 in the co signature facet the c14n became really slow
+        for (int i = 0; i < 80000; i++) {
+            Element fooElement = document.createElementNS("urn:test", "tns:foo");
+            fooElement.setTextContent("bar");
+            dataElement.appendChild(fooElement);
+        }
+
 		KeyPair keyPair1 = PkiTestUtils.generateKeyPair();
 		KeyPair keyPair2 = PkiTestUtils.generateKeyPair();
 
