@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>be.fedict.eid-applet</groupId>
 		<artifactId>eid-applet-test</artifactId>
-		<version>1.1.2-SNAPSHOT</version>
+		<version>1.1.2</version>
 	</parent>
 	<name>eID Applet Test Model</name>
 	<description>EJB3 Model for Test eID Applet Web App.</description>

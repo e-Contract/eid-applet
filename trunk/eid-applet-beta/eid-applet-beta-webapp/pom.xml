@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>be.fedict.eid-applet</groupId>
 		<artifactId>eid-applet-beta</artifactId>
-		<version>1.1.2-SNAPSHOT</version>
+		<version>1.1.2</version>
 	</parent>
 	<name>eID Applet Beta Web Application</name>
 	<description>Beta Web Application for eID Applet.</description>
