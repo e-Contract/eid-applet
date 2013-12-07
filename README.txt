@@ -13,6 +13,8 @@ The following is required for compiling the eID Applet software:
 * Oracle Java 1.6.0_45
 * Apache Maven 3.0.4+, 3.1.1
 
+Note: the eID Applet does not compile using Java 7 for the moment.
+
 
 === 3. Build
 
