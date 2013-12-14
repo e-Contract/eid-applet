@@ -1,0 +1,181 @@
+1.1.3 - 14 Dec 2013
+	* updated Oracle deployJava javascript
+	* Removed all FedICT branding
+
+1.1.2 - 7 Dec 2013
+	* XML signature XPath co-signature fix
+	* Permissions and Codebase attributes in manifest
+
+1.1.0.GA - 4 Nov 2013
+	* CDI support
+	* fix NULL DER parameter on AlgorithmIdentifiers
+	* Java 7 compilation fixes
+	* OOXML signature fixes
+	* Mac OS X fixes for both PC/SC and dialogs
+	* improved card reader handling
+	* work-around for disabled third party cookies
+	* documented Maven integration
+	* documented HttpOnly on Tomcat 7
+	* also check card validity interval on identification
+	* fix for BouncyCastle 1.49
+
+1.0.5.GA - 2 Oct 2012
+	* improved exception and error handling
+	* removed PKCS#11 usage (only direct PC/SC from now on)
+	* deployJava script improvements
+	* support for new eID secure pinpad reader (transaction msg signing)
+	* support for blue card
+	* support for extra field of foreigner eID cards
+	* 2048 bit RSA support
+	* RSA-PSS support
+	* HSTS support
+	* various build system improvements
+	* i18n fixes and improvements
+	* OOXML signature fix (external targets)
+
+1.0.4.GA - 9 Dec 2011
+	* XAdES digest algo configuration
+	* XAdES c14n, namespace, XML schema fixes
+	* ASiC support
+	* Maven site configuration
+	* Maven fixes (cleanup & repository changes)
+	* CDI support
+	* Office2010 signature improvements
+	* German date of birth fixes
+	* common deployment javascript for the eID Applet
+
+1.0.3.GA - 20 Jun 2011
+	* fixed Hibernate LOB and Oracle issue
+	* 64-bit workaround for Ubuntu
+	* fixed UTF-8 issue in AJP/HTTP connectors
+	* fixed year only in DoB
+	* verification of NRN cert chain during signature creation
+	* OOXML signature improvements
+	* TLV-structured AuthenticationContract (security fix)
+	* CSRF countermeasure
+	* cleanup of Maven repository locations
+	* German translation
+	* fixed Beta site JPA mapping
+
+1.0.2.GA - 25 Feb 2011
+	* co-signature signature facet
+	* Office 2010 XAdES-X-L support
+	* identity signature facet
+	* upgrade to JBoss AS 6.0.0.Final
+	* SQL DDL maven plugin
+	* upgrade to Maven 3.0.2
+	* Transfer-Encoding chunked (IIS)
+	* various MW 4 patches (Frank Marien)
+
+1.0.1.GA - 15 Sep 2010
+	* fix: no javadoc for JAXB generated classes
+	* fix for EJBTHREE-2152
+	* proper error reporting for untrusted certificates during eID authn
+	* proper error reporting on invalid signing certificates for postSign
+	* fix: xerces run-time issue
+	* set request policy OID on TSP client
+	* fix: codehaus moved to nexus maven repository
+	* fixed eID Applet beta site identity result page
+
+1.0.1.RC3 - 18 Aug 2010
+	* XAdES-X-L v1.4.1 support
+	* XAdES-EPES support
+	* IdentityService SPI to allow run-time eID data selection
+	* HideDetailsButton eID Applet parameter
+
+1.0.1.RC2 - 5 Aug 2010
+	* fix: 64 bit Windows where sunpkcs11.jar is not available
+	* JSON servlet improvements
+	* identity retrieval during pre-sign phase
+	* protocol graph generator
+	* accessibility by Bart Hanssens
+	* fix: TLV document type parsing
+	* fix: ODT MathML DTD resolver
+	* upgraded the JBoss AS to 6.0.0.M4
+	* fix: NPE on Mac OS X 10.5
+	* UserAgent applet parameter
+
+1.0.1.RC1 - 25 June 2010
+	* fix: UTF-8 encoding for Mac OS X compilation
+	* fix: supporting IcedTea JRE under Fedora
+	* XML Signature support for RSA-SHA384 and RSA-SHA512
+	* IncludeCertificates during eID authentication
+	* CMS Signature Service
+	* fix: OOXML signature verification
+	* fix: Ubuntu libpcsclite.so non-standard location
+	* updated the JavaEE application server to JAX-WS RI 2.2.1
+	* secure channel binding via ChannelBindingService SPI
+	* fix: detection of card removal
+	* eID Applet session cookie detection
+	* fix: TLV parser UTF-8 encoding
+	* allow for non-SSL when eID Applet runs on localhost
+	* improved the JSONServlet
+	* fix: ODF signature service signing of manifest and mimetype
+	* MessageCallbackEx to have machine processable message identifiers
+	* RequireSecureReader to enfore usage of secure pinpad readers
+	* CCID i18n in case of a display on the secure reader
+	* CCID improvements for PIN modification
+	* DiagnosticMode to be able to run diagnostic tests at the client-side
+	* improved authn error reporting for expired/revoked certificates
+	* improved i18n on the various dialogs
+	* refactoring of message handlers using @InitParam
+	* NoPKCS11 feature for avoid usage of eID Middleware
+
+1.0.0.GA - 11 January 2010
+	* upgrade to JBoss Application Server 6.0.0.M1
+	* allow for missing authentication certificate
+	* allow for missing non-repudiation certificate
+
+1.0.0-rc-3 - 6 January 2010
+	* fix for german date of birth
+	* improved the @PostConstruct stack tracing
+	* fix resource encoding from UTF-8 to ISO-8859-1
+	* javascript callback with status parameter
+	* eID authentication + identification feature
+	* fix for variable PIN size (4 till 12 chars)
+	* eID PIN unblock via CCID
+	* eID PIN change via CCID
+
+1.0.0-rc-2 - 16 December 2009
+	* fix to IncludeCertificates after CheckClientEnvironment
+	* fix to no longer use Tomahawk for email input validation
+	* javascript MessageCallback feature
+	* fix to remove Maven descriptor from the eID Applet JAR
+	* fix to not to stop on a failing logoff
+	* documented the JBoss Seam conversation preservation issue
+	* fix since FedICT should be pronounced as Fedict according to marketing
+	* include certificates sizes in eID Applet protocol messages
+	* identity data usage via a privacy service
+	* documentation on PrivacyService SPI
+
+1.0.0-rc-1 - 22 November 2009
+	* SkipSecureConnectionCheck
+	* dual-licensing of the OOXML signature code under LGPL and AL
+	* signature facets cleanup
+	* XAdES support on ODF signature service
+	* PreLogoff
+	* Audit Service identified method
+	* XAdES SigningTime in Zulu
+	* fix read binary when file size mod 0xff
+
+1.0.0-beta-4 - 18 September 2009
+	* various improvements to the PHP eID Applet Service
+	* fix for PC/SC library loading under Linux
+	* improved OpenSC PKCS#11 error handling
+	* CCID secure pinpad reader support (direct & start/finish)
+	* TLV parser fix for large fields
+	* ODF signature service fixes (valid in OpenOffice.org 3.1)
+	* OOXML signature service implementation (Office 2007)
+	* eID identity export to KML 2.2 (Google Earth) and vCard 3.0
+	* improved the ASP.NET eID Applet Service implementation (photo)
+	* updated the eID Applet developer's guide
+	* eID identity export in JSON format
+	* French translation updates
+
+1.0.0-beta-3 - 24 July 2009
+	* initial eID Applet Service Signer implementation (XML + ODF)
+	* non-reversible citizen identifiers (NRCID) support
+	* Details button on the eID Applet
+	* various small fixes, improvements and refactorings
+	* initial ASP.NET eID Applet Service (not part of SDK yet)
+	* initial PHP eID Applet Service (not part of SDK yet)
