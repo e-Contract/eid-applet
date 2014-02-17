@@ -312,17 +312,6 @@
 					</row>
 					<row>
 						<entry>
-							<code>RemoveCardCallback</code>
-						</entry>
-						<entry>optional</entry>
-						<entry>
-							When the eID Applet runs in kiosk mode, a web developer can
-							use this parameter to set a Javascript callback. The callback
-							function will be invoked on an eID card removal event.
-						</entry>
-					</row>
-					<row>
-						<entry>
 							<code>MessageCallback</code>
 						</entry>
 						<entry>optional</entry>
@@ -1578,72 +1567,6 @@
 	<param-name>UnblockPin</param-name>
 	<param-value>true</param-value>
 </init-param>]]></programlisting>
-		</section>
-		<section>
-			<title>eID Applet Kiosk Mode</title>
-			<para>
-				Some web applications require explicit management of the
-				(authenticated) user session. For this type of web applications we
-				have foreseen a so-called Kiosk Mode. In this mode the eID Applet
-				will notify the web application in case the eID card has been
-				removed from the smart card reader. The web developer can use this
-				notification to trigger for example a session cleanup at the
-				server-side.
-			</para>
-			<para>
-				The eID Applet Kiosk Mode can be activated by setting the following
-				<code>init-param</code>
-				on the
-				<code>AppletServiceServlet</code>
-				:
-			</para>
-			<programlisting language="XML"><![CDATA[<init-param>
-	<param-name>Kiosk</param-name>
-	<param-value>true</param-value>
-</init-param>]]></programlisting>
-			<para>
-				The web developer can install the notification callback as
-				follows inside a web page:
-			</para>
-			<programlisting language="XML"><![CDATA[<script src="https://www.java.com/js/deployJava.js"></script>
-<script>
-	var attributes = {
-		code :'be.fedict.eid.applet.Applet.class',
-		archive :'eid-applet-package.jar',
-		width :1,
-		height :1,
-		mayscript :'true'
-	};
-	var parameters = {
-		AppletService :'applet-kiosk-service',
-		RemoveCardCallback :'removeCardCallback'
-	};
-	var version = '1.6';
-	deployJava.runApplet(attributes, parameters, version);
-</script>
-<script>
-	function removeCardCallback() {
-		alert('eID card removal has been detected by the web page.');
-	}
-</script>]]></programlisting>
-			<para>
-				As you can see the web developer can install a Javascript callback
-				function by setting the
-				<code>RemoveCardCallback</code>
-				eID Applet parameter. In our example we simply display a Javascript
-				pop-up. Of course more complex operations are possible here. One
-				might imagine a use case where the callback method invokes a
-				server-side component via AJAX.
-			</para>
-			<tip>
-				<title>mayscript</title>
-				<para>
-					Don't forget the
-					<code>mayscript:'true'</code>
-					attribute, else the eID Applet will not be able to invoke
-					Javascripts inside the browser window.
-				</para>
-			</tip>
 		</section>
 		<section>
 			<title>Generic eID Applet Service settings</title>

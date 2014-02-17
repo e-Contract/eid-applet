@@ -81,8 +81,6 @@ public class Applet extends JApplet {
 
 	public static final String MESSAGE_CALLBACK_EX_PARAM = "MessageCallbackEx";
 
-	public static final String DIAGNOSTIC_TEST_CALLBACK_PARAM = "DiagnosticTestCallback";
-
 	public static final String HIDE_DETAILS_BUTTON_PARAM = "HideDetailsButton";
 
 	private JStatusLabel statusLabel;

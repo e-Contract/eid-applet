@@ -28,8 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.CookieHandler;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
@@ -77,7 +75,6 @@ import be.fedict.eid.applet.shared.HelloMessage;
 import be.fedict.eid.applet.shared.IdentificationRequestMessage;
 import be.fedict.eid.applet.shared.IdentityDataMessage;
 import be.fedict.eid.applet.shared.InsecureClientMessage;
-import be.fedict.eid.applet.shared.KioskMessage;
 import be.fedict.eid.applet.shared.SignCertificatesDataMessage;
 import be.fedict.eid.applet.shared.SignCertificatesRequestMessage;
 import be.fedict.eid.applet.shared.SignRequestMessage;
@@ -291,9 +288,6 @@ public class Controller {
 						return null;
 					}
 				}
-			}
-			if (resultMessage instanceof KioskMessage) {
-				kioskMode();
 			}
 			if (resultMessage instanceof AdministrationMessage) {
 				AdministrationMessage administrationMessage = (AdministrationMessage) resultMessage;
@@ -569,49 +563,6 @@ public class Controller {
 				addressFile, photoFile, identitySignFile, addressSignFile,
 				nrnCertFile);
 		return signCertificatesDataMessage;
-	}
-
-	private void kioskMode() throws IllegalArgumentException,
-			SecurityException, IOException, InterruptedException,
-			NoSuchFieldException, IllegalAccessException,
-			InvocationTargetException, NoSuchMethodException, Exception {
-		addDetailMessage("entering Kiosk Mode...");
-		this.view.setStatusMessage(Status.NORMAL,
-				Messages.MESSAGE_ID.KIOSK_MODE);
-		while (true) {
-			if (false == this.pcscEidSpi.isEidPresent()) {
-				this.pcscEidSpi.waitForEidPresent();
-			}
-			addDetailMessage("waiting for card removal...");
-			this.pcscEidSpi.removeCard();
-			addDetailMessage("card removed");
-			ClassLoader classLoader = Controller.class.getClassLoader();
-			Class<?> jsObjectClass;
-			try {
-				jsObjectClass = classLoader
-						.loadClass("netscape.javascript.JSObject");
-			} catch (ClassNotFoundException e) {
-				addDetailMessage("JSObject class not found");
-				addDetailMessage("not running inside a browser?");
-				continue;
-			}
-			Method getWindowMethod = jsObjectClass.getMethod("getWindow",
-					new Class<?>[] { java.applet.Applet.class });
-			Object jsObject = getWindowMethod.invoke(null,
-					this.runtime.getApplet());
-			Method callMethod = jsObjectClass.getMethod("call", new Class<?>[] {
-					String.class, Class.forName("[Ljava.lang.Object;") });
-			String removeCardCallback = this.runtime
-					.getParameter("RemoveCardCallback");
-			if (null != removeCardCallback) {
-				addDetailMessage("invoking javascript callback: "
-						+ removeCardCallback);
-				callMethod
-						.invoke(jsObject, removeCardCallback, new Object[] {});
-			} else {
-				addDetailMessage("missing RemoveCardCallback parameter");
-			}
-		}
 	}
 
 	/**
