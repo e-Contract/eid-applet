@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -24,7 +25,6 @@ import java.util.Locale;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
@@ -58,11 +58,6 @@ public class TestView implements View {
 		if (Status.ERROR == status) {
 			throw new RuntimeException("status ERROR received");
 		}
-	}
-
-	@Override
-	public void addTestResult(DiagnosticTests diagnosticTest, boolean success,
-			String description) {
 	}
 
 	@Override

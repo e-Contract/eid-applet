@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -87,7 +88,6 @@ import org.mortbay.jetty.testing.ServletTester;
 
 import be.fedict.eid.applet.Applet;
 import be.fedict.eid.applet.Controller;
-import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.Runtime;
 import be.fedict.eid.applet.Status;
@@ -121,8 +121,8 @@ public class ControllerTest {
 
 	private SubjectKeyIdentifier createSubjectKeyId(PublicKey publicKey)
 			throws IOException {
-		ByteArrayInputStream bais = new ByteArrayInputStream(publicKey
-				.getEncoded());
+		ByteArrayInputStream bais = new ByteArrayInputStream(
+				publicKey.getEncoded());
 		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo(
 				(ASN1Sequence) new ASN1InputStream(bais).readObject());
 		return new SubjectKeyIdentifier(info);
@@ -131,8 +131,8 @@ public class ControllerTest {
 	private AuthorityKeyIdentifier createAuthorityKeyId(PublicKey publicKey)
 			throws IOException {
 
-		ByteArrayInputStream bais = new ByteArrayInputStream(publicKey
-				.getEncoded());
+		ByteArrayInputStream bais = new ByteArrayInputStream(
+				publicKey.getEncoded());
 		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo(
 				(ASN1Sequence) new ASN1InputStream(bais).readObject());
 
@@ -225,8 +225,8 @@ public class ControllerTest {
 				"CN=localhost", notBefore, notAfter);
 		File tmpP12File = File.createTempFile("ssl-", ".p12");
 		LOG.debug("p12 file: " + tmpP12File.getAbsolutePath());
-		persistKey(tmpP12File, keyPair.getPrivate(), this.certificate, "secret"
-				.toCharArray(), "secret".toCharArray());
+		persistKey(tmpP12File, keyPair.getPrivate(), this.certificate,
+				"secret".toCharArray(), "secret".toCharArray());
 
 		SslSocketConnector sslSocketConnector = new SslSocketConnector();
 		sslSocketConnector.setKeystore(tmpP12File.getAbsolutePath());
@@ -239,8 +239,8 @@ public class ControllerTest {
 		sslSocketConnector.setMaxIdleTime(30000);
 		int sslPort = getFreePort();
 		sslSocketConnector.setPort(sslPort);
-		this.servletTester.getContext().getServer().addConnector(
-				sslSocketConnector);
+		this.servletTester.getContext().getServer()
+				.addConnector(sslSocketConnector);
 		this.sslLocation = "https://localhost:" + sslPort + "/";
 
 		this.servletTester.start();
@@ -343,11 +343,6 @@ public class ControllerTest {
 			if (Status.ERROR == status) {
 				throw new RuntimeException("status ERROR received");
 			}
-		}
-
-		@Override
-		public void addTestResult(DiagnosticTests diagnosticTest,
-				boolean success, String description) {
 		}
 
 		@Override
@@ -599,8 +594,8 @@ public class ControllerTest {
 				TestAuthenticationService.class.getName());
 		this.servletHolder.setInitParameter("Logoff", "true");
 		File tmpCertFile = File.createTempFile("ssl-server-cert-", ".crt");
-		FileUtils.writeByteArrayToFile(tmpCertFile, this.certificate
-				.getEncoded());
+		FileUtils.writeByteArrayToFile(tmpCertFile,
+				this.certificate.getEncoded());
 		this.servletHolder.setInitParameter("ChannelBindingServerCertificate",
 				tmpCertFile.toString());
 
@@ -650,8 +645,8 @@ public class ControllerTest {
 				TestAuthenticationService.class.getName());
 		this.servletHolder.setInitParameter("Logoff", "true");
 		File tmpCertFile = File.createTempFile("ssl-server-cert-", ".crt");
-		FileUtils.writeByteArrayToFile(tmpCertFile, this.certificate
-				.getEncoded());
+		FileUtils.writeByteArrayToFile(tmpCertFile,
+				this.certificate.getEncoded());
 		this.servletHolder.setInitParameter("ChannelBindingServerCertificate",
 				tmpCertFile.toString());
 		this.servletHolder.setInitParameter("SessionIdChannelBinding", "true");
