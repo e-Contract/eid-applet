@@ -8,7 +8,7 @@
 		<version>1.2.0-SNAPSHOT</version>
 	</parent>
 	<name>eID Applet Test EAR</name>
-	<description>JavaEE 5 EAR for Test eID Applet Web App.</description>
+	<description>JavaEE 6 EAR for Test eID Applet Web App.</description>
 	<artifactId>eid-applet-test-deploy</artifactId>
 	<packaging>ear</packaging>
 	<build>
@@ -18,16 +18,6 @@
 				<artifactId>maven-ear-plugin</artifactId>
 				<configuration>
 					<modules>
-						<jarModule>
-							<groupId>be.fedict.commons-eid</groupId>
-							<artifactId>commons-eid-consumer</artifactId>
-							<includeInApplicationXml>true</includeInApplicationXml>
-						</jarModule>
-						<jarModule>
-							<groupId>be.fedict.eid-applet</groupId>
-							<artifactId>eid-applet-service-spi</artifactId>
-							<includeInApplicationXml>true</includeInApplicationXml>
-						</jarModule>
 						<ejbModule>
 							<groupId>be.fedict.eid-applet</groupId>
 							<artifactId>eid-applet-test-model</artifactId>
@@ -38,17 +28,15 @@
 							<contextRoot>/eid-applet-test</contextRoot>
 						</webModule>
 					</modules>
-					<version>5</version>
+					<version>6</version>
 					<defaultLibBundleDir>lib</defaultLibBundleDir>
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jboss-maven-plugin</artifactId>
+				<groupId>org.jboss.as.plugins</groupId>
+				<artifactId>jboss-as-maven-plugin</artifactId>
 				<configuration>
-					<fileNames>
-						<fileName>${basedir}/target/${project.artifactId}-${project.version}.ear</fileName>
-					</fileNames>
+					<filename>${project.build.finalName}.${project.packaging}</filename>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -113,22 +101,18 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk16</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.santuario</groupId>
 			<artifactId>xmlsec</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

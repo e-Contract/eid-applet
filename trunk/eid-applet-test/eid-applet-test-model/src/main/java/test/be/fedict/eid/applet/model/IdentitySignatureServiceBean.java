@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2010 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -23,7 +24,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.ejb.Local;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.security.jacc.PolicyContext;
 import javax.security.jacc.PolicyContextException;
@@ -34,17 +35,14 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.jboss.ejb3.annotation.LocalBinding;
 
 import be.fedict.eid.applet.service.spi.AddressDTO;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 import be.fedict.eid.applet.service.spi.IdentityDTO;
-import be.fedict.eid.applet.service.spi.SignatureServiceEx;
 
 @Stateless
-@Local(SignatureServiceEx.class)
-@LocalBinding(jndiBinding = "test/eid/applet/model/IdentitySignatureServiceBean")
-public class IdentitySignatureServiceBean implements SignatureServiceEx {
+@EJB(name = "java:global/test/IdentitySignatureServiceBean", beanInterface = IdentitySignatureService.class)
+public class IdentitySignatureServiceBean implements IdentitySignatureService {
 
 	private static final Log LOG = LogFactory
 			.getLog(IdentitySignatureServiceBean.class);
@@ -57,9 +55,7 @@ public class IdentitySignatureServiceBean implements SignatureServiceEx {
 
 		HttpSession session = getHttpSession();
 		session.setAttribute("SignatureValue", signatureValueStr);
-		session
-				.setAttribute("SigningCertificateChain",
-						signingCertificateChain);
+		session.setAttribute("SigningCertificateChain", signingCertificateChain);
 	}
 
 	private HttpSession getHttpSession() {

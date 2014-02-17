@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2012 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -20,16 +21,11 @@ package test.be.fedict.eid.applet.model;
 
 import java.util.Calendar;
 
-import javax.ejb.Local;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
-import org.jboss.ejb3.annotation.LocalBinding;
-
-import be.fedict.eid.applet.service.spi.SecureCardReaderService;
-
 @Stateless
-@Local(SecureCardReaderService.class)
-@LocalBinding(jndiBinding = "test/eid/applet/model/SecureCardReaderServiceBean")
+@EJB(name = "java:global/test/SecureCardReaderServiceBean", beanInterface = SecureCardReaderService.class)
 public class SecureCardReaderServiceBean implements SecureCardReaderService {
 
 	public String getTransactionMessage() {

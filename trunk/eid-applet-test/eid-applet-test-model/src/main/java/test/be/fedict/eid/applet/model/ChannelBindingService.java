@@ -1,6 +1,5 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2009 FedICT.
  * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -19,20 +18,7 @@
 
 package test.be.fedict.eid.applet.model;
 
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
+public interface ChannelBindingService extends
+		be.fedict.eid.applet.service.spi.ChannelBindingService {
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-@Stateless
-@EJB(name = "java:global/test/PrivacyServiceBean", beanInterface = PrivacyService.class)
-public class PrivacyServiceBean implements PrivacyService {
-
-	private static final Log LOG = LogFactory.getLog(PrivacyServiceBean.class);
-
-	public String getIdentityDataUsage(String language) {
-		LOG.debug("getIdentityDataUsage for language: " + language);
-		return "Identity Data Usage message from the server.";
-	}
 }

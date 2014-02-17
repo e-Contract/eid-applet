@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -20,21 +21,17 @@ package test.be.fedict.eid.applet.model;
 
 import java.util.List;
 
-import javax.ejb.Local;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.ejb3.annotation.LocalBinding;
 
 import be.fedict.eid.applet.service.spi.InsecureClientEnvironmentException;
-import be.fedict.eid.applet.service.spi.SecureClientEnvironmentService;
 
 @Stateless
-@Local(SecureClientEnvironmentService.class)
-@LocalBinding(jndiBinding = "test/eid/applet/model/InsecureClientEnvironmentBean")
-public class InsecureClientEnvironmentBean implements
-		SecureClientEnvironmentService {
+@EJB(name = "java:global/test/InsecureClientEnvironmentBean", beanInterface = InsecureClientEnvironment.class)
+public class InsecureClientEnvironmentBean implements InsecureClientEnvironment {
 
 	private static final Log LOG = LogFactory
 			.getLog(InsecureClientEnvironmentBean.class);

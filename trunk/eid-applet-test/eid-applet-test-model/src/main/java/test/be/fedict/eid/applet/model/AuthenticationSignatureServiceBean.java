@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2012 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -28,7 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
-import javax.ejb.Local;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.security.jacc.PolicyContext;
 import javax.security.jacc.PolicyContextException;
@@ -37,18 +38,15 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.ejb3.annotation.LocalBinding;
 
 import be.fedict.commons.eid.consumer.jca.ProxyPrivateKey;
 import be.fedict.commons.eid.consumer.jca.ProxyProvider;
 import be.fedict.eid.applet.service.spi.AuthenticationSignatureContext;
-import be.fedict.eid.applet.service.spi.AuthenticationSignatureService;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 import be.fedict.eid.applet.service.spi.PreSignResult;
 
 @Stateless
-@Local(AuthenticationSignatureService.class)
-@LocalBinding(jndiBinding = "test/eid/applet/model/AuthenticationSignatureServiceBean")
+@EJB(name = "java:global/test/AuthenticationSignatureServiceBean", beanInterface = AuthenticationSignatureService.class)
 public class AuthenticationSignatureServiceBean implements
 		AuthenticationSignatureService {
 
