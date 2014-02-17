@@ -49,7 +49,6 @@ import be.fedict.eid.applet.shared.CheckClientMessage;
 import be.fedict.eid.applet.shared.FilesDigestRequestMessage;
 import be.fedict.eid.applet.shared.HelloMessage;
 import be.fedict.eid.applet.shared.IdentificationRequestMessage;
-import be.fedict.eid.applet.shared.KioskMessage;
 import be.fedict.eid.applet.shared.SignCertificatesRequestMessage;
 import be.fedict.eid.applet.shared.SignRequestMessage;
 
@@ -94,8 +93,6 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	public static final String PRE_LOGOFF_INIT_PARAM_NAME = "PreLogoff";
 
-	public static final String KIOSK_INIT_PARAM_NAME = "Kiosk";
-
 	public static final String SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME = "SessionIdChannelBinding";
 
 	public static final String CHANNEL_BINDING_SERVER_CERTIFICATE = "ChannelBindingServerCertificate";
@@ -103,8 +100,6 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 	public static final String CHANNEL_BINDING_SERVICE = "ChannelBindingService";
 
 	public static final String REQUIRE_SECURE_READER_INIT_PARAM_NAME = "RequireSecureReader";
-
-	public static final String DIAGNOSTIC_MODE_INIT_PARAM_NAME = "DiagnosticMode";
 
 	public static final String IDENTITY_SERVICE_INIT_PARAM_NAME = "IdentityService";
 
@@ -140,9 +135,6 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 
 	@InitParam(INCLUDE_CERTS_INIT_PARAM_NAME)
 	private boolean includeCertificates;
-
-	@InitParam(KIOSK_INIT_PARAM_NAME)
-	private boolean kiosk;
 
 	@InitParam(SESSION_ID_CHANNEL_BINDING_INIT_PARAM_NAME)
 	private boolean sessionIdChannelBinding;
@@ -185,11 +177,6 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 		if (null != secureClientEnvService) {
 			CheckClientMessage checkClientMessage = new CheckClientMessage();
 			return checkClientMessage;
-		}
-		if (this.kiosk) {
-			LOG.debug("operating in Kiosk Mode");
-			KioskMessage kioskMessage = new KioskMessage();
-			return kioskMessage;
 		}
 		if (this.changePin || this.unblockPin) {
 			AdministrationMessage administrationMessage = new AdministrationMessage(
