@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -52,7 +53,6 @@ import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 import javax.smartcardio.TerminalFactory;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import org.apache.commons.codec.binary.Hex;
@@ -76,11 +76,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.View;
 import be.fedict.eid.applet.sc.Constants;
-import be.fedict.eid.applet.sc.DiagnosticCallbackHandler;
 import be.fedict.eid.applet.sc.PcscEid;
 import be.fedict.eid.applet.sc.PcscEidSpi;
 import be.fedict.eid.applet.sc.Task;
@@ -496,34 +494,6 @@ public class PcscTest {
 		pcscEidSpi.changePin();
 
 		pcscEidSpi.close();
-	}
-
-	@Test
-	public void diagnosticTests() throws Exception {
-		this.messages = new Messages(Locale.GERMAN);
-		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
-
-		DiagnosticTestCallbackHandler callbackHandler = new DiagnosticTestCallbackHandler();
-
-		pcscEidSpi.diagnosticTests(callbackHandler);
-
-		pcscEidSpi.close();
-	}
-
-	public static class DiagnosticTestCallbackHandler implements
-			DiagnosticCallbackHandler {
-
-		private static final Log LOG = LogFactory
-				.getLog(DiagnosticTestCallbackHandler.class);
-
-		@Override
-		public void addTestResult(DiagnosticTests test, boolean success,
-				String information) {
-			LOG.debug("test result: " + test.name() + ": "
-					+ test.getDescription() + " = " + success + " ("
-					+ information + ")");
-		}
-
 	}
 
 	@Test
