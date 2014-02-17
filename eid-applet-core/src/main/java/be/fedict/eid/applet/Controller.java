@@ -2,6 +2,7 @@
  * eID Applet Project.
  * Copyright (C) 2008-2010 FedICT.
  * Copyright (C) 2009 Frank Cornelis.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -35,13 +36,9 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.DigestInputStream;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,7 +56,6 @@ import be.fedict.eid.applet.io.AppletSSLSocketFactory;
 import be.fedict.eid.applet.io.HttpURLConnectionHttpReceiver;
 import be.fedict.eid.applet.io.HttpURLConnectionHttpTransmitter;
 import be.fedict.eid.applet.io.LocalAppletProtocolContext;
-import be.fedict.eid.applet.sc.DiagnosticCallbackHandler;
 import be.fedict.eid.applet.sc.PcscEid;
 import be.fedict.eid.applet.sc.PcscEidSpi;
 import be.fedict.eid.applet.sc.Task;
@@ -74,7 +70,6 @@ import be.fedict.eid.applet.shared.AuthenticationRequestMessage;
 import be.fedict.eid.applet.shared.CheckClientMessage;
 import be.fedict.eid.applet.shared.ClientEnvironmentMessage;
 import be.fedict.eid.applet.shared.ContinueInsecureMessage;
-import be.fedict.eid.applet.shared.DiagnosticMessage;
 import be.fedict.eid.applet.shared.FileDigestsDataMessage;
 import be.fedict.eid.applet.shared.FilesDigestRequestMessage;
 import be.fedict.eid.applet.shared.FinishedMessage;
@@ -297,9 +292,6 @@ public class Controller {
 					}
 				}
 			}
-			if (resultMessage instanceof DiagnosticMessage) {
-				diagnosticMode();
-			}
 			if (resultMessage instanceof KioskMessage) {
 				kioskMode();
 			}
@@ -486,130 +478,6 @@ public class Controller {
 			return responseMessage;
 		} finally {
 			this.pcscEidSpi.close();
-		}
-	}
-
-	private void diagnosticMode() {
-		addDetailMessage("diagnostic mode...");
-		osDiagnosticTest();
-		jvmDiagnosticTest();
-		browserDiagnosticTest();
-
-		ControllerDiagnosticCallbackHandler callbackHandler = new ControllerDiagnosticCallbackHandler();
-		X509Certificate authnCertificate = this.pcscEidSpi
-				.diagnosticTests(callbackHandler);
-		this.pcscEidSpi.close();
-
-		mscapiDiagnosticTest(authnCertificate);
-
-		this.view.resetProgress(1);
-	}
-
-	private void jvmDiagnosticTest() {
-		String javaVersion = System.getProperty("java.version");
-		String javaVendor = System.getProperty("java.vendor");
-		String javaRuntimeDescription = javaVendor + " " + javaVersion;
-		this.view.addTestResult(DiagnosticTests.JAVA_RUNTIME, true,
-				javaRuntimeDescription);
-	}
-
-	private void osDiagnosticTest() {
-		String osName = System.getProperty("os.name");
-		String osVersion = System.getProperty("os.version");
-		String osArch = System.getProperty("os.arch");
-		String osDescription = osName + " " + osVersion + " (" + osArch + ")";
-		this.view.addTestResult(DiagnosticTests.OS, true, osDescription);
-	}
-
-	private void browserDiagnosticTest() {
-		ClassLoader classLoader = Controller.class.getClassLoader();
-		Class<?> jsObjectClass;
-		try {
-			jsObjectClass = classLoader
-					.loadClass("netscape.javascript.JSObject");
-		} catch (ClassNotFoundException e) {
-			addDetailMessage("JSObject class not found");
-			addDetailMessage("not running inside a browser?");
-			this.view.addTestResult(DiagnosticTests.BROWSER, false,
-					e.getMessage());
-			return;
-		}
-		try {
-			Method getWindowMethod = jsObjectClass.getMethod("getWindow",
-					new Class<?>[] { java.applet.Applet.class });
-			Method getMemberMethod = jsObjectClass.getMethod("getMember",
-					new Class<?>[] { String.class });
-			Object windowJSObject = getWindowMethod.invoke(null,
-					this.runtime.getApplet());
-			Object navigatorJSObject = getMemberMethod.invoke(windowJSObject,
-					"navigator");
-			Object userAgent = getMemberMethod.invoke(navigatorJSObject,
-					"userAgent");
-			addDetailMessage("user agent: " + userAgent);
-			this.view.addTestResult(DiagnosticTests.BROWSER, true,
-					userAgent.toString());
-		} catch (Exception e) {
-			this.view.addTestResult(DiagnosticTests.BROWSER, false,
-					e.getMessage());
-			return;
-		}
-	}
-
-	private void mscapiDiagnosticTest(X509Certificate authnCertificate) {
-		String osName = System.getProperty("os.name");
-		if (false == osName.startsWith("Windows")) {
-			this.view
-					.addDetailMessage("skipping MSCAPI test as we're not on windows");
-			return;
-		}
-		KeyStore keyStore;
-		Enumeration<String> aliases;
-		try {
-			keyStore = KeyStore.getInstance("Windows-MY");
-			keyStore.load(null, null);
-			aliases = keyStore.aliases();
-		} catch (Exception e) {
-			this.view.addDetailMessage("error loading MSCAPI keystore: "
-					+ e.getMessage());
-			this.view.addTestResult(DiagnosticTests.MSCAPI, false,
-					e.getMessage());
-			return;
-		}
-		String eIDSubjectName = null;
-		while (aliases.hasMoreElements()) {
-			String alias = aliases.nextElement();
-			this.view.addDetailMessage("alias: " + alias);
-			X509Certificate certificate;
-			try {
-				certificate = (X509Certificate) keyStore.getCertificate(alias);
-			} catch (KeyStoreException e) {
-				this.view.addDetailMessage("error loading MSCAPI certificate: "
-						+ e.getMessage());
-				this.view.addTestResult(DiagnosticTests.MSCAPI, false,
-						e.getMessage());
-				return;
-			}
-
-			if (certificate.equals(authnCertificate)) {
-				String subjectName = certificate.getSubjectX500Principal()
-						.toString();
-				eIDSubjectName = subjectName;
-			}
-		}
-		if (null == eIDSubjectName) {
-			this.view.addTestResult(DiagnosticTests.MSCAPI, false,
-					"No eID certificate found in the Windows keystore");
-			return;
-		}
-		this.view.addTestResult(DiagnosticTests.MSCAPI, true, eIDSubjectName);
-	}
-
-	private class ControllerDiagnosticCallbackHandler implements
-			DiagnosticCallbackHandler {
-
-		public void addTestResult(DiagnosticTests test, boolean success,
-				String information) {
-			Controller.this.view.addTestResult(test, success, information);
 		}
 	}
 

@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2012 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -63,7 +64,6 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 
-import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Dialogs;
 import be.fedict.eid.applet.Dialogs.Pins;
 import be.fedict.eid.applet.Messages;
@@ -409,8 +409,9 @@ public class PcscEid extends Observable implements PcscEidSpi {
 			}
 
 		}
-		
-		this.view.setStatusMessage(Status.NORMAL, MESSAGE_ID.INSERT_CARD_QUESTION);
+
+		this.view.setStatusMessage(Status.NORMAL,
+				MESSAGE_ID.INSERT_CARD_QUESTION);
 
 		Set<CardTerminal> eIDCardTerminals = new HashSet<CardTerminal>();
 		for (CardTerminal cardTerminal : cardTerminalList) {
@@ -649,7 +650,8 @@ public class PcscEid extends Observable implements PcscEidSpi {
 							 * Windows platform.
 							 */
 							this.view.addDetailMessage("no readers available.");
-							this.view.setStatusMessage(Status.NORMAL, MESSAGE_ID.CONNECT_READER);
+							this.view.setStatusMessage(Status.NORMAL,
+									MESSAGE_ID.CONNECT_READER);
 						}
 					}
 					this.view.addDetailMessage("sleeping...");
@@ -1680,217 +1682,6 @@ public class PcscEid extends Observable implements PcscEidSpi {
 
 	public void unblockPin() throws Exception {
 		unblockPin(false);
-	}
-
-	public X509Certificate diagnosticTests(
-			DiagnosticCallbackHandler diagnosticCallbackHandler) {
-		this.view.addDetailMessage("start diagnostic tests");
-		this.view.setStatusMessage(Status.NORMAL, MESSAGE_ID.DIAGNOSTIC_MODE);
-		/*
-		 * PC/SC tests
-		 */
-		if ("None".equals(this.terminalFactory.getType())) {
-			diagnosticCallbackHandler.addTestResult(DiagnosticTests.PCSC,
-					false, "PC/SC service not available");
-			return null;
-		}
-		diagnosticCallbackHandler.addTestResult(DiagnosticTests.PCSC, true,
-				terminalFactory.getType());
-
-		/*
-		 * CARD READER tests
-		 */
-		if (false == hasCardReader()) {
-			this.view
-					.setStatusMessage(Status.NORMAL, MESSAGE_ID.CONNECT_READER);
-			waitForCardReader();
-		}
-
-		try {
-			if (false == isEidPresent()) {
-				this.view.setStatusMessage(Status.NORMAL,
-						MESSAGE_ID.INSERT_CARD_QUESTION);
-				waitForEidPresent();
-			}
-		} catch (Exception e) {
-			diagnosticCallbackHandler.addTestResult(
-					DiagnosticTests.CARD_READER, false, e.getMessage());
-			return null;
-		}
-
-		this.view.setStatusMessage(Status.NORMAL, MESSAGE_ID.DIAGNOSTIC_MODE);
-
-		Integer directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
-		Integer verifyPinStartFeature = getFeature(FEATURE_VERIFY_PIN_START_TAG);
-
-		String terminalName = this.cardTerminal.getName();
-		String cardReaderInformation = terminalName;
-		if (null != directPinVerifyFeature || null != verifyPinStartFeature) {
-			cardReaderInformation += " (CCID secure pinpad reader)";
-		}
-		diagnosticCallbackHandler.addTestResult(DiagnosticTests.CARD_READER,
-				true, cardReaderInformation);
-
-		/*
-		 * eID Readout tests.
-		 */
-		CertificateFactory certificateFactory;
-		try {
-			certificateFactory = CertificateFactory.getInstance("X.509");
-		} catch (CertificateException e) {
-			this.view.addTestResult(DiagnosticTests.EID_READOUT, false,
-					e.getMessage());
-			return null;
-		}
-		int maxProgress = 1; // identity file
-		maxProgress++; // address file
-		maxProgress += 3000 / 255; // photo
-		maxProgress++; // identity signature file
-		maxProgress++; // address signature file
-		maxProgress += (1050 / 255) + 1; // authn cert file
-		maxProgress += (1050 / 255) + 1; // sign cert file
-		maxProgress += (1050 / 255) + 1; // citizen CA cert file
-		maxProgress += (1050 / 255) + 1; // root CA cert file
-		maxProgress += (1050 / 255) + 1; // NRN CA cert file
-		this.view.resetProgress(maxProgress);
-		try {
-			readFile(IDENTITY_FILE_ID);
-		} catch (Exception e) {
-			diagnosticCallbackHandler.addTestResult(
-					DiagnosticTests.EID_READOUT, false, "Identity file");
-			return null;
-		}
-		try {
-			readFile(ADDRESS_FILE_ID);
-		} catch (Exception e) {
-			diagnosticCallbackHandler.addTestResult(
-					DiagnosticTests.EID_READOUT, false, "Address file");
-			return null;
-		}
-		try {
-			readFile(PHOTO_FILE_ID);
-		} catch (Exception e) {
-			diagnosticCallbackHandler.addTestResult(
-					DiagnosticTests.EID_READOUT, false, "Photo file");
-			return null;
-		}
-		try {
-			readFile(IDENTITY_SIGN_FILE_ID);
-		} catch (Exception e) {
-			diagnosticCallbackHandler.addTestResult(
-					DiagnosticTests.EID_READOUT, false,
-					"Identity signature file");
-			return null;
-		}
-		try {
-			readFile(ADDRESS_SIGN_FILE_ID);
-		} catch (Exception e) {
-			diagnosticCallbackHandler.addTestResult(
-					DiagnosticTests.EID_READOUT, false,
-					"Address signature file");
-			return null;
-		}
-		X509Certificate authnCertificate;
-		try {
-			byte[] certData = readFile(AUTHN_CERT_FILE_ID);
-			authnCertificate = (X509Certificate) certificateFactory
-					.generateCertificate(new ByteArrayInputStream(certData));
-		} catch (Exception e) {
-			diagnosticCallbackHandler.addTestResult(
-					DiagnosticTests.EID_READOUT, false,
-					"Authentication certificate file");
-			return null;
-		}
-		try {
-			byte[] certData = readFile(SIGN_CERT_FILE_ID);
-			certificateFactory.generateCertificate(new ByteArrayInputStream(
-					certData));
-		} catch (Exception e) {
-			diagnosticCallbackHandler.addTestResult(
-					DiagnosticTests.EID_READOUT, false,
-					"Signature certificate file");
-			return authnCertificate;
-		}
-		try {
-			byte[] certData = readFile(CA_CERT_FILE_ID);
-			certificateFactory.generateCertificate(new ByteArrayInputStream(
-					certData));
-		} catch (Exception e) {
-			diagnosticCallbackHandler.addTestResult(
-					DiagnosticTests.EID_READOUT, false,
-					"Citizen CA certificate file");
-			return authnCertificate;
-		}
-		try {
-			byte[] certData = readFile(ROOT_CERT_FILE_ID);
-			certificateFactory.generateCertificate(new ByteArrayInputStream(
-					certData));
-		} catch (Exception e) {
-			diagnosticCallbackHandler.addTestResult(
-					DiagnosticTests.EID_READOUT, false,
-					"Root CA certificate file");
-			return authnCertificate;
-		}
-		try {
-			byte[] certData = readFile(RRN_CERT_FILE_ID);
-			certificateFactory.generateCertificate(new ByteArrayInputStream(
-					certData));
-		} catch (Exception e) {
-			diagnosticCallbackHandler.addTestResult(
-					DiagnosticTests.EID_READOUT, false, "NRN certificate file");
-			return authnCertificate;
-		}
-		diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_READOUT,
-				true, null);
-		this.view.setProgressIndeterminate();
-
-		/*
-		 * eID crypto tests.
-		 */
-		CommandAPDU getChallengeApdu = new CommandAPDU(0x00, 0x84, 0x00, 0x00,
-				new byte[] {}, 0, 0, 20);
-		ResponseAPDU responseApdu;
-		try {
-			responseApdu = transmit(getChallengeApdu);
-		} catch (CardException e) {
-			diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
-					false, e.getMessage());
-			return authnCertificate;
-		}
-		if (0x9000 != responseApdu.getSW()) {
-			diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
-					false, "Challenge error");
-			return authnCertificate;
-		}
-		byte[] challenge = responseApdu.getData();
-
-		ByteArrayOutputStream internalAuthnData = new ByteArrayOutputStream();
-		internalAuthnData.write(0x94);
-		internalAuthnData.write(0x14);
-		try {
-			internalAuthnData.write(challenge);
-		} catch (IOException e) {
-			diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
-					false, e.getMessage());
-			return authnCertificate;
-		}
-		CommandAPDU internalAuthnApdu = new CommandAPDU(0x00, 0x88, 0x02, 0x81,
-				internalAuthnData.toByteArray());
-		try {
-			responseApdu = transmit(internalAuthnApdu);
-		} catch (CardException e) {
-			diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
-					false, e.getMessage());
-			return authnCertificate;
-		}
-		if (0x9000 != responseApdu.getSW()) {
-			diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
-					false, "Internal authentication failed");
-			return authnCertificate;
-		}
-		diagnosticCallbackHandler.addTestResult(DiagnosticTests.EID_CRYPTO,
-				true, null);
-		return authnCertificate;
 	}
 
 	public byte[] getChallenge(int size) throws CardException {

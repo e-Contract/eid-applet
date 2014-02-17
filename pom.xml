@@ -917,7 +917,7 @@
 		<jaxws.version>2.2.1</jaxws.version>
 		<hornetq.version>2.1.1.Final</hornetq.version>
 		<jaxb-impl.version>2.2.1</jaxb-impl.version>
-		<richfaces.version>3.3.3.Final</richfaces.version>
+		<richfaces.version>3.3.4.Final</richfaces.version>
 		<bouncycastle.version>1.45</bouncycastle.version>
 		<!-- jTrust 1.1.2 fails on 1.46 -->
 		<maven-javadoc-plugin.version>2.8</maven-javadoc-plugin.version>

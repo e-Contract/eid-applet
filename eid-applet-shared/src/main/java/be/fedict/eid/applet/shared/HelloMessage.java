@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -30,11 +31,11 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
  * @author Frank Cornelis
  * 
  */
-@ResponsesAllowed( { IdentificationRequestMessage.class,
+@ResponsesAllowed({ IdentificationRequestMessage.class,
 		CheckClientMessage.class, AuthenticationRequestMessage.class,
 		AdministrationMessage.class, SignRequestMessage.class,
 		FilesDigestRequestMessage.class, KioskMessage.class,
-		SignCertificatesRequestMessage.class, DiagnosticMessage.class })
+		SignCertificatesRequestMessage.class })
 @StartRequestMessage(ProtocolState.INIT)
 public class HelloMessage extends AbstractProtocolMessage {
 	@HttpHeader(TYPE_HTTP_HEADER)
