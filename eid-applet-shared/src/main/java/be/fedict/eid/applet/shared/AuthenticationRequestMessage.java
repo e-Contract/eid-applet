@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -18,7 +19,6 @@
 
 package be.fedict.eid.applet.shared;
 
-import be.fedict.eid.applet.shared.annotation.Description;
 import be.fedict.eid.applet.shared.annotation.HttpBody;
 import be.fedict.eid.applet.shared.annotation.HttpHeader;
 import be.fedict.eid.applet.shared.annotation.MessageDiscriminator;
@@ -86,7 +86,6 @@ public class AuthenticationRequestMessage extends AbstractProtocolMessage {
 
 	@HttpBody
 	@NotNull
-	@Description("The challenge to be signed using the authentication certificate. If IncludeHostname is set, then prefix the challenge with the server hostname before signing.")
 	public byte[] challenge;
 
 	public AuthenticationRequestMessage() {

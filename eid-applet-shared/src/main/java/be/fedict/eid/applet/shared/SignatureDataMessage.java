@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -28,7 +29,6 @@ import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
 
-import be.fedict.eid.applet.shared.annotation.Description;
 import be.fedict.eid.applet.shared.annotation.HttpBody;
 import be.fedict.eid.applet.shared.annotation.HttpHeader;
 import be.fedict.eid.applet.shared.annotation.MessageDiscriminator;
@@ -70,7 +70,6 @@ public class SignatureDataMessage extends AbstractProtocolMessage {
 
 	@HttpBody
 	@NotNull
-	@Description("Contains concatenation of signature value and sign cert chain.")
 	public byte[] body;
 
 	public SignatureDataMessage() {

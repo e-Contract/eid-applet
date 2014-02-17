@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -28,7 +29,6 @@ import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
 
-import be.fedict.eid.applet.shared.annotation.Description;
 import be.fedict.eid.applet.shared.annotation.HttpBody;
 import be.fedict.eid.applet.shared.annotation.HttpHeader;
 import be.fedict.eid.applet.shared.annotation.MessageDiscriminator;
@@ -85,7 +85,6 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 
 	@HttpBody
 	@NotNull
-	@Description("The non-repudiation certificate chain, optional identity files.")
 	public byte[] body;
 
 	/**
@@ -187,7 +186,6 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 		idx += this.rootCertFileSize;
 		this.rootCertificate = getCertificate(rootCaCertFile);
 
-
 		this.certificateChain = new LinkedList<X509Certificate>();
 		this.certificateChain.add(signCert);
 		this.certificateChain.add(citizenCaCert);
@@ -234,7 +232,7 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 
 	public X509Certificate rrnCertificate;
 
-    public X509Certificate rootCertificate;
+	public X509Certificate rootCertificate;
 
 	private X509Certificate getCertificate(byte[] certData) {
 		CertificateFactory certificateFactory;

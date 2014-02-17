@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -20,7 +21,6 @@ package be.fedict.eid.applet.shared;
 
 import java.util.List;
 
-import be.fedict.eid.applet.shared.annotation.Description;
 import be.fedict.eid.applet.shared.annotation.HttpBody;
 import be.fedict.eid.applet.shared.annotation.HttpHeader;
 import be.fedict.eid.applet.shared.annotation.MessageDiscriminator;
@@ -36,7 +36,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
  * 
  */
 @ProtocolStateAllowed(ProtocolState.ENV_CHECK)
-@ResponsesAllowed( { IdentificationRequestMessage.class,
+@ResponsesAllowed({ IdentificationRequestMessage.class,
 		InsecureClientMessage.class, AuthenticationRequestMessage.class,
 		AdministrationMessage.class, SignRequestMessage.class,
 		FilesDigestRequestMessage.class, SignCertificatesRequestMessage.class })
@@ -77,6 +77,5 @@ public class ClientEnvironmentMessage extends AbstractProtocolMessage {
 
 	@HttpBody
 	@NotNull
-	@Description("A list of strings containing the names of the smart card readers.")
 	public List<String> readerList;
 }
