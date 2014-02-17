@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2010 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -18,19 +19,16 @@
 
 package test.be.fedict.eid.applet.model;
 
-import javax.ejb.Local;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.ejb3.annotation.LocalBinding;
 
 import be.fedict.eid.applet.service.spi.IdentityRequest;
-import be.fedict.eid.applet.service.spi.IdentityService;
 
 @Stateless
-@Local(IdentityService.class)
-@LocalBinding(jndiBinding = "test/eid/applet/model/IdentityServiceBean")
+@EJB(name = "java:global/test/IdentityServiceBean", beanInterface = IdentityService.class)
 public class IdentityServiceBean implements IdentityService {
 
 	private static final Log LOG = LogFactory.getLog(IdentityServiceBean.class);

@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -32,7 +33,7 @@ import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.ejb.Local;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.security.jacc.PolicyContext;
 import javax.security.jacc.PolicyContextException;
@@ -70,7 +71,6 @@ import org.apache.jcp.xml.dsig.internal.dom.DOMXMLSignature;
 import org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.utils.Base64;
-import org.jboss.ejb3.annotation.LocalBinding;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -78,12 +78,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import be.fedict.eid.applet.service.spi.DigestInfo;
-import be.fedict.eid.applet.service.spi.SignatureService;
 
 @Stateless
-@Local(SignatureService.class)
-@LocalBinding(jndiBinding = "test/eid/applet/model/XmlSignatureServiceBean")
-public class XmlSignatureServiceBean implements SignatureService {
+@EJB(name = "java:global/test/XmlSignatureServiceBean", beanInterface = XmlSignatureService.class)
+public class XmlSignatureServiceBean implements XmlSignatureService {
 
 	private static final Log LOG = LogFactory
 			.getLog(XmlSignatureServiceBean.class);

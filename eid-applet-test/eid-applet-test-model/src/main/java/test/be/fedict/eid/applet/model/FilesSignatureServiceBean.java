@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -24,7 +25,7 @@ import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.ejb.Local;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.security.jacc.PolicyContext;
 import javax.security.jacc.PolicyContextException;
@@ -34,16 +35,12 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.jboss.ejb3.annotation.LocalBinding;
 
 import be.fedict.eid.applet.service.spi.DigestInfo;
-import be.fedict.eid.applet.service.spi.SignatureService;
 
 @Stateless
-@Local(SignatureService.class)
-@LocalBinding(jndiBinding = "test/eid/applet/model/FilesSignatureServiceBean")
-public class FilesSignatureServiceBean implements SignatureService {
+@EJB(name = "java:global/test/FilesSignatureServiceBean", beanInterface = FilesSignatureService.class)
+public class FilesSignatureServiceBean implements FilesSignatureService {
 
 	private static final Log LOG = LogFactory
 			.getLog(FilesSignatureServiceBean.class);
@@ -64,9 +61,7 @@ public class FilesSignatureServiceBean implements SignatureService {
 
 		HttpSession session = httpServletRequest.getSession();
 		session.setAttribute("SignatureValue", signatureValueStr);
-		session
-				.setAttribute("SigningCertificateChain",
-						signingCertificateChain);
+		session.setAttribute("SigningCertificateChain", signingCertificateChain);
 	}
 
 	public DigestInfo preSign(List<DigestInfo> digestInfos,
@@ -87,8 +82,7 @@ public class FilesSignatureServiceBean implements SignatureService {
 		LOG.debug("signature digest algo: " + signDigestAlgo);
 
 		List<String> fileDescriptions = new LinkedList<String>();
-		MessageDigest messageDigest = MessageDigest.getInstance(signDigestAlgo,
-				new BouncyCastleProvider());
+		MessageDigest messageDigest = MessageDigest.getInstance(signDigestAlgo);
 		for (DigestInfo digestInfo : digestInfos) {
 			LOG.debug("processing digest for: " + digestInfo.description);
 			fileDescriptions.add(digestInfo.description + "\n");

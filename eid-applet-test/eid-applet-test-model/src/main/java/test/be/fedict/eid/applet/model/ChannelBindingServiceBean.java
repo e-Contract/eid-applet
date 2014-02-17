@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2010 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -20,7 +21,7 @@ package test.be.fedict.eid.applet.model;
 
 import java.security.cert.X509Certificate;
 
-import javax.ejb.Local;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.security.jacc.PolicyContext;
 import javax.security.jacc.PolicyContextException;
@@ -29,21 +30,16 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.ejb3.annotation.LocalBinding;
-
-import be.fedict.eid.applet.service.spi.ChannelBindingService;
 
 @Stateless
-@Local(ChannelBindingService.class)
-@LocalBinding(jndiBinding = "test/eid/applet/model/ChannelBindingServiceBean")
+@EJB(name = "java:global/test/ChannelBindingServiceBean", beanInterface = ChannelBindingService.class)
 public class ChannelBindingServiceBean implements ChannelBindingService {
 
 	private static final Log LOG = LogFactory
 			.getLog(ChannelBindingServiceBean.class);
 
 	public static final String SERVER_CERTIFICATE_SESSION_ATTRIBUTE = ChannelBindingServiceBean.class
-			.getName()
-			+ ".serverCertificate";
+			.getName() + ".serverCertificate";
 
 	public X509Certificate getServerCertificate() {
 		LOG.debug("getServerCertificate");
