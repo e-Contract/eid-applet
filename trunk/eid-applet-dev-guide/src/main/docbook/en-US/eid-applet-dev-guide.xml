@@ -349,18 +349,6 @@
 					</row>
 					<row>
 						<entry>
-							<code>DiagnosticTestCallback</code>
-						</entry>
-						<entry>optional</entry>
-						<entry>
-							Via this parameter a web developer can configure a
-							Javascript callback for eID Applets that run in diagnostic mode.
-							This callback function will be invoked every time the eID Applet
-							performed an eID diagnostic test.
-						</entry>
-					</row>
-					<row>
-						<entry>
 							<code>UserAgent</code>
 						</entry>
 						<entry>optional</entry>
@@ -1656,92 +1644,6 @@
 					Javascripts inside the browser window.
 				</para>
 			</tip>
-		</section>
-		<section>
-			<title>eID Applet Diagnostic Mode</title>
-			<para>
-				The eID Applet can run in a diagnostic mode. Via this feature
-				web applications can check the client runtime functionality related
-				to eID.
-			</para>
-			<para>
-				The diagnostic mode can be activated by setting the following
-				<code>init-param</code>
-				on the
-				<code>AppletServiceServlet</code>
-				:
-			</para>
-			<programlisting language="XML"><![CDATA[<init-param>
-	<param-name>DiagnosticMode</param-name>
-	<param-value>true</param-value>
-</init-param>]]></programlisting>
-			<para>
-				When running in diagnostic mode the eID Applet will communicate
-				the results of the different tests that it runs via a Javascript
-				callback. The web developer can install the test result callback as
-				follows inside a web page:
-			</para>
-			<programlisting language="XML"><![CDATA[<script src="https://www.java.com/js/deployJava.js"></script>
-<script>
-	var attributes = {
-		code :'be.fedict.eid.applet.Applet.class',
-		archive :'eid-applet-package.jar',
-		width :1,
-		height :1,
-		mayscript :'true'
-	};
-	var parameters = {
-		AppletService :'applet-diagnostic-service',
-		DiagnosticTestCallback :'diagnosticTestCallback',
-		TargetPage : 'javascript:diagnoseDone();'
-	};
-	var version = '1.6';
-	deployJava.runApplet(attributes, parameters, version);
-</script>
-<script>
-	function diagnosticTestCallback(testId, testDescription, testResult, testResultDescription) {
-		document.getElementById('testResults').innerHTML += '<tr>' + 
-			'<td>' + testId + '</td>' + 
-			'<td>' + testDescription + '</td>' + 
-			'<td>' + testResult + '</td>' + 
-			'<td>' + testResultDescription + '</td>' +
-			'</tr>';
-	}
-	function diagnoseDone() {
-		document.getElementById('message').innerHTML = 'End of diagnose.';
-	}
-</script>
-<table id="testResults">
-	<tr>
-		<th>Test ID</th>
-		<th>Test Description</th>
-		<th>Successful</th>
-		<th>Information</th>
-	</tr>
-</table>
-<pre id="message"></pre>]]></programlisting>
-			<tip>
-				<title>mayscript</title>
-				<para>
-					Don't forget the
-					<code>mayscript:'true'</code>
-					attribute, else the eID Applet will not be able to invoke
-					Javascripts inside the browser window.
-				</para>
-			</tip>
-			<warning>
-				<title>Internet Explorer 8</title>
-				<para>
-					Because Microsoft changed the behaviour of Javascript within
-					Internet Explorer 8 you have to pay special attention when
-					implementing your Javascript callbacks. For example, the
-					<code>innerHTML</code>
-					attribute of an HTML
-					<code>table</code>
-					has been made read only causing the above example to fail on
-					Internet Explorer 8.
-				</para>
-			</warning>
 		</section>
 		<section>
 			<title>Generic eID Applet Service settings</title>

@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2010 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -287,8 +288,6 @@ public class Applet extends JApplet {
 
 	private String messageCallbackExParam;
 
-	private String diagnosticTestCallbackParam;
-
 	private boolean hideDetailsButtonParam;
 
 	private void initUI() {
@@ -298,9 +297,6 @@ public class Applet extends JApplet {
 		this.messageCallbackParam = super.getParameter(MESSAGE_CALLBACK_PARAM);
 		this.messageCallbackExParam = super
 				.getParameter(MESSAGE_CALLBACK_EX_PARAM);
-
-		this.diagnosticTestCallbackParam = super
-				.getParameter(DIAGNOSTIC_TEST_CALLBACK_PARAM);
 
 		String hideDetailsButtonParam = super
 				.getParameter(HIDE_DETAILS_BUTTON_PARAM);
@@ -381,8 +377,8 @@ public class Applet extends JApplet {
 				"Detailed log messages");
 
 		JPopupMenu popupMenu = new JPopupMenu();
-		JMenuItem copyMenuItem = new JMenuItem(this.messages
-				.getMessage(MESSAGE_ID.COPY_ALL));
+		JMenuItem copyMenuItem = new JMenuItem(
+				this.messages.getMessage(MESSAGE_ID.COPY_ALL));
 		copyMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -465,8 +461,8 @@ public class Applet extends JApplet {
 			Method getDesktopMethod = desktopClass.getMethod("getDesktop");
 			final Object desktop = getDesktopMethod.invoke(null);
 			final Method mailMethod = desktopClass.getMethod("mail", URI.class);
-			JMenuItem emailMenuItem = new JMenuItem(this.messages
-					.getMessage(MESSAGE_ID.MAIL));
+			JMenuItem emailMenuItem = new JMenuItem(
+					this.messages.getMessage(MESSAGE_ID.MAIL));
 			emailMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					String message = Applet.this.detailMessages.getText();
@@ -497,6 +493,7 @@ public class Applet extends JApplet {
 		@SuppressWarnings("unchecked")
 		public void run() {
 			addDetailMessage("eID Applet - Copyright (C) 2008-2013 FedICT.");
+			addDetailMessage("Copyright (C) 2014 e-Contract.be BVBA.");
 			addDetailMessage("Released under GNU LGPL version 3.0 license.");
 			addDetailMessage("More info: http://code.google.com/p/eid-applet/");
 			/*
@@ -646,11 +643,6 @@ public class Applet extends JApplet {
 			Applet.this.setStatusMessage(status, messageId);
 		}
 
-		public void addTestResult(DiagnosticTests diagnosticTest,
-				boolean success, String description) {
-			Applet.this.addTestResult(diagnosticTest, success, description);
-		}
-
 		public void setProgressIndeterminate() {
 			Applet.this.setProgressIndetermintate();
 		}
@@ -700,46 +692,6 @@ public class Applet extends JApplet {
 	private void increaseProgress() {
 		this.progress++;
 		this.progressBar.setValue(this.progress);
-	}
-
-	private void addTestResult(DiagnosticTests diagnosticTest, boolean success,
-			String description) {
-		if (null == this.diagnosticTestCallbackParam) {
-			addDetailMessage("no DiagnosticTestCallback applet param set");
-			return;
-		}
-		ClassLoader classLoader = Applet.class.getClassLoader();
-		Class<?> jsObjectClass;
-		try {
-			jsObjectClass = classLoader
-					.loadClass("netscape.javascript.JSObject");
-		} catch (ClassNotFoundException e) {
-			addDetailMessage("JSObject class not found");
-			return;
-		}
-		try {
-			Method getWindowMethod = jsObjectClass.getMethod("getWindow",
-					new Class<?>[] { java.applet.Applet.class });
-			Object jsObject = getWindowMethod.invoke(null, this);
-			Method callMethod = jsObjectClass.getMethod("call", new Class<?>[] {
-					String.class, Class.forName("[Ljava.lang.Object;") });
-			addDetailMessage("invoking Javascript message callback: "
-					+ this.diagnosticTestCallbackParam);
-			if (null == callMethod) {
-				throw new RuntimeException("no call method available");
-			}
-			if (null == jsObject) {
-				throw new RuntimeException("no jsObject available");
-			}
-			callMethod.invoke(jsObject, this.diagnosticTestCallbackParam,
-					new Object[] { diagnosticTest.name(),
-							diagnosticTest.getDescription(), success,
-							description });
-		} catch (Exception e) {
-			addDetailMessage("error locating: JSObject.getWindow().call: "
-					+ e.getMessage());
-			return;
-		}
 	}
 
 	private Component getParentComponent() {

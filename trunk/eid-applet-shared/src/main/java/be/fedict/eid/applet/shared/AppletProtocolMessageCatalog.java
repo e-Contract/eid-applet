@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2012 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -52,7 +53,6 @@ public class AppletProtocolMessageCatalog implements ProtocolMessageCatalog {
 		catalog.add(KioskMessage.class);
 		catalog.add(SignCertificatesRequestMessage.class);
 		catalog.add(SignCertificatesDataMessage.class);
-		catalog.add(DiagnosticMessage.class);
 
 		catalog.add(IdentityDataMessage.class);
 		catalog.add(FinishedMessage.class);

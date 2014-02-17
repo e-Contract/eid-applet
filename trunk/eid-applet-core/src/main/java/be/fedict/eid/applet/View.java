@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -37,13 +38,9 @@ public interface View {
 
 	Component getParentComponent();
 
-	void addTestResult(DiagnosticTests diagnosticTest, boolean success,
-			String description);
-
 	/*
 	 * Progress indication functions.
 	 */
-
 	void setProgressIndeterminate();
 
 	void resetProgress(int max);

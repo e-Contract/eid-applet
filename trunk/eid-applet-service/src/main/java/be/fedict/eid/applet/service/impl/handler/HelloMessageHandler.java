@@ -2,6 +2,7 @@
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
  * Copyright (C) 2009 Frank Cornelis.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -45,7 +46,6 @@ import be.fedict.eid.applet.service.spi.SignatureService;
 import be.fedict.eid.applet.shared.AdministrationMessage;
 import be.fedict.eid.applet.shared.AuthenticationRequestMessage;
 import be.fedict.eid.applet.shared.CheckClientMessage;
-import be.fedict.eid.applet.shared.DiagnosticMessage;
 import be.fedict.eid.applet.shared.FilesDigestRequestMessage;
 import be.fedict.eid.applet.shared.HelloMessage;
 import be.fedict.eid.applet.shared.IdentificationRequestMessage;
@@ -152,9 +152,6 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 	@InitParam(REQUIRE_SECURE_READER_INIT_PARAM_NAME)
 	private boolean requireSecureReader;
 
-	@InitParam(DIAGNOSTIC_MODE_INIT_PARAM_NAME)
-	private boolean diagnosticMode;
-
 	@InitParam(SECURE_CLIENT_ENV_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<SecureClientEnvironmentService> secureClientEnvServiceLocator;
 
@@ -182,12 +179,6 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 		LOG.debug("hello message received");
 
 		storeClientLanguage(message.language, session);
-
-		if (this.diagnosticMode) {
-			LOG.debug("diagnostic mode");
-			DiagnosticMessage diagnosticMessage = new DiagnosticMessage();
-			return diagnosticMessage;
-		}
 
 		SecureClientEnvironmentService secureClientEnvService = this.secureClientEnvServiceLocator
 				.locateService();
