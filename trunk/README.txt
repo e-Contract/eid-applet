@@ -11,7 +11,7 @@ The source code is hosted at: http://code.google.com/p/eid-applet/
 
 The following is required for compiling the eID Applet software:
 * Oracle Java 1.6.0_45
-* Apache Maven 3.0.4+, 3.1.1
+* Apache Maven 3.1.1
 
 Note: the eID Applet does not compile using Java 7 for the moment.
 
@@ -47,7 +47,7 @@ You can speed up the development build cycle by skipping the unit tests via:
 === 4. SDK Release
 
 An SDK build can be performed via:
-	mvn -Dhttp.proxyHost=proxy.yourict.net -Dhttp.proxyPort=8080 -Psdk,etoken clean deploy
+	mvn -Psdk,etoken clean deploy
 
 The final SDK artifact is located under:
 	eid-applet-sdk/target/
