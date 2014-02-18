@@ -27,7 +27,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Constructor;
 import java.net.CookieHandler;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
@@ -55,7 +54,6 @@ import be.fedict.eid.applet.io.HttpURLConnectionHttpReceiver;
 import be.fedict.eid.applet.io.HttpURLConnectionHttpTransmitter;
 import be.fedict.eid.applet.io.LocalAppletProtocolContext;
 import be.fedict.eid.applet.sc.PcscEid;
-import be.fedict.eid.applet.sc.PcscEidSpi;
 import be.fedict.eid.applet.sc.Task;
 import be.fedict.eid.applet.sc.TaskRunner;
 import be.fedict.eid.applet.shared.AdministrationMessage;
@@ -103,7 +101,7 @@ public class Controller {
 	/**
 	 * Will only be set if PC/SC Java 6 is available.
 	 */
-	private final PcscEidSpi pcscEidSpi;
+	private final PcscEid pcscEidSpi;
 
 	private final ProtocolStateMachine protocolStateMachine;
 
@@ -114,12 +112,7 @@ public class Controller {
 		this.messages = messages;
 
 		try {
-			Class<? extends PcscEidSpi> pcscEidClass = (Class<? extends PcscEidSpi>) Class
-					.forName("be.fedict.eid.applet.sc.PcscEid");
-			Constructor<? extends PcscEidSpi> pcscEidConstructor = pcscEidClass
-					.getConstructor(View.class, Messages.class);
-			this.pcscEidSpi = pcscEidConstructor.newInstance(this.view,
-					this.messages);
+			this.pcscEidSpi = new PcscEid(this.view, this.messages);
 		} catch (Exception e) {
 			String msg = "error loading PC/SC eID component: " + e.getMessage();
 			this.view.addDetailMessage(msg);

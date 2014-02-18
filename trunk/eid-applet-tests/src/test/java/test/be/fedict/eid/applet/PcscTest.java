@@ -80,7 +80,6 @@ import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.View;
 import be.fedict.eid.applet.sc.Constants;
 import be.fedict.eid.applet.sc.PcscEid;
-import be.fedict.eid.applet.sc.PcscEidSpi;
 import be.fedict.eid.applet.sc.Task;
 import be.fedict.eid.applet.sc.TaskRunner;
 import be.fedict.eid.applet.service.Address;
@@ -385,7 +384,7 @@ public class PcscTest {
 
 	@Test
 	public void logoff() throws Exception {
-		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
+		PcscEid pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEidSpi.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEidSpi.waitForEidPresent();
@@ -467,7 +466,7 @@ public class PcscTest {
 
 	@Test
 	public void logoffAndDie() throws Exception {
-		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
+		PcscEid pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEidSpi.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEidSpi.waitForEidPresent();
@@ -485,7 +484,7 @@ public class PcscTest {
 	@Test
 	public void pcscChangePin() throws Exception {
 		this.messages = new Messages(Locale.GERMAN);
-		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
+		PcscEid pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEidSpi.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEidSpi.waitForEidPresent();
@@ -498,7 +497,7 @@ public class PcscTest {
 
 	@Test
 	public void pcscUnblockPin() throws Exception {
-		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
+		PcscEid pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEidSpi.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEidSpi.waitForEidPresent();
@@ -511,7 +510,7 @@ public class PcscTest {
 
 	@Test
 	public void photo() throws Exception {
-		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
+		PcscEid pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEidSpi.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEidSpi.waitForEidPresent();
@@ -558,7 +557,7 @@ public class PcscTest {
 
 	@Test
 	public void testReadAddress() throws Exception {
-		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
+		PcscEid pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEidSpi.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEidSpi.waitForEidPresent();
@@ -578,7 +577,7 @@ public class PcscTest {
 
 	@Test
 	public void testReadNonRepudiationCertificate() throws Exception {
-		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
+		PcscEid pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEidSpi.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEidSpi.waitForEidPresent();
@@ -615,7 +614,7 @@ public class PcscTest {
 
 	@Test
 	public void testDEREncoding() throws Exception {
-		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
+		PcscEid pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEidSpi.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEidSpi.waitForEidPresent();
@@ -760,7 +759,7 @@ public class PcscTest {
 
 	@Test
 	public void displayCitizenCertificates() throws Exception {
-		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
+		PcscEid pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEidSpi.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEidSpi.waitForEidPresent();
@@ -817,7 +816,7 @@ public class PcscTest {
 
 	@Test
 	public void testReadIdentityFile() throws Exception {
-		PcscEidSpi pcscEidSpi = new PcscEid(new TestView(), this.messages);
+		PcscEid pcscEidSpi = new PcscEid(new TestView(), this.messages);
 		if (false == pcscEidSpi.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEidSpi.waitForEidPresent();
