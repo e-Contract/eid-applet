@@ -943,7 +943,7 @@ public class PcscEid extends Observable {
 
 	private ResponseAPDU verifyPin(int retriesLeft,
 			Integer verifyPinStartFeature) throws IOException, CardException,
-			InterruptedException {
+			InterruptedException, UserCancelledException {
 		this.view.addDetailMessage("CCID verify PIN start/end sequence...");
 		byte[] verifyCommandData = createPINVerificationDataStructure(0x20);
 		this.dialogs.showPINPadFrame(retriesLeft);
@@ -964,7 +964,8 @@ public class PcscEid extends Observable {
 	}
 
 	private ResponseAPDU verifyPinDirect(int retriesLeft,
-			Integer directPinVerifyFeature) throws IOException, CardException {
+			Integer directPinVerifyFeature) throws IOException, CardException,
+			UserCancelledException {
 		this.view.addDetailMessage("direct PIN verification...");
 		byte[] verifyCommandData = createPINVerificationDataStructure(0x20);
 		this.dialogs.showPINPadFrame(retriesLeft);
@@ -978,7 +979,7 @@ public class PcscEid extends Observable {
 		ResponseAPDU responseApdu = new ResponseAPDU(result);
 		if (0x6401 == responseApdu.getSW()) {
 			this.view.addDetailMessage("canceled by user");
-			throw new SecurityException("canceled by user");
+			throw new UserCancelledException();
 		} else if (0x6400 == responseApdu.getSW()) {
 			this.view.addDetailMessage("PIN pad timeout");
 		}
@@ -986,7 +987,8 @@ public class PcscEid extends Observable {
 	}
 
 	private ResponseAPDU verifyPukDirect(int retriesLeft,
-			Integer directPinVerifyFeature) throws IOException, CardException {
+			Integer directPinVerifyFeature) throws IOException, CardException,
+			UserCancelledException {
 		this.view.addDetailMessage("direct PUK verification...");
 		byte[] verifyCommandData = createPINVerificationDataStructure(0x2C);
 		this.dialogs.showPUKPadFrame(retriesLeft);
@@ -1000,7 +1002,7 @@ public class PcscEid extends Observable {
 		ResponseAPDU responseApdu = new ResponseAPDU(result);
 		if (0x6401 == responseApdu.getSW()) {
 			this.view.addDetailMessage("canceled by user");
-			throw new SecurityException("canceled by user");
+			throw new UserCancelledException();
 		} else if (0x6400 == responseApdu.getSW()) {
 			this.view.addDetailMessage("PIN pad timeout");
 		}
@@ -1317,7 +1319,7 @@ public class PcscEid extends Observable {
 
 	private ResponseAPDU doChangePinStartFinish(int retriesLeft,
 			Integer modifyPinStartFeature) throws IOException, CardException,
-			InterruptedException {
+			InterruptedException, UserCancelledException {
 		byte[] modifyCommandData = createPINModificationDataStructure(0x24);
 		this.card.transmitControlCommand(modifyPinStartFeature,
 				modifyCommandData);
@@ -1349,7 +1351,7 @@ public class PcscEid extends Observable {
 	}
 
 	private void ccidWaitForOK(int getKeyPressedFeature) throws CardException,
-			InterruptedException {
+			InterruptedException, UserCancelledException {
 		// wait for key pressed
 		loop: while (true) {
 			byte[] getKeyPressedResult = this.card.transmitControlCommand(
@@ -1372,7 +1374,7 @@ public class PcscEid extends Observable {
 			case 0x1b:
 				this.view.addDetailMessage("user canceled");
 				// XXX: need to send the PIN finish ioctl?
-				throw new SecurityException("canceled by user");
+				throw new UserCancelledException();
 			case 0x40:
 				// happens in case of a reader timeout
 				this.view.addDetailMessage("PIN abort");
@@ -1385,7 +1387,8 @@ public class PcscEid extends Observable {
 	}
 
 	private ResponseAPDU doChangePinDirect(int retriesLeft,
-			Integer directPinModifyFeature) throws IOException, CardException {
+			Integer directPinModifyFeature) throws IOException, CardException,
+			UserCancelledException {
 		this.view.addDetailMessage("direct PIN modification...");
 		byte[] modifyCommandData = createPINModificationDataStructure(0x24);
 		this.dialogs.showPINChangePadFrame(retriesLeft);
@@ -1401,7 +1404,7 @@ public class PcscEid extends Observable {
 			this.view.addDetailMessage("PINs differ");
 		} else if (0x6401 == responseApdu.getSW()) {
 			this.view.addDetailMessage("canceled by user");
-			throw new SecurityException("canceled by user");
+			throw new UserCancelledException();
 		} else if (0x6400 == responseApdu.getSW()) {
 			this.view.addDetailMessage("PIN pad timeout");
 		}
