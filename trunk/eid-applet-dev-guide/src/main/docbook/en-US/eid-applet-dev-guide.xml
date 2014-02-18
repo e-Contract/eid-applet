@@ -1418,11 +1418,7 @@
 				<code>IncludeAddress</code>
 				and
 				<code>IncludePhoto</code>
-				init-params. Doing so you need to implement the
-				<code>SignatureServiceEx</code>
-				SPI instead of the
-				<code>SignatureService</code>
-				SPI.
+				init-params.
 			</para>
 			<para>
 				The eID Applet Service can be configured to perform two basic
