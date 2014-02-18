@@ -2,67 +2,64 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:rich="http://richfaces.org/rich"
-	xmlns:f="http://java.sun.com/jsf/core"
-        lang="en" xml:lang="en">
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core" lang="en" xml:lang="en">
 <body>
-<ui:composition template="/WEB-INF/template.xhtml">
-	<ui:param name="activeMenu" value="results" />
-	<ui:define name="body">
-		<h2>eID Applet Test Report</h2>
-		<h:form>
-			<rich:dataTable var="testResult" value="#{testReport}" rows="20">
-				<rich:column>
-					<f:facet name="header">
-						<h:outputText value="Test" />
-					</f:facet>
-					<h:outputText value="#{testResult.test}" />
-				</rich:column>
-				<rich:column>
-					<f:facet name="header">
-						<h:outputText value="Result" />
-					</f:facet>
-					<h:outputText value="#{testResult.result}" />
-				</rich:column>
-				<rich:column>
-					<f:facet name="header">
-						<h:outputText value="OS Name" />
-					</f:facet>
-					<h:outputText value="#{testResult.osName}" />
-				</rich:column>
-				<rich:column>
-					<f:facet name="header">
-						<h:outputText value="OS Version" />
-					</f:facet>
-					<h:outputText value="#{testResult.osVersion}" />
-				</rich:column>
-				<rich:column>
-					<f:facet name="header">
-						<h:outputText value="Java Version" />
-					</f:facet>
-					<h:outputText value="#{testResult.javaVersion}" />
-				</rich:column>
-				<rich:column>
-					<f:facet name="header">
-						<h:outputText value="User Agent" />
-					</f:facet>
-					<h:outputText value="#{testResult.navigatorUserAgent}" />
-				</rich:column>
-				<rich:column>
-					<f:facet name="header">
-						<h:outputText value="Created" />
-					</f:facet>
-					<h:outputText value="#{testResult.created.time}">
-						<f:convertDateTime timeZone="Europe/Paris" dateStyle="full"
-							type="both" />
-					</h:outputText>
-				</rich:column>
-				<f:facet name="footer">
-					<rich:datascroller />
-				</f:facet>
-			</rich:dataTable>
-		</h:form>
-	</ui:define>
-</ui:composition>
+	<ui:composition template="/WEB-INF/template.xhtml">
+		<ui:param name="activeMenu" value="results" />
+		<ui:define name="body">
+			<h2>eID Applet Test Report</h2>
+			<h:form>
+				<p:dataTable var="testResult" value="#{betaReport.report}" rows="20"
+					paginator="true" resizableColumns="true">
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Test" />
+						</f:facet>
+						<h:outputText value="#{testResult.test}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Result" />
+						</f:facet>
+						<h:outputText value="#{testResult.result}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="OS Name" />
+						</f:facet>
+						<h:outputText value="#{testResult.osName}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="OS Version" />
+						</f:facet>
+						<h:outputText value="#{testResult.osVersion}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Java Version" />
+						</f:facet>
+						<h:outputText value="#{testResult.javaVersion}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="User Agent" />
+						</f:facet>
+						<h:outputText value="#{testResult.navigatorUserAgent}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Created" />
+						</f:facet>
+						<h:outputText value="#{testResult.created.time}">
+							<f:convertDateTime timeZone="Europe/Paris" dateStyle="full"
+								type="both" />
+						</h:outputText>
+					</p:column>
+				</p:dataTable>
+			</h:form>
+		</ui:define>
+	</ui:composition>
 </body>
 </html>

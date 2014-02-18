@@ -20,9 +20,8 @@ h3 {
 	font-style: italic;
 }
 
-
 #header {
-	width: 700px;
+	width: 70%;
 	margin: 0 auto;
 }
 
@@ -32,7 +31,7 @@ h3 {
 }
 
 #menu {
-	width: 700px;
+	width: 70%;
 	height: 44px;
 	background-color: #e0e0e0;
 	margin: 0 auto;
@@ -69,7 +68,7 @@ h3 {
 }
 
 #content {
-	width: 700px;
+	width: 70%;
 	margin: 0 auto;
 	color: #303030;
 }

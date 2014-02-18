@@ -524,6 +524,16 @@
 				<artifactId>commons-eid-consumer</artifactId>
 				<version>0.2.1</version>
 			</dependency>
+			<dependency>
+				<groupId>org.primefaces</groupId>
+				<artifactId>primefaces</artifactId>
+				<version>4.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.spec</groupId>
+				<artifactId>jboss-javaee-all-6.0</artifactId>
+				<version>3.0.2.Final</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<build>

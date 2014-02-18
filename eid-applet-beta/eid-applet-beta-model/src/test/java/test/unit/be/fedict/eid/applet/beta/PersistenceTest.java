@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -19,11 +20,8 @@
 package test.unit.be.fedict.eid.applet.beta;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.Calendar;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -38,11 +36,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import be.fedict.eid.applet.beta.FeedbackEntity;
 import be.fedict.eid.applet.beta.SessionContextEntity;
 import be.fedict.eid.applet.beta.TestReportEntity;
 import be.fedict.eid.applet.beta.TestResultEntity;
-import be.fedict.eid.applet.beta.admin.AdministratorEntity;
 
 public class PersistenceTest {
 
@@ -62,10 +58,8 @@ public class PersistenceTest {
 				"jdbc:hsqldb:mem:beta");
 		configuration.setProperty("hibernate.hbm2ddl.auto", "create");
 		configuration.addAnnotatedClass(SessionContextEntity.class);
-		configuration.addAnnotatedClass(FeedbackEntity.class);
 		configuration.addAnnotatedClass(TestResultEntity.class);
 		configuration.addAnnotatedClass(TestReportEntity.class);
-		configuration.addAnnotatedClass(AdministratorEntity.class);
 		EntityManagerFactory entityManagerFactory = configuration
 				.buildEntityManagerFactory();
 
@@ -131,66 +125,6 @@ public class PersistenceTest {
 		}
 	}
 
-	@Test
-	public void feedbackEntity() throws Exception {
-		SessionContextEntity sessionContextEntity = new SessionContextEntity(
-				"http-session-id", "user-agent");
-		this.entityManager.persist(sessionContextEntity);
-		int contextId = sessionContextEntity.getContextId();
-
-		this.entityManager.getTransaction().commit();
-		this.entityManager.getTransaction().begin();
-
-		sessionContextEntity = this.entityManager.find(
-				SessionContextEntity.class, contextId);
-
-		FeedbackEntity feedbackEntity = new FeedbackEntity();
-		feedbackEntity.setEmail("valid@email.be");
-		feedbackEntity.setSubject("subject");
-		feedbackEntity.setMessage("message");
-		feedbackEntity.setCreated(Calendar.getInstance());
-		feedbackEntity.setSessionContext(sessionContextEntity);
-
-		this.entityManager.persist(feedbackEntity);
-		int feedbackId = feedbackEntity.getId();
-
-		this.entityManager.getTransaction().commit();
-		this.entityManager.getTransaction().begin();
-
-		feedbackEntity = this.entityManager.find(FeedbackEntity.class,
-				feedbackId);
-		assertNotNull(feedbackEntity.getSessionContext());
-	}
-
-	@Test
-	public void testFeedbackEntityHibernateValidator() throws Exception {
-		SessionContextEntity sessionContextEntity = new SessionContextEntity(
-				"http-session-id", "user-agent");
-		this.entityManager.persist(sessionContextEntity);
-		int contextId = sessionContextEntity.getContextId();
-
-		this.entityManager.getTransaction().commit();
-		this.entityManager.getTransaction().begin();
-
-		sessionContextEntity = this.entityManager.find(
-				SessionContextEntity.class, contextId);
-
-		FeedbackEntity feedbackEntity = new FeedbackEntity();
-		feedbackEntity.setEmail("invalid-email-address");
-		feedbackEntity.setSubject("subject");
-		feedbackEntity.setMessage("message");
-		feedbackEntity.setCreated(Calendar.getInstance());
-		feedbackEntity.setSessionContext(sessionContextEntity);
-
-		try {
-			this.entityManager.persist(feedbackEntity);
-			fail();
-		} catch (Exception e) {
-			// expected
-			this.entityManager.getTransaction().rollback();
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testResults() throws Exception {
@@ -231,15 +165,5 @@ public class PersistenceTest {
 
 		// verify
 		assertEquals(1, resultList.size());
-	}
-
-	@Test
-	public void testQueryAdministratorEntity() throws Exception {
-		// setup
-		Query query = this.entityManager
-				.createQuery("FROM AdministratorEntity");
-
-		// operate & verify
-		assertTrue(query.getResultList().isEmpty());
 	}
 }
