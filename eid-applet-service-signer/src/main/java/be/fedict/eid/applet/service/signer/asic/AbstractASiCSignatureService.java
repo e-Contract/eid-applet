@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2009-2011 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -51,7 +52,7 @@ import be.fedict.eid.applet.service.signer.time.TimeStampService;
 import be.fedict.eid.applet.service.spi.AddressDTO;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 import be.fedict.eid.applet.service.spi.IdentityDTO;
-import be.fedict.eid.applet.service.spi.SignatureServiceEx;
+import be.fedict.eid.applet.service.spi.SignatureService;
 
 /**
  * Abstract ASiC signature service implementation. Implements Associated
@@ -61,7 +62,7 @@ import be.fedict.eid.applet.service.spi.SignatureServiceEx;
  * 
  */
 public class AbstractASiCSignatureService extends AbstractXmlSignatureService
-		implements SignatureServiceEx {
+		implements SignatureService {
 
 	private final TemporaryDataStorage temporaryDataStorage;
 
@@ -133,11 +134,13 @@ public class AbstractASiCSignatureService extends AbstractXmlSignatureService
 		}
 	}
 
+	@Override
 	public DigestInfo preSign(List<DigestInfo> digestInfos,
 			List<X509Certificate> signingCertificateChain,
 			IdentityDTO identity, AddressDTO address, byte[] photo)
 			throws NoSuchAlgorithmException {
-		return super.preSign(digestInfos, signingCertificateChain);
+		return super.preSign(digestInfos, signingCertificateChain, identity,
+				address, photo);
 	}
 
 	@Override

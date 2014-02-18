@@ -36,7 +36,9 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import be.fedict.eid.applet.service.spi.AddressDTO;
 import be.fedict.eid.applet.service.spi.DigestInfo;
+import be.fedict.eid.applet.service.spi.IdentityDTO;
 
 @Stateless
 @EJB(name = "java:global/test/FilesSignatureServiceBean", beanInterface = FilesSignatureService.class)
@@ -65,7 +67,8 @@ public class FilesSignatureServiceBean implements FilesSignatureService {
 	}
 
 	public DigestInfo preSign(List<DigestInfo> digestInfos,
-			List<X509Certificate> signingCertificateChain)
+			List<X509Certificate> signingCertificateChain,
+			IdentityDTO identity, AddressDTO address, byte[] photo)
 			throws NoSuchAlgorithmException {
 		LOG.debug("preSign");
 

@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2010 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -115,7 +116,8 @@ public class OOXMLTest {
 		List<X509Certificate> certChain = pcscEid.getSignCertificateChain();
 
 		// operate
-		DigestInfo digestInfo = signatureService.preSign(null, certChain);
+		DigestInfo digestInfo = signatureService.preSign(null, certChain, null,
+				null, null);
 
 		// verify
 		assertNotNull(digestInfo);
@@ -181,7 +183,8 @@ public class OOXMLTest {
 				.singletonList(certificate);
 
 		// operate
-		DigestInfo digestInfo = signatureService.preSign(null, certChain);
+		DigestInfo digestInfo = signatureService.preSign(null, certChain, null,
+				null, null);
 
 		// verify
 		assertNotNull(digestInfo);

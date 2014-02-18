@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -49,7 +50,9 @@ import org.junit.Test;
 
 import be.fedict.eid.applet.service.AppletServiceServlet;
 import be.fedict.eid.applet.service.impl.handler.SignatureDataMessageHandler;
+import be.fedict.eid.applet.service.spi.AddressDTO;
 import be.fedict.eid.applet.service.spi.DigestInfo;
+import be.fedict.eid.applet.service.spi.IdentityDTO;
 import be.fedict.eid.applet.service.spi.SignatureService;
 import be.fedict.eid.applet.shared.SignatureDataMessage;
 
@@ -426,7 +429,8 @@ public class SignatureDataMessageHandlerTest {
 		}
 
 		public DigestInfo preSign(List<DigestInfo> digestInfos,
-				List<X509Certificate> signingCertificateChain)
+				List<X509Certificate> signingCertificateChain,
+				IdentityDTO identity, AddressDTO address, byte[] photo)
 				throws NoSuchAlgorithmException {
 			return null;
 		}

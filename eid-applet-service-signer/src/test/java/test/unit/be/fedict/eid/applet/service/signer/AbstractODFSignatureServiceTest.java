@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -133,7 +134,7 @@ public class AbstractODFSignatureServiceTest {
 		private final ByteArrayOutputStream signedODFOutputStream;
 
 		public ODFTestSignatureService() {
-            super(DigestAlgo.SHA1);
+			super(DigestAlgo.SHA1);
 			this.temporaryDataStorage = new TemporaryTestDataStorage();
 			this.signedODFOutputStream = new ByteArrayOutputStream();
 		}
@@ -200,8 +201,8 @@ public class AbstractODFSignatureServiceTest {
 				KeyUsage.nonRepudiation));
 
 		// operate
-		DigestInfo digestInfo = odfSignatureService.preSign(null, Collections
-				.singletonList(certificate));
+		DigestInfo digestInfo = odfSignatureService.preSign(null,
+				Collections.singletonList(certificate), null, null, null);
 
 		// verify
 		assertNotNull(digestInfo);
@@ -220,8 +221,8 @@ public class AbstractODFSignatureServiceTest {
 		/*
 		 * Operate: postSign
 		 */
-		odfSignatureService.postSign(signatureValue, Collections
-				.singletonList(certificate));
+		odfSignatureService.postSign(signatureValue,
+				Collections.singletonList(certificate));
 
 		byte[] signedODFData = odfSignatureService.getSignedODFData();
 		assertNotNull(signedODFData);

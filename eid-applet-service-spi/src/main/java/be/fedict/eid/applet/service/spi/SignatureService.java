@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -53,11 +54,18 @@ public interface SignatureService {
 	 *            the optional list of digest infos.
 	 * @param signingCertificateChain
 	 *            the optional list of certificates.
+	 * @param identity
+	 *            the optional identity.
+	 * @param address
+	 *            the optional identity address.
+	 * @param photo
+	 *            the optional identity photo.
 	 * @return the digest to be signed.
 	 * @throws NoSuchAlgorithmException
 	 */
 	DigestInfo preSign(List<DigestInfo> digestInfos,
-			List<X509Certificate> signingCertificateChain)
+			List<X509Certificate> signingCertificateChain,
+			IdentityDTO identity, AddressDTO address, byte[] photo)
 			throws NoSuchAlgorithmException;
 
 	/**
