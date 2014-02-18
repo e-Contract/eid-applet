@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -33,7 +34,7 @@ public class TaskRunner {
 
 	private static final int BACKOFF_SLEEP = 1000 * 2;
 
-	private final PcscEidSpi pcscEidSpi;
+	private final PcscEid pcscEidSpi;
 
 	private final View view;
 
@@ -43,7 +44,7 @@ public class TaskRunner {
 	 * @param pcscEidSpi
 	 * @param view
 	 */
-	public TaskRunner(PcscEidSpi pcscEidSpi, View view) {
+	public TaskRunner(PcscEid pcscEidSpi, View view) {
 		this.pcscEidSpi = pcscEidSpi;
 		this.view = view;
 	}

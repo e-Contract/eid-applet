@@ -74,12 +74,10 @@ import be.fedict.eid.applet.View;
 /**
  * Holds all functions related to eID card access over PC/SC.
  * 
- * This class required the Java 6 runtime to operate.
- * 
  * @author Frank Cornelis
  * 
  */
-public class PcscEid extends Observable implements PcscEidSpi {
+public class PcscEid extends Observable {
 
 	public static final int MIN_PIN_SIZE = 4;
 
