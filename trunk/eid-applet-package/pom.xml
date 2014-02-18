@@ -93,7 +93,7 @@
 								<addMavenDescriptor>false</addMavenDescriptor>
 								<manifestEntries>
 									<Permissions>all-permissions</Permissions>
-									<Codebase>https://*.be localhost 127.0.0.1</Codebase>
+									<Codebase><![CDATA[https://*.be https://*.brussels https://*.vlaanderen localhost 127.0.0.1]]></Codebase>
 								</manifestEntries>
 							</archive>
 							<type>PKCS12</type>
@@ -117,7 +117,7 @@
 								<addMavenDescriptor>false</addMavenDescriptor>
 								<manifestEntries>
 									<Permissions>all-permissions</Permissions>
-									<Codebase>https://*.be localhost 127.0.0.1</Codebase>
+									<Codebase><![CDATA[https://*.be https://*.brussels https://*.vlaanderen localhost 127.0.0.1]]></Codebase>
 								</manifestEntries>
 							</archive>
 						</configuration>
@@ -140,15 +140,9 @@
 							<storepass>FedICT1234</storepass>
 							<alias>CODE_SIGN</alias>
 							<verbose>true</verbose>
-							<!-- 
-								Cannot get past the HTTP proxy, even with proxy config.
-							-->
-							<!--
-							<arguments>
-								<argument>-tsa</argument>
-								<argument>http://tsa.belgium.be/connect</argument>
-							</arguments>
-							-->
+							<!-- Cannot get past the HTTP proxy, even with proxy config. -->
+							<!-- <arguments> <argument>-tsa</argument> <argument>http://tsa.belgium.be/connect</argument> 
+								</arguments> -->
 						</configuration>
 					</plugin>
 				</plugins>
