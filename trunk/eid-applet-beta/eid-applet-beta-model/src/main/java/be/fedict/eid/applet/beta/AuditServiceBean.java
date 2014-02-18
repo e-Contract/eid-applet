@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -21,18 +22,14 @@ package be.fedict.eid.applet.beta;
 import java.security.cert.X509Certificate;
 
 import javax.ejb.EJB;
-import javax.ejb.Local;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import org.jboss.ejb3.annotation.LocalBinding;
-
 import be.fedict.eid.applet.service.spi.AuditService;
 
 @Stateless
-@Local(AuditService.class)
-@LocalBinding(jndiBinding = "fedict/eid/applet/beta/AuditServiceBean")
+@EJB(name = "java:global/beta/AuditServiceBean", beanInterface = AuditService.class)
 public class AuditServiceBean implements AuditService {
 
 	@EJB

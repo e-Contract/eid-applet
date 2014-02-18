@@ -8,7 +8,7 @@
 		<version>1.2.0-SNAPSHOT</version>
 	</parent>
 	<name>eID Applet Beta Project</name>
-	<description>Contains an eID Applet Beta Java EE web
+	<description>Contains an eID Applet Beta Java EE 6 web
 		application.</description>
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-beta</artifactId>
@@ -25,9 +25,7 @@
 		</dependencies>
 	</dependencyManagement>
 	<modules>
-		<module>eid-applet-beta-service</module>
 		<module>eid-applet-beta-model</module>
-		<module>eid-applet-beta-taglib</module>
 		<module>eid-applet-beta-webapp</module>
 		<module>eid-applet-beta-deploy</module>
 	</modules>

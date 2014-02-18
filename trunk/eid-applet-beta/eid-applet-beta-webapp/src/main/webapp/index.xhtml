@@ -1,0 +1,23 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html" lang="en" xml:lang="en">
+<body>
+	<ui:composition template="/WEB-INF/template.xhtml">
+		<ui:param name="activeMenu" value="main" />
+		<ui:define name="body">
+			<h2>Welcome</h2>
+			<p>Welcome to the eID Applet Beta Site.</p>
+			<p>The eID Applet is a browser component. This component can be
+				used by web application developers to ease integration of eID
+				functionality in their business processes.</p>
+			<p>Via this eID Applet Beta Site you can participate in testing
+				the next version of the eID Applet on your system.</p>
+			<p>Thanks for taking the time to test the eID Applet.</p>
+			<h:form>
+				<h:commandLink value="Start the eID Applet tests." action="/tests" />
+			</h:form>
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

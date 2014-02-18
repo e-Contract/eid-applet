@@ -3,83 +3,90 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:rich="http://richfaces.org/rich"
-        lang="en" xml:lang="en">
+	xmlns:p="http://primefaces.org/ui" lang="en" xml:lang="en">
 <body>
-<ui:composition template="/WEB-INF/template.xhtml">
-	<ui:param name="activeMenu" value="test" />
-	<ui:define name="body">
-		<h2>eID Applet Authentication Test Results</h2>
-		<p>The eID Applet Authentication was successful.</p>
-		<rich:tabPanel switchType="client">
-			<rich:tab label="Authentication">
-				<h:panelGrid columns="2">
-					<h:outputText value="Identifier" />
-					<h:outputText value="#{eid.identifier}" />
-				</h:panelGrid>
-			</rich:tab>
-			<rich:tab label="Client Environment"
-				rendered="#{!empty eid.identity}">
-				<h:panelGrid columns="2">
-					<h:outputText value="Client Java Version" />
-					<h:outputText value="#{clientJavaVersion}" />
+	<ui:composition template="/WEB-INF/template.xhtml">
+		<ui:param name="activeMenu" value="test" />
+		<ui:define name="body">
+			<h2>eID Applet Authentication Test Results</h2>
+			<p>The eID Applet Authentication was successful.</p>
+			<p:tabView switchType="client">
+				<p:tab title="Authentication">
+					<h:panelGrid columns="2">
+						<h:outputText value="Identifier" />
+						<h:outputText value="#{eid.identifier}" />
+					</h:panelGrid>
+				</p:tab>
+				<p:tab title="Client Environment" rendered="#{!empty eid.identity}">
+					<h:panelGrid columns="2">
+						<h:outputText value="Client Java Version" />
+						<h:outputText value="#{clientJavaVersion}" />
 
-					<h:outputText value="Client Java Vendor" />
-					<h:outputText value="#{clientJavaVendor}" />
+						<h:outputText value="Client Java Vendor" />
+						<h:outputText value="#{clientJavaVendor}" />
 
-					<h:outputText value="Client OS Name" />
-					<h:outputText value="#{clientOSName}" />
+						<h:outputText value="Client OS Name" />
+						<h:outputText value="#{clientOSName}" />
 
-					<h:outputText value="Client OS Arch" />
-					<h:outputText value="#{clientOSArch}" />
+						<h:outputText value="Client OS Arch" />
+						<h:outputText value="#{clientOSArch}" />
 
-					<h:outputText value="Client OS Version" />
-					<h:outputText value="#{clientOSVersion}" />
+						<h:outputText value="Client OS Version" />
+						<h:outputText value="#{clientOSVersion}" />
 
-					<h:outputText value="Client Readers" />
-					<h:outputText value="#{clientReaders}" />
+						<h:outputText value="Client Readers" />
+						<h:outputText value="#{clientReaders}" />
 
-					<h:outputText value="Client User Agent" />
-					<h:outputText value="#{clientUserAgent}" />
+						<h:outputText value="Client User Agent" />
+						<h:outputText value="#{clientUserAgent}" />
 
-					<h:outputText value="Client SSL Cipher Suite" />
-					<h:outputText value="#{clientSslCipherSuite}" />
+						<h:outputText value="Client SSL Cipher Suite" />
+						<h:outputText value="#{clientSslCipherSuite}" />
 
-					<h:outputText value="Client SSL Key Size" />
-					<h:outputText value="#{clientSslKeySize}" />
+						<h:outputText value="Client SSL Key Size" />
+						<h:outputText value="#{clientSslKeySize}" />
 
-					<h:outputText value="Client Remote Address" />
-					<h:outputText value="#{clientRemoteAddress}" />
+						<h:outputText value="Client Remote Address" />
+						<h:outputText value="#{clientRemoteAddress}" />
 
-					<h:outputText value="Client Navigator User Agent" />
-					<h:outputText value="#{clientNavigatorUserAgent}" />
+						<h:outputText value="Client Navigator User Agent" />
+						<h:outputText value="#{clientNavigatorUserAgent}" />
 
-					<h:outputText value="Client Navigator App Name" />
-					<h:outputText value="#{clientNavigatorAppName}" />
+						<h:outputText value="Client Navigator App Name" />
+						<h:outputText value="#{clientNavigatorAppName}" />
 
-					<h:outputText value="Client Navigator App Version" />
-					<h:outputText value="#{clientNavigatorAppVersion}" />
-				</h:panelGrid>
-			</rich:tab>
-			<rich:tab label="Authentication Certificate">
-				<div style="overflow: auto; width: 600px; height: 200px;"><pre>
+						<h:outputText value="Client Navigator App Version" />
+						<h:outputText value="#{clientNavigatorAppVersion}" />
+					</h:panelGrid>
+				</p:tab>
+				<p:tab title="Authentication Certificate">
+					<div style="overflow: auto; width: 100%; height: 200px;">
+						<pre>
 					#{authenticationCertificateChain[0]}
-				</pre></div>
-			</rich:tab>
-			<rich:tab label="Citizen CA Certificate">
-				<div style="overflow: auto; width: 600px; height: 200px;"><pre>
+				</pre>
+					</div>
+				</p:tab>
+				<p:tab title="Citizen CA Certificate">
+					<div style="overflow: auto; width: 100%; height: 200px;">
+						<pre>
 					#{authenticationCertificateChain[1]}
-				</pre></div>
-			</rich:tab>
-			<rich:tab label="Root CA Certificate">
-				<div style="overflow: auto; width: 600px; height: 200px;"><pre>
+				</pre>
+					</div>
+				</p:tab>
+				<p:tab title="Root CA Certificate">
+					<div style="overflow: auto; width: 100%; height: 200px;">
+						<pre>
 					#{authenticationCertificateChain[2]}
-				</pre></div>
-			</rich:tab>
-		</rich:tabPanel>
-		<p><a
-			href="#{facesContext.externalContext.requestContextPath}/tests.seam">Go back to the tests.</a></p>
-	</ui:define>
-</ui:composition>
+				</pre>
+					</div>
+				</p:tab>
+			</p:tabView>
+			<p>
+				<a
+					href="#{facesContext.externalContext.requestContextPath}/tests.xhtml">Go
+					back to the tests.</a>
+			</p>
+		</ui:define>
+	</ui:composition>
 </body>
 </html>

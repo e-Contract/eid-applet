@@ -2,34 +2,39 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:rich="http://richfaces.org/rich"
-	xmlns:f="http://java.sun.com/jsf/core"
-        lang="en" xml:lang="en">
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core" lang="en" xml:lang="en">
 <body>
-<ui:composition template="/WEB-INF/template.xhtml">
-	<ui:param name="activeMenu" value="test" />
-	<ui:define name="body">
-		<h2>eID Applet Tests</h2>
-		<p>Via this page you can test the eID Applet within your web
-		browser.</p>
-		<h:panelGrid columns="2">
-			<rich:panel>
-				<f:facet name="header">eID Applet Identification</f:facet>
+	<ui:composition template="/WEB-INF/template.xhtml">
+		<ui:param name="activeMenu" value="test" />
+		<ui:define name="body">
+			<h2>eID Applet Tests</h2>
+			<p>Via this page you can test the eID Applet within your web
+				browser.</p>
+			<h:panelGrid columns="2">
+				<p:panel>
+					<f:facet name="header">eID Applet Identification</f:facet>
 			This test will perform an eID identification using the eID Applet.
 			A simple eID data readout will take place.
-			<p><a
-					href="#{facesContext.externalContext.requestContextPath}/identification.seam">Run the eID Applet Identification test.</a></p>
-			</rich:panel>
+			<p>
+						<a
+							href="#{facesContext.externalContext.requestContextPath}/identification.xhtml">Run
+							the eID Applet Identification test.</a>
+					</p>
+				</p:panel>
 
-			<rich:panel>
-				<f:facet name="header">eID Applet Authentication</f:facet>
+				<p:panel>
+					<f:facet name="header">eID Applet Authentication</f:facet>
 			This test will perform an eID authentication using the eID Applet.
 			This test requires you to enter your eID PIN code.
-			<p><a
-					href="#{facesContext.externalContext.requestContextPath}/authentication.seam">Run the eID Applet Authentication test.</a></p>
-			</rich:panel>
-		</h:panelGrid>
-	</ui:define>
-</ui:composition>
+			<p>
+						<a
+							href="#{facesContext.externalContext.requestContextPath}/authentication.xhtml">Run
+							the eID Applet Authentication test.</a>
+					</p>
+				</p:panel>
+			</h:panelGrid>
+		</ui:define>
+	</ui:composition>
 </body>
 </html>

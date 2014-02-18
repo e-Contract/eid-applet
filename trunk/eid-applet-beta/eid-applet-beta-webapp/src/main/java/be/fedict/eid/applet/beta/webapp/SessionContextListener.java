@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -19,6 +20,7 @@
 package be.fedict.eid.applet.beta.webapp;
 
 import javax.ejb.EJB;
+import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
@@ -28,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 
 import be.fedict.eid.applet.beta.SessionContextManager;
 
+@WebListener
 public class SessionContextListener implements HttpSessionListener {
 
 	private static final Log LOG = LogFactory
@@ -40,7 +43,8 @@ public class SessionContextListener implements HttpSessionListener {
 		HttpSession session = event.getSession();
 		String sessionId = session.getId();
 		LOG.debug("session created: " + sessionId);
-		int contextId = this.sessionContextManager.getSessionContextId(sessionId);
+		int contextId = this.sessionContextManager
+				.getSessionContextId(sessionId);
 		LOG.debug("context Id: " + contextId);
 	}
 
