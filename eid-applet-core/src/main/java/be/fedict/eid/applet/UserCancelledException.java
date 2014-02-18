@@ -1,6 +1,5 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2010 FedICT.
  * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,38 +16,10 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.shared;
+package be.fedict.eid.applet;
 
-/**
- * Error enumeration.
- * 
- * @author Frank Cornelis
- * 
- */
-public enum ErrorCode {
+public class UserCancelledException extends Exception {
 
-	/**
-	 * Error code for expired certificates.
-	 */
-	CERTIFICATE_EXPIRED,
+	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Error code for revoked certificates.
-	 */
-	CERTIFICATE_REVOKED,
-
-	/**
-	 * Generic error code for invalid certificates.
-	 */
-	CERTIFICATE,
-
-	/**
-	 * Error code for untrusted certificates.
-	 */
-	CERTIFICATE_NOT_TRUSTED,
-
-	/**
-	 * User cancelled the eID operation.
-	 */
-	USER_CANCELED;
 }

@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -33,6 +34,14 @@ public interface Runtime {
 	 * Applet.
 	 */
 	void gotoTargetPage();
+
+	/**
+	 * Navigates the web browser to the cancel page, if configured via the eID
+	 * Applet parameters.
+	 * 
+	 * @return <code>true</code> if cancel page was configured.
+	 */
+	boolean gotoCancelPage();
 
 	URL getDocumentBase();
 

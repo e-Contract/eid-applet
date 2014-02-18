@@ -71,6 +71,8 @@ public class Applet extends JApplet {
 
 	public static final String TARGET_PAGE_PARAM = "TargetPage";
 
+	public static final String CANCEL_PAGE_PARAM = "CancelPage";
+
 	public static final String BACKGROUND_COLOR_PARAM = "BackgroundColor";
 
 	public static final String FOREGROUND_COLOR_PARAM = "ForegroundColor";
@@ -233,6 +235,23 @@ public class Applet extends JApplet {
 				addDetailMessage("URL error: " + e.getMessage());
 			}
 		}
+	}
+
+	private boolean gotoCancelPage() {
+		String cancelPageParam = getParameter(CANCEL_PAGE_PARAM);
+		if (null == cancelPageParam) {
+			return false;
+		}
+		AppletContext appletContext = getAppletContext();
+		URL documentBase = getDocumentBase();
+		try {
+			URL targetUrl = new URL(documentBase, cancelPageParam);
+			addDetailMessage("Navigating to: " + targetUrl);
+			appletContext.showDocument(targetUrl, "_self");
+		} catch (MalformedURLException e) {
+			addDetailMessage("URL error: " + e.getMessage());
+		}
+		return true;
 	}
 
 	private void addDetailMessage(final String detailMessage) {
@@ -488,7 +507,6 @@ public class Applet extends JApplet {
 	}
 
 	private class AppletThread implements Runnable {
-		@SuppressWarnings("unchecked")
 		public void run() {
 			addDetailMessage("eID Applet - Copyright (C) 2008-2013 FedICT.");
 			addDetailMessage("Copyright (C) 2014 e-Contract.be BVBA.");
@@ -589,7 +607,7 @@ public class Applet extends JApplet {
 			/*
 			 * Next is to make sure we run privileged.
 			 */
-			AccessController.doPrivileged(new PrivilegedAction() {
+			AccessController.doPrivileged(new PrivilegedAction<Object>() {
 				public Object run() {
 					addDetailMessage("running privileged code...");
 					Controller controller = new Controller(new AppletView(),
@@ -603,20 +621,29 @@ public class Applet extends JApplet {
 
 	private class AppletRuntime implements Runtime {
 
+		@Override
 		public URL getDocumentBase() {
 			return Applet.this.getDocumentBase();
 		}
 
+		@Override
 		public String getParameter(String name) {
 			return Applet.this.getParameter(name);
 		}
 
+		@Override
 		public void gotoTargetPage() {
 			Applet.this.gotoTargetPage();
 		}
 
+		@Override
 		public Applet getApplet() {
 			return Applet.this;
+		}
+
+		@Override
+		public boolean gotoCancelPage() {
+			return Applet.this.gotoCancelPage();
 		}
 	}
 
