@@ -14,7 +14,7 @@
 			<year>2008-2013</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>4 November 2013</releaseinfo>
+		<releaseinfo>18 February 2014</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -277,6 +277,17 @@
 					</row>
 					<row>
 						<entry>
+							<code>CancelPage</code>
+						</entry>
+						<entry>optional</entry>
+						<entry>
+							Indicates the page to which the eID Applet navigates after the
+							user cancelled the eID operation. For example:
+							<code>cancel.jsp</code>
+						</entry>
+					</row>
+					<row>
+						<entry>
 							<code>BackgroundColor</code>
 						</entry>
 						<entry>optional</entry>
@@ -424,7 +435,7 @@
 			servlet components to ease integration of the eID Applet within
 			servlet container Java EE based web applications. The eID Applet
 			Service components require at least a servlet version 2.4 container
-			and a JRE version 1.5. The eID Applet and eID Applet Service
+			and a JRE version 1.6. The eID Applet and eID Applet Service
 			architecture has been depicted in
 			<xref linkend="eid-applet-architecture" />
 			.
