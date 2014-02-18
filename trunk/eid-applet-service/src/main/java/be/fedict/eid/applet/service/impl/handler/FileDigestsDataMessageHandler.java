@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -93,7 +94,8 @@ public class FileDigestsDataMessageHandler implements
 
 		DigestInfo digestInfo;
 		try {
-			digestInfo = signatureService.preSign(fileDigestInfos, null);
+			digestInfo = signatureService.preSign(fileDigestInfos, null, null,
+					null, null);
 		} catch (NoSuchAlgorithmException e) {
 			throw new ServletException("no such algo: " + e.getMessage(), e);
 		}

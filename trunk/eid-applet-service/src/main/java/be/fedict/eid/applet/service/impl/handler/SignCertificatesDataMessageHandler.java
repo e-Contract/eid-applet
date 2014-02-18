@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2013 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -52,7 +53,6 @@ import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
 import be.fedict.eid.applet.service.spi.IdentityRequest;
 import be.fedict.eid.applet.service.spi.IdentityService;
 import be.fedict.eid.applet.service.spi.SignatureService;
-import be.fedict.eid.applet.service.spi.SignatureServiceEx;
 import be.fedict.eid.applet.shared.SignCertificatesDataMessage;
 import be.fedict.eid.applet.shared.SignRequestMessage;
 
@@ -194,35 +194,15 @@ public class SignCertificatesDataMessageHandler implements
 		}
 
 		DigestInfo digestInfo;
-		LOG.debug("signature service class: "
-				+ signatureService.getClass().getName());
-		if (SignatureServiceEx.class.isAssignableFrom(signatureService
-				.getClass())) {
-			LOG.debug("SignatureServiceEx SPI implementation detected");
-			/*
-			 * The SignatureServiceEx SPI can also receive the identity during
-			 * the pre-sign phase.
-			 */
-			SignatureServiceEx signatureServiceEx = (SignatureServiceEx) signatureService;
-			DTOMapper dtoMapper = new DTOMapper();
-			IdentityDTO identityDTO = dtoMapper
-					.map(identity, IdentityDTO.class);
-			AddressDTO addressDTO = dtoMapper.map(address, AddressDTO.class);
-			try {
-				digestInfo = signatureServiceEx.preSign(null,
-						signingCertificateChain, identityDTO, addressDTO,
-						message.photoData);
-			} catch (NoSuchAlgorithmException e) {
-				throw new ServletException("no such algo: " + e.getMessage(), e);
-			}
-		} else {
-			LOG.debug("regular SignatureService SPI implementation");
-			try {
-				digestInfo = signatureService.preSign(null,
-						signingCertificateChain);
-			} catch (NoSuchAlgorithmException e) {
-				throw new ServletException("no such algo: " + e.getMessage(), e);
-			}
+		DTOMapper dtoMapper = new DTOMapper();
+		IdentityDTO identityDTO = dtoMapper.map(identity, IdentityDTO.class);
+		AddressDTO addressDTO = dtoMapper.map(address, AddressDTO.class);
+		try {
+			digestInfo = signatureService.preSign(null,
+					signingCertificateChain, identityDTO, addressDTO,
+					message.photoData);
+		} catch (NoSuchAlgorithmException e) {
+			throw new ServletException("no such algo: " + e.getMessage(), e);
 		}
 
 		// also save it in the session for later verification

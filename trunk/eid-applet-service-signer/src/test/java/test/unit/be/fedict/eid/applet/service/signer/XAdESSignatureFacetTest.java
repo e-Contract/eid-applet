@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2010 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -52,7 +53,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -76,6 +76,7 @@ import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
 import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import be.fedict.eid.applet.service.signer.SignatureFacet;
 import be.fedict.eid.applet.service.signer.TemporaryDataStorage;
 import be.fedict.eid.applet.service.signer.facets.EnvelopedSignatureFacet;
@@ -145,9 +146,10 @@ public class XAdESSignatureFacetTest {
 		KeyInfoSignatureFacet keyInfoSignatureFacet = new KeyInfoSignatureFacet(
 				true, false, false);
 		SignaturePolicyService signaturePolicyService = null;
-		//SignaturePolicyService signaturePolicyService = new ExplicitSignaturePolicyService(
-		//		"urn:test", "hello world".getBytes(), "description",
-		//		"http://here.com");
+		// SignaturePolicyService signaturePolicyService = new
+		// ExplicitSignaturePolicyService(
+		// "urn:test", "hello world".getBytes(), "description",
+		// "http://here.com");
 		XAdESSignatureFacet xadesSignatureFacet = new XAdESSignatureFacet(
 				signaturePolicyService);
 		TimeStampService mockTimeStampService = EasyMock
@@ -204,7 +206,8 @@ public class XAdESSignatureFacetTest {
 		EasyMock.replay(mockTimeStampService, mockRevocationDataService);
 
 		// operate
-		DigestInfo digestInfo = testedInstance.preSign(null, certificateChain);
+		DigestInfo digestInfo = testedInstance.preSign(null, certificateChain,
+				null, null, null);
 
 		// verify
 		assertNotNull(digestInfo);
@@ -373,7 +376,8 @@ public class XAdESSignatureFacetTest {
 		EasyMock.replay(mockTimeStampService, mockRevocationDataService);
 
 		// operate
-		DigestInfo digestInfo = testedInstance.preSign(null, certificateChain);
+		DigestInfo digestInfo = testedInstance.preSign(null, certificateChain,
+				null, null, null);
 
 		// verify
 		assertNotNull(digestInfo);

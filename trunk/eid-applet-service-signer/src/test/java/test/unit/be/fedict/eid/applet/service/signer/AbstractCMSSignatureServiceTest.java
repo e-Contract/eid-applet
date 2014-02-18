@@ -115,7 +115,7 @@ public class AbstractCMSSignatureServiceTest {
 
 		// operate
 		DigestInfo digestInfo = signatureService.preSign(null,
-				signingCertificateChain);
+				signingCertificateChain, null, null, null);
 
 		// verify
 		assertNotNull(digestInfo);

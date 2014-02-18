@@ -18,8 +18,8 @@
 
 package test.be.fedict.eid.applet.model;
 
-import be.fedict.eid.applet.service.spi.SignatureServiceEx;
+import be.fedict.eid.applet.service.spi.SignatureService;
 
-public interface IdentitySignatureService extends SignatureServiceEx {
+public interface IdentitySignatureService extends SignatureService {
 
 }

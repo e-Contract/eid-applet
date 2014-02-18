@@ -77,7 +77,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import be.fedict.eid.applet.service.spi.AddressDTO;
 import be.fedict.eid.applet.service.spi.DigestInfo;
+import be.fedict.eid.applet.service.spi.IdentityDTO;
 
 @Stateless
 @EJB(name = "java:global/test/XmlSignatureServiceBean", beanInterface = XmlSignatureService.class)
@@ -152,7 +154,8 @@ public class XmlSignatureServiceBean implements XmlSignatureService {
 	}
 
 	public DigestInfo preSign(List<DigestInfo> digestInfos,
-			List<X509Certificate> signingCertificateChain)
+			List<X509Certificate> signingCertificateChain,
+			IdentityDTO identity, AddressDTO address, byte[] photo)
 			throws NoSuchAlgorithmException {
 		LOG.debug("preSign");
 		HttpServletRequest httpServletRequest;
