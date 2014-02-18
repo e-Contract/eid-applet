@@ -99,8 +99,8 @@ public class JGraphTest {
 	private DefaultGraphCell createCell(String name, boolean raised) {
 		DefaultGraphCell cell = new DefaultGraphCell(name);
 		cell.addPort();
-		GraphConstants.setBorder(cell.getAttributes(), BorderFactory
-				.createRaisedBevelBorder());
+		GraphConstants.setBorder(cell.getAttributes(),
+				BorderFactory.createRaisedBevelBorder());
 		return cell;
 	}
 
@@ -193,9 +193,9 @@ public class JGraphTest {
 			if (null != responsesAllowedAnnotation) {
 				Class<?>[] responseClasses = responsesAllowedAnnotation.value();
 				for (Class<?> responseClass : responseClasses) {
-					graph.addEdge("edge-" + edgeIdx, messageClass
-							.getSimpleName(), responseClass.getSimpleName(),
-							EdgeType.DIRECTED);
+					graph.addEdge("edge-" + edgeIdx,
+							messageClass.getSimpleName(),
+							responseClass.getSimpleName(), EdgeType.DIRECTED);
 					edgeIdx++;
 				}
 			}
@@ -206,8 +206,9 @@ public class JGraphTest {
 				List<String> messages = allowedProtocolStates
 						.get(protocolState);
 				for (String message : messages) {
-					graph.addEdge("edge-" + edgeIdx, messageClass
-							.getSimpleName(), message, EdgeType.DIRECTED);
+					graph.addEdge("edge-" + edgeIdx,
+							messageClass.getSimpleName(), message,
+							EdgeType.DIRECTED);
 					edgeIdx++;
 				}
 			}
@@ -224,8 +225,8 @@ public class JGraphTest {
 				startMessage, stopMessages);
 		visualization.getRenderContext().setVertexFillPaintTransformer(
 				myVertexTransformer);
-		visualization.getRenderer().getVertexLabelRenderer().setPosition(
-				Position.AUTO);
+		visualization.getRenderer().getVertexLabelRenderer()
+				.setPosition(Position.AUTO);
 		visualization.setPreferredSize(new Dimension(900, 650));
 		visualization.setBackground(Color.WHITE);
 		return visualization;

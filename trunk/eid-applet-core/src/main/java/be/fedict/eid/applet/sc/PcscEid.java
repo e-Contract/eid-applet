@@ -69,6 +69,7 @@ import be.fedict.eid.applet.Dialogs.Pins;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.Messages.MESSAGE_ID;
 import be.fedict.eid.applet.Status;
+import be.fedict.eid.applet.UserCancelledException;
 import be.fedict.eid.applet.View;
 
 /**
@@ -782,7 +783,7 @@ public class PcscEid extends Observable {
 
 	public byte[] sign(byte[] digestValue, String digestAlgo, byte keyId,
 			boolean requireSecureReader) throws CardException, IOException,
-			InterruptedException {
+			InterruptedException, UserCancelledException {
 		Integer directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
 		Integer verifyPinStartFeature = getFeature(FEATURE_VERIFY_PIN_START_TAG);
 
@@ -896,7 +897,7 @@ public class PcscEid extends Observable {
 	}
 
 	public void verifyPin() throws IOException, CardException,
-			InterruptedException {
+			InterruptedException, UserCancelledException {
 		Integer directPinVerifyFeature = getFeature(FEATURE_VERIFY_PIN_DIRECT_TAG);
 		Integer verifyPinStartFeature = getFeature(FEATURE_VERIFY_PIN_START_TAG);
 		verifyPin(directPinVerifyFeature, verifyPinStartFeature);
@@ -904,7 +905,7 @@ public class PcscEid extends Observable {
 
 	private void verifyPin(Integer directPinVerifyFeature,
 			Integer verifyPinStartFeature) throws IOException, CardException,
-			InterruptedException {
+			InterruptedException, UserCancelledException {
 		if (isWindows8()) {
 			this.card.endExclusive();
 		}
@@ -1219,7 +1220,8 @@ public class PcscEid extends Observable {
 		return modifyCommandData;
 	}
 
-	private ResponseAPDU verifyPin(int retriesLeft) throws CardException {
+	private ResponseAPDU verifyPin(int retriesLeft) throws CardException,
+			UserCancelledException {
 		char[] pin = this.dialogs.getPin(retriesLeft);
 		byte[] verifyData = new byte[] { (byte) (0x20 | pin.length),
 				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
@@ -1250,7 +1252,7 @@ public class PcscEid extends Observable {
 
 	public byte[] signAuthn(byte[] toBeSigned, boolean requireSecureReader)
 			throws NoSuchAlgorithmException, CardException, IOException,
-			InterruptedException {
+			InterruptedException, UserCancelledException {
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
 		byte[] digest = messageDigest.digest(toBeSigned);
 		byte keyId = AUTHN_KEY_ID;
@@ -1564,7 +1566,8 @@ public class PcscEid extends Observable {
 
 	public byte[] sign(byte[] digestValue, String digestAlgo,
 			boolean requireSecureReader) throws NoSuchAlgorithmException,
-			CardException, IOException, InterruptedException {
+			CardException, IOException, InterruptedException,
+			UserCancelledException {
 		byte keyId = NON_REP_KEY_ID;
 		byte[] signatureValue = sign(digestValue, digestAlgo, keyId,
 				requireSecureReader);
@@ -1664,13 +1667,14 @@ public class PcscEid extends Observable {
 	}
 
 	public byte[] signAuthn(byte[] toBeSigned) throws NoSuchAlgorithmException,
-			CardException, IOException, InterruptedException {
+			CardException, IOException, InterruptedException,
+			UserCancelledException {
 		return signAuthn(toBeSigned, false);
 	}
 
 	public byte[] sign(byte[] digestValue, String digestAlgo)
 			throws NoSuchAlgorithmException, CardException, IOException,
-			InterruptedException {
+			InterruptedException, UserCancelledException {
 		return sign(digestValue, digestAlgo, false);
 	}
 
@@ -1702,7 +1706,7 @@ public class PcscEid extends Observable {
 
 	public byte[] signTransactionMessage(String transactionMessage,
 			boolean requireSecureReader) throws CardException, IOException,
-			InterruptedException {
+			InterruptedException, UserCancelledException {
 		Integer eIDPINPadReaderFeature = getFeature(FEATURE_EID_PIN_PAD_READER_TAG);
 		if (null != eIDPINPadReaderFeature) {
 			this.dialogs.showSecureReaderTransactionFrame();

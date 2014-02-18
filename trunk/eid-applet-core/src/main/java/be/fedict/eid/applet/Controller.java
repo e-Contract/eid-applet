@@ -66,6 +66,7 @@ import be.fedict.eid.applet.shared.AuthenticationRequestMessage;
 import be.fedict.eid.applet.shared.CheckClientMessage;
 import be.fedict.eid.applet.shared.ClientEnvironmentMessage;
 import be.fedict.eid.applet.shared.ContinueInsecureMessage;
+import be.fedict.eid.applet.shared.ErrorCode;
 import be.fedict.eid.applet.shared.FileDigestsDataMessage;
 import be.fedict.eid.applet.shared.FilesDigestRequestMessage;
 import be.fedict.eid.applet.shared.FinishedMessage;
@@ -105,7 +106,6 @@ public class Controller {
 
 	private final ProtocolStateMachine protocolStateMachine;
 
-	@SuppressWarnings("unchecked")
 	public Controller(View view, Runtime runtime, Messages messages) {
 		this.view = view;
 		this.runtime = runtime;
@@ -499,8 +499,15 @@ public class Controller {
 						includePhoto, null);
 				if (false == response) {
 					this.pcscEidSpi.close();
-					throw new SecurityException(
-							"user did not agree to release eID identity information");
+					if (false == this.runtime.gotoCancelPage()) {
+						throw new SecurityException(
+								"user did not agree to release eID identity information");
+					} else {
+						// TODO
+						// return new FinishedMessage(ErrorCode.USER_CANCELED);
+						throw new SecurityException(
+								"user did not agree to release eID identity information");
+					}
 				}
 				// FIXME: repeat for screen reader, perhaps we need pre- and
 				// post-approval msg
@@ -692,11 +699,23 @@ public class Controller {
 							+ signRequestMessage.digestAlgo + " with RSA",
 					signatureCreationLabel, JOptionPane.YES_NO_OPTION);
 			if (JOptionPane.OK_OPTION != response) {
-				throw new SecurityException("sign operation aborted");
+				if (false == this.runtime.gotoCancelPage()) {
+					throw new SecurityException("sign operation aborted");
+				} else {
+					return new FinishedMessage(ErrorCode.USER_CANCELED);
+				}
 			}
-			signatureValue = this.pcscEidSpi.sign(
-					signRequestMessage.digestValue,
-					signRequestMessage.digestAlgo, requireSecureReader);
+			try {
+				signatureValue = this.pcscEidSpi.sign(
+						signRequestMessage.digestValue,
+						signRequestMessage.digestAlgo, requireSecureReader);
+			} catch (UserCancelledException e) {
+				if (false == this.runtime.gotoCancelPage()) {
+					throw new SecurityException("sign operation aborted");
+				} else {
+					return new FinishedMessage(ErrorCode.USER_CANCELED);
+				}
+			}
 
 			int maxProgress = 0;
 			maxProgress += (1050 / 255) + 1; // sign cert file
@@ -856,8 +875,12 @@ public class Controller {
 					includePhoto, null);
 			if (false == response) {
 				this.pcscEidSpi.close();
-				throw new SecurityException(
-						"user did not agree to release eID identity information");
+				if (false == this.runtime.gotoCancelPage()) {
+					throw new SecurityException(
+							"user did not agree to release eID identity information");
+				} else {
+					return new FinishedMessage(ErrorCode.USER_CANCELED);
+				}
 			}
 		}
 
@@ -882,8 +905,16 @@ public class Controller {
 				this.view.addDetailMessage("performing a pre-logoff");
 				this.pcscEidSpi.logoff();
 			}
-			signatureValue = this.pcscEidSpi.signAuthn(toBeSigned,
-					requireSecureReader);
+			try {
+				signatureValue = this.pcscEidSpi.signAuthn(toBeSigned,
+						requireSecureReader);
+			} catch (UserCancelledException e) {
+				if (false == this.runtime.gotoCancelPage()) {
+					throw e;
+				} else {
+					return new FinishedMessage(ErrorCode.USER_CANCELED);
+				}
+			}
 
 			if (null != transactionMessage) {
 				signedTransactionMessage = this.pcscEidSpi
@@ -1085,8 +1116,12 @@ public class Controller {
 				includePhoto, identityDataUsage);
 		if (false == response) {
 			this.pcscEidSpi.close();
-			throw new SecurityException(
-					"user did not agree to release eID identity information");
+			if (false == this.runtime.gotoCancelPage()) {
+				throw new SecurityException(
+						"user did not agree to release eID identity information");
+			} else {
+				return new FinishedMessage(ErrorCode.USER_CANCELED);
+			}
 		}
 
 		addDetailMessage("Reading identity file...");

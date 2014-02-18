@@ -311,6 +311,11 @@ public class ControllerTest {
 		public Applet getApplet() {
 			return null;
 		}
+
+		@Override
+		public boolean gotoCancelPage() {
+			return false;
+		}
 	}
 
 	private static class TestView implements View {

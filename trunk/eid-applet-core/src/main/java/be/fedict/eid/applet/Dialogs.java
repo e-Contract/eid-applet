@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -230,7 +231,7 @@ public class Dialogs {
 		return pins;
 	}
 
-	public char[] getPin() {
+	public char[] getPin() throws UserCancelledException {
 		return getPin(-1);
 	}
 
@@ -280,7 +281,7 @@ public class Dialogs {
 		}
 	}
 
-	public char[] getPin(int retriesLeft) {
+	public char[] getPin(int retriesLeft) throws UserCancelledException {
 		// main panel
 		JPanel mainPanel = new JPanel() {
 			private static final long serialVersionUID = 1L;
@@ -385,19 +386,20 @@ public class Dialogs {
 
 		dialog.pack();
 		dialog.setLocationRelativeTo(this.view.getParentComponent());
-		
+
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent e) {
 				passwordField.requestFocus();
 			}
 		});
-		
+
 		Timer timer = new Timer(200, null);
-		FocusDialogActionListener focusDialogActionListener = new FocusDialogActionListener(timer, passwordField);
+		FocusDialogActionListener focusDialogActionListener = new FocusDialogActionListener(
+				timer, passwordField);
 		timer.addActionListener(focusDialogActionListener);
 		timer.start();
-		
+
 		dialog.setVisible(true);
 		// setVisible will wait until some button or so has been pressed
 
@@ -405,7 +407,7 @@ public class Dialogs {
 			char[] pin = passwordField.getPassword();
 			return pin;
 		}
-		throw new RuntimeException("operation canceled.");
+		throw new UserCancelledException();
 	}
 
 	private static class DialogResult {
