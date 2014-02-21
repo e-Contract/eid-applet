@@ -1,6 +1,10 @@
 1.2.0 -
 	* removed diagnostic mode
 	* removed kiosk mode
+	* removed SignatureServiceEx
+	* Permissions for *.vlaanderen *.brussels
+	* CancelPage applet parameter
+	* CCID improved feature query
 
 1.1.3 - 14 Dec 2013
 	* updated Oracle deployJava javascript
