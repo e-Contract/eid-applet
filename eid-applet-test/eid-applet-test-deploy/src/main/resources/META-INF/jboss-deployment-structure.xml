@@ -1,0 +1,9 @@
+<jboss-deployment-structure>
+	<ear-subdeployments-isolated>true</ear-subdeployments-isolated>
+	<deployment>
+		<resources>
+			<resource-root path="lib/bcprov-jdk15on-${bouncycastle.version}.jar"
+				use-physical-code-source="true" />
+		</resources>
+	</deployment>
+</jboss-deployment-structure>
