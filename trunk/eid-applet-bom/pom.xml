@@ -55,6 +55,11 @@
 			</dependency>
 			<dependency>
 				<groupId>be.fedict.eid-applet</groupId>
+				<artifactId>eid-applet-service-cdi-endpoint</artifactId>
+				<version>${eid-applet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>be.fedict.eid-applet</groupId>
 				<artifactId>eid-applet-sql-ddl-plugin</artifactId>
 				<version>${eid-applet.version}</version>
 			</dependency>

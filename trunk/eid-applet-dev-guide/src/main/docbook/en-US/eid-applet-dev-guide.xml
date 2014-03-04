@@ -1886,6 +1886,77 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 		</section>
 	</section>
 	<section>
+		<title>Technology Preview: eID Applet CDI Service</title>
+		<para>
+			The Contexts and Dependency Injection that comes with Java EE 6
+			allows for very elegant server-side handling of the eID Applet data.
+			While the Java EE 5 based eID Applet Service used the SPI design
+			pattern and binding via JNDI, CDI allows for a much cleaner design.
+			The CDI based eID Applet Service offers several advantages:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					No more (container specific) JNDI magic required.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Easier access to eID data within all layers of your
+					applications. Hence no more need for JACC magic.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The application itself can determine what is being pushed
+					within the HTTP session.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			Let's start with a simple example. You declare the eID Applet
+			CDI Service Servlet as follows:
+		</para>
+		<programlisting language="Java"><![CDATA[@WebServlet("/eid-applet-service")
+public class IdentifyCDIServlet extends AppletServiceCDIServlet {
+}]]></programlisting>
+		<para>
+			Via CDI event observers you control the corresponding eID Applet. An
+			eID Applet session starts with the
+			<code>StartEvent</code>
+			.
+		</para>
+		<programlisting language="Java"><![CDATA[public void handleStart(
+	@Observes @BeIDContext("/eid-applet-service") StartEvent startEvent) {
+	startEvent.performIdentification().includeAddress();
+}]]></programlisting>
+		<para>
+			Note that the
+			<code>@BeIDContext</code>
+			parameter must correspond with the URL pattern given in
+			<code>@WebServlet</code>
+			on the eID Applet CDI Service servlet. On the
+			<code>StartEvent</code>
+			object you use a fluent-based API to drive the eID Applet.
+		</para>
+		<para>
+			You receive the eID identity data by observing the
+			<code>IdentityEvent</code>
+			.
+		</para>
+		<programlisting language="Java"><![CDATA[public void handleIdentity(
+	@Observes @BeIDContext("/eid-applet-service") IdentityEvent identityEvent) {
+	// use identityEvent.getIdentity();
+}]]></programlisting>
+		<warning>
+			<title>Technology Preview</title>
+			<para>
+				The CDI based eID Applet Service servlet and API is still under
+				development.
+			</para>
+		</warning>
+	</section>
+	<section>
 		<title>Maven Integration</title>
 		<para>
 			In this section we'll discuss the different aspects related to
