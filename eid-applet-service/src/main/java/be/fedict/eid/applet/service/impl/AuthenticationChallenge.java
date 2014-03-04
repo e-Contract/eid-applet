@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -132,5 +133,16 @@ public class AuthenticationChallenge implements Serializable {
 		}
 		byte[] challenge = authenticationChallenge.getChallenge();
 		return challenge;
+	}
+
+	/**
+	 * Gives back the authentication challenge. This challenge is checked for
+	 * freshness and can be consumed only once.
+	 * 
+	 * @param session
+	 * @return
+	 */
+	public static byte[] getAuthnChallenge(HttpSession session) {
+		return getAuthnChallenge(session, null);
 	}
 }

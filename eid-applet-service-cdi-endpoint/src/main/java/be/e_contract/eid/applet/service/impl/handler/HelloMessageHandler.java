@@ -33,7 +33,9 @@ import org.apache.commons.logging.LogFactory;
 import be.e_contract.eid.applet.service.impl.BeIDContextQualifier;
 import be.e_contract.eid.applet.service.impl.Handles;
 import be.fedict.eid.applet.service.cdi.StartEvent;
+import be.fedict.eid.applet.service.impl.AuthenticationChallenge;
 import be.fedict.eid.applet.service.impl.handler.MessageHandler;
+import be.fedict.eid.applet.shared.AuthenticationRequestMessage;
 import be.fedict.eid.applet.shared.HelloMessage;
 import be.fedict.eid.applet.shared.IdentificationRequestMessage;
 
@@ -67,6 +69,40 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 			return new IdentificationRequestMessage(includeAddress,
 					includePhoto, true, includeCertificates, removeCard,
 					identityDataUsage);
+		}
+		StartEvent.AuthenticationRequest authenticationRequest = startEvent
+				.getAuthenticationRequest();
+		if (null != authenticationRequest) {
+			boolean includeHostname = false;
+			byte[] challenge = AuthenticationChallenge
+					.generateChallenge(session);
+			;
+			boolean logoff = authenticationRequest.isLogoff();
+			boolean removeCard = authenticationRequest.isRemoveCard();
+			boolean includeInetAddress = false;
+			boolean preLogoff = authenticationRequest.isPreLogoff();
+			boolean sessionIdChannelBinding = false;
+			boolean serverCertificateChannelBinding = false;
+			boolean includeCertificates = false;
+			boolean includeAddress = authenticationRequest.isIncludeAddress();
+			boolean includeIdentity = authenticationRequest.isIncludeIdentity();
+			boolean includePhoto = authenticationRequest.isIncludePhoto();
+			boolean requireSecureReader = authenticationRequest
+					.isRequireSecureReader();
+			boolean includeIntegrityData;
+			if (includeIdentity || includeAddress || includePhoto) {
+				includeIntegrityData = true;
+			} else {
+				includeIntegrityData = false;
+			}
+			String transactionMessage = authenticationRequest
+					.getTransactionMessage();
+			return new AuthenticationRequestMessage(challenge, includeHostname,
+					includeInetAddress, logoff, preLogoff, removeCard,
+					sessionIdChannelBinding, serverCertificateChannelBinding,
+					includeIdentity, includeCertificates, includeAddress,
+					includePhoto, includeIntegrityData, requireSecureReader,
+					transactionMessage);
 		}
 		throw new RuntimeException("no eID action defined for context: "
 				+ contextQualifier.getContext());

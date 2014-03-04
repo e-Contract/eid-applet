@@ -18,19 +18,16 @@
 
 package test.be.fedict.eid.applet;
 
-import java.io.Serializable;
-
-import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.servlet.annotation.WebServlet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import be.e_contract.eid.applet.service.AppletServiceCDIServlet;
-import be.fedict.eid.applet.service.Identity;
+import be.fedict.eid.applet.service.cdi.AuthenticatedEvent;
+import be.fedict.eid.applet.service.cdi.AuthenticationEvent;
 import be.fedict.eid.applet.service.cdi.BeIDContext;
 import be.fedict.eid.applet.service.cdi.IdentityEvent;
 import be.fedict.eid.applet.service.cdi.StartEvent;
@@ -45,33 +42,41 @@ public class IdentifyCDIServlet extends AppletServiceCDIServlet {
 	public static final String CONTEXT = "/applet-service-cdi";
 
 	@Inject
-	private IdentificationResult identificationResult;
+	private Controller controller;
 
 	public void handleStart(
 			@Observes @BeIDContext(CONTEXT) StartEvent startEvent) {
 		LOG.debug("start event");
-		startEvent.performIdentification().includeAddress();
+		switch (this.controller.getOperation()) {
+		case IDENTIFICATION:
+			startEvent.performIdentification().includeAddress();
+			break;
+		case AUTHENTICATION:
+			startEvent.performAuthentication().includeIdentity();
+			break;
+		}
+	}
+
+	public void handleReset(
+			@Observes @BeIDContext(CONTEXT) StartEvent startEvent) {
+		this.controller.reset();
 	}
 
 	public void handleIdentity(
 			@Observes @BeIDContext(CONTEXT) IdentityEvent identityEvent) {
 		LOG.debug("handle identity");
 		LOG.debug("hello: " + identityEvent.getIdentity().getFirstName());
-		this.identificationResult.setIdentity(identityEvent.getIdentity());
+		this.controller.setIdentity(identityEvent.getIdentity());
 	}
 
-	@Named("identificationResult")
-	@SessionScoped
-	public static class IdentificationResult implements Serializable {
-		private static final long serialVersionUID = 1L;
-		private Identity identity;
+	public void handleAuthCertValidation(
+			@Observes @BeIDContext(CONTEXT) AuthenticationEvent authenticationEvent) {
+		authenticationEvent.valid();
+	}
 
-		public void setIdentity(Identity identity) {
-			this.identity = identity;
-		}
-
-		public Identity getIdentity() {
-			return this.identity;
-		}
+	public void handleAuthenticatedUser(
+			@Observes @BeIDContext(CONTEXT) AuthenticatedEvent authenticatedEvent) {
+		this.controller.setUserIdentifier(authenticatedEvent
+				.getUserIdentifier());
 	}
 }

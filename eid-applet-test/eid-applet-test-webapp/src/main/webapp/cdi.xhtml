@@ -5,17 +5,18 @@
 	xmlns:h="http://java.sun.com/jsf/html">
 <f:view>
 	<h:head>
-		<title>CDI Identification Result</title>
+		<title>CDI Test</title>
 	</h:head>
 
 	<h:body>
-		<h1>CDI Identification Result</h1>
-		<h:panelGrid columns="2">
-			<h:outputText value="Name:" />
-			<h:outputText value="#{identificationResult.identity.name}" />
-		</h:panelGrid>
+		<h1>CDI Test</h1>
 		<h:form>
-			<h:commandButton value="Back" action="#{navigation.back}" />
+			<h:selectOneRadio value="#{cdiTest.operation}" required="true"
+				layout="pageDirection">
+				<f:selectItems value="#{cdiTest.operations}" var="item"
+					itemValue="#{item}" itemLabel="#{item}" />
+			</h:selectOneRadio>
+			<h:commandButton value="Perform" action="#{cdiTest.perform}" />
 		</h:form>
 	</h:body>
 </f:view>
