@@ -16,21 +16,39 @@
  * http://www.gnu.org/licenses/.
  */
 
-package test.be.fedict.eid.applet;
+package be.fedict.eid.applet.service.cdi;
 
-import java.io.IOException;
+import java.security.cert.X509Certificate;
+import java.util.List;
 
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.inject.Named;
+public class AuthenticationEvent {
 
-@Named("navigation")
-public class NavigationController {
+	private final List<X509Certificate> authCertChain;
 
-	public void back() throws IOException {
-		FacesContext facesContext = FacesContext.getCurrentInstance();
-		ExternalContext externalContext = facesContext.getExternalContext();
-		externalContext.redirect(externalContext.getRequestContextPath()
-				+ "/index.html");
+	private boolean valid;
+
+	private boolean invalid;
+
+	public AuthenticationEvent(List<X509Certificate> authCertChain) {
+		this.authCertChain = authCertChain;
+	}
+
+	public List<X509Certificate> getAuthenticationCertificateChain() {
+		return this.authCertChain;
+	}
+
+	public void valid() {
+		this.valid = true;
+	}
+
+	public void invalid() {
+		this.invalid = true;
+	}
+
+	public boolean isValid() {
+		if (this.invalid) {
+			return false;
+		}
+		return this.valid;
 	}
 }
