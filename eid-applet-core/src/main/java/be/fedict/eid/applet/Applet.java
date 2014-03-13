@@ -693,7 +693,8 @@ public class Applet extends JApplet {
 			msg += ", " + this.messages.getMessage(MESSAGE_ID.IDENTITY_PHOTO);
 		}
 		if (null != identityDataUsage) {
-			msg += "\n" + "Usage: " + identityDataUsage;
+			msg += "\n" + this.messages.getMessage(MESSAGE_ID.USAGE) + ": "
+					+ identityDataUsage;
 		}
 		int response = JOptionPane.showConfirmDialog(this, msg, "Privacy",
 				JOptionPane.YES_NO_OPTION);
