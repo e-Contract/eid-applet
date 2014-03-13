@@ -71,7 +71,8 @@ public class Messages {
 				"okButtonText"), YES_BUTTON("yesButtonText"), CERTIFICATE_NOT_TRUSTED(
 				"certificateNotTrusted"), SIGNATURE_CREATION(
 				"signatureCreation"), SIGN_QUESTION("signQuestion"), SIGNATURE_ALGO(
-				"signatureAlgo"), PROTOCOL_SIGNATURE("protocolSignature");
+				"signatureAlgo"), PROTOCOL_SIGNATURE("protocolSignature"), USAGE(
+				"usage");
 
 		private final String id;
 
