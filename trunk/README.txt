@@ -24,14 +24,15 @@ The project can be build via:
 This will also build a test web application EAR artifact named:
 	eid-applet-test-deploy
 
-Deploy the test web application to a local running JBoss AS 6.1.x via:
-	cd eid-applet-test/eid-applet-test-deploy
-	mvn jboss:undeploy jboss:deploy
+This Java EE 6 web application has been tested on the following Java EE 6/7
+application servers:
+* JBoss AS 7.x
+* JBoss EAP 6.x
+* WildFly 7
 
-Please notice that the JavaEE applications will not run on a vanilla JBoss
-Application Server. You'll need to use the eID specific JBoss AS distribution.
-This application server is available from:
-	http://code.google.com/p/eid-as/
+Deploy the test web application to a local running JBoss application server via:
+	cd eid-applet-test/eid-applet-test-deploy
+	mvn jboss-as:deploy
 
 During the build process a token is required to sign the applet JAR.
 By default the Maven build will use a software token to sign the applet JAR.
