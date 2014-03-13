@@ -26,7 +26,7 @@
 				<groupId>org.bouncycastle</groupId>
 				<artifactId>bcprov-jdk15on</artifactId>
 				<!-- hardcoded to avoid runtime issues -->
-				<version>1.50</version>
+				<version>${bouncycastle-jboss7.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -35,4 +35,7 @@
 		<module>eid-applet-test-webapp</module>
 		<module>eid-applet-test-deploy</module>
 	</modules>
+	<properties>
+		<bouncycastle-jboss7.version>1.50</bouncycastle-jboss7.version>
+	</properties>
 </project>
