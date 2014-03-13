@@ -2,7 +2,8 @@
 	<ear-subdeployments-isolated>true</ear-subdeployments-isolated>
 	<deployment>
 		<resources>
-			<resource-root path="lib/bcprov-jdk15on-${bouncycastle.version}.jar"
+			<resource-root
+				path="lib/bcprov-jdk15on-${bouncycastle-jboss7.version}.jar"
 				use-physical-code-source="true" />
 		</resources>
 	</deployment>
