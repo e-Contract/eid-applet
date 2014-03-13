@@ -94,6 +94,7 @@
 								<manifestEntries>
 									<Permissions>all-permissions</Permissions>
 									<Codebase><![CDATA[https://*.be https://*.brussels https://*.vlaanderen localhost 127.0.0.1]]></Codebase>
+									<Application-Name>eID Applet</Application-Name>
 								</manifestEntries>
 							</archive>
 							<type>PKCS12</type>
@@ -118,6 +119,7 @@
 								<manifestEntries>
 									<Permissions>all-permissions</Permissions>
 									<Codebase><![CDATA[https://*.be https://*.brussels https://*.vlaanderen localhost 127.0.0.1]]></Codebase>
+									<Application-Name>eID Applet</Application-Name>
 								</manifestEntries>
 							</archive>
 						</configuration>
