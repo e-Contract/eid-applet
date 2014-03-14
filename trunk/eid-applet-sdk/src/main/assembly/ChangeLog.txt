@@ -5,7 +5,7 @@
 	* Permissions for *.vlaanderen *.brussels
 	* CancelPage applet parameter
 	* CCID improved feature query
-	* initial work on CID based eID Applet Service
+	* initial work on CDI based eID Applet Service
 	* Manifest Application-Name set to eID Applet
 	* Usage translation
 	* fix for BouncyCastle 1.50
