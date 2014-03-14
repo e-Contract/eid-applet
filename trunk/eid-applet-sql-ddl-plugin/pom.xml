@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.2.0-SNAPSHOT</version>
+		<version>1.2.0.Beta2</version>
 	</parent>
 	<name>eID Applet SQL DDL Plugin</name>
 	<description>SQL Data Definition Language Maven2 plugin, in sync with JBoss AS Hibernate.</description>
