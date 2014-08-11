@@ -93,3 +93,10 @@ control of the GNU LGPL v3.0 license unless otherwise decided in the future
 by _ALL_ eID Applet Project copyright holders.
 The license conditions can be found in the file: LICENSE.txt
 
+
+=== 8. Copyright
+
+The eID Applet copyright holders are:
+* FedICT, federal ICT department of Belgium
+* e-Contract.be BVBA, https://www.e-contract.be
+* Bart Hanssens from FedICT
