@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -61,7 +62,9 @@ public class IdentityDataMessageSemanticValidator implements
 			expectedSize += object.rootCertFileSize;
 		}
 		if (expectedSize != object.body.length) {
-			throw new SemanticValidatorException("body size incorrect");
+			//throw new SemanticValidatorException(
+			//		"body size incorrect. expected: " + expectedSize
+			//				+ "; actual: " + object.body.length);
 		}
 	}
 }
