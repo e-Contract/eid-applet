@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2009 Frank Cornelis.
+ * Copyright (C) 2009-2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -17,7 +17,7 @@
  */
 
 /*
- * Copyright (C) 2009 Frank Cornelis.
+ * Copyright (C) 2009-2014 e-Contract.be BVBA.
  * This file is part of the eID Applet Project.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
