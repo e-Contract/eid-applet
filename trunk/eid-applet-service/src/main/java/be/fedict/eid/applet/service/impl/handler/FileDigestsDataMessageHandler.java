@@ -34,11 +34,14 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
 import be.fedict.eid.applet.service.impl.ServiceLocator;
+import be.fedict.eid.applet.service.spi.AuthorizationException;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 import be.fedict.eid.applet.service.spi.IdentityRequest;
 import be.fedict.eid.applet.service.spi.IdentityService;
 import be.fedict.eid.applet.service.spi.SignatureService;
+import be.fedict.eid.applet.shared.ErrorCode;
 import be.fedict.eid.applet.shared.FileDigestsDataMessage;
+import be.fedict.eid.applet.shared.FinishedMessage;
 import be.fedict.eid.applet.shared.SignRequestMessage;
 
 /**
@@ -98,6 +101,8 @@ public class FileDigestsDataMessageHandler implements
 					null, null);
 		} catch (NoSuchAlgorithmException e) {
 			throw new ServletException("no such algo: " + e.getMessage(), e);
+		} catch (AuthorizationException e) {
+			return new FinishedMessage(ErrorCode.AUTHORIZATION);
 		}
 
 		// also save it in the session for later verification

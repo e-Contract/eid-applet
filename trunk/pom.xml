@@ -908,12 +908,12 @@
 	<distributionManagement>
 		<repository>
 			<id>e-contract-deploy</id>
-			<url>scp://e-contract.be/maven2</url>
+			<url>sftp://e-contract.be/maven2</url>
 			<uniqueVersion>false</uniqueVersion>
 		</repository>
 		<site>
 			<id>e-contract</id>
-			<url>scp://e-contract.be/sites/eid-applet</url>
+			<url>sftp://e-contract.be/sites/eid-applet</url>
 		</site>
 	</distributionManagement>
 	<issueManagement>

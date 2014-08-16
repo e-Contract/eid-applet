@@ -73,6 +73,8 @@ public class Applet extends JApplet {
 
 	public static final String CANCEL_PAGE_PARAM = "CancelPage";
 
+	public static final String AUTHORIZATION_ERROR_PAGE_PARAM = "AuthorizationErrorPage";
+
 	public static final String BACKGROUND_COLOR_PARAM = "BackgroundColor";
 
 	public static final String FOREGROUND_COLOR_PARAM = "ForegroundColor";
@@ -252,6 +254,22 @@ public class Applet extends JApplet {
 			addDetailMessage("URL error: " + e.getMessage());
 		}
 		return true;
+	}
+
+	private void gotoAuthorizationErrorPage() {
+		String authorizationErrorPage = getParameter(AUTHORIZATION_ERROR_PAGE_PARAM);
+		if (null == authorizationErrorPage) {
+			return;
+		}
+		AppletContext appletContext = getAppletContext();
+		URL documentBase = getDocumentBase();
+		try {
+			URL targetUrl = new URL(documentBase, authorizationErrorPage);
+			addDetailMessage("Navigating to: " + targetUrl);
+			appletContext.showDocument(targetUrl, "_self");
+		} catch (MalformedURLException e) {
+			addDetailMessage("URL error: " + e.getMessage());
+		}
 	}
 
 	private void addDetailMessage(final String detailMessage) {
@@ -644,6 +662,11 @@ public class Applet extends JApplet {
 		@Override
 		public boolean gotoCancelPage() {
 			return Applet.this.gotoCancelPage();
+		}
+
+		@Override
+		public void gotoAuthorizationErrorPage() {
+			Applet.this.gotoAuthorizationErrorPage();
 		}
 	}
 

@@ -72,7 +72,7 @@ public class Messages {
 				"certificateNotTrusted"), SIGNATURE_CREATION(
 				"signatureCreation"), SIGN_QUESTION("signQuestion"), SIGNATURE_ALGO(
 				"signatureAlgo"), PROTOCOL_SIGNATURE("protocolSignature"), USAGE(
-				"usage");
+				"usage"), AUTHORIZATION_ERROR("authorizationError");
 
 		private final String id;
 
