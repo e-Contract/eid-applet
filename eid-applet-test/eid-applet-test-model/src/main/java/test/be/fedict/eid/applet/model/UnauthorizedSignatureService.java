@@ -1,6 +1,5 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2010 FedICT.
  * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,43 +16,10 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.eid.applet.shared;
+package test.be.fedict.eid.applet.model;
 
-/**
- * Error enumeration.
- * 
- * @author Frank Cornelis
- * 
- */
-public enum ErrorCode {
+import be.fedict.eid.applet.service.spi.SignatureService;
 
-	/**
-	 * Error code for expired certificates.
-	 */
-	CERTIFICATE_EXPIRED,
+public interface UnauthorizedSignatureService extends SignatureService {
 
-	/**
-	 * Error code for revoked certificates.
-	 */
-	CERTIFICATE_REVOKED,
-
-	/**
-	 * Generic error code for invalid certificates.
-	 */
-	CERTIFICATE,
-
-	/**
-	 * Error code for untrusted certificates.
-	 */
-	CERTIFICATE_NOT_TRUSTED,
-
-	/**
-	 * User cancelled the eID operation.
-	 */
-	USER_CANCELED,
-
-	/**
-	 * User was not authorized to perform the requested operation.
-	 */
-	AUTHORIZATION;
 }

@@ -14,7 +14,7 @@
 			<year>2008-2013</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>18 February 2014</releaseinfo>
+		<releaseinfo>16 August 2014</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -284,6 +284,18 @@
 							Indicates the page to which the eID Applet navigates after the
 							user cancelled the eID operation. For example:
 							<code>cancel.jsp</code>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<code>AuthorizationErrorPage</code>
+						</entry>
+						<entry>optional</entry>
+						<entry>
+							Indicates the page to which the eID Applet navigates in case the
+							user was not authorized to perform a certain eID operation. For
+							example:
+							<code>authorization-error.jsp</code>
 						</entry>
 					</row>
 					<row>

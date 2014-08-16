@@ -44,7 +44,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
  * @author Frank Cornelis
  * 
  */
-@ResponsesAllowed(SignRequestMessage.class)
+@ResponsesAllowed({ SignRequestMessage.class, FinishedMessage.class })
 @ProtocolStateAllowed(ProtocolState.SIGN_CERTS)
 public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 

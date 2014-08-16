@@ -36,7 +36,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
  * 
  */
 @ProtocolStateAllowed(ProtocolState.DIGEST)
-@ResponsesAllowed(SignRequestMessage.class)
+@ResponsesAllowed({ SignRequestMessage.class, FinishedMessage.class })
 public class FileDigestsDataMessage extends AbstractProtocolMessage {
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator

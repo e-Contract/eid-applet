@@ -316,6 +316,11 @@ public class ControllerTest {
 		public boolean gotoCancelPage() {
 			return false;
 		}
+
+		@Override
+		public void gotoAuthorizationErrorPage() {
+			LOG.debug("gotoAuthorizationErrorPage");
+		}
 	}
 
 	private static class TestView implements View {

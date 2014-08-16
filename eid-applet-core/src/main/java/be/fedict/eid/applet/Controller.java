@@ -362,6 +362,11 @@ public class Controller {
 						setStatusMessage(Status.ERROR,
 								MESSAGE_ID.CERTIFICATE_NOT_TRUSTED);
 						return null;
+					case AUTHORIZATION:
+						setStatusMessage(Status.ERROR,
+								MESSAGE_ID.AUTHORIZATION_ERROR);
+						this.runtime.gotoAuthorizationErrorPage();
+						return null;
 					default:
 					}
 					setStatusMessage(Status.ERROR, MESSAGE_ID.GENERIC_ERROR);

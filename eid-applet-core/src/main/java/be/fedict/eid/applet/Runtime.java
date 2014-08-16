@@ -43,6 +43,12 @@ public interface Runtime {
 	 */
 	boolean gotoCancelPage();
 
+	/**
+	 * Navigates the web browser to the authorization error page, if configured
+	 * via the eID Applet parameters.
+	 */
+	void gotoAuthorizationErrorPage();
+
 	URL getDocumentBase();
 
 	/**

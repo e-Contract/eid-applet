@@ -62,11 +62,12 @@ public interface SignatureService {
 	 *            the optional identity photo.
 	 * @return the digest to be signed.
 	 * @throws NoSuchAlgorithmException
+	 * @throws AuthorizationException
 	 */
 	DigestInfo preSign(List<DigestInfo> digestInfos,
 			List<X509Certificate> signingCertificateChain,
 			IdentityDTO identity, AddressDTO address, byte[] photo)
-			throws NoSuchAlgorithmException;
+			throws NoSuchAlgorithmException, AuthorizationException;
 
 	/**
 	 * Post-sign callback method. Received the signature value. Depending on the

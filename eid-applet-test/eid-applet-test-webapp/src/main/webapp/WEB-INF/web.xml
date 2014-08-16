@@ -656,6 +656,20 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>AppletSignUnauthorizedServiceServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+		<init-param>
+			<param-name>SignatureService</param-name>
+			<param-value>java:global/test/UnauthorizedSignatureServiceBean
+			</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AppletSignUnauthorizedServiceServlet</servlet-name>
+		<url-pattern>/applet-service-sign-unauthorized</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>AuthnSignAppletServiceServlet</servlet-name>
 		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
 		<init-param>

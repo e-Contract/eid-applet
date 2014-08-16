@@ -35,6 +35,7 @@ import be.fedict.eid.applet.service.impl.AuthenticationChallenge;
 import be.fedict.eid.applet.service.impl.RequestContext;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.spi.AuthenticationService;
+import be.fedict.eid.applet.service.spi.AuthorizationException;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
 import be.fedict.eid.applet.service.spi.IdentityRequest;
@@ -45,7 +46,9 @@ import be.fedict.eid.applet.service.spi.SignatureService;
 import be.fedict.eid.applet.shared.AdministrationMessage;
 import be.fedict.eid.applet.shared.AuthenticationRequestMessage;
 import be.fedict.eid.applet.shared.ContinueInsecureMessage;
+import be.fedict.eid.applet.shared.ErrorCode;
 import be.fedict.eid.applet.shared.FilesDigestRequestMessage;
+import be.fedict.eid.applet.shared.FinishedMessage;
 import be.fedict.eid.applet.shared.IdentificationRequestMessage;
 import be.fedict.eid.applet.shared.SignRequestMessage;
 
@@ -148,6 +151,8 @@ public class ContinueInsecureMessageHandler implements
 						null);
 			} catch (NoSuchAlgorithmException e) {
 				throw new ServletException("no such algo: " + e.getMessage(), e);
+			} catch (AuthorizationException e) {
+				return new FinishedMessage(ErrorCode.AUTHORIZATION);
 			}
 
 			// also save it in the session for later verification

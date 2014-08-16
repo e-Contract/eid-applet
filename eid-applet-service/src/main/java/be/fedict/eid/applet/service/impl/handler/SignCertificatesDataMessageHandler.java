@@ -47,12 +47,15 @@ import be.fedict.eid.applet.service.impl.ServiceLocator;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
 import be.fedict.eid.applet.service.spi.AddressDTO;
 import be.fedict.eid.applet.service.spi.AuditService;
+import be.fedict.eid.applet.service.spi.AuthorizationException;
 import be.fedict.eid.applet.service.spi.DigestInfo;
 import be.fedict.eid.applet.service.spi.IdentityDTO;
 import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
 import be.fedict.eid.applet.service.spi.IdentityRequest;
 import be.fedict.eid.applet.service.spi.IdentityService;
 import be.fedict.eid.applet.service.spi.SignatureService;
+import be.fedict.eid.applet.shared.ErrorCode;
+import be.fedict.eid.applet.shared.FinishedMessage;
 import be.fedict.eid.applet.shared.SignCertificatesDataMessage;
 import be.fedict.eid.applet.shared.SignRequestMessage;
 
@@ -203,6 +206,8 @@ public class SignCertificatesDataMessageHandler implements
 					message.photoData);
 		} catch (NoSuchAlgorithmException e) {
 			throw new ServletException("no such algo: " + e.getMessage(), e);
+		} catch (AuthorizationException e) {
+			return new FinishedMessage(ErrorCode.AUTHORIZATION);
 		}
 
 		// also save it in the session for later verification
