@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html" lang="en" xml:lang="en">
+<f:view contentType="text/html">
+	<h:head>
+		<meta http-equiv="Content-Type"
+			content="text/html; charset=iso-8859-1" />
+		<meta http-equiv="Content-Script-Type" content="text/javascript" />
+		<meta http-equiv="Content-Style-Type" content="text/css" />
+		<meta http-equiv="expires" content="0" />
+		<meta http-equiv="cache-control" content="no-cache, no-store" />
+		<meta http-equiv="pragma" content="no-cache" />
+		<title>eID Applet Beta Site</title>
+		<link rel="stylesheet" type="text/css"
+			href="#{facesContext.externalContext.requestContextPath}/style.css" />
+	</h:head>
+
+	<h:body>
+		<div id="header">
+			<h1>eID Applet Beta Site</h1>
+		</div>
+
+		<h:form>
+			<div id="menu">
+				<ul>
+					<c:choose>
+						<c:when test="#{activeMenu == 'main'}">
+							<li class="selected"><a
+								href="#{facesContext.externalContext.requestContextPath}/index.xhtml">Home</a></li>
+						</c:when>
+						<c:otherwise>
+							<li><a
+								href="#{facesContext.externalContext.requestContextPath}/index.xhtml">Home</a></li>
+						</c:otherwise>
+					</c:choose>
+
+					<c:choose>
+						<c:when test="#{activeMenu == 'test'}">
+							<li class="selected"><a
+								href="#{facesContext.externalContext.requestContextPath}/tests.xhtml">Tests</a></li>
+						</c:when>
+						<c:otherwise>
+							<li><a
+								href="#{facesContext.externalContext.requestContextPath}/tests.xhtml">Tests</a></li>
+						</c:otherwise>
+					</c:choose>
+
+					<c:choose>
+						<c:when test="#{activeMenu == 'results'}">
+							<li class="selected"><a
+								href="#{facesContext.externalContext.requestContextPath}/results.xhtml">Results</a></li>
+						</c:when>
+						<c:otherwise>
+							<li><a
+								href="#{facesContext.externalContext.requestContextPath}/results.xhtml">Results</a></li>
+						</c:otherwise>
+					</c:choose>
+				</ul>
+			</div>
+		</h:form>
+
+		<div id="content">
+			<ui:insert name="body">
+				<p>Default Body</p>
+			</ui:insert>
+		</div>
+
+	</h:body>
+
+</f:view>
+</html>
