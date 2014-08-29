@@ -927,6 +927,18 @@ public class PcscEid extends Observable {
 		verifyPin(directPinVerifyFeature, verifyPinStartFeature, ccidFeature);
 	}
 
+	public void endExclusive() throws CardException {
+		if (isWindows8()) {
+			this.card.endExclusive();
+		}
+	}
+
+	public void beginExclusive() throws CardException {
+		if (isWindows8()) {
+			this.card.beginExclusive();
+		}
+	}
+
 	private void verifyPin(Integer directPinVerifyFeature,
 			Integer verifyPinStartFeature, CCIDFeatures ccidFeature)
 			throws IOException, CardException, InterruptedException,

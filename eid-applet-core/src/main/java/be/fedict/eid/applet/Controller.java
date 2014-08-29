@@ -98,30 +98,27 @@ public class Controller {
 
 	private final Messages messages;
 
-	/**
-	 * Will only be set if PC/SC Java 6 is available.
-	 */
 	private final PcscEid pcscEidSpi;
 
 	private final ProtocolStateMachine protocolStateMachine;
 
 	public Controller(View view, Runtime runtime, Messages messages) {
-		this.view = view;
 		this.runtime = runtime;
 		this.messages = messages;
 
 		try {
-			this.pcscEidSpi = new PcscEid(this.view, this.messages);
+			this.pcscEidSpi = new PcscEid(view, this.messages);
 		} catch (Exception e) {
 			String msg = "error loading PC/SC eID component: " + e.getMessage();
-			this.view.addDetailMessage(msg);
+			view.addDetailMessage(msg);
 			throw new RuntimeException(msg);
 		}
 		this.pcscEidSpi.addObserver(new PcscEidObserver());
 
-		ProtocolContext protocolContext = new LocalAppletProtocolContext(
-				this.view);
+		ProtocolContext protocolContext = new LocalAppletProtocolContext(view);
 		this.protocolStateMachine = new ProtocolStateMachine(protocolContext);
+
+		this.view = new ExclusiveAccessViewDecorator(view, this.pcscEidSpi);
 	}
 
 	private <T> T sendMessage(Object message, Class<T> responseClass)
