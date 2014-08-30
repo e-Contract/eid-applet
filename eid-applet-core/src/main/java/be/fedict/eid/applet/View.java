@@ -46,4 +46,8 @@ public interface View {
 	void resetProgress(int max);
 
 	void increaseProgress();
+
+	void confirmAuthenticationSignature(String message);
+
+	int confirmSigning(String description, String digestAlgo);
 }

@@ -366,6 +366,15 @@ public class ControllerTest {
 		@Override
 		public void setProgressIndeterminate() {
 		}
+
+		@Override
+		public void confirmAuthenticationSignature(String message) {
+		}
+
+		@Override
+		public int confirmSigning(String description, String digestAlgo) {
+			return 0;
+		}
 	}
 
 	@Test

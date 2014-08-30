@@ -702,6 +702,16 @@ public class Applet extends JApplet {
 		public void increaseProgress() {
 			Applet.this.increaseProgress();
 		}
+
+		@Override
+		public void confirmAuthenticationSignature(String message) {
+			Applet.this.confirmAuthenticationSignature(message);
+		}
+
+		@Override
+		public int confirmSigning(String description, String digestAlgo) {
+			return Applet.this.confirmSigning(description, digestAlgo);
+		}
 	}
 
 	private boolean privacyQuestion(boolean includeAddress,
@@ -722,6 +732,29 @@ public class Applet extends JApplet {
 		int response = JOptionPane.showConfirmDialog(this, msg, "Privacy",
 				JOptionPane.YES_NO_OPTION);
 		return response == JOptionPane.YES_OPTION;
+	}
+
+	private int confirmSigning(String description, String digestAlgo) {
+		String signatureCreationLabel = this.messages
+				.getMessage(MESSAGE_ID.SIGNATURE_CREATION);
+		String signQuestionLabel = this.messages
+				.getMessage(MESSAGE_ID.SIGN_QUESTION);
+		String signatureAlgoLabel = this.messages
+				.getMessage(MESSAGE_ID.SIGNATURE_ALGO);
+		int response = JOptionPane.showConfirmDialog(this.getParentComponent(),
+				signQuestionLabel + " \"" + description + "\"?\n"
+						+ signatureAlgoLabel + ": " + digestAlgo + " with RSA",
+				signatureCreationLabel, JOptionPane.YES_NO_OPTION);
+		return response;
+	}
+
+	private void confirmAuthenticationSignature(String message) {
+		int response = JOptionPane.showConfirmDialog(this.getParentComponent(),
+				message, "eID Authentication Signature",
+				JOptionPane.YES_NO_OPTION);
+		if (response != JOptionPane.YES_OPTION) {
+			throw new SecurityException("user cancelled");
+		}
 	}
 
 	private int progress;
