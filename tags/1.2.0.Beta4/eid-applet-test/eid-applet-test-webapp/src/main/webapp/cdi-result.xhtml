@@ -1,0 +1,26 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html">
+<f:view>
+	<h:head>
+		<title>CDI Test Result</title>
+	</h:head>
+
+	<h:body>
+		<h1>CDI Test Result</h1>
+		<h:panelGrid columns="2" rendered="#{cdiTest.identity != null}">
+			<h:outputText value="Name:" />
+			<h:outputText value="#{cdiTest.identity.name}" />
+		</h:panelGrid>
+		<h:panelGrid columns="2" rendered="#{cdiTest.userIdentifier != null}">
+			<h:outputText value="User identifier:" />
+			<h:outputText value="#{cdiTest.userIdentifier}" />
+		</h:panelGrid>
+		<h:form>
+			<h:commandButton value="Back" action="#{cdiTest.back}" />
+		</h:form>
+	</h:body>
+</f:view>
+</html>

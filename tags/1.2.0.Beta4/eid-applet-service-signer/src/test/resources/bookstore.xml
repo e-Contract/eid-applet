@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<!DOCTYPE bookstore SYSTEM "http://webserver/bookstore.dtd">
+<bookstore>
+	<name>Mike's Store</name>
+	<title>The title</title>
+</bookstore>
