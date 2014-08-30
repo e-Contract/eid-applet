@@ -447,11 +447,11 @@ public class Controller {
 		String stdMsg = this.messages.getMessage(MESSAGE_ID.PROTOCOL_SIGNATURE);
 		String message = stdMsg + "\n" + authSignRequestMessage.message;
 
-		int response = JOptionPane.showConfirmDialog(this.getParentComponent(),
-				message, "eID Authentication Signature",
-				JOptionPane.YES_NO_OPTION);
-		if (response != JOptionPane.YES_OPTION) {
-			throw new SecurityException("user cancelled");
+		try {
+			this.view.confirmAuthenticationSignature(message);
+		} catch (Exception e) {
+			this.pcscEidSpi.close();
+			throw e;
 		}
 
 		try {
@@ -687,18 +687,9 @@ public class Controller {
 		byte[] citizenCaCertFile;
 		byte[] rootCaCertFile;
 		try {
-			String signatureCreationLabel = this.messages
-					.getMessage(MESSAGE_ID.SIGNATURE_CREATION);
-			String signQuestionLabel = this.messages
-					.getMessage(MESSAGE_ID.SIGN_QUESTION);
-			String signatureAlgoLabel = this.messages
-					.getMessage(MESSAGE_ID.SIGNATURE_ALGO);
-			int response = JOptionPane.showConfirmDialog(
-					this.getParentComponent(), signQuestionLabel + " \""
-							+ signRequestMessage.description + "\"?\n"
-							+ signatureAlgoLabel + ": "
-							+ signRequestMessage.digestAlgo + " with RSA",
-					signatureCreationLabel, JOptionPane.YES_NO_OPTION);
+			int response = this.view.confirmSigning(
+					signRequestMessage.description,
+					signRequestMessage.digestAlgo);
 			if (JOptionPane.OK_OPTION != response) {
 				if (false == this.runtime.gotoCancelPage()) {
 					throw new SecurityException("sign operation aborted");

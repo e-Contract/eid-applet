@@ -21,6 +21,7 @@ package be.fedict.eid.applet;
 import java.awt.Component;
 
 import javax.smartcardio.CardException;
+import javax.swing.JOptionPane;
 
 import be.fedict.eid.applet.Messages.MESSAGE_ID;
 import be.fedict.eid.applet.sc.PcscEid;
@@ -95,5 +96,46 @@ public class ExclusiveAccessViewDecorator implements View {
 	@Override
 	public void increaseProgress() {
 		this.delegate.increaseProgress();
+	}
+
+	@Override
+	public void confirmAuthenticationSignature(String message) {
+		try {
+			this.pcscEid.endExclusive();
+		} catch (CardException e) {
+			throw new SecurityException("could not end exclusive card access");
+		}
+		try {
+			this.delegate.confirmAuthenticationSignature(message);
+		} finally {
+			try {
+				this.pcscEid.beginExclusive();
+			} catch (CardException e) {
+				throw new SecurityException(
+						"could not acquire exclusive card access");
+			}
+		}
+	}
+
+	@Override
+	public int confirmSigning(String description, String digestAlgo) {
+		try {
+			this.pcscEid.endExclusive();
+		} catch (CardException e) {
+			this.delegate
+					.addDetailMessage("could not end exclusive card access");
+			return JOptionPane.CANCEL_OPTION;
+		}
+		try {
+			return this.delegate.confirmSigning(description, digestAlgo);
+		} finally {
+			try {
+				this.pcscEid.beginExclusive();
+			} catch (CardException e) {
+				this.delegate
+						.addDetailMessage("could not acquire exclusive card access");
+				return JOptionPane.CANCEL_OPTION;
+			}
+		}
 	}
 }
