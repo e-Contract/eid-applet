@@ -38,6 +38,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -134,6 +135,9 @@ public class PcscEid extends Observable {
 	public static final byte[] APPLET_AID = new byte[] { (byte) 0xA0, 0x00,
 			0x00, 0x00, 0x30, 0x29, 0x05, 0x70, 0x00, (byte) 0xAD, 0x13, 0x10,
 			0x01, 0x01, (byte) 0xFF };
+	
+	private static boolean riskPPDU = false;
+	private static Set<String> ppduExceptions = null;
 
 	private final View view;
 
@@ -151,6 +155,33 @@ public class PcscEid extends Observable {
 		this.terminalFactory = TerminalFactory.getDefault();
 		this.dialogs = new Dialogs(this.view, messages);
 		this.locale = messages.getLocale();
+	}
+	
+	public static void riskPPDU(boolean risk) {
+		PcscEid.riskPPDU = risk;
+	}
+	
+	public static void setPPDUExceptions(Collection<String> ppduExceptions) {
+		PcscEid.ppduExceptions = new HashSet<String>(ppduExceptions);
+	}
+
+	public static void addPPDUException(String terminalName) {
+		if (PcscEid.ppduExceptions == null)
+			PcscEid.ppduExceptions = new HashSet<String>();
+		PcscEid.ppduExceptions.add(terminalName);
+	}
+
+	public static void removePPDUException(String terminalName) {
+		if (PcscEid.ppduExceptions == null)
+			return;
+		PcscEid.ppduExceptions.remove(terminalName);
+	}
+
+	private static boolean riskPPDUForCardTerminal(String name) {
+		if (PcscEid.ppduExceptions == null)
+			return PcscEid.riskPPDU;
+		return PcscEid.riskPPDU ? (!PcscEid.ppduExceptions.contains(name))
+				: (PcscEid.ppduExceptions.contains(name));
 	}
 
 	/**
@@ -737,6 +768,8 @@ public class PcscEid extends Observable {
 	public static final byte FEATURE_EID_PIN_PAD_READER_TAG = (byte) 0x80;
 
 	private CCIDFeatures getCCIDFeatures() {
+		final boolean onMsWindows = (System.getProperty("os.name") != null && System
+				.getProperty("os.name").startsWith("Windows"));
 		this.view.addDetailMessage("CCID GET_FEATURE IOCTL...");
 		int ioctl;
 		String osName = System.getProperty("os.name");
@@ -745,13 +778,28 @@ public class PcscEid extends Observable {
 		} else {
 			ioctl = 0x42000D48;
 		}
-		byte[] features;
+		byte[] features = new byte[0];
 		try {
 			features = this.card.transmitControlCommand(ioctl, new byte[0]);
 		} catch (CardException e) {
 			this.view.addDetailMessage("GET_FEATURES IOCTL error: "
 					+ e.getMessage());
-			return new CCIDFeatures(null);
+			// try pseudo-APDU (PPDU) interface
+			this.view.addDetailMessage("trying PPDU interface...");
+			try {
+				if(!onMsWindows || !riskPPDUForCardTerminal(cardTerminal.getName())) {
+					return new CCIDFeatures(null);
+				}
+				ResponseAPDU responseAPDU = this.cardChannel.transmit(new CommandAPDU((byte)0xff, (byte)0xc2, 0x01, 0x00, new byte[] {}, 32));
+				this.view.addDetailMessage("PPDU response: " + Integer.toHexString(responseAPDU.getSW()));
+				if(responseAPDU.getSW() == 0x9000) {
+					features = responseAPDU.getData();
+				} else {
+					return new CCIDFeatures(null);
+				}
+			} catch (CardException e2) {
+				this.view.addDetailMessage("PPDU failed: " + e2.getMessage());
+			}
 		} finally {
 			try {
 				Thread.sleep(25);
