@@ -1,7 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2010 FedICT.
- * Copyright (C) 2014 e-Contract.be BVBA.
+ * Copyright (C) 2014-2015 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -259,7 +259,13 @@ public class XAdESSignatureFacetTest {
 		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(
 				XMLSignature.XMLNS, "Signature");
 		assertEquals(1, signatureNodeList.getLength());
-		Node signatureNode = signatureNodeList.item(0);
+		Element signatureNode = (Element) signatureNodeList.item(0);
+
+		// work-around for Java 7
+		Element signedPropertiesElement = (Element) signatureNode
+				.getElementsByTagNameNS(XAdESXLSignatureFacet.XADES_NAMESPACE,
+						"SignedProperties").item(0);
+		signedPropertiesElement.setIdAttribute("Id", true);
 
 		DOMValidateContext domValidateContext = new DOMValidateContext(
 				KeySelector.singletonKeySelector(keyPair.getPublic()),
@@ -429,7 +435,13 @@ public class XAdESSignatureFacetTest {
 		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(
 				XMLSignature.XMLNS, "Signature");
 		assertEquals(1, signatureNodeList.getLength());
-		Node signatureNode = signatureNodeList.item(0);
+		Element signatureNode = (Element) signatureNodeList.item(0);
+
+		// work-around for Java 7
+		Element signedPropertiesElement = (Element) signatureNode
+				.getElementsByTagNameNS(XAdESXLSignatureFacet.XADES_NAMESPACE,
+						"SignedProperties").item(0);
+		signedPropertiesElement.setIdAttribute("Id", true);
 
 		DOMValidateContext domValidateContext = new DOMValidateContext(
 				KeySelector.singletonKeySelector(keyPair.getPublic()),

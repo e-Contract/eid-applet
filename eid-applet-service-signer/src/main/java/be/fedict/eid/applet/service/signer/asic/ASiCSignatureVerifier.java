@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2011 FedICT.
+ * Copyright (C) 2015 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -39,6 +40,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import be.fedict.eid.applet.service.signer.KeyInfoKeySelector;
+import be.fedict.eid.applet.service.signer.facets.XAdESXLSignatureFacet;
 import be.fedict.eid.applet.service.signer.odf.ODFUtil;
 
 /**
@@ -87,6 +89,14 @@ public class ASiCSignatureVerifier {
 				.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 		for (int idx = 0; idx < signatureNodeList.getLength(); idx++) {
 			Element signatureElement = (Element) signatureNodeList.item(idx);
+
+			// work-around for Java 7
+			Element signedPropertiesElement = (Element) signatureElement
+					.getElementsByTagNameNS(
+							XAdESXLSignatureFacet.XADES_NAMESPACE,
+							"SignedProperties").item(0);
+			signedPropertiesElement.setIdAttribute("Id", true);
+
 			KeyInfoKeySelector keySelector = new KeyInfoKeySelector();
 			DOMValidateContext domValidateContext = new DOMValidateContext(
 					keySelector, signatureElement);
