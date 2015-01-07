@@ -1,7 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
- * Copyright (C) 2014 e-Contract.be BVBA.
+ * Copyright (C) 2014-2015 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -84,6 +84,7 @@ import be.fedict.eid.applet.sc.Task;
 import be.fedict.eid.applet.sc.TaskRunner;
 import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.Identity;
+import be.fedict.eid.applet.service.impl.tlv.TlvField;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
 import be.fedict.trust.BelgianTrustValidatorFactory;
 import be.fedict.trust.FallbackTrustLinker;
@@ -937,6 +938,102 @@ public class PcscTest {
 		assertEquals(size, result.length);
 
 		pcscEid.close();
+	}
+
+	/**
+	 * Looking for a clean way to detect PPDU smart card readers.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testDetectPPDU() throws Exception {
+		PcscEid pcscEid = new PcscEid(new TestView(), this.messages);
+		if (false == pcscEid.isEidPresent()) {
+			LOG.debug("insert eID card");
+			pcscEid.waitForEidPresent();
+		}
+		Card card = pcscEid.getCard();
+		int ioctl;
+		String osName = System.getProperty("os.name");
+		if (osName.startsWith("Windows")) {
+			ioctl = (0x31 << 16 | (3400) << 2);
+		} else {
+			ioctl = 0x42000D48;
+		}
+		byte[] features = card.transmitControlCommand(ioctl, new byte[0]);
+		if (0 == features.length) {
+			LOG.debug("no CCID reader");
+			return;
+		}
+		LOG.debug("feature list: " + new String(Hex.encodeHex(features)));
+		CCIDFeatures ccidFeatures = new CCIDFeatures(features);
+		for (int idx = 0; idx < 0x14; idx++) {
+			LOG.debug("has feature " + Integer.toHexString(idx) + " "
+					+ ccidFeatures.findFeature((byte) idx));
+		}
+		if (null != ccidFeatures.findFeature((byte) 0x12)) {
+			byte[] tlvFeatures = card.transmitControlCommand(
+					ccidFeatures.findFeature((byte) 0x12), new byte[0]);
+			LOG.debug("TLV feature list: "
+					+ new String(Hex.encodeHex(tlvFeatures)));
+			FeatureGetTlvProperties featureGetTlvProperties = TlvParser.parse(
+					tlvFeatures, FeatureGetTlvProperties.class);
+			if (null != featureGetTlvProperties.bPPDUSupport) {
+				LOG.debug("PPDU support: "
+						+ featureGetTlvProperties.bPPDUSupport[0]);
+			}
+			if (null != featureGetTlvProperties.usbVendorId) {
+				LOG.debug("USB vendor id: "
+						+ Hex.encodeHexString(featureGetTlvProperties.usbVendorId));
+			}
+			if (null != featureGetTlvProperties.usbProductId) {
+				LOG.debug("USB product id: "
+						+ Hex.encodeHexString(featureGetTlvProperties.usbProductId));
+			}
+		}
+	}
+
+	public static class FeatureGetTlvProperties {
+		@TlvField(9)
+		public byte[] bPPDUSupport;
+
+		@TlvField(0x0b)
+		public byte[] usbVendorId;
+
+		@TlvField(0x0c)
+		public byte[] usbProductId;
+	}
+
+	private static class CCIDFeatures {
+		private final byte[] features;
+
+		public CCIDFeatures(byte[] features) {
+			this.features = features;
+		}
+
+		public Integer findFeature(byte featureTag) {
+			if (null == this.features) {
+				return null;
+			}
+			int idx = 0;
+			while (idx < this.features.length) {
+				byte tag = this.features[idx];
+				idx++;
+				idx++;
+				if (featureTag == tag) {
+					int feature = 0;
+					for (int count = 0; count < 3; count++) {
+						feature |= this.features[idx] & 0xff;
+						idx++;
+						feature <<= 8;
+					}
+					feature |= this.features[idx] & 0xff;
+					return feature;
+				}
+				idx += 4;
+			}
+			return null;
+		}
 	}
 
 	@Test
