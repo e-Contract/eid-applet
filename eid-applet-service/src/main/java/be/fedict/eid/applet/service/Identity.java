@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2015 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -27,7 +28,9 @@ import be.fedict.eid.applet.service.dto.Mapping;
 import be.fedict.eid.applet.service.dto.MapsTo;
 import be.fedict.eid.applet.service.impl.tlv.ChipNumberDataConvertor;
 import be.fedict.eid.applet.service.impl.tlv.ConvertData;
+import be.fedict.eid.applet.service.impl.tlv.CountryOfProtectionDataConvertor;
 import be.fedict.eid.applet.service.impl.tlv.DateOfBirthDataConvertor;
+import be.fedict.eid.applet.service.impl.tlv.DateOfProtectionDataConvertor;
 import be.fedict.eid.applet.service.impl.tlv.DocumentTypeConvertor;
 import be.fedict.eid.applet.service.impl.tlv.GenderDataConvertor;
 import be.fedict.eid.applet.service.impl.tlv.SpecialOrganisationConvertor;
@@ -143,6 +146,17 @@ public class Identity implements Serializable {
 	@TlvField(20)
 	public boolean memberOfFamily;
 
+	@TlvField(21)
+	public String dateAndCountryOfProtection;
+
+	@TlvField(21)
+	@ConvertData(DateOfProtectionDataConvertor.class)
+	public GregorianCalendar dateOfProtection;
+
+	@TlvField(21)
+	@ConvertData(CountryOfProtectionDataConvertor.class)
+	public String countryOfProtection;
+
 	/*
 	 * We're also providing getters and a toString to make this class more
 	 * useful within web frameworks like JBoss Seam.
@@ -226,6 +240,18 @@ public class Identity implements Serializable {
 
 	public SpecialOrganisation getSpecialOrganisation() {
 		return this.specialOrganisation;
+	}
+
+	public String getDateAndCountryOfProtection() {
+		return this.dateAndCountryOfProtection;
+	}
+
+	public GregorianCalendar getDateOfProtection() {
+		return this.dateOfProtection;
+	}
+
+	public String getCountryOfProtection() {
+		return this.countryOfProtection;
 	}
 
 	@Override

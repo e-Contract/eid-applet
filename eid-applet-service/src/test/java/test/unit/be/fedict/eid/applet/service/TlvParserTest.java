@@ -196,6 +196,29 @@ public class TlvParserTest {
 	}
 
 	@Test
+	public void testDateAndCountryOfProtection() throws Exception {
+		// setup
+		byte[] idFile = IOUtils.toByteArray(TlvParserTest.class
+				.getResourceAsStream("/dateandcountry.tlv"));
+
+		// operate
+		Identity identity = TlvParser.parse(idFile, Identity.class);
+
+		// verify
+		LOG.debug("document type: " + identity.documentType);
+		LOG.debug("date and country of protection: "
+				+ identity.getDateAndCountryOfProtection());
+		assertEquals("13.08.2014-IT", identity.getDateAndCountryOfProtection());
+		LOG.debug("date of protection: "
+				+ identity.getDateOfProtection().getTime());
+		assertEquals(2014, identity.getDateOfProtection().get(Calendar.YEAR));
+		assertEquals(8 - 1, identity.getDateOfProtection().get(Calendar.MONTH));
+		assertEquals(13,
+				identity.getDateOfProtection().get(Calendar.DAY_OF_MONTH));
+		assertEquals("IT", identity.getCountryOfProtection());
+	}
+
+	@Test
 	public void parseAddressFile() throws Exception {
 		// setup
 		InputStream addressInputStream = TlvParserTest.class
