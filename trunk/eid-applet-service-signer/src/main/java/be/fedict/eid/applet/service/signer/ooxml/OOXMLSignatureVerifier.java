@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2015 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -82,6 +83,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import be.fedict.eid.applet.service.signer.KeyInfoKeySelector;
+import be.fedict.eid.applet.service.signer.facets.XAdESXLSignatureFacet;
 import be.fedict.eid.applet.service.signer.jaxb.opc.contenttypes.CTDefault;
 import be.fedict.eid.applet.service.signer.jaxb.opc.contenttypes.CTOverride;
 import be.fedict.eid.applet.service.signer.jaxb.opc.contenttypes.CTTypes;
@@ -160,6 +162,15 @@ public class OOXMLSignatureVerifier {
 				return null;
 			}
 			Node signatureNode = signatureNodeList.item(0);
+
+			// work-around for Java 7
+			Element signedPropertiesElement = (Element) ((Element) signatureNode)
+					.getElementsByTagNameNS(
+							XAdESXLSignatureFacet.XADES_NAMESPACE,
+							"SignedProperties").item(0);
+			if (null != signedPropertiesElement) {
+				signedPropertiesElement.setIdAttribute("Id", true);
+			}
 
 			KeyInfoKeySelector keySelector = new KeyInfoKeySelector();
 			DOMValidateContext domValidateContext = new DOMValidateContext(
@@ -256,7 +267,8 @@ public class OOXMLSignatureVerifier {
 									relsEntryName.indexOf("_rels/"));
 					String streamEntry = baseUri + relationshipTarget;
 					LOG.debug("stream entry: " + streamEntry);
-					streamEntry = FilenameUtils.separatorsToUnix(FilenameUtils.normalize(streamEntry));
+					streamEntry = FilenameUtils.separatorsToUnix(FilenameUtils
+							.normalize(streamEntry));
 					LOG.debug("normalized stream entry: " + streamEntry);
 					String contentType = getContentType(contentTypes,
 							streamEntry);
