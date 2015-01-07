@@ -1,7 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2012 FedICT.
- * Copyright (C) 2014 e-Contract.be BVBA.
+ * Copyright (C) 2014-2015 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -1679,6 +1679,12 @@ public class PcscEid extends Observable {
 		this.view.addDetailMessage("logoff...");
 		ResponseAPDU responseApdu = transmit(logoffApdu);
 		if (0x9000 != responseApdu.getSW()) {
+			this.view.addDetailMessage("logoff status word: "
+					+ Integer.toHexString(responseApdu.getSW()));
+			if (0x6e00 == responseApdu.getSW()) {
+				// BUD001 smart card reader work-around
+				return;
+			}
 			throw new RuntimeException("logoff failed");
 		}
 	}
@@ -1704,8 +1710,14 @@ public class PcscEid extends Observable {
 			CardChannel cardChannel = card.getBasicChannel();
 			CommandAPDU logoffApdu = new CommandAPDU(0x80, 0xE6, 0x00, 0x00);
 			ResponseAPDU responseApdu = cardChannel.transmit(logoffApdu);
-			this.view.addDetailMessage("logoff...");
+			this.view.addDetailMessage("logoff... " + readerName);
 			if (0x9000 != responseApdu.getSW()) {
+				this.view.addDetailMessage("logoff status word: "
+						+ Integer.toHexString(responseApdu.getSW()));
+				if (0x6e00 == responseApdu.getSW()) {
+					// BUD001 smart card reader work-around
+					return;
+				}
 				throw new RuntimeException("logoff failed");
 			}
 		} finally {
