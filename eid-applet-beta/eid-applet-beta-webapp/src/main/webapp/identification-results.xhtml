@@ -50,6 +50,15 @@
 
 								<h:outputText value="Special Status" />
 								<h:outputText value="#{eid.identity.specialStatus}" />
+
+								<h:outputText value="Date of protection" />
+								<h:outputText value="#{eid.identity.dateOfProtection.time}">
+									<f:convertDateTime timeZone="Europe/Paris" dateStyle="full"
+										type="date" />
+								</h:outputText>
+
+								<h:outputText value="Country of protection" />
+								<h:outputText value="#{eid.identity.countryOfProtection}" />
 							</h:panelGrid>
 						</h:panelGroup>
 						<p>
