@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2010 FedICT.
+ * Copyright (C) 2015 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -29,13 +30,12 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.transform.TransformerException;
 
 import org.apache.xml.security.utils.Constants;
+import org.apache.xpath.XPathAPI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import be.fedict.eid.applet.service.signer.SignatureFacet;
 import be.fedict.eid.applet.service.signer.facets.XAdESXLSignatureFacet;
-
-import com.sun.org.apache.xpath.internal.XPathAPI;
 
 /**
  * Work-around for Office2010 to accept the XAdES-BES/EPES signature.
