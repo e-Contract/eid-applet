@@ -473,9 +473,9 @@ public class PcscTest {
 		}
 
 		try {
-			while (true) {
+			do {
 				pcscEidSpi.logoff();
-			}
+			} while (true);
 		} finally {
 			pcscEidSpi.close();
 		}
