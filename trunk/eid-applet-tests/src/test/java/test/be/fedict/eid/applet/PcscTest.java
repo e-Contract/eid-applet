@@ -129,6 +129,10 @@ public class PcscTest {
 			LOG.debug("insert eID card");
 			pcscEid.waitForEidPresent();
 		}
+
+		// PPDU test
+		pcscEid.addPPDUName("digipass 870");
+
 		byte[] challenge = "hello world".getBytes();
 		byte[] signatureValue;
 		List<X509Certificate> authnCertChain;
@@ -491,6 +495,9 @@ public class PcscTest {
 			pcscEidSpi.waitForEidPresent();
 		}
 
+		// PPDU test
+		pcscEidSpi.addPPDUName("digipass 870");
+
 		pcscEidSpi.changePin();
 
 		pcscEidSpi.close();
@@ -503,6 +510,9 @@ public class PcscTest {
 			LOG.debug("insert eID card");
 			pcscEidSpi.waitForEidPresent();
 		}
+
+		// PPDU test
+		pcscEidSpi.addPPDUName("digipass 870");
 
 		pcscEidSpi.unblockPin();
 
