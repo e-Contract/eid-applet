@@ -1,7 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2010 FedICT.
- * Copyright (C) 2009-2014 e-Contract.be BVBA.
+ * Copyright (C) 2009-2015 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.StringTokenizer;
 
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
@@ -113,6 +114,18 @@ public class Controller {
 			view.addDetailMessage(msg);
 			throw new RuntimeException(msg);
 		}
+
+		String ppduNames = runtime.getParameter("PPDUNames");
+		if (null != ppduNames) {
+			StringTokenizer stringTokenizer = new StringTokenizer(ppduNames,
+					",");
+			while (stringTokenizer.hasMoreTokens()) {
+				String ppduName = stringTokenizer.nextToken();
+				view.addDetailMessage("PPDU name: " + ppduName.toLowerCase());
+				this.pcscEidSpi.addPPDUName(ppduName);
+			}
+		}
+
 		this.pcscEidSpi.addObserver(new PcscEidObserver());
 
 		ProtocolContext protocolContext = new LocalAppletProtocolContext(view);
