@@ -1,0 +1,7 @@
+eID Applet Shared
+
+  This artifact holds Java classes that are shared between the eID Applet and the eID Applet Service.
+  
+  This artifact basically defines the protocol between the eID Applet and the eID Applet Service.
+
+  {{{./apidocs/index.html}Javadoc}}
