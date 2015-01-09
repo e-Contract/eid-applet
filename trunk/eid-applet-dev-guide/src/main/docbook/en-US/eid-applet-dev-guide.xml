@@ -402,6 +402,17 @@
 							communicating with the eID Applet Service component.
 						</entry>
 					</row>
+					<row>
+						<entry>
+							<code>PPDUNames</code>
+						</entry>
+						<entry>optional</entry>
+						<entry>
+							The comma-separated names of the card readers on which the
+							eID Applet should try to use the Pseudo-APDU interface if the
+							regular CCID fails.
+						</entry>
+					</row>
 				</tbody>
 			</tgroup>
 		</table>
