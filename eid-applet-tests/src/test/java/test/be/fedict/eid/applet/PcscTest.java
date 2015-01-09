@@ -131,7 +131,7 @@ public class PcscTest {
 		}
 
 		// PPDU test
-		pcscEid.addPPDUName("digipass 870");
+		pcscEid.addPPDUName("digipass");
 
 		byte[] challenge = "hello world".getBytes();
 		byte[] signatureValue;

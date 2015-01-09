@@ -792,6 +792,7 @@ public class PcscEid extends Observable {
 					features = responseAPDU.getData();
 					for (byte feature : features) {
 						ccidFeatures.put(feature, new CCIDFeature(feature));
+						this.view.addDetailMessage("PPDU feature: " + feature);
 					}
 					return ccidFeatures;
 				} else {
@@ -799,6 +800,18 @@ public class PcscEid extends Observable {
 				}
 			} catch (CardException e2) {
 				this.view.addDetailMessage("PPDU failed: " + e2.getMessage());
+				Throwable cause = e2.getCause();
+				if (null != cause) {
+					this.view.addDetailMessage("cause: " + cause.getMessage());
+					StackTraceElement[] stackTrace = cause.getStackTrace();
+					for (StackTraceElement stackTraceElement : stackTrace) {
+						this.view.addDetailMessage("at "
+								+ stackTraceElement.getClassName() + "."
+								+ stackTraceElement.getMethodName() + ":"
+								+ stackTraceElement.getLineNumber());
+					}
+				}
+				selectBelpicJavaCardApplet();
 				return Collections.EMPTY_MAP;
 			}
 		} finally {
