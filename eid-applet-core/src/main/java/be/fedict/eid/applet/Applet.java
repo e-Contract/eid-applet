@@ -236,6 +236,9 @@ public class Applet extends JApplet {
 			} catch (MalformedURLException e) {
 				addDetailMessage("URL error: " + e.getMessage());
 			}
+		} else {
+			// Java WebStart
+			System.exit(0);
 		}
 	}
 
