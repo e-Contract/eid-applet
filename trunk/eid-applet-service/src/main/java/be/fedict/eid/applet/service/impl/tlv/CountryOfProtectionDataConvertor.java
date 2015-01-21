@@ -18,12 +18,23 @@
 
 package be.fedict.eid.applet.service.impl.tlv;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class CountryOfProtectionDataConvertor implements DataConvertor<String> {
+
+	private static final Log LOG = LogFactory
+			.getLog(DateOfProtectionDataConvertor.class);
 
 	@Override
 	public String convert(byte[] value) throws DataConvertorException {
 		byte[] country = new byte[2];
-		System.arraycopy(value, 11, country, 0, 2);
-		return new String(country);
+		try {
+			System.arraycopy(value, 11, country, 0, 2);
+			return new String(country);
+		} catch (Exception e) {
+			LOG.error("error parsing CountryOfProtection: " + e.getMessage(), e);
+			return null;
+		}
 	}
 }
