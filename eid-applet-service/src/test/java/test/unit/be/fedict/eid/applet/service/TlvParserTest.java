@@ -196,6 +196,19 @@ public class TlvParserTest {
 	}
 
 	@Test
+	public void testStringIndexOutOfBoundsExceptionOnDateAndCountryOfProtection()
+			throws Exception {
+		// setup
+		byte[] idFile = new byte[] { 21, 1, '0' };
+
+		// operate
+		Identity identity = TlvParser.parse(idFile, Identity.class);
+		assertNull(identity.dateOfProtection);
+		assertNull(identity.countryOfProtection);
+		assertNotNull(identity.dateAndCountryOfProtection);
+	}
+
+	@Test
 	public void testDateAndCountryOfProtection() throws Exception {
 		// setup
 		byte[] idFile = IOUtils.toByteArray(TlvParserTest.class
