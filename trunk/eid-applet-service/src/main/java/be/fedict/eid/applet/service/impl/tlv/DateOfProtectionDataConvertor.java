@@ -35,6 +35,7 @@ public class DateOfProtectionDataConvertor implements
 		String dateStr = new String(value);
 		LOG.debug("DateAndCountryOfProtection: \"" + dateStr + "\"");
 		try {
+			LOG.debug("DateAndCountryOfProtection size: " + value.length);
 			int day = Integer.parseInt(dateStr.substring(0, 2));
 			int month = Integer.parseInt(dateStr.substring(3, 5));
 			int year = Integer.parseInt(dateStr.substring(6, 10));
