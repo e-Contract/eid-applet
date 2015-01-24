@@ -1,7 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2012 FedICT.
- * Copyright (C) 2014 e-Contract.be BVBA.
+ * Copyright (C) 2014-2015 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -46,33 +46,119 @@ public class Messages {
 	 * 
 	 */
 	public static enum MESSAGE_ID {
-		LOADING("loading"), SECURITY_ERROR("securityError"), CARD_ERROR(
-				"cardError"), GENERIC_ERROR("genericError"), DETECTING_CARD(
-				"detectingCard"), INSERT_CARD_QUESTION("insertCardQuestion"), READING_IDENTITY(
-				"readingIdentity"), TRANSMITTING_IDENTITY(
-				"transmittingIdentity"), DONE("done"), PRIVACY_QUESTION(
-				"privacyQuestion"), AUTHENTICATING("authenticating"), REMOVE_CARD(
-				"removeCard"), SIGNING("signing"), SELECT_FILES("selectFiles"), DIGESTING_FILES(
-				"digestingFiles"), COPY_ALL("copyAll"), MAIL("mail"), PIN_BLOCKED(
-				"pinBlocked"), PIN_CHANGED("pinChanged"), PIN_UNBLOCKED(
-				"pinUnblocked"), RETRIES_LEFT("retriesLeft"), PIN_INCORRECT(
-				"pinIncorrect"), CONNECT_READER("connectReader"), PIN_PAD(
-				"pinPad"), CURRENT_PIN("currentPin"), NEW_PIN("newPin"), OK(
-				"ok"), CANCEL("cancel"), PUK_PAD("pukPad"), PIN_PAD_CHANGE(
-				"pinPadChange"), ENTER_PIN("enterPin"), LABEL_PIN("labelPin"), PIN_CHANGE(
-				"pinChange"), PIN_UNBLOCK("pinUnblock"), PIN_PAD_MODIFY_OLD(
-				"pinPadModifyOld"), PIN_PAD_MODIFY_NEW("pinPadModifyNew"), PIN_PAD_MODIFY_NEW_AGAIN(
-				"pinPadModifyNewAgain"), CERTIFICATE_EXPIRED_ERROR(
-				"certificateExpiredError"), CERTIFICATE_REVOKED_ERROR(
-				"certificateRevokedError"), IDENTITY_INFO("identityInfo"), IDENTITY_IDENTITY(
-				"identityIdentity"), IDENTITY_ADDRESS("identityAddress"), IDENTITY_PHOTO(
-				"identityPhoto"), DETAILS_BUTTON("detailsButtonText"), CANCEL_BUTTON(
-				"cancelButtonText"), NO_BUTTON("noButtonText"), OK_BUTTON(
-				"okButtonText"), YES_BUTTON("yesButtonText"), CERTIFICATE_NOT_TRUSTED(
-				"certificateNotTrusted"), SIGNATURE_CREATION(
-				"signatureCreation"), SIGN_QUESTION("signQuestion"), SIGNATURE_ALGO(
-				"signatureAlgo"), PROTOCOL_SIGNATURE("protocolSignature"), USAGE(
-				"usage"), AUTHORIZATION_ERROR("authorizationError");
+		LOADING("loading"),
+
+		SECURITY_ERROR("securityError"),
+
+		CARD_ERROR("cardError"),
+
+		GENERIC_ERROR("genericError"),
+
+		DETECTING_CARD("detectingCard"),
+
+		INSERT_CARD_QUESTION("insertCardQuestion"),
+
+		READING_IDENTITY("readingIdentity"),
+
+		TRANSMITTING_IDENTITY("transmittingIdentity"),
+
+		DONE("done"),
+
+		PRIVACY_QUESTION("privacyQuestion"),
+
+		AUTHENTICATING("authenticating"),
+
+		REMOVE_CARD("removeCard"),
+
+		SIGNING("signing"),
+
+		SELECT_FILES("selectFiles"),
+
+		DIGESTING_FILES("digestingFiles"),
+
+		COPY_ALL("copyAll"),
+
+		MAIL("mail"),
+
+		PIN_BLOCKED("pinBlocked"),
+
+		PIN_CHANGED("pinChanged"),
+
+		PIN_UNBLOCKED("pinUnblocked"),
+
+		RETRIES_LEFT("retriesLeft"),
+
+		PIN_INCORRECT("pinIncorrect"),
+
+		CONNECT_READER("connectReader"),
+
+		PIN_PAD("pinPad"),
+
+		CURRENT_PIN("currentPin"),
+
+		NEW_PIN("newPin"),
+
+		OK("ok"),
+
+		CANCEL("cancel"),
+
+		PUK_PAD("pukPad"),
+
+		PIN_PAD_CHANGE("pinPadChange"),
+
+		ENTER_PIN("enterPin"),
+
+		LABEL_PIN("labelPin"),
+
+		PIN_CHANGE("pinChange"),
+
+		PIN_UNBLOCK("pinUnblock"),
+
+		PIN_PAD_MODIFY_OLD("pinPadModifyOld"),
+
+		PIN_PAD_MODIFY_NEW("pinPadModifyNew"),
+
+		PIN_PAD_MODIFY_NEW_AGAIN("pinPadModifyNewAgain"),
+
+		CERTIFICATE_EXPIRED_ERROR("certificateExpiredError"),
+
+		CERTIFICATE_REVOKED_ERROR("certificateRevokedError"),
+
+		IDENTITY_INFO("identityInfo"),
+
+		IDENTITY_IDENTITY("identityIdentity"),
+
+		IDENTITY_ADDRESS("identityAddress"),
+
+		IDENTITY_PHOTO("identityPhoto"),
+
+		DETAILS_BUTTON("detailsButtonText"),
+
+		CANCEL_BUTTON("cancelButtonText"),
+
+		NO_BUTTON("noButtonText"),
+
+		OK_BUTTON("okButtonText"),
+
+		YES_BUTTON("yesButtonText"),
+
+		CERTIFICATE_NOT_TRUSTED("certificateNotTrusted"),
+
+		SIGNATURE_CREATION("signatureCreation"),
+
+		SIGN_QUESTION("signQuestion"),
+
+		SIGNATURE_ALGO("signatureAlgo"),
+
+		PROTOCOL_SIGNATURE("protocolSignature"),
+
+		USAGE("usage"),
+
+		AUTHORIZATION_ERROR("authorizationError"),
+
+		SAFARI_SANDBOX_1("safariSandbox1"),
+
+		SAFARI_SANDBOX_2("safariSandBox2");
 
 		private final String id;
 

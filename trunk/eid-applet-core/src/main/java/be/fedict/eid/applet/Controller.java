@@ -107,6 +107,8 @@ public class Controller {
 		this.runtime = runtime;
 		this.messages = messages;
 
+		macosxSandboxDetection(view);
+
 		try {
 			this.pcscEidSpi = new PcscEid(view, this.messages);
 		} catch (Exception e) {
@@ -132,6 +134,23 @@ public class Controller {
 		this.protocolStateMachine = new ProtocolStateMachine(protocolContext);
 
 		this.view = new ExclusiveAccessViewDecorator(view, this.pcscEidSpi);
+	}
+
+	private void macosxSandboxDetection(View view) {
+		String osName = System.getProperty("os.name");
+		if (osName.equals("Mac OS X")) {
+			boolean sandboxed = System.getenv("DIRHELPER_USER_DIR_SUFFIX") != null;
+			if (sandboxed) {
+				String safariMessage = this.messages
+						.getMessage(MESSAGE_ID.SAFARI_SANDBOX_1);
+				safariMessage += this.runtime.getDocumentBase().getHost();
+				safariMessage += this.messages
+						.getMessage(MESSAGE_ID.SAFARI_SANDBOX_2);
+				JOptionPane.showMessageDialog(view.getParentComponent(),
+						safariMessage, "Safari Java Sandbox",
+						JOptionPane.WARNING_MESSAGE);
+			}
+		}
 	}
 
 	private <T> T sendMessage(Object message, Class<T> responseClass)
