@@ -1,0 +1,7 @@
+eID Applet Service SPI
+
+  This artifact holds the service provider interfaces (SPIs) that can be used to configure the eID Applet Service.
+  
+  The configuration of the eID Applet Service directly impacts the behavior of the eID Applet.
+
+  {{{./apidocs/index.html}Javadoc}}
