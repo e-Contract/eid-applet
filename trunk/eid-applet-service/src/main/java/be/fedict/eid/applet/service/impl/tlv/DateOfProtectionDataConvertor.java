@@ -32,10 +32,13 @@ public class DateOfProtectionDataConvertor implements
 	@Override
 	public GregorianCalendar convert(byte[] value)
 			throws DataConvertorException {
+		LOG.debug("DateAndCountryOfProtection size: " + value.length);
+		if (0 == value.length) {
+			return null;
+		}
 		String dateStr = new String(value);
 		LOG.debug("DateAndCountryOfProtection: \"" + dateStr + "\"");
 		try {
-			LOG.debug("DateAndCountryOfProtection size: " + value.length);
 			int day = Integer.parseInt(dateStr.substring(0, 2));
 			int month = Integer.parseInt(dateStr.substring(3, 5));
 			int year = Integer.parseInt(dateStr.substring(6, 10));

@@ -28,6 +28,9 @@ public class CountryOfProtectionDataConvertor implements DataConvertor<String> {
 
 	@Override
 	public String convert(byte[] value) throws DataConvertorException {
+		if (0 == value.length) {
+			return null;
+		}
 		byte[] country = new byte[2];
 		try {
 			System.arraycopy(value, 11, country, 0, 2);
