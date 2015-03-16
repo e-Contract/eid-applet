@@ -75,7 +75,7 @@
 			<title>eID Applet Source Code</title>
 			<para>
 				The eID Applet source code is available at
-				<ulink url="http://code.google.com/p/eid-applet/">eID Applet Google Code</ulink>
+				<ulink url="https://github.com/e-Contract/eid-applet">eID Applet Github</ulink>
 				.
 			</para>
 		</tip>
@@ -1553,7 +1553,7 @@
 				<para>
 					A PKI validation module tailored for the Belgian eID PKI is
 					available at the
-					<ulink url="http://code.google.com/p/jtrust/">jTrust Google Code</ulink>
+					<ulink url="https://github.com/e-Contract/jtrust">jTrust Github</ulink>
 					site.
 				</para>
 				<para>

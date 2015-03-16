@@ -4,7 +4,7 @@ README for eID Applet Project
 === 1. Introduction
 
 This project contains the source code tree of the eID Applet.
-The source code is hosted at: http://code.google.com/p/eid-applet/
+The source code is hosted at: https://github.com/e-Contract/eid-applet
 
 
 === 2. Requirements

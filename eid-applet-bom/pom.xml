@@ -12,7 +12,7 @@
 	<groupId>be.fedict.eid-applet</groupId>
 	<artifactId>eid-applet-bom</artifactId>
 	<packaging>pom</packaging>
-	<url>http://code.google.com/p/eid-applet/</url>
+	<url>https://github.com/e-Contract/eid-applet</url>
 	<properties>
 		<eid-applet.version>${project.version}</eid-applet.version>
 	</properties>
