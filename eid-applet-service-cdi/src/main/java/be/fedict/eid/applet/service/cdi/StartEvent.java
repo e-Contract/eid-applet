@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2014 e-Contract.be BVBA.
+ * Copyright (C) 2014-2015 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -24,6 +24,8 @@ public class StartEvent {
 
 	private AuthenticationRequest authenticationRequest;
 
+	private SigningRequest signingRequest;
+
 	public IdentificationRequest performIdentification() {
 		this.identificationRequest = new IdentificationRequest();
 		return this.identificationRequest;
@@ -40,6 +42,51 @@ public class StartEvent {
 
 	public AuthenticationRequest getAuthenticationRequest() {
 		return this.authenticationRequest;
+	}
+
+	public SigningRequest performSigning() {
+		this.signingRequest = new SigningRequest();
+		return this.signingRequest;
+	}
+
+	public SigningRequest getSigningRequest() {
+		return this.signingRequest;
+	}
+
+	public class SigningRequest {
+
+		private boolean includeAddress;
+
+		private boolean includeIdentity;
+
+		private boolean includePhoto;
+
+		public SigningRequest includeAddress() {
+			this.includeAddress = true;
+			return this;
+		}
+
+		public SigningRequest includeIdentity() {
+			this.includeIdentity = true;
+			return this;
+		}
+
+		public SigningRequest includePhoto() {
+			this.includePhoto = true;
+			return this;
+		}
+
+		public boolean isIncludeAddress() {
+			return this.includeAddress;
+		}
+
+		public boolean isIncludeIdentity() {
+			return this.includeIdentity;
+		}
+
+		public boolean isIncludePhoto() {
+			return this.includePhoto;
+		}
 	}
 
 	public class AuthenticationRequest {

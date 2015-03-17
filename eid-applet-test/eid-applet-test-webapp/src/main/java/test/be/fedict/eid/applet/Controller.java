@@ -20,6 +20,8 @@ package test.be.fedict.eid.applet;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Observes;
@@ -37,9 +39,12 @@ import be.fedict.eid.applet.service.cdi.AuthenticationEvent;
 import be.fedict.eid.applet.service.cdi.BeIDContext;
 import be.fedict.eid.applet.service.cdi.IdentificationEvent;
 import be.fedict.eid.applet.service.cdi.IdentityEvent;
+import be.fedict.eid.applet.service.cdi.SignatureDigestEvent;
+import be.fedict.eid.applet.service.cdi.SignatureEvent;
 import be.fedict.eid.applet.service.cdi.StartEvent;
 import be.fedict.eid.applet.service.cdi.StartEvent.AuthenticationRequest;
 import be.fedict.eid.applet.service.cdi.StartEvent.IdentificationRequest;
+import be.fedict.eid.applet.service.cdi.StartEvent.SigningRequest;
 
 @Named("cdiTest")
 @SessionScoped
@@ -66,6 +71,10 @@ public class Controller implements Serializable {
 	private boolean includeAddress;
 
 	private boolean includePhoto;
+
+	private boolean logoff;
+
+	private boolean removeCard;
 
 	public void setOperation(Operation operation) {
 		this.operation = operation;
@@ -115,6 +124,22 @@ public class Controller implements Serializable {
 		this.includePhoto = includePhoto;
 	}
 
+	public boolean isLogoff() {
+		return this.logoff;
+	}
+
+	public void setLogoff(boolean logoff) {
+		this.logoff = logoff;
+	}
+
+	public boolean isRemoveCard() {
+		return this.removeCard;
+	}
+
+	public void setRemoveCard(boolean removeCard) {
+		this.removeCard = removeCard;
+	}
+
 	public void reset() {
 		this.identity = null;
 		this.address = null;
@@ -141,6 +166,9 @@ public class Controller implements Serializable {
 			if (this.includePhoto) {
 				identificationRequest.includePhoto();
 			}
+			if (this.removeCard) {
+				identificationRequest.removeCard();
+			}
 			break;
 		}
 		case AUTHENTICATION: {
@@ -154,6 +182,25 @@ public class Controller implements Serializable {
 			}
 			if (this.includePhoto) {
 				authenticationRequest.includePhoto();
+			}
+			if (this.removeCard) {
+				authenticationRequest.removeCard();
+			}
+			if (this.logoff) {
+				authenticationRequest.logoff();
+			}
+			break;
+		}
+		case SIGNING: {
+			SigningRequest signingRequest = startEvent.performSigning();
+			if (this.includeIdentity) {
+				signingRequest.includeIdentity();
+			}
+			if (this.includeAddress) {
+				signingRequest.includeAddress();
+			}
+			if (this.includePhoto) {
+				signingRequest.includePhoto();
 			}
 			break;
 		}
@@ -189,5 +236,27 @@ public class Controller implements Serializable {
 	public void handleAuthenticatedUser(
 			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) AuthenticatedEvent authenticatedEvent) {
 		this.userIdentifier = authenticatedEvent.getUserIdentifier();
+	}
+
+	public void handleSignatureDigest(
+			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) SignatureDigestEvent signatureDigestEvent)
+			throws NoSuchAlgorithmException {
+		byte[] data = "hello world".getBytes();
+		MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
+		messageDigest.update(data);
+		byte[] digestValue = messageDigest.digest();
+		String digestAlgo = "SHA1";
+		signatureDigestEvent.sign(digestValue, digestAlgo, "test");
+		if (this.removeCard) {
+			signatureDigestEvent.removeCard();
+		}
+		if (this.logoff) {
+			signatureDigestEvent.logoff();
+		}
+	}
+
+	public void handleSignature(
+			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) SignatureEvent signatureEvent) {
+		LOG.debug("signature event");
 	}
 }
