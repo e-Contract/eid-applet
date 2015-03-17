@@ -49,5 +49,4 @@ public class AppletServiceCDIServlet extends AbstractAppletServiceServlet {
 						(Class<? extends AbstractProtocolMessage>) messageClass))
 				.get();
 	}
-
 }

@@ -52,10 +52,12 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 			Map<String, String> httpHeaders, HttpServletRequest request,
 			HttpSession session) throws ServletException {
 		LOG.debug("hello message handler");
+
 		StartEvent startEvent = new StartEvent();
 		BeIDContextQualifier contextQualifier = new BeIDContextQualifier(
 				request);
 		this.startEvent.select(contextQualifier).fire(startEvent);
+
 		StartEvent.IdentificationRequest identificationRequest = startEvent
 				.getIdentificationRequest();
 		if (null != identificationRequest) {
@@ -70,6 +72,7 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage> {
 					includePhoto, true, includeCertificates, removeCard,
 					identityDataUsage);
 		}
+
 		StartEvent.AuthenticationRequest authenticationRequest = startEvent
 				.getAuthenticationRequest();
 		if (null != authenticationRequest) {

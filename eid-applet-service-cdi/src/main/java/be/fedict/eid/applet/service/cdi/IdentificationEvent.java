@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2014-2015 e-Contract.be BVBA.
+ * Copyright (C) 2015 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -18,32 +18,37 @@
 
 package be.fedict.eid.applet.service.cdi;
 
-import be.fedict.eid.applet.service.Address;
-import be.fedict.eid.applet.service.Identity;
+import java.security.cert.X509Certificate;
+import java.util.List;
 
-public class IdentityEvent {
+public class IdentificationEvent {
 
-	private final Identity identity;
+	private final List<X509Certificate> nrCertChain;
 
-	private final Address address;
+	private boolean valid;
 
-	private final byte[] photo;
+	private boolean invalid;
 
-	public IdentityEvent(Identity identity, Address address, byte[] photo) {
-		this.identity = identity;
-		this.address = address;
-		this.photo = photo;
+	public IdentificationEvent(List<X509Certificate> nrCertChain) {
+		this.nrCertChain = nrCertChain;
 	}
 
-	public Identity getIdentity() {
-		return this.identity;
+	public List<X509Certificate> getNationalRegistrationCertificateChain() {
+		return this.nrCertChain;
 	}
 
-	public Address getAddress() {
-		return this.address;
+	public void valid() {
+		this.valid = true;
 	}
 
-	public byte[] getPhoto() {
-		return this.photo;
+	public void invalid() {
+		this.invalid = true;
+	}
+
+	public boolean isValid() {
+		if (this.invalid) {
+			return false;
+		}
+		return this.valid;
 	}
 }
