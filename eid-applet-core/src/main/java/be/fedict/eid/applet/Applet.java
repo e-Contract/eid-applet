@@ -1,7 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2010 FedICT.
- * Copyright (C) 2014 e-Contract.be BVBA.
+ * Copyright (C) 2014-2015 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -532,7 +532,7 @@ public class Applet extends JApplet {
 			addDetailMessage("eID Applet - Copyright (C) 2008-2013 FedICT.");
 			addDetailMessage("Copyright (C) 2014-2015 e-Contract.be BVBA.");
 			addDetailMessage("Released under GNU LGPL version 3.0 license.");
-			addDetailMessage("More info: http://code.google.com/p/eid-applet/");
+			addDetailMessage("More info: https://github.com/e-Contract/eid-applet");
 			/*
 			 * first check required applet permissions. prevents that
 			 * cardTerminal.connect will trigger the security exception later on
