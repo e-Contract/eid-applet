@@ -20,6 +20,12 @@
 		<h:outputText value="User identifier:" />
 		<h:outputText value="#{cdiTest.userIdentifier}" />
 	</h:panelGrid>
+	<h:panelGrid columns="2"
+		rendered="#{cdiTest.serverCertificate != null}">
+		<h:outputText value="Server certificate:" />
+		<h:outputText
+			value="#{cdiTest.serverCertificate.subjectX500Principal}" />
+	</h:panelGrid>
 	<h:form>
 		<h:commandButton value="Back" action="/cdi.xhtml" />
 	</h:form>

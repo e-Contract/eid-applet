@@ -1,7 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
- * Copyright (C) 2014 e-Contract.be BVBA.
+ * Copyright (C) 2014-2015 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -286,6 +286,7 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 		if (null != this.serverCertFileSize) {
 			byte[] serverCertData = copy(this.body, idx,
 					this.serverCertFileSize);
+			this.encodedServerCertificate = serverCertData;
 			this.serverCertificate = getCertificate(serverCertData);
 			idx += this.serverCertFileSize;
 		}
@@ -345,6 +346,8 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	public X509Certificate rrnCertificate;
 
 	public X509Certificate serverCertificate;
+
+	public byte[] encodedServerCertificate;
 
 	public byte[] transactionMessageSignature;
 }

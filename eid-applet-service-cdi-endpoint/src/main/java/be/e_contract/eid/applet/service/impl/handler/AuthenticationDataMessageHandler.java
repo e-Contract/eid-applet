@@ -48,6 +48,7 @@ import be.fedict.eid.applet.service.cdi.AuthenticatedEvent;
 import be.fedict.eid.applet.service.cdi.AuthenticationEvent;
 import be.fedict.eid.applet.service.cdi.IdentificationEvent;
 import be.fedict.eid.applet.service.cdi.IdentityEvent;
+import be.fedict.eid.applet.service.cdi.SecureChannelBindingEvent;
 import be.fedict.eid.applet.service.impl.AuthenticationChallenge;
 import be.fedict.eid.applet.service.impl.UserIdentifierUtil;
 import be.fedict.eid.applet.service.impl.handler.MessageHandler;
@@ -72,6 +73,9 @@ public class AuthenticationDataMessageHandler implements
 	@Inject
 	private Event<IdentificationEvent> identificationEvent;
 
+	@Inject
+	private Event<SecureChannelBindingEvent> secureChannelBindingEvent;
+
 	@Override
 	public Object handleMessage(AuthenticationDataMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
@@ -88,8 +92,8 @@ public class AuthenticationDataMessageHandler implements
 		 * binding.
 		 */
 		AuthenticationContract authenticationContract = new AuthenticationContract(
-				message.saltValue, null, null, message.sessionId, null,
-				challenge);
+				message.saltValue, null, null, message.sessionId,
+				message.encodedServerCertificate, challenge);
 		byte[] toBeSigned;
 		try {
 			toBeSigned = authenticationContract.calculateToBeSigned();
@@ -129,6 +133,16 @@ public class AuthenticationDataMessageHandler implements
 		if (false == authenticationEvent.isValid()) {
 			throw new SecurityException(
 					"invalid authentication certificate chain");
+		}
+
+		if (null != message.encodedServerCertificate) {
+			SecureChannelBindingEvent secureChannelBindingEvent = new SecureChannelBindingEvent(
+					message.serverCertificate);
+			this.secureChannelBindingEvent.select(contextQualifier).fire(
+					secureChannelBindingEvent);
+			if (false == secureChannelBindingEvent.isValid()) {
+				throw new SecurityException("secure channel binding error");
+			}
 		}
 
 		if (null != message.identityData) {

@@ -107,6 +107,8 @@ public class StartEvent {
 
 		private String transactionMessage;
 
+		private boolean secureChannelBinding;
+
 		public AuthenticationRequest logoff() {
 			this.logoff = true;
 			return this;
@@ -139,6 +141,11 @@ public class StartEvent {
 
 		public AuthenticationRequest requireSecureReader() {
 			this.requireSecureReader = true;
+			return this;
+		}
+
+		public AuthenticationRequest enableSecureChannelBinding() {
+			this.secureChannelBinding = true;
 			return this;
 		}
 
@@ -178,6 +185,10 @@ public class StartEvent {
 
 		public String getTransactionMessage() {
 			return this.transactionMessage;
+		}
+
+		public boolean isSecureChannelBinding() {
+			return this.secureChannelBinding;
 		}
 	}
 

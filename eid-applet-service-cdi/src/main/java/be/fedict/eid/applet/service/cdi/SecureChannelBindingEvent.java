@@ -19,40 +19,35 @@
 package be.fedict.eid.applet.service.cdi;
 
 import java.security.cert.X509Certificate;
-import java.util.List;
 
-import be.fedict.eid.applet.shared.ErrorCode;
+public class SecureChannelBindingEvent {
 
-public class SignatureEvent {
+	private final X509Certificate serverCertificate;
 
-	private final byte[] signatureValue;
+	private boolean valid;
 
-	private final List<X509Certificate> certificateChain;
+	private boolean invalid;
 
-	private ErrorCode errorCode;
-
-	public SignatureEvent(byte[] signatureValue,
-			List<X509Certificate> certificateChain) {
-		this.signatureValue = signatureValue;
-		this.certificateChain = certificateChain;
+	public SecureChannelBindingEvent(X509Certificate serverCertificate) {
+		this.serverCertificate = serverCertificate;
 	}
 
-	public byte[] getSignatureValue() {
-		return this.signatureValue;
+	public X509Certificate getServerCertificate() {
+		return this.serverCertificate;
 	}
 
-	public List<X509Certificate> getCertificateChain() {
-		return this.certificateChain;
+	public void valid() {
+		this.valid = true;
 	}
 
-	public void setError(ErrorCode errorCode) {
-		if (null != this.errorCode) {
-			return;
+	public void invalid() {
+		this.invalid = true;
+	}
+
+	public boolean isValid() {
+		if (this.invalid) {
+			return false;
 		}
-		this.errorCode = errorCode;
-	}
-
-	public ErrorCode getError() {
-		return this.errorCode;
+		return this.valid;
 	}
 }

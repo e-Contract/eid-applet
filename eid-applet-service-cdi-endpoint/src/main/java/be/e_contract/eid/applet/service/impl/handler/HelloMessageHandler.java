@@ -97,7 +97,8 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage>,
 			boolean includeInetAddress = false;
 			boolean preLogoff = authenticationRequest.isPreLogoff();
 			boolean sessionIdChannelBinding = false;
-			boolean serverCertificateChannelBinding = false;
+			boolean serverCertificateChannelBinding = authenticationRequest
+					.isSecureChannelBinding();
 			boolean includeCertificates = false;
 			boolean includeAddress = authenticationRequest.isIncludeAddress();
 			boolean includeIdentity = authenticationRequest.isIncludeIdentity();

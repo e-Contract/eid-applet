@@ -34,6 +34,11 @@
 			<h:selectBooleanCheckbox id="removeCard"
 				value="#{cdiTest.removeCard}" />
 			<h:outputLabel value="Remove Card" for="removeCard" />
+
+			<h:selectBooleanCheckbox id="secureChannelBinding"
+				value="#{cdiTest.secureChannelBinding}" />
+			<h:outputLabel value="Secure Channel Binding"
+				for="secureChannelBinding" />
 		</h:panelGrid>
 		<h:commandButton value="Perform" action="#{cdiTest.perform}" />
 	</h:form>

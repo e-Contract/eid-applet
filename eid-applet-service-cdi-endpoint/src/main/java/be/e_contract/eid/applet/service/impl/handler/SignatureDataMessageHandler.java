@@ -177,8 +177,10 @@ public class SignatureDataMessageHandler implements
 		BeIDContextQualifier contextQualifier = new BeIDContextQualifier(
 				request);
 		this.signatureEvent.select(contextQualifier).fire(signatureEvent);
-		// TODO: revoked certificate and such
 
+		if (null != signatureEvent.getError()) {
+			return new FinishedMessage(signatureEvent.getError());
+		}
 		return new FinishedMessage();
 	}
 

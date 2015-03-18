@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Observes;
@@ -39,6 +40,7 @@ import be.fedict.eid.applet.service.cdi.AuthenticationEvent;
 import be.fedict.eid.applet.service.cdi.BeIDContext;
 import be.fedict.eid.applet.service.cdi.IdentificationEvent;
 import be.fedict.eid.applet.service.cdi.IdentityEvent;
+import be.fedict.eid.applet.service.cdi.SecureChannelBindingEvent;
 import be.fedict.eid.applet.service.cdi.SignatureDigestEvent;
 import be.fedict.eid.applet.service.cdi.SignatureEvent;
 import be.fedict.eid.applet.service.cdi.StartEvent;
@@ -75,6 +77,10 @@ public class Controller implements Serializable {
 	private boolean logoff;
 
 	private boolean removeCard;
+
+	private boolean secureChannelBinding;
+
+	private X509Certificate serverCertificate;
 
 	public void setOperation(Operation operation) {
 		this.operation = operation;
@@ -140,10 +146,23 @@ public class Controller implements Serializable {
 		this.removeCard = removeCard;
 	}
 
+	public boolean isSecureChannelBinding() {
+		return this.secureChannelBinding;
+	}
+
+	public void setSecureChannelBinding(boolean secureChannelBinding) {
+		this.secureChannelBinding = secureChannelBinding;
+	}
+
+	public X509Certificate getServerCertificate() {
+		return this.serverCertificate;
+	}
+
 	public void reset() {
 		this.identity = null;
 		this.address = null;
 		this.userIdentifier = null;
+		this.serverCertificate = null;
 	}
 
 	public void perform() throws IOException {
@@ -188,6 +207,9 @@ public class Controller implements Serializable {
 			}
 			if (this.logoff) {
 				authenticationRequest.logoff();
+			}
+			if (this.secureChannelBinding) {
+				authenticationRequest.enableSecureChannelBinding();
 			}
 			break;
 		}
@@ -258,5 +280,15 @@ public class Controller implements Serializable {
 	public void handleSignature(
 			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) SignatureEvent signatureEvent) {
 		LOG.debug("signature event");
+	}
+
+	public void handleSecureChannelBinding(
+			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) SecureChannelBindingEvent secureChannelBindingEvent) {
+		LOG.debug("secure channel identity: "
+				+ secureChannelBindingEvent.getServerCertificate()
+						.getSubjectX500Principal());
+		this.serverCertificate = secureChannelBindingEvent
+				.getServerCertificate();
+		secureChannelBindingEvent.valid();
 	}
 }
