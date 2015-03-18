@@ -1909,7 +1909,7 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 		</section>
 	</section>
 	<section>
-		<title>Technology Preview: eID Applet CDI Service</title>
+		<title>eID Applet CDI Service</title>
 		<para>
 			The Contexts and Dependency Injection that comes with Java EE 6
 			allows for very elegant server-side handling of the eID Applet data.
@@ -1933,6 +1933,12 @@ NavigatorAppVersion : navigator.appVersion]]></programlisting>
 				<para>
 					The application itself can determine what is being pushed
 					within the HTTP session.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					CDI can be used throughout the entire application
+					architecture.
 				</para>
 			</listitem>
 		</itemizedlist>
@@ -1971,13 +1977,6 @@ public class IdentifyCDIServlet extends AppletServiceCDIServlet {
 	@Observes @BeIDContext("/eid-applet-service") IdentityEvent identityEvent) {
 	// use identityEvent.getIdentity();
 }]]></programlisting>
-		<warning>
-			<title>Technology Preview</title>
-			<para>
-				The CDI based eID Applet Service servlet and API is still under
-				development.
-			</para>
-		</warning>
 	</section>
 	<section>
 		<title>Maven Integration</title>
