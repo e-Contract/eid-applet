@@ -139,12 +139,13 @@
 							<storetype>PKCS11</storetype>
 							<providerClass>sun.security.pkcs11.SunPKCS11</providerClass>
 							<providerArg>src/main/jar/etoken.config</providerArg>
-							<storepass>FedICT1234</storepass>
-							<alias>CODE_SIGN</alias>
+							<storepass>${etoken.storepass}</storepass>
+							<alias>${etoken.alias}</alias>
 							<verbose>true</verbose>
-							<!-- Cannot get past the HTTP proxy, even with proxy config. -->
-							<!-- <arguments> <argument>-tsa</argument> <argument>http://tsa.belgium.be/connect</argument> 
-								</arguments> -->
+							<arguments>
+								<argument>-tsa</argument>
+								<argument>http://tsa.belgium.be/connect</argument>
+							</arguments>
 						</configuration>
 					</plugin>
 				</plugins>
