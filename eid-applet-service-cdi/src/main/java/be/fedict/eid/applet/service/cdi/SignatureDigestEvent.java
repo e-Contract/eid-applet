@@ -18,6 +18,9 @@
 
 package be.fedict.eid.applet.service.cdi;
 
+import java.security.cert.X509Certificate;
+import java.util.List;
+
 public class SignatureDigestEvent {
 
 	private byte[] digestValue;
@@ -29,6 +32,17 @@ public class SignatureDigestEvent {
 	private boolean logoff;
 
 	private boolean removeCard;
+
+	private final List<X509Certificate> signingCertificateChain;
+
+	public SignatureDigestEvent() {
+		super();
+		this.signingCertificateChain = null;
+	}
+
+	public SignatureDigestEvent(List<X509Certificate> signingCertificateChain) {
+		this.signingCertificateChain = signingCertificateChain;
+	}
 
 	public void sign(byte[] digestValue, String digestAlgo, String description) {
 		this.digestValue = digestValue;
@@ -64,5 +78,9 @@ public class SignatureDigestEvent {
 
 	public boolean isRemoveCard() {
 		return this.removeCard;
+	}
+
+	public List<X509Certificate> getSigningCertificateChain() {
+		return this.signingCertificateChain;
 	}
 }

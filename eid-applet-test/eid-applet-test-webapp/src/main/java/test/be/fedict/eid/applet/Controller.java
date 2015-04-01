@@ -74,6 +74,8 @@ public class Controller implements Serializable {
 
 	private boolean includePhoto;
 
+	private boolean includeCertificates;
+
 	private boolean logoff;
 
 	private boolean removeCard;
@@ -128,6 +130,14 @@ public class Controller implements Serializable {
 
 	public void setIncludePhoto(boolean includePhoto) {
 		this.includePhoto = includePhoto;
+	}
+
+	public boolean isIncludeCertificates() {
+		return this.includeCertificates;
+	}
+
+	public void setIncludeCertificates(boolean includeCertificates) {
+		this.includeCertificates = includeCertificates;
 	}
 
 	public boolean isLogoff() {
@@ -224,6 +234,9 @@ public class Controller implements Serializable {
 			if (this.includePhoto) {
 				signingRequest.includePhoto();
 			}
+			if (this.includeCertificates) {
+				signingRequest.includeCertificates();
+			}
 			break;
 		}
 		default:
@@ -263,6 +276,10 @@ public class Controller implements Serializable {
 	public void handleSignatureDigest(
 			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) SignatureDigestEvent signatureDigestEvent)
 			throws NoSuchAlgorithmException {
+		if (this.includeCertificates
+				&& null == signatureDigestEvent.getSigningCertificateChain()) {
+			throw new RuntimeException("signing certificates not included");
+		}
 		byte[] data = "hello world".getBytes();
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
 		messageDigest.update(data);

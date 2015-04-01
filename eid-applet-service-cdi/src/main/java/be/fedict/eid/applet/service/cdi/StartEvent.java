@@ -61,6 +61,8 @@ public class StartEvent {
 
 		private boolean includePhoto;
 
+		private boolean includeCertificates;
+
 		public SigningRequest includeAddress() {
 			this.includeAddress = true;
 			return this;
@@ -76,6 +78,11 @@ public class StartEvent {
 			return this;
 		}
 
+		public SigningRequest includeCertificates() {
+			this.includeCertificates = true;
+			return this;
+		}
+
 		public boolean isIncludeAddress() {
 			return this.includeAddress;
 		}
@@ -86,6 +93,10 @@ public class StartEvent {
 
 		public boolean isIncludePhoto() {
 			return this.includePhoto;
+		}
+
+		public boolean isIncludeCertificates() {
+			return this.includeCertificates;
 		}
 	}
 

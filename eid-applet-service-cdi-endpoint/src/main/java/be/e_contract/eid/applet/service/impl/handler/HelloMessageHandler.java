@@ -127,7 +127,10 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage>,
 			boolean includeIdentity = signingRequest.isIncludeIdentity();
 			boolean includeAddress = signingRequest.isIncludeAddress();
 			boolean includePhoto = signingRequest.isIncludePhoto();
-			if (includeIdentity || includeAddress || includePhoto) {
+			boolean includeCertificates = signingRequest
+					.isIncludeCertificates();
+			if (includeIdentity || includeAddress || includePhoto
+					|| includeCertificates) {
 				return new SignCertificatesRequestMessage(includeIdentity,
 						includeAddress, includePhoto, true);
 			}

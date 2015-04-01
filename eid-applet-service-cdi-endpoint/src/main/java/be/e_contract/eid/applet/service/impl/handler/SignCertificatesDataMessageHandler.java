@@ -141,7 +141,8 @@ public class SignCertificatesDataMessageHandler implements
 					new IdentityEvent(identity, address, message.photoData));
 		}
 
-		SignatureDigestEvent signatureDigestEvent = new SignatureDigestEvent();
+		SignatureDigestEvent signatureDigestEvent = new SignatureDigestEvent(
+				message.certificateChain);
 		this.signatureDigestEvent.select(contextQualifier).fire(
 				signatureDigestEvent);
 		String digestAlgo = signatureDigestEvent.getDigestAlgo();
