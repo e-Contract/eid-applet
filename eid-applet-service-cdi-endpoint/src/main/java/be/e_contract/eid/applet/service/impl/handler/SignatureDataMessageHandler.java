@@ -41,6 +41,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import be.e_contract.eid.applet.service.impl.BeIDContextQualifier;
 import be.e_contract.eid.applet.service.impl.Handles;
+import be.fedict.eid.applet.service.cdi.SecurityAuditEvent;
+import be.fedict.eid.applet.service.cdi.SecurityAuditEvent.Incident;
 import be.fedict.eid.applet.service.cdi.SignatureEvent;
 import be.fedict.eid.applet.service.impl.handler.MessageHandler;
 import be.fedict.eid.applet.shared.FinishedMessage;
@@ -93,6 +95,9 @@ public class SignatureDataMessageHandler implements
 	@Inject
 	private Event<SignatureEvent> signatureEvent;
 
+	@Inject
+	private Event<SecurityAuditEvent> securityAuditEvent;
+
 	@Override
 	public Object handleMessage(SignatureDataMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
@@ -109,6 +114,9 @@ public class SignatureDataMessageHandler implements
 		LOG.debug("non-repudiation signing certificate: "
 				+ signingCertificate.getSubjectX500Principal());
 		PublicKey signingPublicKey = signingCertificate.getPublicKey();
+
+		BeIDContextQualifier contextQualifier = new BeIDContextQualifier(
+				request);
 
 		/*
 		 * Verify the signature.
@@ -129,10 +137,19 @@ public class SignatureDataMessageHandler implements
 				signature.update(expectedDigestValue);
 				boolean result = signature.verify(signatureValue);
 				if (false == result) {
+					SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
+							Incident.SIGNATURE, signingCertificate,
+							signatureValue);
+					this.securityAuditEvent.select(contextQualifier).fire(
+							securityAuditEvent);
 					throw new SecurityException("signature incorrect");
 				}
 			} catch (Exception e) {
 				LOG.debug("signature verification error: " + e.getMessage(), e);
+				SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
+						Incident.SIGNATURE, signingCertificate, signatureValue);
+				this.securityAuditEvent.select(contextQualifier).fire(
+						securityAuditEvent);
 				throw new ServletException("signature verification error: "
 						+ e.getMessage(), e);
 			}
@@ -163,10 +180,19 @@ public class SignatureDataMessageHandler implements
 				signature.update(digestInfo.toByteArray());
 				boolean result = signature.verify(signatureValue);
 				if (false == result) {
+					SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
+							Incident.SIGNATURE, signingCertificate,
+							signatureValue);
+					this.securityAuditEvent.select(contextQualifier).fire(
+							securityAuditEvent);
 					throw new SecurityException("signature incorrect");
 				}
 			} catch (Exception e) {
 				LOG.debug("signature verification error: " + e.getMessage());
+				SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
+						Incident.SIGNATURE, signingCertificate, signatureValue);
+				this.securityAuditEvent.select(contextQualifier).fire(
+						securityAuditEvent);
 				throw new ServletException("signature verification error: "
 						+ e.getMessage(), e);
 			}
@@ -174,11 +200,13 @@ public class SignatureDataMessageHandler implements
 
 		SignatureEvent signatureEvent = new SignatureEvent(signatureValue,
 				certificateChain);
-		BeIDContextQualifier contextQualifier = new BeIDContextQualifier(
-				request);
 		this.signatureEvent.select(contextQualifier).fire(signatureEvent);
 
 		if (null != signatureEvent.getError()) {
+			SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
+					Incident.TRUST, signingCertificate);
+			this.securityAuditEvent.select(contextQualifier).fire(
+					securityAuditEvent);
 			return new FinishedMessage(signatureEvent.getError());
 		}
 		return new FinishedMessage();

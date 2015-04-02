@@ -46,6 +46,8 @@ import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.cdi.IdentificationEvent;
 import be.fedict.eid.applet.service.cdi.IdentityEvent;
+import be.fedict.eid.applet.service.cdi.SecurityAuditEvent;
+import be.fedict.eid.applet.service.cdi.SecurityAuditEvent.Incident;
 import be.fedict.eid.applet.service.cdi.SignatureDigestEvent;
 import be.fedict.eid.applet.service.impl.handler.MessageHandler;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
@@ -70,6 +72,9 @@ public class SignCertificatesDataMessageHandler implements
 	@Inject
 	private SignatureState signatureState;
 
+	@Inject
+	private Event<SecurityAuditEvent> securityAuditEvent;
+
 	@Override
 	public Object handleMessage(SignCertificatesDataMessage message,
 			Map<String, String> httpHeaders, HttpServletRequest request,
@@ -86,14 +91,18 @@ public class SignCertificatesDataMessageHandler implements
 			this.identificationEvent.select(contextQualifier).fire(
 					identificationEvent);
 			if (false == identificationEvent.isValid()) {
+				SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
+						Incident.TRUST, message.rrnCertificate);
+				this.securityAuditEvent.select(contextQualifier).fire(
+						securityAuditEvent);
 				throw new SecurityException(
 						"invalid national registry certificate chain");
 			}
 
-			PublicKey rrnPublicKey = message.rrnCertificate.getPublicKey();
-			verifySignature(message.rrnCertificate.getSigAlgName(),
-					message.identitySignatureData, rrnPublicKey, request,
-					message.identityData);
+			verifySignature(contextQualifier,
+					message.rrnCertificate.getSigAlgName(),
+					message.identitySignatureData, message.rrnCertificate,
+					request, message.identityData);
 
 			Identity identity = TlvParser.parse(message.identityData,
 					Identity.class);
@@ -108,6 +117,10 @@ public class SignCertificatesDataMessageHandler implements
 						message.photoData);
 				if (false == Arrays.equals(expectedPhotoDigest,
 						actualPhotoDigest)) {
+					SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
+							Incident.DATA_INTEGRITY, message.photoData);
+					this.securityAuditEvent.select(contextQualifier).fire(
+							securityAuditEvent);
 					throw new ServletException("photo digest incorrect");
 				}
 			}
@@ -115,9 +128,10 @@ public class SignCertificatesDataMessageHandler implements
 			Address address;
 			if (null != message.addressData) {
 				byte[] addressFile = trimRight(message.addressData);
-				verifySignature(message.rrnCertificate.getSigAlgName(),
-						message.addressSignatureData, rrnPublicKey, request,
-						addressFile, message.identitySignatureData);
+				verifySignature(contextQualifier,
+						message.rrnCertificate.getSigAlgName(),
+						message.addressSignatureData, message.rrnCertificate,
+						request, addressFile, message.identitySignatureData);
 				address = TlvParser.parse(message.addressData, Address.class);
 			} else {
 				address = null;
@@ -133,6 +147,10 @@ public class SignCertificatesDataMessageHandler implements
 				Date cardValidityDateEndDate = cardValidityDateEndGregorianCalendar
 						.getTime();
 				if (now.after(cardValidityDateEndDate)) {
+					SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
+							Incident.DATA_INTEGRITY, message.identityData);
+					this.securityAuditEvent.select(contextQualifier).fire(
+							securityAuditEvent);
 					throw new SecurityException("eID card has expired");
 				}
 			}
@@ -164,15 +182,16 @@ public class SignCertificatesDataMessageHandler implements
 	public void init(ServletConfig config) throws ServletException {
 	}
 
-	private void verifySignature(String signAlgo, byte[] signatureData,
-			PublicKey publicKey, HttpServletRequest request, byte[]... data)
-			throws ServletException {
+	private void verifySignature(BeIDContextQualifier contextQualifier,
+			String signAlgo, byte[] signatureData, X509Certificate certificate,
+			HttpServletRequest request, byte[]... data) throws ServletException {
 		Signature signature;
 		try {
 			signature = Signature.getInstance(signAlgo);
 		} catch (NoSuchAlgorithmException e) {
 			throw new ServletException("algo error: " + e.getMessage(), e);
 		}
+		PublicKey publicKey = certificate.getPublicKey();
 		try {
 			signature.initVerify(publicKey);
 		} catch (InvalidKeyException e) {
@@ -184,9 +203,17 @@ public class SignCertificatesDataMessageHandler implements
 			}
 			boolean result = signature.verify(signatureData);
 			if (false == result) {
+				SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
+						Incident.DATA_INTEGRITY, certificate, signatureData);
+				this.securityAuditEvent.select(contextQualifier).fire(
+						securityAuditEvent);
 				throw new ServletException("signature incorrect");
 			}
 		} catch (SignatureException e) {
+			SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
+					Incident.DATA_INTEGRITY, certificate, signatureData);
+			this.securityAuditEvent.select(contextQualifier).fire(
+					securityAuditEvent);
 			throw new ServletException("signature error: " + e.getMessage(), e);
 		}
 	}

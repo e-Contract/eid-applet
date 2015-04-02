@@ -52,6 +52,8 @@ import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.cdi.IdentificationEvent;
 import be.fedict.eid.applet.service.cdi.IdentityEvent;
+import be.fedict.eid.applet.service.cdi.SecurityAuditEvent;
+import be.fedict.eid.applet.service.cdi.SecurityAuditEvent.Incident;
 import be.fedict.eid.applet.service.impl.handler.MessageHandler;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
 import be.fedict.eid.applet.shared.FinishedMessage;
@@ -69,6 +71,9 @@ public class IdentityDataMessageHandler implements
 
 	@Inject
 	private Event<IdentificationEvent> identificationEvent;
+
+	@Inject
+	private Event<SecurityAuditEvent> securityAuditEvent;
 
 	@Override
 	public Object handleMessage(IdentityDataMessage message,
@@ -89,13 +94,16 @@ public class IdentityDataMessageHandler implements
 		this.identificationEvent.select(contextQualifier).fire(
 				identificationEvent);
 		if (false == identificationEvent.isValid()) {
+			SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
+					Incident.TRUST, rrnCertificate);
+			this.securityAuditEvent.select(contextQualifier).fire(
+					securityAuditEvent);
 			throw new SecurityException(
 					"invalid national registry certificate chain");
 		}
 
-		PublicKey rrnPublicKey = rrnCertificate.getPublicKey();
-		verifySignature(rrnCertificate.getSigAlgName(),
-				message.identitySignatureFile, rrnPublicKey, request,
+		verifySignature(contextQualifier, rrnCertificate.getSigAlgName(),
+				message.identitySignatureFile, rrnCertificate, request,
 				message.idFile);
 
 		Identity identity = TlvParser.parse(message.idFile, Identity.class);
@@ -110,6 +118,10 @@ public class IdentityDataMessageHandler implements
 					getDigestAlgo(expectedPhotoDigest.length),
 					message.photoFile);
 			if (false == Arrays.equals(expectedPhotoDigest, actualPhotoDigest)) {
+				SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
+						Incident.DATA_INTEGRITY, message.photoFile);
+				this.securityAuditEvent.select(contextQualifier).fire(
+						securityAuditEvent);
 				throw new ServletException("photo digest incorrect");
 			}
 		}
@@ -117,8 +129,8 @@ public class IdentityDataMessageHandler implements
 		Address address;
 		if (null != message.addressFile) {
 			byte[] addressFile = trimRight(message.addressFile);
-			verifySignature(rrnCertificate.getSigAlgName(),
-					message.addressSignatureFile, rrnPublicKey, request,
+			verifySignature(contextQualifier, rrnCertificate.getSigAlgName(),
+					message.addressSignatureFile, rrnCertificate, request,
 					addressFile, message.identitySignatureFile);
 			address = TlvParser.parse(message.addressFile, Address.class);
 		} else {
@@ -135,6 +147,10 @@ public class IdentityDataMessageHandler implements
 			Date cardValidityDateEndDate = cardValidityDateEndGregorianCalendar
 					.getTime();
 			if (now.after(cardValidityDateEndDate)) {
+				SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
+						Incident.DATA_INTEGRITY, message.idFile);
+				this.securityAuditEvent.select(contextQualifier).fire(
+						securityAuditEvent);
 				throw new SecurityException("eID card has expired");
 			}
 		}
@@ -187,15 +203,16 @@ public class IdentityDataMessageHandler implements
 		}
 	}
 
-	private void verifySignature(String signAlgo, byte[] signatureData,
-			PublicKey publicKey, HttpServletRequest request, byte[]... data)
-			throws ServletException {
+	private void verifySignature(BeIDContextQualifier contextQualifier,
+			String signAlgo, byte[] signatureData, X509Certificate certificate,
+			HttpServletRequest request, byte[]... data) throws ServletException {
 		Signature signature;
 		try {
 			signature = Signature.getInstance(signAlgo);
 		} catch (NoSuchAlgorithmException e) {
 			throw new ServletException("algo error: " + e.getMessage(), e);
 		}
+		PublicKey publicKey = certificate.getPublicKey();
 		try {
 			signature.initVerify(publicKey);
 		} catch (InvalidKeyException e) {
@@ -207,9 +224,17 @@ public class IdentityDataMessageHandler implements
 			}
 			boolean result = signature.verify(signatureData);
 			if (false == result) {
+				SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
+						Incident.DATA_INTEGRITY, certificate, signatureData);
+				this.securityAuditEvent.select(contextQualifier).fire(
+						securityAuditEvent);
 				throw new ServletException("signature incorrect");
 			}
 		} catch (SignatureException e) {
+			SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
+					Incident.DATA_INTEGRITY, certificate, signatureData);
+			this.securityAuditEvent.select(contextQualifier).fire(
+					securityAuditEvent);
 			throw new ServletException("signature error: " + e.getMessage(), e);
 		}
 	}
