@@ -10,8 +10,8 @@ The source code is hosted at: https://github.com/e-Contract/eid-applet
 === 2. Requirements
 
 The following is required for compiling the eID Applet software:
-* Oracle Java 1.7.0_72
-* Apache Maven 3.2.3
+* Oracle Java 1.7.0_72 or Java 1.8.0_40
+* Apache Maven 3.2.5
 
 
 === 3. Build
@@ -37,7 +37,18 @@ By default the Maven build will use a software token to sign the applet JAR.
 One can configure the usage of an eToken via the following Maven property:
 	-Petoken
 The eToken configuration is located in pom.xml under the eid-applet-package 
-artifact.
+artifact. Your .m2/settings.xml should contain the following config:
+<settings xmlns="http://maven.apache.org/SETTINGS/1.1.0">
+	<profiles>
+		<profile>
+			<id>etoken</id>
+			<properties>
+				<etoken.alias>...</etoken.alias>
+				<etoken.storepass>...</etoken.storepass>
+			</properties>
+		</profile>
+	</profiles>
+</settings>
 
 You can speed up the development build cycle by skipping the unit tests via:
 	mvn -Dmaven.test.skip=true clean install
@@ -51,8 +62,8 @@ An SDK build can be performed via:
 The final SDK artifact is located under:
 	eid-applet-sdk/target/
 
-An SDK release build should use the production eToken containing the official
-FedICT code signing certificate.
+An SDK release build should use the production eToken containing an official
+code signing certificate.
 
 
 === 5. Eclipse IDE
