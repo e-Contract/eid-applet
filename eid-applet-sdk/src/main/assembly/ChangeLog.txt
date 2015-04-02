@@ -1,4 +1,4 @@
-1.2.0 -
+1.2.0 - 2 Apr 2015
 	* removed diagnostic mode
 	* removed kiosk mode
 	* removed SignatureServiceEx
