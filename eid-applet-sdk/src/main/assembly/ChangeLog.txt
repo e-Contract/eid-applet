@@ -1,4 +1,4 @@
-1.2.1 -
+1.2.1 - 24 Apr 2015
 	* improved CDI PKI validation exception handling
 
 1.2.0 - 2 Apr 2015
