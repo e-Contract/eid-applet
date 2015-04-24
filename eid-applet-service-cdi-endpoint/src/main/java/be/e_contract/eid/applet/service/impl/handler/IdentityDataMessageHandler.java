@@ -56,6 +56,11 @@ import be.fedict.eid.applet.service.cdi.SecurityAuditEvent;
 import be.fedict.eid.applet.service.cdi.SecurityAuditEvent.Incident;
 import be.fedict.eid.applet.service.impl.handler.MessageHandler;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
+import be.fedict.eid.applet.service.spi.CertificateSecurityException;
+import be.fedict.eid.applet.service.spi.ExpiredCertificateSecurityException;
+import be.fedict.eid.applet.service.spi.RevokedCertificateSecurityException;
+import be.fedict.eid.applet.service.spi.TrustCertificateSecurityException;
+import be.fedict.eid.applet.shared.ErrorCode;
 import be.fedict.eid.applet.shared.FinishedMessage;
 import be.fedict.eid.applet.shared.IdentityDataMessage;
 
@@ -91,8 +96,18 @@ public class IdentityDataMessageHandler implements
 				rrnCertificateChain);
 		BeIDContextQualifier contextQualifier = new BeIDContextQualifier(
 				request);
-		this.identificationEvent.select(contextQualifier).fire(
-				identificationEvent);
+		try {
+			this.identificationEvent.select(contextQualifier).fire(
+					identificationEvent);
+		} catch (ExpiredCertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE_EXPIRED);
+		} catch (RevokedCertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE_REVOKED);
+		} catch (TrustCertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE_NOT_TRUSTED);
+		} catch (CertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE);
+		}
 		if (false == identificationEvent.isValid()) {
 			SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
 					Incident.TRUST, rrnCertificate);

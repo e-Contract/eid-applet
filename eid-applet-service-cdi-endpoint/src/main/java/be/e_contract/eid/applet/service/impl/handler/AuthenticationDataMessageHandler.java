@@ -55,8 +55,13 @@ import be.fedict.eid.applet.service.impl.AuthenticationChallenge;
 import be.fedict.eid.applet.service.impl.UserIdentifierUtil;
 import be.fedict.eid.applet.service.impl.handler.MessageHandler;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
+import be.fedict.eid.applet.service.spi.CertificateSecurityException;
+import be.fedict.eid.applet.service.spi.ExpiredCertificateSecurityException;
+import be.fedict.eid.applet.service.spi.RevokedCertificateSecurityException;
+import be.fedict.eid.applet.service.spi.TrustCertificateSecurityException;
 import be.fedict.eid.applet.shared.AuthenticationContract;
 import be.fedict.eid.applet.shared.AuthenticationDataMessage;
+import be.fedict.eid.applet.shared.ErrorCode;
 import be.fedict.eid.applet.shared.FinishedMessage;
 
 @Handles(AuthenticationDataMessage.class)
@@ -142,8 +147,18 @@ public class AuthenticationDataMessageHandler implements
 
 		AuthenticationEvent authenticationEvent = new AuthenticationEvent(
 				certificateChain);
-		this.authenticationEvent.select(contextQualifier).fire(
-				authenticationEvent);
+		try {
+			this.authenticationEvent.select(contextQualifier).fire(
+					authenticationEvent);
+		} catch (ExpiredCertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE_EXPIRED);
+		} catch (RevokedCertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE_REVOKED);
+		} catch (TrustCertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE_NOT_TRUSTED);
+		} catch (CertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE);
+		}
 		if (false == authenticationEvent.isValid()) {
 			SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
 					Incident.TRUST, message.authnCert);

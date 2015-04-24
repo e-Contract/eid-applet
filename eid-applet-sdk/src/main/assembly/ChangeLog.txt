@@ -1,3 +1,6 @@
+1.2.1 -
+	* improved CDI PKI validation exception handling
+
 1.2.0 - 2 Apr 2015
 	* removed diagnostic mode
 	* removed kiosk mode

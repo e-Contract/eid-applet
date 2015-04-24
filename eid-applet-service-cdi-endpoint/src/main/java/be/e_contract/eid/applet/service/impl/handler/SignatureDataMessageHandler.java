@@ -45,6 +45,11 @@ import be.fedict.eid.applet.service.cdi.SecurityAuditEvent;
 import be.fedict.eid.applet.service.cdi.SecurityAuditEvent.Incident;
 import be.fedict.eid.applet.service.cdi.SignatureEvent;
 import be.fedict.eid.applet.service.impl.handler.MessageHandler;
+import be.fedict.eid.applet.service.spi.CertificateSecurityException;
+import be.fedict.eid.applet.service.spi.ExpiredCertificateSecurityException;
+import be.fedict.eid.applet.service.spi.RevokedCertificateSecurityException;
+import be.fedict.eid.applet.service.spi.TrustCertificateSecurityException;
+import be.fedict.eid.applet.shared.ErrorCode;
 import be.fedict.eid.applet.shared.FinishedMessage;
 import be.fedict.eid.applet.shared.SignatureDataMessage;
 
@@ -200,7 +205,17 @@ public class SignatureDataMessageHandler implements
 
 		SignatureEvent signatureEvent = new SignatureEvent(signatureValue,
 				certificateChain);
-		this.signatureEvent.select(contextQualifier).fire(signatureEvent);
+		try {
+			this.signatureEvent.select(contextQualifier).fire(signatureEvent);
+		} catch (ExpiredCertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE_EXPIRED);
+		} catch (RevokedCertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE_REVOKED);
+		} catch (TrustCertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE_NOT_TRUSTED);
+		} catch (CertificateSecurityException e) {
+			return new FinishedMessage(ErrorCode.CERTIFICATE);
+		}
 
 		if (null != signatureEvent.getError()) {
 			SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(

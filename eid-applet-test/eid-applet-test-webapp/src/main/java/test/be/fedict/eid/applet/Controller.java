@@ -47,6 +47,11 @@ import be.fedict.eid.applet.service.cdi.StartEvent;
 import be.fedict.eid.applet.service.cdi.StartEvent.AuthenticationRequest;
 import be.fedict.eid.applet.service.cdi.StartEvent.IdentificationRequest;
 import be.fedict.eid.applet.service.cdi.StartEvent.SigningRequest;
+import be.fedict.eid.applet.service.spi.AuthorizationException;
+import be.fedict.eid.applet.service.spi.CertificateSecurityException;
+import be.fedict.eid.applet.service.spi.ExpiredCertificateSecurityException;
+import be.fedict.eid.applet.service.spi.RevokedCertificateSecurityException;
+import be.fedict.eid.applet.service.spi.TrustCertificateSecurityException;
 
 @Named("cdiTest")
 @SessionScoped
@@ -60,7 +65,13 @@ public class Controller implements Serializable {
 		IDENTIFICATION, AUTHENTICATION, SIGNING
 	}
 
+	public static enum PKIValidation {
+		OK, CERTIFICATE_ERROR, CERTIFICATE_EXPIRED, CERTIFICATE_REVOKED, CERTIFICATE_NOT_TRUSTED, AUTHORIZATION
+	}
+
 	private Operation operation;
+
+	private PKIValidation pkiValidation;
 
 	private Identity identity;
 
@@ -94,6 +105,18 @@ public class Controller implements Serializable {
 
 	public Operation[] getOperations() {
 		return Operation.values();
+	}
+
+	public PKIValidation getPkiValidation() {
+		return this.pkiValidation;
+	}
+
+	public void setPkiValidation(PKIValidation pkiValidation) {
+		this.pkiValidation = pkiValidation;
+	}
+
+	public PKIValidation[] getPkiValidations() {
+		return PKIValidation.values();
 	}
 
 	public Identity getIdentity() {
@@ -251,7 +274,9 @@ public class Controller implements Serializable {
 	}
 
 	public void handleIdentification(
-			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) IdentificationEvent identificationEvent) {
+			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) IdentificationEvent identificationEvent)
+			throws Exception {
+		emulatePkiValidation();
 		identificationEvent.valid();
 	}
 
@@ -264,7 +289,9 @@ public class Controller implements Serializable {
 	}
 
 	public void handleAuthCertValidation(
-			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) AuthenticationEvent authenticationEvent) {
+			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) AuthenticationEvent authenticationEvent)
+			throws Exception {
+		emulatePkiValidation();
 		authenticationEvent.valid();
 	}
 
@@ -295,8 +322,30 @@ public class Controller implements Serializable {
 	}
 
 	public void handleSignature(
-			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) SignatureEvent signatureEvent) {
+			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) SignatureEvent signatureEvent)
+			throws Exception {
 		LOG.debug("signature event");
+		emulatePkiValidation();
+	}
+
+	private void emulatePkiValidation() throws Exception {
+		if (null == this.pkiValidation) {
+			return;
+		}
+		switch (this.pkiValidation) {
+		case OK:
+			break;
+		case AUTHORIZATION:
+			throw new AuthorizationException();
+		case CERTIFICATE_ERROR:
+			throw new CertificateSecurityException();
+		case CERTIFICATE_EXPIRED:
+			throw new ExpiredCertificateSecurityException();
+		case CERTIFICATE_REVOKED:
+			throw new RevokedCertificateSecurityException();
+		case CERTIFICATE_NOT_TRUSTED:
+			throw new TrustCertificateSecurityException();
+		}
 	}
 
 	public void handleSecureChannelBinding(
