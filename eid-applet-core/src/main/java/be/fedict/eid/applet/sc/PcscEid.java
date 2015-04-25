@@ -29,7 +29,6 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -152,7 +151,10 @@ public class PcscEid extends Observable {
 
 	public PcscEid(View view, Messages messages) {
 		this.view = view;
-		linuxPcscliteLibraryConfig();
+
+		Logger logger = new Logger(view);
+		LibJ2PCSCGNULinuxFix.fixNativeLibrary(logger);
+
 		this.terminalFactory = TerminalFactory.getDefault();
 		this.dialogs = new Dialogs(this.view, messages);
 		this.locale = messages.getLocale();
@@ -166,63 +168,6 @@ public class PcscEid extends Observable {
 	public void setMessages(Messages messages) {
 		this.dialogs = new Dialogs(this.view, messages);
 		this.locale = messages.getLocale();
-	}
-
-	/**
-	 * Finds .so.version file on GNU/Linux. avoid guessing all GNU/Linux
-	 * distros' library path configurations on 32 and 64-bit when working around
-	 * the buggy libj2pcsc.so implementation based on JRE implementations adding
-	 * the native library paths to the end of java.library.path
-	 */
-	private static File findLinuxNativeLibrary(String baseName, int version) {
-		String nativeLibraryPaths = System.getProperty("java.library.path");
-		if (nativeLibraryPaths == null) {
-			return null;
-		}
-
-		String libFileName = System.mapLibraryName(baseName) + "." + version;
-		for (String nativeLibraryPath : nativeLibraryPaths.split(":")) {
-			File libraryFile = new File(nativeLibraryPath, libFileName);
-			if (libraryFile.exists()) {
-				return libraryFile;
-			}
-		}
-
-		return null;
-	}
-
-	private void linuxPcscliteLibraryConfig() {
-		String osName = System.getProperty("os.name");
-		if (osName.startsWith("Linux")) {
-			/*
-			 * Workaround for Linux. Apparently the libj2pcsc.so from the JRE
-			 * links to libpcsclite.so instead of libpcsclite.so.1. This can
-			 * cause linking problems on Linux distributions that don't have the
-			 * libpcsclite.so symbolic link.
-			 * 
-			 * See also: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=529339
-			 */
-
-			this.view
-					.addDetailMessage("[libj2pcsc.so workaround] Workaround for developer-only libj2pcsc.so on GNU/Linux Platforms enabled..");
-
-			File libPcscLite = findLinuxNativeLibrary("pcsclite", 1);
-			if (libPcscLite != null) {
-				this.view
-						.addDetailMessage("[libj2pcsc.so workaround] pcsclite found. Adjusting sun.security.smartcardio.library to ["
-								+ libPcscLite.getAbsolutePath() + "]");
-				System.setProperty("sun.security.smartcardio.library",
-						libPcscLite.getAbsolutePath());
-			} else {
-				this.view
-						.addDetailMessage("[libj2pcsc.so workaround] failed to find pcsclite.");
-				String pathSought = System.getProperty("java.library.path");
-				this.view
-						.addDetailMessage("[libj2pcsc.so workaround] java.library.path=["
-								+ (pathSought != null ? pathSought : "null")
-								+ "]");
-			}
-		}
 	}
 
 	public List<String> getReaderList() {
