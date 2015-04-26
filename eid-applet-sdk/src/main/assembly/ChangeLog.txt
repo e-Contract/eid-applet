@@ -1,4 +1,4 @@
-1.2.2 -
+1.2.2 - 26 Apr 2015
 	* Ubuntu fix for Oracle JVM
 	* CDI API authorization support
 
