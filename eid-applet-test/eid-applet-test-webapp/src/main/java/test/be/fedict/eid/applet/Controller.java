@@ -21,11 +21,11 @@ package test.be.fedict.eid.applet;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Observes;
+import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
@@ -94,6 +94,25 @@ public class Controller implements Serializable {
 	private boolean secureChannelBinding;
 
 	private X509Certificate serverCertificate;
+
+	private String message;
+
+	public String getMessage() {
+		return this.message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public void loadAction() {
+		if (null != this.message) {
+			FacesContext facesContext = FacesContext.getCurrentInstance();
+			facesContext.addMessage(null, new FacesMessage(
+					FacesMessage.SEVERITY_WARN, this.message, null));
+			this.message = null;
+		}
+	}
 
 	public void setOperation(Operation operation) {
 		this.operation = operation;
@@ -302,10 +321,16 @@ public class Controller implements Serializable {
 
 	public void handleSignatureDigest(
 			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) SignatureDigestEvent signatureDigestEvent)
-			throws NoSuchAlgorithmException {
+			throws Exception {
 		if (this.includeCertificates
 				&& null == signatureDigestEvent.getSigningCertificateChain()) {
 			throw new RuntimeException("signing certificates not included");
+		}
+		if (this.includeCertificates) {
+			if (this.pkiValidation != null
+					&& this.pkiValidation == PKIValidation.AUTHORIZATION) {
+				throw new AuthorizationException();
+			}
 		}
 		byte[] data = "hello world".getBytes();
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
@@ -334,9 +359,8 @@ public class Controller implements Serializable {
 		}
 		switch (this.pkiValidation) {
 		case OK:
-			break;
 		case AUTHORIZATION:
-			throw new AuthorizationException();
+			break;
 		case CERTIFICATE_ERROR:
 			throw new CertificateSecurityException();
 		case CERTIFICATE_EXPIRED:

@@ -37,7 +37,10 @@ import be.fedict.eid.applet.service.cdi.SignatureDigestEvent;
 import be.fedict.eid.applet.service.cdi.StartEvent;
 import be.fedict.eid.applet.service.impl.AuthenticationChallenge;
 import be.fedict.eid.applet.service.impl.handler.MessageHandler;
+import be.fedict.eid.applet.service.spi.AuthorizationException;
 import be.fedict.eid.applet.shared.AuthenticationRequestMessage;
+import be.fedict.eid.applet.shared.ErrorCode;
+import be.fedict.eid.applet.shared.FinishedMessage;
 import be.fedict.eid.applet.shared.HelloMessage;
 import be.fedict.eid.applet.shared.IdentificationRequestMessage;
 import be.fedict.eid.applet.shared.SignCertificatesRequestMessage;
@@ -135,8 +138,12 @@ public class HelloMessageHandler implements MessageHandler<HelloMessage>,
 						includeAddress, includePhoto, true);
 			}
 			SignatureDigestEvent signatureDigestEvent = new SignatureDigestEvent();
-			this.signatureDigestEvent.select(contextQualifier).fire(
-					signatureDigestEvent);
+			try {
+				this.signatureDigestEvent.select(contextQualifier).fire(
+						signatureDigestEvent);
+			} catch (AuthorizationException e) {
+				return new FinishedMessage(ErrorCode.AUTHORIZATION);
+			}
 			String digestAlgo = signatureDigestEvent.getDigestAlgo();
 			boolean logoff = signatureDigestEvent.isLogoff();
 			boolean requireSecureReader = false;

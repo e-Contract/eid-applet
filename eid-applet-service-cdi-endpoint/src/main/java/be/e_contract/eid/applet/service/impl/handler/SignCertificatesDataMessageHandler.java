@@ -51,6 +51,7 @@ import be.fedict.eid.applet.service.cdi.SecurityAuditEvent.Incident;
 import be.fedict.eid.applet.service.cdi.SignatureDigestEvent;
 import be.fedict.eid.applet.service.impl.handler.MessageHandler;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
+import be.fedict.eid.applet.service.spi.AuthorizationException;
 import be.fedict.eid.applet.service.spi.CertificateSecurityException;
 import be.fedict.eid.applet.service.spi.ExpiredCertificateSecurityException;
 import be.fedict.eid.applet.service.spi.RevokedCertificateSecurityException;
@@ -177,8 +178,12 @@ public class SignCertificatesDataMessageHandler implements
 
 		SignatureDigestEvent signatureDigestEvent = new SignatureDigestEvent(
 				message.certificateChain);
-		this.signatureDigestEvent.select(contextQualifier).fire(
-				signatureDigestEvent);
+		try {
+			this.signatureDigestEvent.select(contextQualifier).fire(
+					signatureDigestEvent);
+		} catch (AuthorizationException e) {
+			return new FinishedMessage(ErrorCode.AUTHORIZATION);
+		}
 		String digestAlgo = signatureDigestEvent.getDigestAlgo();
 		boolean logoff = signatureDigestEvent.isLogoff();
 		boolean requireSecureReader = false;

@@ -15,7 +15,8 @@
 		var parameters = {
 			TargetPage : 'cdi-result.xhtml',
 			AppletService : 'applet-service-cdi',
-			CancelPage : 'cdi.xhtml'
+			CancelPage : 'cdi.xhtml?message=cancel',
+			AuthorizationErrorPage : 'cdi.xhtml?message=authorization'
 		};
 		var version = '1.7';
 		deployJava.runApplet(attributes, parameters, version);

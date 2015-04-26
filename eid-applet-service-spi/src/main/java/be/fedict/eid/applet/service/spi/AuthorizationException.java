@@ -18,15 +18,13 @@
 
 package be.fedict.eid.applet.service.spi;
 
-import java.security.GeneralSecurityException;
-
 /**
  * Thrown if the current user is not authorized to perform the action.
  * 
  * @author Frank Cornelis
  *
  */
-public class AuthorizationException extends GeneralSecurityException {
+public class AuthorizationException extends SecurityException {
 
 	private static final long serialVersionUID = 1L;
 
