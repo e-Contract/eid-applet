@@ -95,12 +95,10 @@ public final class LibJ2PCSCGNULinuxFix {
 	 * Determine Ubuntu-type multilib configuration
 	 */
 	private static UbuntuBitness getUbuntuBitness() {
-		boolean has32 = false;
-		boolean has64 = false;
 		File multilibdir = new File(UBUNTU_MULTILIB_32_PATH);
-		has32 = multilibdir != null && multilibdir.isDirectory();
+		boolean has32 = multilibdir.exists() && multilibdir.isDirectory();
 		multilibdir = new File(UBUNTU_MULTILIB_64_PATH);
-		has64 = multilibdir != null && multilibdir.isDirectory();
+		boolean has64 = multilibdir.exists() && multilibdir.isDirectory();
 
 		if (has32 && (!has64)) {
 			return UbuntuBitness.PURE32;

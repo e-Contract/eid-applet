@@ -136,9 +136,6 @@ public class PcscEid extends Observable {
 			0x00, 0x00, 0x30, 0x29, 0x05, 0x70, 0x00, (byte) 0xAD, 0x13, 0x10,
 			0x01, 0x01, (byte) 0xFF };
 
-	private static boolean riskPPDU = false;
-	private static Set<String> ppduExceptions = null;
-
 	private final View view;
 
 	private final TerminalFactory terminalFactory;
@@ -512,6 +509,8 @@ public class PcscEid extends Observable {
 		dialog.getContentPane().add(list);
 
 		MouseListener mouseListener = new MouseAdapter() {
+
+			@Override
 			public void mouseClicked(MouseEvent mouseEvent) {
 				JList theList = (JList) mouseEvent.getSource();
 				if (mouseEvent.getClickCount() == 2) {
