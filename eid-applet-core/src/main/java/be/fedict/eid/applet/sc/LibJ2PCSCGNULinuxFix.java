@@ -125,7 +125,7 @@ public final class LibJ2PCSCGNULinuxFix {
 	private static String addMultiarchPath(final String libPath,
 			final String suffix) {
 		String retval = extendLibraryPath(libPath, "/lib/" + suffix);
-		return extendLibraryPath(libPath, "/usr/lib/" + suffix);
+		return extendLibraryPath(retval, "/usr/lib/" + suffix);
 	}
 
 	/*
