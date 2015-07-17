@@ -1,7 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2015 e-Contract.be BVBA.
- * Copyright (C) 2008-2013 FedICT.
+ * Copyright (C) 2008-2015 FedICT.
  * 
  * Takes from Commons eID project.
  *
