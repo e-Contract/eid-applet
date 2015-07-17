@@ -41,8 +41,8 @@ public final class LibJ2PCSCGNULinuxFix {
 	private static final String LIBRARY_PATH_PROPERTY = "java.library.path";
 	private static final String GNULINUX_OS_PROPERTY_PREFIX = "Linux";
 	private static final String PCSC_LIBRARY_NAME = "pcsclite";
-	private static final String UBUNTU_MULTILIB_32_PATH = "/usr/lib/i386-linux-gnu";
-	private static final String UBUNTU_MULTILIB_64_PATH = "/usr/lib/x86_64-linux-gnu";
+	private static final String UBUNTU_MULTILIB_32_SUFFIX = "i386-linux-gnu";
+	private static final String UBUNTU_MULTILIB_64_SUFFIX = "x86_64-linux-gnu";
 	private static final String JRE_BITNESS_PROPERTY = "os.arch";
 	private static final String OS_NAME_PROPERTY = "os.name";
 	private static final String JRE_BITNESS_32_VALUE = "i386";
@@ -95,9 +95,9 @@ public final class LibJ2PCSCGNULinuxFix {
 	 * Determine Ubuntu-type multilib configuration
 	 */
 	private static UbuntuBitness getUbuntuBitness() {
-		File multilibdir = new File(UBUNTU_MULTILIB_32_PATH);
+		File multilibdir = new File("/lib/" + UBUNTU_MULTILIB_32_SUFFIX);
 		boolean has32 = multilibdir.exists() && multilibdir.isDirectory();
-		multilibdir = new File(UBUNTU_MULTILIB_64_PATH);
+		multilibdir = new File("/lib/" + UBUNTU_MULTILIB_64_SUFFIX);
 		boolean has64 = multilibdir.exists() && multilibdir.isDirectory();
 
 		if (has32 && (!has64)) {
@@ -122,6 +122,11 @@ public final class LibJ2PCSCGNULinuxFix {
 		}
 		return libPath + ":" + extension;
 	}
+	private static String addMultiarchPath(final String libPath,
+			final String suffix) {
+		String retval = extendLibraryPath(libPath, "/lib/" + suffix);
+		return extendLibraryPath(libPath, "/usr/lib/" + suffix);
+	}
 
 	/*
 	 * Oracle Java 7, java.library.path is severely limited as compared to the
@@ -130,20 +135,20 @@ public final class LibJ2PCSCGNULinuxFix {
 	 */
 	private static String fixPathForUbuntuMultiLib(final String libraryPath,
 			final Logger logger) {
-		logger.debug("Looking for Ubuntu-style multilib installation.");
+		logger.debug("Looking for Debian/Ubuntu-style multilib installation.");
 
 		switch (getUbuntuBitness()) {
 		case PURE32:
 			// pure 32-bit Ubuntu. Add the 32-bit lib dir.
-			logger.debug("pure 32-bit Ubuntu detected, using 32-bit multilib path: "
-					+ UBUNTU_MULTILIB_32_PATH);
-			return extendLibraryPath(libraryPath, UBUNTU_MULTILIB_32_PATH);
+			logger.debug("pure 32-bit Debian/Ubuntu detected, adding library paths containing 32-bit multilib suffix: "
+					+ UBUNTU_MULTILIB_32_SUFFIX);
+			return addMultiarchPath(libraryPath, UBUNTU_MULTILIB_32_SUFFIX);
 
 		case PURE64:
 			// pure 64-bit Ubuntu. Add the 64-bit lib dir.
-			logger.debug("pure 64-bit Ubuntu detected, using 64-bit multilib path: "
-					+ UBUNTU_MULTILIB_64_PATH);
-			return extendLibraryPath(libraryPath, UBUNTU_MULTILIB_64_PATH);
+			logger.debug("pure 64-bit Debian/Ubuntu detected, adding library paths containing 64-bit multilib suffix: "
+					+ UBUNTU_MULTILIB_64_SUFFIX);
+			return addMultiarchPath(libraryPath, UBUNTU_MULTILIB_64_SUFFIX);
 
 		case MULTILIB: {
 			// multilib Ubuntu. Let the currently running JRE's bitness
@@ -159,21 +164,21 @@ public final class LibJ2PCSCGNULinuxFix {
 			logger.debug("JRE Bitness is [" + jvmBinaryArch + "]");
 
 			if (jvmBinaryArch.equals(JRE_BITNESS_32_VALUE)) {
-				logger.debug("32-bit JRE, using 32-bit multilib path: "
-						+ UBUNTU_MULTILIB_32_PATH);
-				return extendLibraryPath(libraryPath, UBUNTU_MULTILIB_32_PATH);
+				logger.debug("32-bit JRE, using 32-bit multilib suffix: "
+						+ UBUNTU_MULTILIB_32_SUFFIX);
+				return addMultiarchPath(libraryPath, UBUNTU_MULTILIB_32_SUFFIX);
 			}
 
 			if (jvmBinaryArch.equals(JRE_BITNESS_64_VALUE)) {
-				logger.debug("64-bit JRE, using 64-bit multilib path: "
-						+ UBUNTU_MULTILIB_64_PATH);
-				return extendLibraryPath(libraryPath, UBUNTU_MULTILIB_64_PATH);
+				logger.debug("64-bit JRE, using 64-bit multilib suffix: "
+						+ UBUNTU_MULTILIB_64_SUFFIX);
+				return addMultiarchPath(libraryPath, UBUNTU_MULTILIB_64_SUFFIX);
 			}
 		}
 			break;
 
 		default: {
-			logger.debug("Did not find Ubuntu-style multilib.");
+			logger.debug("Did not find Debian/Ubuntu-style multilib.");
 		}
 		}
 		return libraryPath;
