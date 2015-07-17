@@ -41,8 +41,8 @@ public final class LibJ2PCSCGNULinuxFix {
 	private static final String LIBRARY_PATH_PROPERTY = "java.library.path";
 	private static final String GNULINUX_OS_PROPERTY_PREFIX = "Linux";
 	private static final String PCSC_LIBRARY_NAME = "pcsclite";
-	private static final String UBUNTU_MULTILIB_32_PATH = "/lib/i386-linux-gnu";
-	private static final String UBUNTU_MULTILIB_64_PATH = "/lib/x86_64-linux-gnu";
+	private static final String UBUNTU_MULTILIB_32_PATH = "/usr/lib/i386-linux-gnu";
+	private static final String UBUNTU_MULTILIB_64_PATH = "/usr/lib/x86_64-linux-gnu";
 	private static final String JRE_BITNESS_PROPERTY = "os.arch";
 	private static final String OS_NAME_PROPERTY = "os.name";
 	private static final String JRE_BITNESS_32_VALUE = "i386";
