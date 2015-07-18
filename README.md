@@ -10,8 +10,8 @@ The source code is hosted at: `https://github.com/e-Contract/eid-applet`
 
 The following is required for compiling the eID Applet software:
 
-* Oracle Java 1.7.0_72 or Java 1.8.0_40
-* Apache Maven 3.2.5
+* Oracle Java 1.7.0_72 or Java 1.8.0_51
+* Apache Maven 3.3.3
 
 ## 3. Build
 
@@ -80,6 +80,8 @@ code signing certificate.
 You can use the m2eclipse Eclipse plugin to import the Maven projects although
 the m2eclipse Eclipse plugin does not yet understand the entire project
 structure.
+
+Since Eclipse Mars release 4.5.0, importing the eID Applet project just works.
 
 Another option is to use the Maven Eclipse plugin.
 
