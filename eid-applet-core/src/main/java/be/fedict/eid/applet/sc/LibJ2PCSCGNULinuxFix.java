@@ -1,9 +1,9 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2015 e-Contract.be BVBA.
- * Copyright (C) 2008-2013 FedICT.
+ * Copyright (C) 2008-2015 FedICT.
  * 
- * Takes from Commons eID project.
+ * Taken from Commons eID project.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -69,20 +69,16 @@ public final class LibJ2PCSCGNULinuxFix {
 	 */
 	public static void fixNativeLibrary(final Logger logger) {
 		final String osName = System.getProperty(OS_NAME_PROPERTY);
-		if ((osName != null)
-				&& (osName.startsWith(GNULINUX_OS_PROPERTY_PREFIX))) {
+		if ((osName != null) && (osName.startsWith(GNULINUX_OS_PROPERTY_PREFIX))) {
 			logger.debug("OS is [" + osName + "]. Enabling PCSC library fix.");
-			final File libPcscLite = findGNULinuxNativeLibrary(
-					PCSC_LIBRARY_NAME, PCSC_LIBRARY_VERSION, logger);
+			final File libPcscLite = findGNULinuxNativeLibrary(PCSC_LIBRARY_NAME, PCSC_LIBRARY_VERSION, logger);
 			if (libPcscLite != null) {
-				logger.debug("Setting [" + SMARTCARDIO_LIBRARY_PROPERTY
-						+ "] to [" + libPcscLite.getAbsolutePath() + "]");
-				System.setProperty(SMARTCARDIO_LIBRARY_PROPERTY,
-						libPcscLite.getAbsolutePath());
+				logger.debug(
+						"Setting [" + SMARTCARDIO_LIBRARY_PROPERTY + "] to [" + libPcscLite.getAbsolutePath() + "]");
+				System.setProperty(SMARTCARDIO_LIBRARY_PROPERTY, libPcscLite.getAbsolutePath());
 			}
 		} else {
-			logger.debug("OS is [" + osName
-					+ "]. Not Enabling PCSC library fix.");
+			logger.debug("OS is [" + osName + "]. Not Enabling PCSC library fix.");
 		}
 	}
 
@@ -115,15 +111,20 @@ public final class LibJ2PCSCGNULinuxFix {
 	 * return the path with extension appended, if it wasn't already contained
 	 * in the path
 	 */
-	private static String extendLibraryPath(final String libPath,
-			final String extension) {
+	private static String extendLibraryPath(final String libPath, final String extension) {
 		if (libPath.contains(extension)) {
 			return libPath;
 		}
 		return libPath + ":" + extension;
 	}
-	private static String addMultiarchPath(final String libPath,
-			final String suffix) {
+
+	/*
+	 * It turns out the Ubuntu packages differ from the Debian ones, due to
+	 * Debian bug#531592 and a difference of opinion between the Debian
+	 * maintainer of PC/SC and the Ubuntu maintainers. As such, if we want to
+	 * work on both distributions, we need to add both directories.
+	 */
+	private static String addMultiarchPath(final String libPath, final String suffix) {
 		String retval = extendLibraryPath(libPath, "/lib/" + suffix);
 		return extendLibraryPath(retval, "/usr/lib/" + suffix);
 	}
@@ -133,8 +134,7 @@ public final class LibJ2PCSCGNULinuxFix {
 	 * OpenJDK default and doesn't contain Ubuntu 12's MULTILIB directories.
 	 * Test for Ubuntu in various configs and add the required paths
 	 */
-	private static String fixPathForUbuntuMultiLib(final String libraryPath,
-			final Logger logger) {
+	private static String fixPathForUbuntuMultiLib(final String libraryPath, final Logger logger) {
 		logger.debug("Looking for Debian/Ubuntu-style multilib installation.");
 
 		switch (getUbuntuBitness()) {
@@ -155,8 +155,7 @@ public final class LibJ2PCSCGNULinuxFix {
 			// determine which lib dir to add.
 			logger.debug("Multilib Ubuntu detected. Using JRE Bitness.");
 
-			final String jvmBinaryArch = System
-					.getProperty(JRE_BITNESS_PROPERTY);
+			final String jvmBinaryArch = System.getProperty(JRE_BITNESS_PROPERTY);
 			if (jvmBinaryArch == null) {
 				return libraryPath;
 			}
@@ -164,14 +163,12 @@ public final class LibJ2PCSCGNULinuxFix {
 			logger.debug("JRE Bitness is [" + jvmBinaryArch + "]");
 
 			if (jvmBinaryArch.equals(JRE_BITNESS_32_VALUE)) {
-				logger.debug("32-bit JRE, using 32-bit multilib suffix: "
-						+ UBUNTU_MULTILIB_32_SUFFIX);
+				logger.debug("32-bit JRE, using 32-bit multilib suffix: " + UBUNTU_MULTILIB_32_SUFFIX);
 				return addMultiarchPath(libraryPath, UBUNTU_MULTILIB_32_SUFFIX);
 			}
 
 			if (jvmBinaryArch.equals(JRE_BITNESS_64_VALUE)) {
-				logger.debug("64-bit JRE, using 64-bit multilib suffix: "
-						+ UBUNTU_MULTILIB_64_SUFFIX);
+				logger.debug("64-bit JRE, using 64-bit multilib suffix: " + UBUNTU_MULTILIB_64_SUFFIX);
 				return addMultiarchPath(libraryPath, UBUNTU_MULTILIB_64_SUFFIX);
 			}
 		}
@@ -191,8 +188,7 @@ public final class LibJ2PCSCGNULinuxFix {
 	 * the native library paths to the end of java.library.path. Fixes the path
 	 * for Oracle JRE which doesn't contain the Ubuntu MULTILIB directories
 	 */
-	private static File findGNULinuxNativeLibrary(final String baseName,
-			final int version, final Logger logger) {
+	private static File findGNULinuxNativeLibrary(final String baseName, final int version, final Logger logger) {
 		// get java.library.path
 		String nativeLibraryPaths = System.getProperty(LIBRARY_PATH_PROPERTY);
 		if (nativeLibraryPaths == null) {
@@ -202,17 +198,14 @@ public final class LibJ2PCSCGNULinuxFix {
 		logger.debug("Original Path=[" + nativeLibraryPaths + "]");
 
 		// when on Ubuntu, add appropriate MULTILIB path
-		nativeLibraryPaths = fixPathForUbuntuMultiLib(nativeLibraryPaths,
-				logger);
+		nativeLibraryPaths = fixPathForUbuntuMultiLib(nativeLibraryPaths, logger);
 
-		logger.debug("Path after Ubuntu multilib Fixes=[" + nativeLibraryPaths
-				+ "]");
+		logger.debug("Path after Ubuntu multilib Fixes=[" + nativeLibraryPaths + "]");
 
 		// scan the directories in the path and return the first library called
 		// "baseName" with version "version"
 
-		final String libFileName = System.mapLibraryName(baseName) + "."
-				+ version;
+		final String libFileName = System.mapLibraryName(baseName) + "." + version;
 
 		logger.debug("Scanning path for [" + libFileName + "]");
 
@@ -220,8 +213,7 @@ public final class LibJ2PCSCGNULinuxFix {
 			logger.debug("Scanning [" + nativeLibraryPath + "]");
 			final File libraryFile = new File(nativeLibraryPath, libFileName);
 			if (libraryFile.exists()) {
-				logger.debug("[" + libFileName + "] found in ["
-						+ nativeLibraryPath + "]");
+				logger.debug("[" + libFileName + "] found in [" + nativeLibraryPath + "]");
 				return libraryFile;
 			}
 		}
