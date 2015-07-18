@@ -495,6 +495,7 @@ public class PcscEid extends Observable {
 		dialog.pack();
 		dialog.setLocationRelativeTo(this.view.getParentComponent());
 		dialog.setResizable(false);
+		dialog.setAlwaysOnTop(true);
 
 		dialog.setVisible(true);
 

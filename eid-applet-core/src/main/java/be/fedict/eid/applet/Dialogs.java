@@ -1,7 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2009 FedICT.
- * Copyright (C) 2014 e-Contract.be BVBA.
+ * Copyright (C) 2014-2015 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -256,6 +256,7 @@ public class Dialogs {
 		this.pinPadFrame.getContentPane().add(panel);
 		this.pinPadFrame.pack();
 		this.pinPadFrame.setLocationRelativeTo(this.view.getParentComponent());
+		this.pinPadFrame.setAlwaysOnTop(true);
 		this.pinPadFrame.setVisible(true);
 	}
 
@@ -364,6 +365,7 @@ public class Dialogs {
 
 		dialog.pack();
 		dialog.setLocationRelativeTo(this.view.getParentComponent());
+		dialog.setAlwaysOnTop(true);
 
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
