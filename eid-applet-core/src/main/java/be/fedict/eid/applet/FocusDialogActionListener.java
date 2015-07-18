@@ -29,14 +29,15 @@ import javax.swing.Timer;
 public class FocusDialogActionListener implements ActionListener {
 
 	private final Component component;
-	
+
 	private final Timer timer;
-	
+
 	public FocusDialogActionListener(Timer timer, Component component) {
 		this.timer = timer;
 		this.component = component;
 	}
-	
+
+	@Override
 	public void actionPerformed(ActionEvent event) {
 		if (this.component.isVisible()) {
 			EventQueue eventQueue = new EventQueue();
