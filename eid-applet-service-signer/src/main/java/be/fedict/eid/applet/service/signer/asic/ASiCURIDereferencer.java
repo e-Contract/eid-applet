@@ -68,13 +68,11 @@ public class ASiCURIDereferencer implements URIDereferencer {
 		this.data = data;
 		this.tmpFile = tmpFile;
 
-		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-				.getInstance();
+		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
 		this.baseUriDereferener = xmlSignatureFactory.getURIDereferencer();
 	}
 
-	public Data dereference(URIReference uriReference, XMLCryptoContext context)
-			throws URIReferenceException {
+	public Data dereference(URIReference uriReference, XMLCryptoContext context) throws URIReferenceException {
 		if (null == uriReference) {
 			throw new URIReferenceException("URIReference cannot be null");
 		}
@@ -95,8 +93,7 @@ public class ASiCURIDereferencer implements URIDereferencer {
 			try {
 				zipInputStream = new FileInputStream(this.tmpFile);
 			} catch (FileNotFoundException e) {
-				throw new URIReferenceException("file not found error: "
-						+ e.getMessage(), e);
+				throw new URIReferenceException("file not found error: " + e.getMessage(), e);
 			}
 		} else {
 			zipInputStream = new ByteArrayInputStream(this.data);

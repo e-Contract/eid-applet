@@ -44,11 +44,9 @@ import be.fedict.eid.applet.service.spi.IdentityDTO;
 @EJB(name = "java:global/test/IdentitySignatureServiceBean", beanInterface = IdentitySignatureService.class)
 public class IdentitySignatureServiceBean implements IdentitySignatureService {
 
-	private static final Log LOG = LogFactory
-			.getLog(IdentitySignatureServiceBean.class);
+	private static final Log LOG = LogFactory.getLog(IdentitySignatureServiceBean.class);
 
-	public void postSign(byte[] signatureValue,
-			List<X509Certificate> signingCertificateChain) {
+	public void postSign(byte[] signatureValue, List<X509Certificate> signingCertificateChain) {
 		LOG.debug("postSign");
 
 		String signatureValueStr = new String(Hex.encodeHex(signatureValue));
@@ -61,8 +59,7 @@ public class IdentitySignatureServiceBean implements IdentitySignatureService {
 	private HttpSession getHttpSession() {
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}
@@ -70,10 +67,8 @@ public class IdentitySignatureServiceBean implements IdentitySignatureService {
 		return httpSession;
 	}
 
-	public DigestInfo preSign(List<DigestInfo> digestInfos,
-			List<X509Certificate> signingCertificateChain,
-			IdentityDTO identity, AddressDTO address, byte[] photo)
-			throws NoSuchAlgorithmException {
+	public DigestInfo preSign(List<DigestInfo> digestInfos, List<X509Certificate> signingCertificateChain,
+			IdentityDTO identity, AddressDTO address, byte[] photo) throws NoSuchAlgorithmException {
 		LOG.debug("preSign (ex)");
 
 		String toBeSigned = identity.name + address.city;
@@ -83,8 +78,7 @@ public class IdentitySignatureServiceBean implements IdentitySignatureService {
 		httpSession.setAttribute("IdentityName", identity.name);
 		httpSession.setAttribute("IdentityCity", address.city);
 
-		MessageDigest messageDigest = MessageDigest.getInstance(digestAlgo,
-				new BouncyCastleProvider());
+		MessageDigest messageDigest = MessageDigest.getInstance(digestAlgo, new BouncyCastleProvider());
 		byte[] digestValue = messageDigest.digest(toBeSigned.getBytes());
 
 		String description = "Test Text Document";
@@ -98,10 +92,8 @@ public class IdentitySignatureServiceBean implements IdentitySignatureService {
 		return null;
 	}
 
-	public DigestInfo preSign(List<DigestInfo> digestInfos,
-			List<X509Certificate> signingCertificateChain)
+	public DigestInfo preSign(List<DigestInfo> digestInfos, List<X509Certificate> signingCertificateChain)
 			throws NoSuchAlgorithmException {
-		throw new UnsupportedOperationException(
-				"this is a SignatureServiceEx implementation");
+		throw new UnsupportedOperationException("this is a SignatureServiceEx implementation");
 	}
 }

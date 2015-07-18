@@ -35,18 +35,16 @@ import org.apache.commons.logging.LogFactory;
 @EJB(name = "java:global/test/ChannelBindingServiceBean", beanInterface = ChannelBindingService.class)
 public class ChannelBindingServiceBean implements ChannelBindingService {
 
-	private static final Log LOG = LogFactory
-			.getLog(ChannelBindingServiceBean.class);
+	private static final Log LOG = LogFactory.getLog(ChannelBindingServiceBean.class);
 
-	public static final String SERVER_CERTIFICATE_SESSION_ATTRIBUTE = ChannelBindingServiceBean.class
-			.getName() + ".serverCertificate";
+	public static final String SERVER_CERTIFICATE_SESSION_ATTRIBUTE = ChannelBindingServiceBean.class.getName()
+			+ ".serverCertificate";
 
 	public X509Certificate getServerCertificate() {
 		LOG.debug("getServerCertificate");
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}

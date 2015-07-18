@@ -36,8 +36,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 public class AuthenticationRequestMessage extends AbstractProtocolMessage {
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator
-	public static final String TYPE = AuthenticationRequestMessage.class
-			.getSimpleName();
+	public static final String TYPE = AuthenticationRequestMessage.class.getSimpleName();
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "RemoveCard")
 	public boolean removeCard;
@@ -92,14 +91,11 @@ public class AuthenticationRequestMessage extends AbstractProtocolMessage {
 		super();
 	}
 
-	public AuthenticationRequestMessage(byte[] challenge,
-			boolean includeHostname, boolean includeInetAddress,
-			boolean logoff, boolean preLogoff, boolean removeCard,
-			boolean sessionIdChannelBinding,
-			boolean serverCertificateChannelBinding, boolean includeIdentity,
-			boolean includeCertificates, boolean includeAddress,
-			boolean includePhoto, boolean includeIntegrityData,
-			boolean requireSecureReader, String transactionMessage) {
+	public AuthenticationRequestMessage(byte[] challenge, boolean includeHostname, boolean includeInetAddress,
+			boolean logoff, boolean preLogoff, boolean removeCard, boolean sessionIdChannelBinding,
+			boolean serverCertificateChannelBinding, boolean includeIdentity, boolean includeCertificates,
+			boolean includeAddress, boolean includePhoto, boolean includeIntegrityData, boolean requireSecureReader,
+			String transactionMessage) {
 		this.challenge = challenge;
 		this.includeHostname = includeHostname;
 		this.includeInetAddress = includeInetAddress;

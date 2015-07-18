@@ -68,10 +68,8 @@ public class ASiCSignatureVerifier {
 	 * @throws XMLSignatureException
 	 */
 	public static List<X509Certificate> verifySignatures(byte[] asicDocument)
-			throws IOException, ParserConfigurationException, SAXException,
-			MarshalException, XMLSignatureException {
-		ZipInputStream zipInputStream = new ZipInputStream(
-				new ByteArrayInputStream(asicDocument));
+			throws IOException, ParserConfigurationException, SAXException, MarshalException, XMLSignatureException {
+		ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(asicDocument));
 		ZipEntry zipEntry;
 		while (null != (zipEntry = zipInputStream.getNextEntry())) {
 			if (ASiCUtil.isSignatureZipEntry(zipEntry)) {
@@ -83,31 +81,23 @@ public class ASiCSignatureVerifier {
 			return signatories;
 		}
 
-		Document documentSignaturesDocument = ODFUtil
-				.loadDocument(zipInputStream);
-		NodeList signatureNodeList = documentSignaturesDocument
-				.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
+		Document documentSignaturesDocument = ODFUtil.loadDocument(zipInputStream);
+		NodeList signatureNodeList = documentSignaturesDocument.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 		for (int idx = 0; idx < signatureNodeList.getLength(); idx++) {
 			Element signatureElement = (Element) signatureNodeList.item(idx);
 
 			// work-around for Java 7
 			Element signedPropertiesElement = (Element) signatureElement
-					.getElementsByTagNameNS(
-							XAdESXLSignatureFacet.XADES_NAMESPACE,
-							"SignedProperties").item(0);
+					.getElementsByTagNameNS(XAdESXLSignatureFacet.XADES_NAMESPACE, "SignedProperties").item(0);
 			signedPropertiesElement.setIdAttribute("Id", true);
 
 			KeyInfoKeySelector keySelector = new KeyInfoKeySelector();
-			DOMValidateContext domValidateContext = new DOMValidateContext(
-					keySelector, signatureElement);
-			ASiCURIDereferencer dereferencer = new ASiCURIDereferencer(
-					asicDocument);
+			DOMValidateContext domValidateContext = new DOMValidateContext(keySelector, signatureElement);
+			ASiCURIDereferencer dereferencer = new ASiCURIDereferencer(asicDocument);
 			domValidateContext.setURIDereferencer(dereferencer);
 
-			XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-					.getInstance();
-			XMLSignature xmlSignature = xmlSignatureFactory
-					.unmarshalXMLSignature(domValidateContext);
+			XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
+			XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
 			boolean valid = xmlSignature.validate(domValidateContext);
 			if (!valid) {
 				continue;

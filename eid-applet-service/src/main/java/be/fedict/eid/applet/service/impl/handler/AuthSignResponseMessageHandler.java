@@ -42,28 +42,23 @@ import be.fedict.eid.applet.shared.FinishedMessage;
  * 
  */
 @HandlesMessage(AuthSignResponseMessage.class)
-public class AuthSignResponseMessageHandler implements
-		MessageHandler<AuthSignResponseMessage> {
+public class AuthSignResponseMessageHandler implements MessageHandler<AuthSignResponseMessage> {
 
-	private static final Log LOG = LogFactory
-			.getLog(AuthSignResponseMessageHandler.class);
+	private static final Log LOG = LogFactory.getLog(AuthSignResponseMessageHandler.class);
 
 	@InitParam(AuthenticationDataMessageHandler.AUTHN_SIGNATURE_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<AuthenticationSignatureService> authenticationSignatureServiceLocator;
 
-	public Object handleMessage(AuthSignResponseMessage message,
-			Map<String, String> httpHeaders, HttpServletRequest request,
-			HttpSession session) throws ServletException {
+	public Object handleMessage(AuthSignResponseMessage message, Map<String, String> httpHeaders,
+			HttpServletRequest request, HttpSession session) throws ServletException {
 		LOG.debug("handleMessage");
 
 		byte[] signatureValue = message.signatureValue;
 
 		AuthenticationSignatureService authenticationSignatureService = this.authenticationSignatureServiceLocator
 				.locateService();
-		AuthenticationSignatureContext authenticationSignatureContext = new AuthenticationSignatureContextImpl(
-				session);
-		authenticationSignatureService.postSign(signatureValue, null,
-				authenticationSignatureContext);
+		AuthenticationSignatureContext authenticationSignatureContext = new AuthenticationSignatureContextImpl(session);
+		authenticationSignatureService.postSign(signatureValue, null, authenticationSignatureContext);
 
 		FinishedMessage finishedMessage = new FinishedMessage();
 		return finishedMessage;

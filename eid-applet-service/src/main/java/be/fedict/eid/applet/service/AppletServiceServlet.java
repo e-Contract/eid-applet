@@ -82,18 +82,13 @@ public class AppletServiceServlet extends AbstractAppletServiceServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Log LOG = LogFactory
-			.getLog(AppletServiceServlet.class);
+	private static final Log LOG = LogFactory.getLog(AppletServiceServlet.class);
 
 	private static final Class<? extends MessageHandler<?>>[] MESSAGE_HANDLER_CLASSES = new Class[] {
-			IdentityDataMessageHandler.class, HelloMessageHandler.class,
-			ClientEnvironmentMessageHandler.class,
-			AuthenticationDataMessageHandler.class,
-			SignatureDataMessageHandler.class,
-			FileDigestsDataMessageHandler.class,
-			ContinueInsecureMessageHandler.class,
-			SignCertificatesDataMessageHandler.class,
-			AuthSignResponseMessageHandler.class };
+			IdentityDataMessageHandler.class, HelloMessageHandler.class, ClientEnvironmentMessageHandler.class,
+			AuthenticationDataMessageHandler.class, SignatureDataMessageHandler.class,
+			FileDigestsDataMessageHandler.class, ContinueInsecureMessageHandler.class,
+			SignCertificatesDataMessageHandler.class, AuthSignResponseMessageHandler.class };
 
 	private Map<Class<?>, MessageHandler<?>> messageHandlers;
 
@@ -110,47 +105,38 @@ public class AppletServiceServlet extends AbstractAppletServiceServlet {
 
 		this.messageHandlers = new HashMap<Class<?>, MessageHandler<?>>();
 		for (Class<? extends MessageHandler<?>> messageHandlerClass : MESSAGE_HANDLER_CLASSES) {
-			HandlesMessage handlesMessageAnnotation = messageHandlerClass
-					.getAnnotation(HandlesMessage.class);
+			HandlesMessage handlesMessageAnnotation = messageHandlerClass.getAnnotation(HandlesMessage.class);
 			if (null == handlesMessageAnnotation) {
-				throw new ServletException(
-						"missing meta-data on message handler: "
-								+ messageHandlerClass.getName());
+				throw new ServletException("missing meta-data on message handler: " + messageHandlerClass.getName());
 			}
-			Class<? extends AbstractProtocolMessage> protocolMessageClass = handlesMessageAnnotation
-					.value();
+			Class<? extends AbstractProtocolMessage> protocolMessageClass = handlesMessageAnnotation.value();
 			MessageHandler<?> messageHandler;
 			try {
 				messageHandler = messageHandlerClass.newInstance();
 			} catch (Exception e) {
-				throw new ServletException(
-						"cannot create message handler instance");
+				throw new ServletException("cannot create message handler instance");
 			}
 			this.messageHandlers.put(protocolMessageClass, messageHandler);
 		}
 
-		Collection<MessageHandler<?>> messageHandlers = this.messageHandlers
-				.values();
+		Collection<MessageHandler<?>> messageHandlers = this.messageHandlers.values();
 		for (MessageHandler<?> messageHandler : messageHandlers) {
 			try {
 				injectInitParams(config, messageHandler);
 			} catch (Exception e) {
-				throw new ServletException(
-						"error injecting init-param into message handler field: "
-								+ e.getMessage(), e);
+				throw new ServletException("error injecting init-param into message handler field: " + e.getMessage(),
+						e);
 			}
 			messageHandler.init(config);
 		}
 	}
 
-	public static void injectInitParams(ServletConfig config,
-			MessageHandler<?> messageHandler) throws ServletException,
-			IllegalArgumentException, IllegalAccessException {
+	public static void injectInitParams(ServletConfig config, MessageHandler<?> messageHandler)
+			throws ServletException, IllegalArgumentException, IllegalAccessException {
 		Class<?> messageHandlerClass = messageHandler.getClass();
 		Field[] fields = messageHandlerClass.getDeclaredFields();
 		for (Field field : fields) {
-			InitParam initParamAnnotation = field
-					.getAnnotation(InitParam.class);
+			InitParam initParamAnnotation = field.getAnnotation(InitParam.class);
 			if (null == initParamAnnotation) {
 				continue;
 			}
@@ -161,15 +147,13 @@ public class AppletServiceServlet extends AbstractAppletServiceServlet {
 				/*
 				 * We always inject a service locator.
 				 */
-				ServiceLocator<Object> fieldValue = new ServiceLocator<Object>(
-						initParamName, config);
+				ServiceLocator<Object> fieldValue = new ServiceLocator<Object>(initParamName, config);
 				field.set(messageHandler, fieldValue);
 				continue;
 			}
 			String initParamValue = config.getInitParameter(initParamName);
 			if (initParamAnnotation.required() && null == initParamValue) {
-				throw new ServletException("missing required init-param: "
-						+ initParamName + " for message handler:"
+				throw new ServletException("missing required init-param: " + initParamName + " for message handler:"
 						+ messageHandlerClass.getName());
 			}
 			if (null == initParamValue) {
@@ -190,8 +174,7 @@ public class AppletServiceServlet extends AbstractAppletServiceServlet {
 				try {
 					inetAddress = InetAddress.getByName(initParamValue);
 				} catch (UnknownHostException e) {
-					throw new ServletException("unknown host: "
-							+ initParamValue);
+					throw new ServletException("unknown host: " + initParamValue);
 				}
 				field.set(messageHandler, inetAddress);
 				continue;
@@ -201,8 +184,7 @@ public class AppletServiceServlet extends AbstractAppletServiceServlet {
 				field.set(messageHandler, fieldValue);
 				continue;
 			}
-			throw new ServletException("unsupported init-param field type: "
-					+ fieldType.getName());
+			throw new ServletException("unsupported init-param field type: " + fieldType.getName());
 		}
 	}
 

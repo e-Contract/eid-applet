@@ -74,8 +74,7 @@ import be.fedict.eid.applet.service.signer.SignatureFacet;
  */
 public class KeyInfoSignatureFacet implements SignatureFacet {
 
-	private static final Log LOG = LogFactory
-			.getLog(KeyInfoSignatureFacet.class);
+	private static final Log LOG = LogFactory.getLog(KeyInfoSignatureFacet.class);
 
 	private final boolean includeEntireCertificateChain;
 
@@ -90,15 +89,14 @@ public class KeyInfoSignatureFacet implements SignatureFacet {
 	 * @param includeIssuerSerial
 	 * @param includeKeyValue
 	 */
-	public KeyInfoSignatureFacet(boolean includeEntireCertificateChain,
-			boolean includeIssuerSerial, boolean includeKeyValue) {
+	public KeyInfoSignatureFacet(boolean includeEntireCertificateChain, boolean includeIssuerSerial,
+			boolean includeKeyValue) {
 		this.includeEntireCertificateChain = includeEntireCertificateChain;
 		this.includeIssuerSerial = includeIssuerSerial;
 		this.includeKeyValue = includeKeyValue;
 	}
 
-	public void postSign(Element signatureElement,
-			List<X509Certificate> signingCertificateChain) {
+	public void postSign(Element signatureElement, List<X509Certificate> signingCertificateChain) {
 		LOG.debug("postSign");
 
 		String signatureNamespacePrefix = signatureElement.getPrefix();
@@ -108,8 +106,8 @@ public class KeyInfoSignatureFacet implements SignatureFacet {
 		 * before the first ds:Object element.
 		 */
 		Node nextSibling;
-		NodeList objectNodeList = signatureElement.getElementsByTagNameNS(
-				"http://www.w3.org/2000/09/xmldsig#", "Object");
+		NodeList objectNodeList = signatureElement.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#",
+				"Object");
 		if (0 == objectNodeList.getLength()) {
 			nextSibling = null;
 		} else {
@@ -119,8 +117,7 @@ public class KeyInfoSignatureFacet implements SignatureFacet {
 		/*
 		 * Construct the ds:KeyInfo element using JSR 105.
 		 */
-		KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM",
-				new XMLDSigRI());
+		KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM", new XMLDSigRI());
 		List<Object> x509DataObjects = new LinkedList<Object>();
 		X509Certificate signingCertificate = signingCertificateChain.get(0);
 
@@ -129,19 +126,16 @@ public class KeyInfoSignatureFacet implements SignatureFacet {
 		if (this.includeKeyValue) {
 			KeyValue keyValue;
 			try {
-				keyValue = keyInfoFactory.newKeyValue(signingCertificate
-						.getPublicKey());
+				keyValue = keyInfoFactory.newKeyValue(signingCertificate.getPublicKey());
 			} catch (KeyException e) {
-				throw new RuntimeException("key exception: " + e.getMessage(),
-						e);
+				throw new RuntimeException("key exception: " + e.getMessage(), e);
 			}
 			keyInfoContent.add(keyValue);
 		}
 
 		if (this.includeIssuerSerial) {
 			x509DataObjects.add(keyInfoFactory.newX509IssuerSerial(
-					signingCertificate.getIssuerX500Principal().toString(),
-					signingCertificate.getSerialNumber()));
+					signingCertificate.getIssuerX500Principal().toString(), signingCertificate.getSerialNumber()));
 		}
 
 		if (this.includeEntireCertificateChain) {
@@ -175,22 +169,18 @@ public class KeyInfoSignatureFacet implements SignatureFacet {
 			}
 		};
 
-		XMLSignContext xmlSignContext = new DOMSignContext(key,
-				signatureElement);
+		XMLSignContext xmlSignContext = new DOMSignContext(key, signatureElement);
 		DOMCryptoContext domCryptoContext = (DOMCryptoContext) xmlSignContext;
 		try {
-			domKeyInfo.marshal(signatureElement, nextSibling,
-					signatureNamespacePrefix, domCryptoContext);
+			domKeyInfo.marshal(signatureElement, nextSibling, signatureNamespacePrefix, domCryptoContext);
 		} catch (MarshalException e) {
 			throw new RuntimeException("marshall error: " + e.getMessage(), e);
 		}
 	}
 
-	public void preSign(XMLSignatureFactory signatureFactory,
-			Document document, String signatureId,
-			List<X509Certificate> signingCertificateChain,
-			List<Reference> references, List<XMLObject> objects)
-			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+	public void preSign(XMLSignatureFactory signatureFactory, Document document, String signatureId,
+			List<X509Certificate> signingCertificateChain, List<Reference> references, List<XMLObject> objects)
+					throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		// empty
 	}
 }

@@ -58,22 +58,16 @@ import be.fedict.eid.applet.service.spi.IdentityDTO;
 
 public class ASiCSignatureServiceTest {
 
-	private static final Log LOG = LogFactory
-			.getLog(ASiCSignatureServiceTest.class);
+	private static final Log LOG = LogFactory.getLog(ASiCSignatureServiceTest.class);
 
-	private final static class ASiCSignatureService extends
-			AbstractASiCSignatureService {
+	private final static class ASiCSignatureService extends AbstractASiCSignatureService {
 
-		public ASiCSignatureService(InputStream documentInputStream,
-				DigestAlgo digestAlgo,
-				RevocationDataService revocationDataService,
-				TimeStampService timeStampService,
-				TemporaryDataStorage temporaryDataStorage,
-				IdentityDTO identity, byte[] photo,
+		public ASiCSignatureService(InputStream documentInputStream, DigestAlgo digestAlgo,
+				RevocationDataService revocationDataService, TimeStampService timeStampService,
+				TemporaryDataStorage temporaryDataStorage, IdentityDTO identity, byte[] photo,
 				OutputStream documentOutputStream) throws IOException {
-			super(documentInputStream, digestAlgo, revocationDataService,
-					timeStampService, "ClaimedRole", identity, photo,
-					temporaryDataStorage, documentOutputStream);
+			super(documentInputStream, digestAlgo, revocationDataService, timeStampService, "ClaimedRole", identity,
+					photo, temporaryDataStorage, documentOutputStream);
 			setSignatureNamespacePrefix("ds");
 		}
 	}
@@ -84,25 +78,21 @@ public class ASiCSignatureServiceTest {
 		KeyPair caKeyPair = PkiTestUtils.generateKeyPair();
 		DateTime caNotBefore = new DateTime();
 		DateTime caNotAfter = caNotBefore.plusYears(1);
-		X509Certificate caCertificate = PkiTestUtils.generateCertificate(
-				caKeyPair.getPublic(), "CN=TestCA", caNotBefore, caNotAfter,
-				null, caKeyPair.getPrivate(), true, 0, null, null,
+		X509Certificate caCertificate = PkiTestUtils.generateCertificate(caKeyPair.getPublic(), "CN=TestCA",
+				caNotBefore, caNotAfter, null, caKeyPair.getPrivate(), true, 0, null, null,
 				new KeyUsage(KeyUsage.cRLSign | KeyUsage.keyCertSign));
 
-		final X509CRL crl = PkiTestUtils.generateCrl(caCertificate,
-				caKeyPair.getPrivate());
+		final X509CRL crl = PkiTestUtils.generateCrl(caCertificate, caKeyPair.getPrivate());
 
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusMonths(1);
-		X509Certificate certificate = PkiTestUtils.generateCertificate(
-				keyPair.getPublic(), "CN=Test", notBefore, notAfter,
-				caCertificate, caKeyPair.getPrivate(), false, 0, null, null,
+		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair.getPublic(), "CN=Test", notBefore,
+				notAfter, caCertificate, caKeyPair.getPrivate(), false, 0, null, null,
 				new KeyUsage(KeyUsage.nonRepudiation));
 
 		ByteArrayOutputStream asicOutputStream = new ByteArrayOutputStream();
-		ZipOutputStream asicZipOutputStream = new ZipOutputStream(
-				asicOutputStream);
+		ZipOutputStream asicZipOutputStream = new ZipOutputStream(asicOutputStream);
 
 		ZipEntry fileZipEntry = new ZipEntry("file.txt");
 		asicZipOutputStream.putNextEntry(fileZipEntry);
@@ -110,8 +100,7 @@ public class ASiCSignatureServiceTest {
 		asicZipOutputStream.closeEntry();
 		asicZipOutputStream.close();
 
-		ByteArrayInputStream asicInputStream = new ByteArrayInputStream(
-				asicOutputStream.toByteArray());
+		ByteArrayInputStream asicInputStream = new ByteArrayInputStream(asicOutputStream.toByteArray());
 
 		ByteArrayOutputStream resultOutputStream = new ByteArrayOutputStream();
 
@@ -128,8 +117,7 @@ public class ASiCSignatureServiceTest {
 
 		RevocationDataService revocationDataService = new RevocationDataService() {
 
-			public RevocationData getRevocationData(
-					List<X509Certificate> certificateChain) {
+			public RevocationData getRevocationData(List<X509Certificate> certificateChain) {
 				RevocationData revocationData = new RevocationData();
 				revocationData.addCRL(crl);
 				return revocationData;
@@ -137,24 +125,20 @@ public class ASiCSignatureServiceTest {
 		};
 		TimeStampService timeStampService = new TimeStampService() {
 
-			public byte[] timeStamp(byte[] data, RevocationData revocationData)
-					throws Exception {
+			public byte[] timeStamp(byte[] data, RevocationData revocationData) throws Exception {
 				return "encoded time-stamp token".getBytes();
 			}
 		};
 
-		ASiCSignatureService testedInstance = new ASiCSignatureService(
-				asicInputStream, DigestAlgo.SHA256, revocationDataService,
-				timeStampService, temporaryDataStorage, identity, photo,
-				resultOutputStream);
+		ASiCSignatureService testedInstance = new ASiCSignatureService(asicInputStream, DigestAlgo.SHA256,
+				revocationDataService, timeStampService, temporaryDataStorage, identity, photo, resultOutputStream);
 
 		List<X509Certificate> signingCertificateChain = new LinkedList<X509Certificate>();
 		signingCertificateChain.add(certificate);
 		signingCertificateChain.add(caCertificate);
 
 		// operate: preSign
-		DigestInfo digestInfo = testedInstance.preSign(null,
-				signingCertificateChain, identity, address, photo);
+		DigestInfo digestInfo = testedInstance.preSign(null, signingCertificateChain, identity, address, photo);
 
 		// verify
 		assertNotNull(digestInfo);
@@ -166,8 +150,7 @@ public class ASiCSignatureServiceTest {
 		// sign the digest value
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
-		byte[] digestInfoValue = ArrayUtils.addAll(
-				PkiTestUtils.SHA256_DIGEST_INFO_PREFIX, digestInfo.digestValue);
+		byte[] digestInfoValue = ArrayUtils.addAll(PkiTestUtils.SHA256_DIGEST_INFO_PREFIX, digestInfo.digestValue);
 		byte[] signatureValue = cipher.doFinal(digestInfoValue);
 
 		// operate: postSign
@@ -179,8 +162,7 @@ public class ASiCSignatureServiceTest {
 		FileUtils.writeByteArrayToFile(tmpFile, asicResult);
 		LOG.debug("ASiC file: " + tmpFile.getAbsolutePath());
 
-		List<X509Certificate> signers = ASiCSignatureVerifier
-				.verifySignatures(asicResult);
+		List<X509Certificate> signers = ASiCSignatureVerifier.verifySignatures(asicResult);
 		assertNotNull(signers);
 		assertEquals(1, signers.size());
 		assertEquals(certificate, signers.get(0));

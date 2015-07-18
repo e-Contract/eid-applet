@@ -108,13 +108,11 @@ import org.xml.sax.SAXException;
 
 public class PkiTestUtils {
 
-	public static final byte[] SHA1_DIGEST_INFO_PREFIX = new byte[] { 0x30,
-			0x1f, 0x30, 0x07, 0x06, 0x05, 0x2b, 0x0e, 0x03, 0x02, 0x1a, 0x04,
-			0x14 };
+	public static final byte[] SHA1_DIGEST_INFO_PREFIX = new byte[] { 0x30, 0x1f, 0x30, 0x07, 0x06, 0x05, 0x2b, 0x0e,
+			0x03, 0x02, 0x1a, 0x04, 0x14 };
 
-	public static final byte[] SHA256_DIGEST_INFO_PREFIX = new byte[] { 0x30,
-			0x2f, 0x30, 0x0b, 0x06, 0x09, 0x60, (byte) 0x86, 0x48, 0x01, 0x65,
-			0x03, 0x04, 0x02, 0x01, 0x04, 0x20 };
+	public static final byte[] SHA256_DIGEST_INFO_PREFIX = new byte[] { 0x30, 0x2f, 0x30, 0x0b, 0x06, 0x09, 0x60,
+			(byte) 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01, 0x04, 0x20 };
 
 	private PkiTestUtils() {
 		super();
@@ -123,39 +121,29 @@ public class PkiTestUtils {
 	static KeyPair generateKeyPair() throws Exception {
 		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
 		SecureRandom random = new SecureRandom();
-		keyPairGenerator.initialize(new RSAKeyGenParameterSpec(1024,
-				RSAKeyGenParameterSpec.F4), random);
+		keyPairGenerator.initialize(new RSAKeyGenParameterSpec(1024, RSAKeyGenParameterSpec.F4), random);
 		KeyPair keyPair = keyPairGenerator.generateKeyPair();
 		return keyPair;
 	}
 
-	private static SubjectKeyIdentifier createSubjectKeyId(PublicKey publicKey)
-			throws IOException {
-		ByteArrayInputStream bais = new ByteArrayInputStream(
-				publicKey.getEncoded());
-		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo(
-				(ASN1Sequence) new ASN1InputStream(bais).readObject());
+	private static SubjectKeyIdentifier createSubjectKeyId(PublicKey publicKey) throws IOException {
+		ByteArrayInputStream bais = new ByteArrayInputStream(publicKey.getEncoded());
+		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(bais).readObject());
 		return new SubjectKeyIdentifier(info);
 	}
 
-	private static AuthorityKeyIdentifier createAuthorityKeyId(
-			PublicKey publicKey) throws IOException {
+	private static AuthorityKeyIdentifier createAuthorityKeyId(PublicKey publicKey) throws IOException {
 
-		ByteArrayInputStream bais = new ByteArrayInputStream(
-				publicKey.getEncoded());
-		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo(
-				(ASN1Sequence) new ASN1InputStream(bais).readObject());
+		ByteArrayInputStream bais = new ByteArrayInputStream(publicKey.getEncoded());
+		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(bais).readObject());
 
 		return new AuthorityKeyIdentifier(info);
 	}
 
-	static X509Certificate generateCertificate(PublicKey subjectPublicKey,
-			String subjectDn, DateTime notBefore, DateTime notAfter,
-			X509Certificate issuerCertificate, PrivateKey issuerPrivateKey,
-			boolean caFlag, int pathLength, String crlUri, String ocspUri,
-			KeyUsage keyUsage) throws IOException, InvalidKeyException,
-			IllegalStateException, NoSuchAlgorithmException,
-			SignatureException, CertificateException {
+	static X509Certificate generateCertificate(PublicKey subjectPublicKey, String subjectDn, DateTime notBefore,
+			DateTime notAfter, X509Certificate issuerCertificate, PrivateKey issuerPrivateKey, boolean caFlag,
+			int pathLength, String crlUri, String ocspUri, KeyUsage keyUsage) throws IOException, InvalidKeyException,
+					IllegalStateException, NoSuchAlgorithmException, SignatureException, CertificateException {
 		String signatureAlgorithm = "SHA1withRSA";
 		X509V3CertificateGenerator certificateGenerator = new X509V3CertificateGenerator();
 		certificateGenerator.reset();
@@ -165,61 +153,48 @@ public class PkiTestUtils {
 		certificateGenerator.setNotAfter(notAfter.toDate());
 		X509Principal issuerDN;
 		if (null != issuerCertificate) {
-			issuerDN = new X509Principal(issuerCertificate
-					.getSubjectX500Principal().toString());
+			issuerDN = new X509Principal(issuerCertificate.getSubjectX500Principal().toString());
 		} else {
 			issuerDN = new X509Principal(subjectDn);
 		}
 		certificateGenerator.setIssuerDN(issuerDN);
 		certificateGenerator.setSubjectDN(new X509Principal(subjectDn));
-		certificateGenerator.setSerialNumber(new BigInteger(128,
-				new SecureRandom()));
+		certificateGenerator.setSerialNumber(new BigInteger(128, new SecureRandom()));
 
-		certificateGenerator.addExtension(X509Extensions.SubjectKeyIdentifier,
-				false, createSubjectKeyId(subjectPublicKey));
+		certificateGenerator.addExtension(X509Extensions.SubjectKeyIdentifier, false,
+				createSubjectKeyId(subjectPublicKey));
 		PublicKey issuerPublicKey;
 		issuerPublicKey = subjectPublicKey;
-		certificateGenerator.addExtension(
-				X509Extensions.AuthorityKeyIdentifier, false,
+		certificateGenerator.addExtension(X509Extensions.AuthorityKeyIdentifier, false,
 				createAuthorityKeyId(issuerPublicKey));
 
 		if (caFlag) {
 			if (-1 == pathLength) {
-				certificateGenerator.addExtension(
-						X509Extensions.BasicConstraints, false,
-						new BasicConstraints(true));
+				certificateGenerator.addExtension(X509Extensions.BasicConstraints, false, new BasicConstraints(true));
 			} else {
-				certificateGenerator.addExtension(
-						X509Extensions.BasicConstraints, false,
+				certificateGenerator.addExtension(X509Extensions.BasicConstraints, false,
 						new BasicConstraints(pathLength));
 			}
 		}
 
 		if (null != crlUri) {
-			GeneralName gn = new GeneralName(
-					GeneralName.uniformResourceIdentifier, new DERIA5String(
-							crlUri));
+			GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, new DERIA5String(crlUri));
 			GeneralNames gns = new GeneralNames(new DERSequence(gn));
 			DistributionPointName dpn = new DistributionPointName(0, gns);
 			DistributionPoint distp = new DistributionPoint(dpn, null, null);
-			certificateGenerator.addExtension(
-					X509Extensions.CRLDistributionPoints, false,
-					new DERSequence(distp));
+			certificateGenerator.addExtension(X509Extensions.CRLDistributionPoints, false, new DERSequence(distp));
 		}
 
 		if (null != ocspUri) {
-			GeneralName ocspName = new GeneralName(
-					GeneralName.uniformResourceIdentifier, ocspUri);
+			GeneralName ocspName = new GeneralName(GeneralName.uniformResourceIdentifier, ocspUri);
 			AuthorityInformationAccess authorityInformationAccess = new AuthorityInformationAccess(
 					X509ObjectIdentifiers.ocspAccessMethod, ocspName);
-			certificateGenerator.addExtension(
-					X509Extensions.AuthorityInfoAccess.getId(), false,
+			certificateGenerator.addExtension(X509Extensions.AuthorityInfoAccess.getId(), false,
 					authorityInformationAccess);
 		}
 
 		if (null != keyUsage) {
-			certificateGenerator.addExtension(X509Extensions.KeyUsage, true,
-					keyUsage);
+			certificateGenerator.addExtension(X509Extensions.KeyUsage, true, keyUsage);
 		}
 
 		X509Certificate certificate;
@@ -231,22 +206,18 @@ public class PkiTestUtils {
 		 * security provider instead of BouncyCastle. If we don't do this trick
 		 * we might run into trouble when trying to use the CertPath validator.
 		 */
-		CertificateFactory certificateFactory = CertificateFactory
-				.getInstance("X.509");
+		CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
 		certificate = (X509Certificate) certificateFactory
-				.generateCertificate(new ByteArrayInputStream(certificate
-						.getEncoded()));
+				.generateCertificate(new ByteArrayInputStream(certificate.getEncoded()));
 		return certificate;
 	}
 
 	static Document loadDocument(InputStream documentInputStream)
 			throws ParserConfigurationException, SAXException, IOException {
 		InputSource inputSource = new InputSource(documentInputStream);
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.parse(inputSource);
 		return document;
 	}
@@ -255,8 +226,7 @@ public class PkiTestUtils {
 		Source source = new DOMSource(dom);
 		StringWriter stringWriter = new StringWriter();
 		Result result = new StreamResult(stringWriter);
-		TransformerFactory transformerFactory = TransformerFactory
-				.newInstance();
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
 		/*
 		 * We have to omit the ?xml declaration if we want to embed the
@@ -267,31 +237,26 @@ public class PkiTestUtils {
 		return stringWriter.getBuffer().toString();
 	}
 
-	public static X509CRL generateCrl(X509Certificate issuer,
-			PrivateKey issuerPrivateKey) throws InvalidKeyException,
-			CRLException, IllegalStateException, NoSuchAlgorithmException,
-			SignatureException {
+	public static X509CRL generateCrl(X509Certificate issuer, PrivateKey issuerPrivateKey) throws InvalidKeyException,
+			CRLException, IllegalStateException, NoSuchAlgorithmException, SignatureException {
 		X509V2CRLGenerator crlGenerator = new X509V2CRLGenerator();
 		crlGenerator.setIssuerDN(issuer.getSubjectX500Principal());
 		Date now = new Date();
 		crlGenerator.setThisUpdate(now);
 		crlGenerator.setNextUpdate(new Date(now.getTime() + 100000));
 		crlGenerator.setSignatureAlgorithm("SHA1withRSA");
-		crlGenerator.addExtension(X509Extensions.CRLNumber, false,
-				new CRLNumber(new BigInteger("1234")));
+		crlGenerator.addExtension(X509Extensions.CRLNumber, false, new CRLNumber(new BigInteger("1234")));
 		X509CRL x509Crl = crlGenerator.generate(issuerPrivateKey);
 		return x509Crl;
 	}
 
-	public static OCSPResp createOcspResp(X509Certificate certificate,
-			boolean revoked, X509Certificate issuerCertificate,
-			X509Certificate ocspResponderCertificate,
-			PrivateKey ocspResponderPrivateKey, String signatureAlgorithm)
-			throws Exception {
+	public static OCSPResp createOcspResp(X509Certificate certificate, boolean revoked,
+			X509Certificate issuerCertificate, X509Certificate ocspResponderCertificate,
+			PrivateKey ocspResponderPrivateKey, String signatureAlgorithm) throws Exception {
 		// request
 		OCSPReqGenerator ocspReqGenerator = new OCSPReqGenerator();
-		CertificateID certId = new CertificateID(CertificateID.HASH_SHA1,
-				issuerCertificate, certificate.getSerialNumber());
+		CertificateID certId = new CertificateID(CertificateID.HASH_SHA1, issuerCertificate,
+				certificate.getSerialNumber());
 		ocspReqGenerator.addRequest(certId);
 		OCSPReq ocspReq = ocspReqGenerator.generate();
 
@@ -304,30 +269,25 @@ public class PkiTestUtils {
 			CertificateID certificateID = ocspRequest.getCertID();
 			CertificateStatus certificateStatus;
 			if (revoked) {
-				certificateStatus = new RevokedStatus(new Date(),
-						CRLReason.unspecified);
+				certificateStatus = new RevokedStatus(new Date(), CRLReason.unspecified);
 			} else {
 				certificateStatus = CertificateStatus.GOOD;
 			}
-			basicOCSPRespGenerator
-					.addResponse(certificateID, certificateStatus);
+			basicOCSPRespGenerator.addResponse(certificateID, certificateStatus);
 		}
 
 		// basic response generation
 		X509Certificate[] chain = null;
 		if (!ocspResponderCertificate.equals(issuerCertificate)) {
-			chain = new X509Certificate[] { ocspResponderCertificate,
-					issuerCertificate };
+			chain = new X509Certificate[] { ocspResponderCertificate, issuerCertificate };
 		}
 
-		BasicOCSPResp basicOCSPResp = basicOCSPRespGenerator.generate(
-				signatureAlgorithm, ocspResponderPrivateKey, chain, new Date(),
-				BouncyCastleProvider.PROVIDER_NAME);
+		BasicOCSPResp basicOCSPResp = basicOCSPRespGenerator.generate(signatureAlgorithm, ocspResponderPrivateKey,
+				chain, new Date(), BouncyCastleProvider.PROVIDER_NAME);
 
 		// response generation
 		OCSPRespGenerator ocspRespGenerator = new OCSPRespGenerator();
-		OCSPResp ocspResp = ocspRespGenerator.generate(
-				OCSPRespGenerator.SUCCESSFUL, basicOCSPResp);
+		OCSPResp ocspResp = ocspRespGenerator.generate(OCSPRespGenerator.SUCCESSFUL, basicOCSPResp);
 
 		return ocspResp;
 	}

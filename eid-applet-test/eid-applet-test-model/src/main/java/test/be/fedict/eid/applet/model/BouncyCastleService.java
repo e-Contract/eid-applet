@@ -47,5 +47,4 @@ public class BouncyCastleService {
 			this.provider = null;
 		}
 	}
-
 }

@@ -53,22 +53,18 @@ public class UserIdentifierUtil {
 	 * @return
 	 */
 	public static String getUserId(X509Certificate signingCertificate) {
-		X500Principal userPrincipal = signingCertificate
-				.getSubjectX500Principal();
+		X500Principal userPrincipal = signingCertificate.getSubjectX500Principal();
 		String name = userPrincipal.toString();
 		int serialNumberBeginIdx = name.indexOf("SERIALNUMBER=");
 		if (-1 == serialNumberBeginIdx) {
 			throw new SecurityException("SERIALNUMBER not found in X509 CN");
 		}
-		int serialNumberValueBeginIdx = serialNumberBeginIdx
-				+ "SERIALNUMBER=".length();
-		int serialNumberValueEndIdx = name.indexOf(",",
-				serialNumberValueBeginIdx);
+		int serialNumberValueBeginIdx = serialNumberBeginIdx + "SERIALNUMBER=".length();
+		int serialNumberValueEndIdx = name.indexOf(",", serialNumberValueBeginIdx);
 		if (-1 == serialNumberValueEndIdx) {
 			serialNumberValueEndIdx = name.length();
 		}
-		String userId = name.substring(serialNumberValueBeginIdx,
-				serialNumberValueEndIdx);
+		String userId = name.substring(serialNumberValueBeginIdx, serialNumberValueEndIdx);
 		return userId;
 	}
 
@@ -89,8 +85,7 @@ public class UserIdentifierUtil {
 	 *            long. Encoded in hexadecimal format.
 	 * @return
 	 */
-	public static String getNonReversibleCitizenIdentifier(String userId,
-			String orgId, String appId, String secret) {
+	public static String getNonReversibleCitizenIdentifier(String userId, String orgId, String appId, String secret) {
 		if (null == secret) {
 			throw new IllegalArgumentException("secret key is null");
 		}
@@ -117,8 +112,7 @@ public class UserIdentifierUtil {
 			secretKey = Hex.decodeHex(secret.toCharArray());
 		} catch (DecoderException e) {
 			LOG.error("secret is not hexadecimal encoded: " + e.getMessage());
-			throw new IllegalArgumentException(
-					"secret is not hexadecimal encoded");
+			throw new IllegalArgumentException("secret is not hexadecimal encoded");
 		}
 		if ((128 / 8) > secretKey.length) {
 			/*
@@ -145,8 +139,7 @@ public class UserIdentifierUtil {
 		try {
 			mac = Mac.getInstance(macKey.getAlgorithm());
 		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("HMAC algo not available: "
-					+ e.getMessage());
+			throw new RuntimeException("HMAC algo not available: " + e.getMessage());
 		}
 		try {
 			mac.init(macKey);

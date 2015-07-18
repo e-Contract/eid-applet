@@ -39,12 +39,11 @@ public class LogFilter implements Filter {
 	public void destroy() {
 	}
 
-	public void doFilter(ServletRequest request, ServletResponse response,
-			FilterChain chain) throws IOException, ServletException {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
 		LOG.debug("doFilter");
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
-		LogHttpServletRequestWrapper requestWrapper = new LogHttpServletRequestWrapper(
-				httpRequest);
+		LogHttpServletRequestWrapper requestWrapper = new LogHttpServletRequestWrapper(httpRequest);
 		Enumeration<String> headerNamesEnum = requestWrapper.getHeaderNames();
 		while (headerNamesEnum.hasMoreElements()) {
 			String headerName = headerNamesEnum.nextElement();

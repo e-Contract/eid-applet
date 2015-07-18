@@ -60,15 +60,12 @@ import org.apache.commons.logging.LogFactory;
  */
 public class HttpSessionTemporaryDataStorage implements TemporaryDataStorage {
 
-	private static final Log LOG = LogFactory
-			.getLog(HttpSessionTemporaryDataStorage.class);
+	private static final Log LOG = LogFactory.getLog(HttpSessionTemporaryDataStorage.class);
 
-	public static final String TEMP_OUTPUT_STREAM_ATTRIBUTE = HttpSessionTemporaryDataStorage.class
-			.getName()
+	public static final String TEMP_OUTPUT_STREAM_ATTRIBUTE = HttpSessionTemporaryDataStorage.class.getName()
 			+ ".tempData";
 
-	public static final String TEMP_ATTRIBUTES_ATTRIBUTE = HttpSessionTemporaryDataStorage.class
-			.getName()
+	public static final String TEMP_ATTRIBUTES_ATTRIBUTE = HttpSessionTemporaryDataStorage.class.getName()
 			+ ".tempAttribs";
 
 	public InputStream getTempInputStream() {
@@ -81,8 +78,7 @@ public class HttpSessionTemporaryDataStorage implements TemporaryDataStorage {
 			return null;
 		}
 		byte[] tempData = tempOutputStream.toByteArray();
-		ByteArrayInputStream tempInputStream = new ByteArrayInputStream(
-				tempData);
+		ByteArrayInputStream tempInputStream = new ByteArrayInputStream(tempData);
 		return tempInputStream;
 	}
 
@@ -90,8 +86,7 @@ public class HttpSessionTemporaryDataStorage implements TemporaryDataStorage {
 		LOG.debug("get new temp output stream");
 		HttpSession httpSession = getHttpSession();
 		ByteArrayOutputStream tempOutputStream = new ByteArrayOutputStream();
-		httpSession
-				.setAttribute(TEMP_OUTPUT_STREAM_ATTRIBUTE, tempOutputStream);
+		httpSession.setAttribute(TEMP_OUTPUT_STREAM_ATTRIBUTE, tempOutputStream);
 		return tempOutputStream;
 	}
 
@@ -103,8 +98,7 @@ public class HttpSessionTemporaryDataStorage implements TemporaryDataStorage {
 	public static HttpSession getHttpSession() {
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}

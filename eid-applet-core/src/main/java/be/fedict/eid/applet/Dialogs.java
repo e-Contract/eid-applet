@@ -78,9 +78,7 @@ public class Dialogs {
 
 		if (-1 != retriesLeft) {
 			Box retriesPanel = Box.createHorizontalBox();
-			JLabel retriesLabel = new JLabel(
-					this.messages.getMessage(MESSAGE_ID.RETRIES_LEFT) + ": "
-							+ retriesLeft);
+			JLabel retriesLabel = new JLabel(this.messages.getMessage(MESSAGE_ID.RETRIES_LEFT) + ": " + retriesLeft);
 			retriesLabel.setForeground(Color.RED);
 			retriesPanel.add(retriesLabel);
 			retriesPanel.add(Box.createHorizontalGlue());
@@ -113,15 +111,13 @@ public class Dialogs {
 		}
 
 		Component parentComponent = this.view.getParentComponent();
-		int result = JOptionPane.showOptionDialog(parentComponent, mainPanel,
-				"eID PIN unblock", JOptionPane.OK_CANCEL_OPTION,
-				JOptionPane.QUESTION_MESSAGE, null, null, null);
+		int result = JOptionPane.showOptionDialog(parentComponent, mainPanel, "eID PIN unblock",
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 		if (result != JOptionPane.OK_OPTION) {
 			throw new RuntimeException("operation canceled.");
 		}
 		try {
-			if (puk1Field.getPassword().length != PUK_SIZE
-					|| puk2Field.getPassword().length != PUK_SIZE) {
+			if (puk1Field.getPassword().length != PUK_SIZE || puk2Field.getPassword().length != PUK_SIZE) {
 				throw new RuntimeException("PUK size incorrect");
 			}
 			System.arraycopy(puk1Field.getPassword(), 0, puk1, 0, PUK_SIZE);
@@ -163,9 +159,7 @@ public class Dialogs {
 
 		if (-1 != retriesLeft) {
 			Box retriesPanel = Box.createHorizontalBox();
-			JLabel retriesLabel = new JLabel(
-					this.messages.getMessage(MESSAGE_ID.RETRIES_LEFT) + ": "
-							+ retriesLeft);
+			JLabel retriesLabel = new JLabel(this.messages.getMessage(MESSAGE_ID.RETRIES_LEFT) + ": " + retriesLeft);
 			retriesLabel.setForeground(Color.RED);
 			retriesPanel.add(retriesLabel);
 			retriesPanel.add(Box.createHorizontalGlue());
@@ -176,8 +170,7 @@ public class Dialogs {
 		JPasswordField oldPinField = new JPasswordField(MAX_PIN_SIZE);
 		{
 			Box oldPinPanel = Box.createHorizontalBox();
-			JLabel oldPinLabel = new JLabel(
-					this.messages.getMessage(MESSAGE_ID.CURRENT_PIN) + ":");
+			JLabel oldPinLabel = new JLabel(this.messages.getMessage(MESSAGE_ID.CURRENT_PIN) + ":");
 			oldPinLabel.setLabelFor(oldPinField);
 			oldPinPanel.add(oldPinLabel);
 			oldPinPanel.add(Box.createHorizontalStrut(5));
@@ -190,8 +183,7 @@ public class Dialogs {
 		JPasswordField newPinField = new JPasswordField(MAX_PIN_SIZE);
 		{
 			Box newPinPanel = Box.createHorizontalBox();
-			JLabel newPinLabel = new JLabel(
-					this.messages.getMessage(MESSAGE_ID.NEW_PIN) + ":");
+			JLabel newPinLabel = new JLabel(this.messages.getMessage(MESSAGE_ID.NEW_PIN) + ":");
 			newPinLabel.setLabelFor(newPinField);
 			newPinPanel.add(newPinLabel);
 			newPinPanel.add(Box.createHorizontalStrut(5));
@@ -204,8 +196,7 @@ public class Dialogs {
 		JPasswordField new2PinField = new JPasswordField(MAX_PIN_SIZE);
 		{
 			Box new2PinPanel = Box.createHorizontalBox();
-			JLabel new2PinLabel = new JLabel(
-					this.messages.getMessage(MESSAGE_ID.NEW_PIN) + ":");
+			JLabel new2PinLabel = new JLabel(this.messages.getMessage(MESSAGE_ID.NEW_PIN) + ":");
 			new2PinLabel.setLabelFor(new2PinField);
 			new2PinPanel.add(new2PinLabel);
 			new2PinPanel.add(Box.createHorizontalStrut(5));
@@ -214,18 +205,15 @@ public class Dialogs {
 		}
 
 		Component parentComponent = this.view.getParentComponent();
-		int result = JOptionPane.showOptionDialog(parentComponent, mainPanel,
-				"Change eID PIN", JOptionPane.OK_CANCEL_OPTION,
-				JOptionPane.QUESTION_MESSAGE, null, null, null);
+		int result = JOptionPane.showOptionDialog(parentComponent, mainPanel, "Change eID PIN",
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 		if (result != JOptionPane.OK_OPTION) {
 			throw new RuntimeException("operation canceled.");
 		}
-		if (false == Arrays.equals(newPinField.getPassword(),
-				new2PinField.getPassword())) {
+		if (false == Arrays.equals(newPinField.getPassword(), new2PinField.getPassword())) {
 			throw new RuntimeException("new PINs not equal");
 		}
-		Pins pins = new Pins(oldPinField.getPassword(),
-				newPinField.getPassword());
+		Pins pins = new Pins(oldPinField.getPassword(), newPinField.getPassword());
 		Arrays.fill(oldPinField.getPassword(), (char) 0);
 		Arrays.fill(newPinField.getPassword(), (char) 0);
 		return pins;
@@ -240,8 +228,7 @@ public class Dialogs {
 	private JFrame secureReaderTransactionFrame;
 
 	public void showPINPadFrame(int retriesLeft) {
-		showPINPadFrame(retriesLeft, "PIN",
-				this.messages.getMessage(MESSAGE_ID.PIN_PAD));
+		showPINPadFrame(retriesLeft, "PIN", this.messages.getMessage(MESSAGE_ID.PIN_PAD));
 	}
 
 	private void showPINPadFrame(int retriesLeft, String title, String message) {
@@ -261,9 +248,7 @@ public class Dialogs {
 		panel.setLayout(boxLayout);
 
 		if (-1 != retriesLeft) {
-			JLabel retriesLabel = new JLabel(
-					this.messages.getMessage(MESSAGE_ID.RETRIES_LEFT) + ": "
-							+ retriesLeft);
+			JLabel retriesLabel = new JLabel(this.messages.getMessage(MESSAGE_ID.RETRIES_LEFT) + ": " + retriesLeft);
 			retriesLabel.setForeground(Color.RED);
 			panel.add(retriesLabel);
 		}
@@ -290,8 +275,7 @@ public class Dialogs {
 
 			@Override
 			public Insets getInsets() {
-				return new Insets(BORDER_SIZE, BORDER_SIZE, BORDER_SIZE,
-						BORDER_SIZE);
+				return new Insets(BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE);
 			}
 		};
 		BoxLayout boxLayout = new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS);
@@ -299,9 +283,7 @@ public class Dialogs {
 
 		if (-1 != retriesLeft) {
 			Box retriesPanel = Box.createHorizontalBox();
-			JLabel retriesLabel = new JLabel(
-					this.messages.getMessage(MESSAGE_ID.RETRIES_LEFT) + ": "
-							+ retriesLeft);
+			JLabel retriesLabel = new JLabel(this.messages.getMessage(MESSAGE_ID.RETRIES_LEFT) + ": " + retriesLeft);
 			retriesLabel.setForeground(Color.RED);
 			retriesPanel.add(retriesLabel);
 			retriesPanel.add(Box.createHorizontalGlue());
@@ -310,8 +292,7 @@ public class Dialogs {
 		}
 
 		Box passwordPanel = Box.createHorizontalBox();
-		JLabel promptLabel = new JLabel(
-				this.messages.getMessage(MESSAGE_ID.LABEL_PIN) + ": ");
+		JLabel promptLabel = new JLabel(this.messages.getMessage(MESSAGE_ID.LABEL_PIN) + ": ");
 		passwordPanel.add(promptLabel);
 		passwordPanel.add(Box.createHorizontalStrut(5));
 		final JPasswordField passwordField = new JPasswordField(MAX_PIN_SIZE);
@@ -328,17 +309,14 @@ public class Dialogs {
 				return new Insets(0, 0, 5, 5);
 			}
 		};
-		final JButton okButton = new JButton(
-				this.messages.getMessage(MESSAGE_ID.OK));
+		final JButton okButton = new JButton(this.messages.getMessage(MESSAGE_ID.OK));
 		okButton.setEnabled(false);
 		buttonPanel.add(okButton);
-		JButton cancelButton = new JButton(
-				this.messages.getMessage(MESSAGE_ID.CANCEL));
+		JButton cancelButton = new JButton(this.messages.getMessage(MESSAGE_ID.CANCEL));
 		buttonPanel.add(cancelButton);
 
 		// dialog box
-		final JDialog dialog = new JDialog((Frame) null,
-				this.messages.getMessage(MESSAGE_ID.ENTER_PIN), true);
+		final JDialog dialog = new JDialog((Frame) null, this.messages.getMessage(MESSAGE_ID.ENTER_PIN), true);
 		dialog.setLayout(new BorderLayout());
 		dialog.getContentPane().add(mainPanel, BorderLayout.CENTER);
 		dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
@@ -395,8 +373,7 @@ public class Dialogs {
 		});
 
 		Timer timer = new Timer(200, null);
-		FocusDialogActionListener focusDialogActionListener = new FocusDialogActionListener(
-				timer, passwordField);
+		FocusDialogActionListener focusDialogActionListener = new FocusDialogActionListener(timer, passwordField);
 		timer.addActionListener(focusDialogActionListener);
 		timer.start();
 
@@ -419,54 +396,45 @@ public class Dialogs {
 	}
 
 	public void showPinBlockedDialog() {
-		JOptionPane.showMessageDialog(this.view.getParentComponent(),
-				this.messages.getMessage(MESSAGE_ID.PIN_BLOCKED),
+		JOptionPane.showMessageDialog(this.view.getParentComponent(), this.messages.getMessage(MESSAGE_ID.PIN_BLOCKED),
 				"eID card blocked", JOptionPane.ERROR_MESSAGE);
 	}
 
 	public void showPinChanged() {
-		JOptionPane.showMessageDialog(this.view.getParentComponent(),
-				this.messages.getMessage(MESSAGE_ID.PIN_CHANGED),
+		JOptionPane.showMessageDialog(this.view.getParentComponent(), this.messages.getMessage(MESSAGE_ID.PIN_CHANGED),
 				"eID PIN change", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	public void showPinUnblocked() {
 		JOptionPane.showMessageDialog(this.view.getParentComponent(),
-				this.messages.getMessage(MESSAGE_ID.PIN_UNBLOCKED),
-				"eID PIN unblock", JOptionPane.INFORMATION_MESSAGE);
+				this.messages.getMessage(MESSAGE_ID.PIN_UNBLOCKED), "eID PIN unblock", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	public void showPUKPadFrame(int retriesLeft) {
-		showPINPadFrame(retriesLeft, "eID PIN unblock",
-				this.messages.getMessage(MESSAGE_ID.PUK_PAD));
+		showPINPadFrame(retriesLeft, "eID PIN unblock", this.messages.getMessage(MESSAGE_ID.PUK_PAD));
 	}
 
 	public void showPINChangePadFrame(int retriesLeft) {
-		showPINPadFrame(retriesLeft, "eID PIN change",
-				this.messages.getMessage(MESSAGE_ID.PIN_PAD_CHANGE));
+		showPINPadFrame(retriesLeft, "eID PIN change", this.messages.getMessage(MESSAGE_ID.PIN_PAD_CHANGE));
 	}
 
 	public void showPINModifyOldPINFrame(int retriesLeft) {
-		showPINPadFrame(retriesLeft, "eID PIN change",
-				this.messages.getMessage(MESSAGE_ID.PIN_PAD_MODIFY_OLD));
+		showPINPadFrame(retriesLeft, "eID PIN change", this.messages.getMessage(MESSAGE_ID.PIN_PAD_MODIFY_OLD));
 	}
 
 	public void showPINModifyNewPINFrame(int retriesLeft) {
-		showPINPadFrame(retriesLeft, "eID PIN change",
-				this.messages.getMessage(MESSAGE_ID.PIN_PAD_MODIFY_NEW));
+		showPINPadFrame(retriesLeft, "eID PIN change", this.messages.getMessage(MESSAGE_ID.PIN_PAD_MODIFY_NEW));
 	}
 
 	public void showPINModifyNewPINAgainFrame(int retriesLeft) {
-		showPINPadFrame(retriesLeft, "eID PIN change",
-				this.messages.getMessage(MESSAGE_ID.PIN_PAD_MODIFY_NEW_AGAIN));
+		showPINPadFrame(retriesLeft, "eID PIN change", this.messages.getMessage(MESSAGE_ID.PIN_PAD_MODIFY_NEW_AGAIN));
 	}
 
 	public void showSecureReaderTransactionFrame() {
 		if (null != this.secureReaderTransactionFrame) {
 			disposeSecureReaderTransactionFrame();
 		}
-		this.secureReaderTransactionFrame = new JFrame(
-				"Transaction Confirmation");
+		this.secureReaderTransactionFrame = new JFrame("Transaction Confirmation");
 		JPanel panel = new JPanel() {
 			private static final long serialVersionUID = 1L;
 
@@ -477,13 +445,11 @@ public class Dialogs {
 		};
 		BoxLayout boxLayout = new BoxLayout(panel, BoxLayout.PAGE_AXIS);
 		panel.setLayout(boxLayout);
-		panel.add(new JLabel(
-				"Check the transaction message on the secure card reader."));
+		panel.add(new JLabel("Check the transaction message on the secure card reader."));
 
 		this.secureReaderTransactionFrame.getContentPane().add(panel);
 		this.secureReaderTransactionFrame.pack();
-		this.secureReaderTransactionFrame.setLocationRelativeTo(this.view
-				.getParentComponent());
+		this.secureReaderTransactionFrame.setLocationRelativeTo(this.view.getParentComponent());
 		this.secureReaderTransactionFrame.setVisible(true);
 	}
 

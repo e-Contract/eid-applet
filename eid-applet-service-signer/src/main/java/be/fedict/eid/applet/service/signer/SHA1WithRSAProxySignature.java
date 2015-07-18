@@ -40,8 +40,7 @@ import org.bouncycastle.util.Arrays;
  */
 public class SHA1WithRSAProxySignature extends Signature {
 
-	private static final Log LOG = LogFactory
-			.getLog(SHA1WithRSAProxySignature.class);
+	private static final Log LOG = LogFactory.getLog(SHA1WithRSAProxySignature.class);
 
 	private static final ThreadLocal<byte[]> digestValues = new ThreadLocal<byte[]>();
 
@@ -61,26 +60,22 @@ public class SHA1WithRSAProxySignature extends Signature {
 	}
 
 	@Override
-	protected Object engineGetParameter(String param)
-			throws InvalidParameterException {
+	protected Object engineGetParameter(String param) throws InvalidParameterException {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	protected void engineInitSign(PrivateKey privateKey)
-			throws InvalidKeyException {
+	protected void engineInitSign(PrivateKey privateKey) throws InvalidKeyException {
 		LOG.debug("engineInitSign: " + privateKey.getAlgorithm());
 	}
 
 	@Override
-	protected void engineInitVerify(PublicKey publicKey)
-			throws InvalidKeyException {
+	protected void engineInitVerify(PublicKey publicKey) throws InvalidKeyException {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	protected void engineSetParameter(String param, Object value)
-			throws InvalidParameterException {
+	protected void engineSetParameter(String param, Object value) throws InvalidParameterException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -89,8 +84,7 @@ public class SHA1WithRSAProxySignature extends Signature {
 		LOG.debug("engineSign");
 		byte[] signatureValue = SHA1WithRSAProxySignature.signatureValues.get();
 		if (null != signatureValue) {
-			LOG.debug("injecting signature value: "
-					+ Hex.encodeHexString(signatureValue));
+			LOG.debug("injecting signature value: " + Hex.encodeHexString(signatureValue));
 			reset();
 			return signatureValue;
 		}
@@ -104,13 +98,11 @@ public class SHA1WithRSAProxySignature extends Signature {
 	}
 
 	@Override
-	protected void engineUpdate(byte[] b, int off, int len)
-			throws SignatureException {
+	protected void engineUpdate(byte[] b, int off, int len) throws SignatureException {
 		LOG.debug("engineUpdate(b,off,len): off=" + off + "; len=" + len);
 		this.messageDigest.update(b, off, len);
 		byte[] digestValue = this.messageDigest.digest();
-		byte[] expectedDigestValue = SHA1WithRSAProxySignature.digestValues
-				.get();
+		byte[] expectedDigestValue = SHA1WithRSAProxySignature.digestValues.get();
 		if (null == expectedDigestValue) {
 			SHA1WithRSAProxySignature.digestValues.set(digestValue);
 		} else {
@@ -134,8 +126,7 @@ public class SHA1WithRSAProxySignature extends Signature {
 		SHA1WithRSAProxySignature.signatureValues.set(signatureValue);
 	}
 
-	public static void setDigestSignatureValue(byte[] digestValue,
-			byte[] signatureValue) {
+	public static void setDigestSignatureValue(byte[] digestValue, byte[] signatureValue) {
 		SHA1WithRSAProxySignature.digestValues.set(digestValue);
 		SHA1WithRSAProxySignature.signatureValues.set(signatureValue);
 	}

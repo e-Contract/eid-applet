@@ -53,8 +53,7 @@ public class TlvParserTest {
 	@Test
 	public void parseIdentityFile() throws Exception {
 		// setup
-		InputStream idInputStream = TlvParserTest.class
-				.getResourceAsStream("/id-alice.tlv");
+		InputStream idInputStream = TlvParserTest.class.getResourceAsStream("/id-alice.tlv");
 		byte[] idFile = IOUtils.toByteArray(idInputStream);
 
 		// operate
@@ -68,16 +67,11 @@ public class TlvParserTest {
 		assertEquals("Alice Geldigekaart2266", identity.firstName);
 		LOG.debug("card number: " + identity.cardNumber);
 		assertEquals("000000226635", identity.cardNumber);
-		LOG.debug("card validity date begin: "
-				+ identity.cardValidityDateBegin.getTime());
-		assertEquals(new GregorianCalendar(2005, 7, 8),
-				identity.cardValidityDateBegin);
-		LOG.debug("card validity date end: "
-				+ identity.cardValidityDateEnd.getTime());
-		assertEquals(new GregorianCalendar(2010, 7, 8),
-				identity.cardValidityDateEnd);
-		LOG.debug("Card Delivery Municipality: "
-				+ identity.cardDeliveryMunicipality);
+		LOG.debug("card validity date begin: " + identity.cardValidityDateBegin.getTime());
+		assertEquals(new GregorianCalendar(2005, 7, 8), identity.cardValidityDateBegin);
+		LOG.debug("card validity date end: " + identity.cardValidityDateEnd.getTime());
+		assertEquals(new GregorianCalendar(2010, 7, 8), identity.cardValidityDateEnd);
+		LOG.debug("Card Delivery Municipality: " + identity.cardDeliveryMunicipality);
 		assertEquals("Certipost Specimen", identity.cardDeliveryMunicipality);
 		LOG.debug("national number: " + identity.nationalNumber);
 		assertEquals("71715100070", identity.nationalNumber);
@@ -100,8 +94,7 @@ public class TlvParserTest {
 	@Test
 	public void parseIdentityFile2() throws Exception {
 		// setup
-		InputStream idInputStream = TlvParserTest.class
-				.getResourceAsStream("/id-alice-2.tlv");
+		InputStream idInputStream = TlvParserTest.class.getResourceAsStream("/id-alice-2.tlv");
 		byte[] idFile = IOUtils.toByteArray(idInputStream);
 
 		// operate
@@ -115,16 +108,11 @@ public class TlvParserTest {
 		assertEquals("Alice Geldigekaart0126", identity.firstName);
 		LOG.debug("card number: " + identity.cardNumber);
 		assertEquals("000000012629", identity.cardNumber);
-		LOG.debug("card validity date begin: "
-				+ identity.cardValidityDateBegin.getTime());
-		assertEquals(new GregorianCalendar(2003, 9, 24),
-				identity.cardValidityDateBegin);
-		LOG.debug("card validity date end: "
-				+ identity.cardValidityDateEnd.getTime());
-		assertEquals(new GregorianCalendar(2008, 9, 24),
-				identity.cardValidityDateEnd);
-		LOG.debug("Card Delivery Municipality: "
-				+ identity.cardDeliveryMunicipality);
+		LOG.debug("card validity date begin: " + identity.cardValidityDateBegin.getTime());
+		assertEquals(new GregorianCalendar(2003, 9, 24), identity.cardValidityDateBegin);
+		LOG.debug("card validity date end: " + identity.cardValidityDateEnd.getTime());
+		assertEquals(new GregorianCalendar(2008, 9, 24), identity.cardValidityDateEnd);
+		LOG.debug("Card Delivery Municipality: " + identity.cardDeliveryMunicipality);
 		assertEquals("Certipost Specimen", identity.cardDeliveryMunicipality);
 		LOG.debug("national number: " + identity.nationalNumber);
 		assertEquals("71715100070", identity.nationalNumber);
@@ -145,8 +133,7 @@ public class TlvParserTest {
 	@Test
 	public void testYellowCane() throws Exception {
 		// setup
-		byte[] idFile = IOUtils.toByteArray(TlvParserTest.class
-				.getResourceAsStream("/yellow-cane.tlv"));
+		byte[] idFile = IOUtils.toByteArray(TlvParserTest.class.getResourceAsStream("/yellow-cane.tlv"));
 
 		// operate
 		Identity identity = TlvParser.parse(idFile, Identity.class);
@@ -162,8 +149,7 @@ public class TlvParserTest {
 	@Test
 	public void testWhiteCane() throws Exception {
 		// setup
-		byte[] idFile = IOUtils.toByteArray(TlvParserTest.class
-				.getResourceAsStream("/white-cane.tlv"));
+		byte[] idFile = IOUtils.toByteArray(TlvParserTest.class.getResourceAsStream("/white-cane.tlv"));
 
 		// operate
 		Identity identity = TlvParser.parse(idFile, Identity.class);
@@ -179,8 +165,7 @@ public class TlvParserTest {
 	@Test
 	public void testExtendedMinority() throws Exception {
 		// setup
-		byte[] idFile = IOUtils.toByteArray(TlvParserTest.class
-				.getResourceAsStream("/extended-minority.tlv"));
+		byte[] idFile = IOUtils.toByteArray(TlvParserTest.class.getResourceAsStream("/extended-minority.tlv"));
 
 		// operate
 		Identity identity = TlvParser.parse(idFile, Identity.class);
@@ -190,14 +175,12 @@ public class TlvParserTest {
 		assertEquals(SpecialStatus.EXTENDED_MINORITY, identity.specialStatus);
 		assertFalse(identity.specialStatus.hasBadSight());
 		assertTrue(identity.specialStatus.hasExtendedMinority());
-		LOG.debug("special organisation: \""
-				+ identity.getSpecialOrganisation() + "\"");
+		LOG.debug("special organisation: \"" + identity.getSpecialOrganisation() + "\"");
 		assertNull(identity.getSpecialOrganisation());
 	}
 
 	@Test
-	public void testStringIndexOutOfBoundsExceptionOnDateAndCountryOfProtection()
-			throws Exception {
+	public void testStringIndexOutOfBoundsExceptionOnDateAndCountryOfProtection() throws Exception {
 		// setup
 		byte[] idFile = new byte[] { 21, 1, '0' };
 
@@ -211,31 +194,26 @@ public class TlvParserTest {
 	@Test
 	public void testDateAndCountryOfProtection() throws Exception {
 		// setup
-		byte[] idFile = IOUtils.toByteArray(TlvParserTest.class
-				.getResourceAsStream("/dateandcountry.tlv"));
+		byte[] idFile = IOUtils.toByteArray(TlvParserTest.class.getResourceAsStream("/dateandcountry.tlv"));
 
 		// operate
 		Identity identity = TlvParser.parse(idFile, Identity.class);
 
 		// verify
 		LOG.debug("document type: " + identity.documentType);
-		LOG.debug("date and country of protection: "
-				+ identity.getDateAndCountryOfProtection());
+		LOG.debug("date and country of protection: " + identity.getDateAndCountryOfProtection());
 		assertEquals("13.08.2014-IT", identity.getDateAndCountryOfProtection());
-		LOG.debug("date of protection: "
-				+ identity.getDateOfProtection().getTime());
+		LOG.debug("date of protection: " + identity.getDateOfProtection().getTime());
 		assertEquals(2014, identity.getDateOfProtection().get(Calendar.YEAR));
 		assertEquals(8 - 1, identity.getDateOfProtection().get(Calendar.MONTH));
-		assertEquals(13,
-				identity.getDateOfProtection().get(Calendar.DAY_OF_MONTH));
+		assertEquals(13, identity.getDateOfProtection().get(Calendar.DAY_OF_MONTH));
 		assertEquals("IT", identity.getCountryOfProtection());
 	}
 
 	@Test
 	public void parseAddressFile() throws Exception {
 		// setup
-		InputStream addressInputStream = TlvParserTest.class
-				.getResourceAsStream("/address-alice.tlv");
+		InputStream addressInputStream = TlvParserTest.class.getResourceAsStream("/address-alice.tlv");
 		byte[] addressFile = IOUtils.toByteArray(addressInputStream);
 
 		// operate
@@ -272,8 +250,7 @@ public class TlvParserTest {
 
 	@Test
 	public void testInvalidDateUnknownMonth() throws Exception {
-		byte[] yearOnlyTLV = new byte[] { 12, 12, '2', '0', ' ', 'J', 'U', 'N',
-				'O', ' ', '1', '9', '6', '4' };
+		byte[] yearOnlyTLV = new byte[] { 12, 12, '2', '0', ' ', 'J', 'U', 'N', 'O', ' ', '1', '9', '6', '4' };
 
 		try {
 			TlvParser.parse(yearOnlyTLV, Identity.class);
@@ -285,8 +262,7 @@ public class TlvParserTest {
 
 	@Test
 	public void testInvalidDateMissingDayOfMonth() throws Exception {
-		byte[] yearOnlyTLV = new byte[] { 12, 8, 'S', 'E', 'P', ' ', '1', '9',
-				'6', '4' };
+		byte[] yearOnlyTLV = new byte[] { 12, 8, 'S', 'E', 'P', ' ', '1', '9', '6', '4' };
 
 		try {
 			TlvParser.parse(yearOnlyTLV, Identity.class);
@@ -355,8 +331,7 @@ public class TlvParserTest {
 
 		// verify
 		assertEquals(0x7f, largeField.field1.length);
-		assertArrayEquals(new byte[] { (byte) 0xca, (byte) 0xfe, (byte) 0xba,
-				(byte) 0xbe }, largeField.field2);
+		assertArrayEquals(new byte[] { (byte) 0xca, (byte) 0xfe, (byte) 0xba, (byte) 0xbe }, largeField.field2);
 	}
 
 	public static class MiddlewareEIDFile {
@@ -366,12 +341,9 @@ public class TlvParserTest {
 
 	@Test
 	public void testParseMiddlewareEIDFile() throws Exception {
-		byte[] eidFile = IOUtils.toByteArray(TlvParserTest.class
-				.getResourceAsStream("/71715100070.eid"));
-		MiddlewareEIDFile middlewareEIDFile = TlvParser.parse(eidFile,
-				MiddlewareEIDFile.class);
-		Identity identity = TlvParser.parse(middlewareEIDFile.identityFile,
-				Identity.class);
+		byte[] eidFile = IOUtils.toByteArray(TlvParserTest.class.getResourceAsStream("/71715100070.eid"));
+		MiddlewareEIDFile middlewareEIDFile = TlvParser.parse(eidFile, MiddlewareEIDFile.class);
+		Identity identity = TlvParser.parse(middlewareEIDFile.identityFile, Identity.class);
 		LOG.debug("identity: " + identity);
 		LOG.debug("identity NRN: " + identity.nationalNumber);
 		assertEquals("71715100070", identity.nationalNumber);
@@ -381,8 +353,7 @@ public class TlvParserTest {
 	@Test
 	public void testForeignerIdentityFile() throws Exception {
 		// setup
-		InputStream inputStream = TlvParserTest.class
-				.getResourceAsStream("/id-foreigner.tlv");
+		InputStream inputStream = TlvParserTest.class.getResourceAsStream("/id-foreigner.tlv");
 		byte[] identityData = IOUtils.toByteArray(inputStream);
 
 		// operate
@@ -395,28 +366,23 @@ public class TlvParserTest {
 		assertEquals(DocumentType.FOREIGNER_E_PLUS, identity.getDocumentType());
 		assertNotNull(identity.getDuplicate());
 		LOG.debug("duplicate: " + identity.getDuplicate());
-		LOG.debug("special organisation: \""
-				+ identity.getSpecialOrganisation() + "\"");
-		assertEquals(SpecialOrganisation.UNSPECIFIED,
-				identity.getSpecialOrganisation());
+		LOG.debug("special organisation: \"" + identity.getSpecialOrganisation() + "\"");
+		assertEquals(SpecialOrganisation.UNSPECIFIED, identity.getSpecialOrganisation());
 	}
 
 	@Test
 	public void testGermanIdentityFileDoB() throws Exception {
 		// setup
-		byte[] idFileCaseInTheField = new byte[] { 12, 12, '2', '3', '.', 'S',
-				'E', 'P', '.', ' ', '1', '9', '8', '2' };
+		byte[] idFileCaseInTheField = new byte[] { 12, 12, '2', '3', '.', 'S', 'E', 'P', '.', ' ', '1', '9', '8', '2' };
 
 		// operate
-		Identity identity = TlvParser.parse(idFileCaseInTheField,
-				Identity.class);
+		Identity identity = TlvParser.parse(idFileCaseInTheField, Identity.class);
 
 		// verify
 		assertNotNull(identity.getDateOfBirth());
 		LOG.debug("date of birth: " + identity.getDateOfBirth().getTime());
 
-		byte[] idFile = new byte[] { 12, 11, '2', '3', '.', 'S', 'E', 'P', '.',
-				'1', '9', '8', '2' };
+		byte[] idFile = new byte[] { 12, 11, '2', '3', '.', 'S', 'E', 'P', '.', '1', '9', '8', '2' };
 		Identity identity2 = TlvParser.parse(idFile, Identity.class);
 		assertEquals(identity.getDateOfBirth(), identity2.getDateOfBirth());
 	}
@@ -424,8 +390,7 @@ public class TlvParserTest {
 	@Test
 	public void testIdentityFileDoBYearOnlyWithSpaces() throws Exception {
 		// setup
-		byte[] idFile = new byte[] { 12, 12, ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-				' ', '1', '9', '6', '2' };
+		byte[] idFile = new byte[] { 12, 12, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '1', '9', '6', '2' };
 
 		// operate
 		Identity identity = TlvParser.parse(idFile, Identity.class);
@@ -441,8 +406,7 @@ public class TlvParserTest {
 	@Test
 	public void testParseOldIdentityFile() throws Exception {
 		// setup
-		InputStream inputStream = TlvParserTest.class
-				.getResourceAsStream("/old-eid.txt");
+		InputStream inputStream = TlvParserTest.class.getResourceAsStream("/old-eid.txt");
 		byte[] base64IdentityData = IOUtils.toByteArray(inputStream);
 		byte[] identityData = Base64.decodeBase64(base64IdentityData);
 
@@ -453,16 +417,14 @@ public class TlvParserTest {
 		LOG.debug("name: " + identity.getName());
 		LOG.debug("first name: " + identity.getFirstName());
 		LOG.debug("document type: " + identity.getDocumentType());
-		LOG.debug("card validity date begin: "
-				+ identity.getCardValidityDateBegin().getTime());
+		LOG.debug("card validity date begin: " + identity.getCardValidityDateBegin().getTime());
 		assertEquals(DocumentType.BELGIAN_CITIZEN, identity.getDocumentType());
 	}
 
 	@Test
 	public void testParseNewIdentityFile() throws Exception {
 		// setup
-		InputStream inputStream = TlvParserTest.class
-				.getResourceAsStream("/new-eid.txt");
+		InputStream inputStream = TlvParserTest.class.getResourceAsStream("/new-eid.txt");
 		byte[] base64IdentityData = IOUtils.toByteArray(inputStream);
 		byte[] identityData = Base64.decodeBase64(base64IdentityData);
 
@@ -472,8 +434,7 @@ public class TlvParserTest {
 		// verify
 		LOG.debug("name: " + identity.getName());
 		LOG.debug("first name: " + identity.getFirstName());
-		LOG.debug("card validity date begin: "
-				+ identity.getCardValidityDateBegin().getTime());
+		LOG.debug("card validity date begin: " + identity.getCardValidityDateBegin().getTime());
 		LOG.debug("document type: " + identity.getDocumentType());
 		assertEquals(DocumentType.BELGIAN_CITIZEN, identity.getDocumentType());
 		assertNull(identity.getDuplicate());
@@ -483,8 +444,7 @@ public class TlvParserTest {
 	@Test
 	public void testHCard() throws Exception {
 		// setup
-		InputStream inputStream = TlvParserTest.class
-				.getResourceAsStream("/h-card.tlv");
+		InputStream inputStream = TlvParserTest.class.getResourceAsStream("/h-card.tlv");
 		byte[] identityData = IOUtils.toByteArray(inputStream);
 
 		// operate
@@ -492,22 +452,18 @@ public class TlvParserTest {
 
 		// verify
 		LOG.debug("document type: " + identity.getDocumentType());
-		assertEquals(DocumentType.EUROPEAN_BLUE_CARD_H,
-				identity.getDocumentType());
+		assertEquals(DocumentType.EUROPEAN_BLUE_CARD_H, identity.getDocumentType());
 		LOG.debug("duplicate: " + identity.getDuplicate());
 		assertEquals("01", identity.getDuplicate());
 		assertTrue(identity.isMemberOfFamily());
-		LOG.debug("special organisation: \""
-				+ identity.getSpecialOrganisation() + "\"");
-		assertEquals(SpecialOrganisation.UNSPECIFIED,
-				identity.getSpecialOrganisation());
+		LOG.debug("special organisation: \"" + identity.getSpecialOrganisation() + "\"");
+		assertEquals(SpecialOrganisation.UNSPECIFIED, identity.getSpecialOrganisation());
 	}
 
 	@Test
 	public void testDuplicate02() throws Exception {
 		// setup
-		InputStream inputStream = TlvParserTest.class
-				.getResourceAsStream("/duplicate-02.tlv");
+		InputStream inputStream = TlvParserTest.class.getResourceAsStream("/duplicate-02.tlv");
 		byte[] identityData = IOUtils.toByteArray(inputStream);
 
 		// operate
@@ -520,9 +476,7 @@ public class TlvParserTest {
 		assertEquals("02", identity.getDuplicate());
 		LOG.debug("member of family: " + identity.isMemberOfFamily());
 		assertTrue(identity.isMemberOfFamily());
-		LOG.debug("special organisation: \""
-				+ identity.getSpecialOrganisation() + "\"");
-		assertEquals(SpecialOrganisation.RESEARCHER,
-				identity.getSpecialOrganisation());
+		LOG.debug("special organisation: \"" + identity.getSpecialOrganisation() + "\"");
+		assertEquals(SpecialOrganisation.RESEARCHER, identity.getSpecialOrganisation());
 	}
 }

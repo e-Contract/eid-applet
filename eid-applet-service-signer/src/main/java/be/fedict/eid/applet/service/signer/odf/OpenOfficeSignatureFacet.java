@@ -18,8 +18,22 @@
 
 package be.fedict.eid.applet.service.signer.odf;
 
-import be.fedict.eid.applet.service.signer.DigestAlgo;
-import be.fedict.eid.applet.service.signer.SignatureFacet;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
+
+import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dom.DOMStructure;
+import javax.xml.crypto.dsig.DigestMethod;
+import javax.xml.crypto.dsig.Reference;
+import javax.xml.crypto.dsig.SignatureProperties;
+import javax.xml.crypto.dsig.SignatureProperty;
+import javax.xml.crypto.dsig.XMLObject;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.utils.Constants;
@@ -30,15 +44,8 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import javax.xml.crypto.XMLStructure;
-import javax.xml.crypto.dom.DOMStructure;
-import javax.xml.crypto.dsig.*;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import be.fedict.eid.applet.service.signer.DigestAlgo;
+import be.fedict.eid.applet.service.signer.SignatureFacet;
 
 /**
  * OpenOffice.org signature facet.
@@ -47,59 +54,49 @@ import java.util.UUID;
  */
 public class OpenOfficeSignatureFacet implements SignatureFacet {
 
-    private static final Log LOG = LogFactory
-            .getLog(OpenOfficeSignatureFacet.class);
+	private static final Log LOG = LogFactory.getLog(OpenOfficeSignatureFacet.class);
 
-    private final DigestAlgo digestAlgo;
+	private final DigestAlgo digestAlgo;
 
-    public OpenOfficeSignatureFacet(DigestAlgo digestAlgo) {
-        this.digestAlgo = digestAlgo;
-    }
+	public OpenOfficeSignatureFacet(DigestAlgo digestAlgo) {
+		this.digestAlgo = digestAlgo;
+	}
 
-    public void preSign(XMLSignatureFactory signatureFactory,
-                        Document document, String signatureId,
-                        List<X509Certificate> signingCertificateChain,
-                        List<Reference> references, List<XMLObject> objects)
-            throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-        LOG.debug("pre sign");
+	public void preSign(XMLSignatureFactory signatureFactory, Document document, String signatureId,
+			List<X509Certificate> signingCertificateChain, List<Reference> references, List<XMLObject> objects)
+					throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+		LOG.debug("pre sign");
 
-        Element dateElement = document.createElementNS("", "dc:date");
-        dateElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:dc",
-                "http://purl.org/dc/elements/1.1/");
-        DateTime dateTime = new DateTime(DateTimeZone.UTC);
-        DateTimeFormatter fmt = ISODateTimeFormat.dateTimeNoMillis();
-        String now = fmt.print(dateTime);
-        now = now.substring(0, now.indexOf("Z"));
-        LOG.debug("now: " + now);
-        dateElement.setTextContent(now);
+		Element dateElement = document.createElementNS("", "dc:date");
+		dateElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:dc", "http://purl.org/dc/elements/1.1/");
+		DateTime dateTime = new DateTime(DateTimeZone.UTC);
+		DateTimeFormatter fmt = ISODateTimeFormat.dateTimeNoMillis();
+		String now = fmt.print(dateTime);
+		now = now.substring(0, now.indexOf("Z"));
+		LOG.debug("now: " + now);
+		dateElement.setTextContent(now);
 
-        String signaturePropertyId = "sign-prop-"
-                + UUID.randomUUID().toString();
-        List<XMLStructure> signaturePropertyContent = new LinkedList<XMLStructure>();
-        signaturePropertyContent.add(new DOMStructure(dateElement));
-        SignatureProperty signatureProperty = signatureFactory
-                .newSignatureProperty(signaturePropertyContent, "#"
-                        + signatureId, signaturePropertyId);
+		String signaturePropertyId = "sign-prop-" + UUID.randomUUID().toString();
+		List<XMLStructure> signaturePropertyContent = new LinkedList<XMLStructure>();
+		signaturePropertyContent.add(new DOMStructure(dateElement));
+		SignatureProperty signatureProperty = signatureFactory.newSignatureProperty(signaturePropertyContent,
+				"#" + signatureId, signaturePropertyId);
 
-        List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
-        List<SignatureProperty> signaturePropertiesContent = new LinkedList<SignatureProperty>();
-        signaturePropertiesContent.add(signatureProperty);
-        SignatureProperties signatureProperties = signatureFactory
-                .newSignatureProperties(signaturePropertiesContent, null);
-        objectContent.add(signatureProperties);
+		List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
+		List<SignatureProperty> signaturePropertiesContent = new LinkedList<SignatureProperty>();
+		signaturePropertiesContent.add(signatureProperty);
+		SignatureProperties signatureProperties = signatureFactory.newSignatureProperties(signaturePropertiesContent,
+				null);
+		objectContent.add(signatureProperties);
 
-        objects.add(signatureFactory.newXMLObject(objectContent, null, null,
-                null));
+		objects.add(signatureFactory.newXMLObject(objectContent, null, null, null));
 
-        DigestMethod digestMethod = signatureFactory.newDigestMethod(
-                this.digestAlgo.getXmlAlgoId(), null);
-        Reference reference = signatureFactory.newReference("#"
-                + signaturePropertyId, digestMethod);
-        references.add(reference);
-    }
+		DigestMethod digestMethod = signatureFactory.newDigestMethod(this.digestAlgo.getXmlAlgoId(), null);
+		Reference reference = signatureFactory.newReference("#" + signaturePropertyId, digestMethod);
+		references.add(reference);
+	}
 
-    public void postSign(Element signatureElement,
-                         List<X509Certificate> signingCertificateChain) {
-        // empty
-    }
+	public void postSign(Element signatureElement, List<X509Certificate> signingCertificateChain) {
+		// empty
+	}
 }

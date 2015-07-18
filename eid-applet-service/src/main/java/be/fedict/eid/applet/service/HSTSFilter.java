@@ -52,16 +52,14 @@ public class HSTSFilter implements Filter {
 	public void destroy() {
 	}
 
-	public void doFilter(ServletRequest request, ServletResponse response,
-			FilterChain chain) throws IOException, ServletException {
-		TransportService transportService = this.transportServiceLocator
-				.locateService();
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
+		TransportService transportService = this.transportServiceLocator.locateService();
 		if (null == transportService) {
 			chain.doFilter(request, response);
 			return;
 		}
-		StrictTransportSecurityConfig hstsConfig = transportService
-				.getStrictTransportSecurityConfig();
+		StrictTransportSecurityConfig hstsConfig = transportService.getStrictTransportSecurityConfig();
 		if (null == hstsConfig) {
 			chain.doFilter(request, response);
 			return;
@@ -77,7 +75,6 @@ public class HSTSFilter implements Filter {
 	}
 
 	public void init(FilterConfig config) throws ServletException {
-		this.transportServiceLocator = new ServiceLocator<TransportService>(
-				TRANSPORT_SERVICE_INIT_PARAM, config);
+		this.transportServiceLocator = new ServiceLocator<TransportService>(TRANSPORT_SERVICE_INIT_PARAM, config);
 	}
 }

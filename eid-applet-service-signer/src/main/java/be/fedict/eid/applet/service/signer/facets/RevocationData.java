@@ -62,8 +62,7 @@ public class RevocationData {
 		try {
 			encodedCrl = crl.getEncoded();
 		} catch (CRLException e) {
-			throw new IllegalArgumentException("CRL coding error: "
-					+ e.getMessage(), e);
+			throw new IllegalArgumentException("CRL coding error: " + e.getMessage(), e);
 		}
 		addCRL(encodedCrl);
 	}

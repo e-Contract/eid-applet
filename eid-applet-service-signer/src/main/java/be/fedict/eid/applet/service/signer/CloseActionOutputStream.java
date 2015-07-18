@@ -34,8 +34,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CloseActionOutputStream extends ProxyOutputStream {
 
-	private static final Log LOG = LogFactory
-			.getLog(CloseActionOutputStream.class);
+	private static final Log LOG = LogFactory.getLog(CloseActionOutputStream.class);
 
 	private final Runnable closeAction;
 

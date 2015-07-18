@@ -46,8 +46,7 @@ public class TestView implements View {
 	}
 
 	@Override
-	public boolean privacyQuestion(boolean includeAddress,
-			boolean includePhoto, String identityDataUsage) {
+	public boolean privacyQuestion(boolean includeAddress, boolean includePhoto, String identityDataUsage) {
 		return false;
 	}
 

@@ -32,9 +32,9 @@ import java.lang.annotation.RetentionPolicy;
 @Documented
 public @interface MapsTo {
 
-	public Class<?> value();
+	public Class<?>value();
 
 	public String field() default "";
 
-	public Class<? extends ValueConvertor<?, ?>> convertor() default IdenticalValueConvertor.class;
+	public Class<? extends ValueConvertor<?, ?>>convertor() default IdenticalValueConvertor.class;
 }

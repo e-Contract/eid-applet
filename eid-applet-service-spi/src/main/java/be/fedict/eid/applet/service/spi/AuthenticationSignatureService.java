@@ -55,7 +55,6 @@ public interface AuthenticationSignatureService {
 	 * @param authenticationSignatureContext
 	 *            the context.
 	 */
-	void postSign(byte[] signatureValue,
-			List<X509Certificate> authnCertificateChain,
+	void postSign(byte[] signatureValue, List<X509Certificate> authnCertificateChain,
 			AuthenticationSignatureContext authenticationSignatureContext);
 }

@@ -40,8 +40,7 @@ public class ServiceLocator<T> {
 
 	private final String className;
 
-	public ServiceLocator(String initParam, ServletConfig config)
-			throws ServletException {
+	public ServiceLocator(String initParam, ServletConfig config) throws ServletException {
 		this.jndiLocation = config.getInitParameter(initParam);
 		this.className = config.getInitParameter(initParam + "Class");
 	}
@@ -68,8 +67,7 @@ public class ServiceLocator<T> {
 			} else if (null != this.className) {
 				Thread currentThread = Thread.currentThread();
 				ClassLoader classLoader = currentThread.getContextClassLoader();
-				Class<T> serviceClass = (Class<T>) classLoader
-						.loadClass(this.className);
+				Class<T> serviceClass = (Class<T>) classLoader.loadClass(this.className);
 				service = serviceClass.newInstance();
 			} else {
 				service = null;

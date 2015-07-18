@@ -70,10 +70,9 @@ public interface SignatureFacet {
 	 * @throws InvalidAlgorithmParameterException
 	 * @throws NoSuchAlgorithmException
 	 */
-	void preSign(XMLSignatureFactory signatureFactory, Document document,
-			String signatureId, List<X509Certificate> signingCertificateChain,
-			List<Reference> references, List<XMLObject> objects)
-			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException;
+	void preSign(XMLSignatureFactory signatureFactory, Document document, String signatureId,
+			List<X509Certificate> signingCertificateChain, List<Reference> references, List<XMLObject> objects)
+					throws NoSuchAlgorithmException, InvalidAlgorithmParameterException;
 
 	/**
 	 * This method is being invoked by the XML signature service engine during
@@ -83,6 +82,5 @@ public interface SignatureFacet {
 	 * @param signatureElement
 	 * @param signingCertificateChain
 	 */
-	void postSign(Element signatureElement,
-			List<X509Certificate> signingCertificateChain);
+	void postSign(Element signatureElement, List<X509Certificate> signingCertificateChain);
 }

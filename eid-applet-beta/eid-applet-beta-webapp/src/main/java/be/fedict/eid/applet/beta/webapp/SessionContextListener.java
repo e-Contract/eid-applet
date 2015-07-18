@@ -33,8 +33,7 @@ import be.fedict.eid.applet.beta.SessionContextManager;
 @WebListener
 public class SessionContextListener implements HttpSessionListener {
 
-	private static final Log LOG = LogFactory
-			.getLog(SessionContextListener.class);
+	private static final Log LOG = LogFactory.getLog(SessionContextListener.class);
 
 	@EJB
 	private SessionContextManager sessionContextManager;
@@ -43,8 +42,7 @@ public class SessionContextListener implements HttpSessionListener {
 		HttpSession session = event.getSession();
 		String sessionId = session.getId();
 		LOG.debug("session created: " + sessionId);
-		int contextId = this.sessionContextManager
-				.getSessionContextId(sessionId);
+		int contextId = this.sessionContextManager.getSessionContextId(sessionId);
 		LOG.debug("context Id: " + contextId);
 	}
 

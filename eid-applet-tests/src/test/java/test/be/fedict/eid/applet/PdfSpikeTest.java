@@ -41,9 +41,6 @@ import org.apache.pdfbox.cos.COSString;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.Test;
 
-import be.fedict.eid.applet.Messages;
-import be.fedict.eid.applet.sc.PcscEid;
-
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Rectangle;
@@ -57,6 +54,9 @@ import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.PdfString;
 import com.lowagie.text.pdf.PdfWriter;
+
+import be.fedict.eid.applet.Messages;
+import be.fedict.eid.applet.sc.PcscEid;
 
 public class PdfSpikeTest {
 
@@ -86,15 +86,13 @@ public class PdfSpikeTest {
 		FileUtils.writeByteArrayToFile(tmpFile, baos.toByteArray());
 
 		// eID
-		PcscEid pcscEid = new PcscEid(new TestView(), new Messages(
-				Locale.getDefault()));
+		PcscEid pcscEid = new PcscEid(new TestView(), new Messages(Locale.getDefault()));
 		if (false == pcscEid.isEidPresent()) {
 			LOG.debug("insert eID card");
 			pcscEid.waitForEidPresent();
 		}
 
-		List<X509Certificate> signCertificateChain = pcscEid
-				.getSignCertificateChain();
+		List<X509Certificate> signCertificateChain = pcscEid.getSignCertificateChain();
 		Certificate[] certs = new Certificate[signCertificateChain.size()];
 		for (int idx = 0; idx < certs.length; idx++) {
 			certs[idx] = signCertificateChain.get(idx);
@@ -105,8 +103,7 @@ public class PdfSpikeTest {
 		File signedTmpFile = File.createTempFile("test-signed-", ".pdf");
 		PdfReader reader = new PdfReader(pdfInputStream);
 		FileOutputStream pdfOutputStream = new FileOutputStream(signedTmpFile);
-		PdfStamper stamper = PdfStamper.createSignature(reader,
-				pdfOutputStream, '\0', null, true);
+		PdfStamper stamper = PdfStamper.createSignature(reader, pdfOutputStream, '\0', null, true);
 
 		// add extra page
 		Rectangle pageSize = reader.getPageSize(1);
@@ -118,31 +115,23 @@ public class PdfSpikeTest {
 		int signatureNameIndex = 1;
 		String signatureName;
 		AcroFields existingAcroFields = reader.getAcroFields();
-		List<String> existingSignatureNames = existingAcroFields
-				.getSignatureNames();
+		List<String> existingSignatureNames = existingAcroFields.getSignatureNames();
 		do {
 			signatureName = "Signature" + signatureNameIndex;
 			signatureNameIndex++;
 		} while (existingSignatureNames.contains(signatureName));
 		LOG.debug("new unique signature name: " + signatureName);
 
-		PdfSignatureAppearance signatureAppearance = stamper
-				.getSignatureAppearance();
-		signatureAppearance.setCrypto(null, certs, null,
-				PdfSignatureAppearance.SELF_SIGNED);
-		signatureAppearance
-				.setCertificationLevel(PdfSignatureAppearance.CERTIFIED_NO_CHANGES_ALLOWED);
+		PdfSignatureAppearance signatureAppearance = stamper.getSignatureAppearance();
+		signatureAppearance.setCrypto(null, certs, null, PdfSignatureAppearance.SELF_SIGNED);
+		signatureAppearance.setCertificationLevel(PdfSignatureAppearance.CERTIFIED_NO_CHANGES_ALLOWED);
 		signatureAppearance.setReason("PDF Signature Test");
 		signatureAppearance.setLocation("Belgium");
-		signatureAppearance
-				.setVisibleSignature(new Rectangle(54, 440, 234, 566),
-						extraPageIndex, signatureName);
-		signatureAppearance.setExternalDigest(new byte[128], new byte[20],
-				"RSA");
+		signatureAppearance.setVisibleSignature(new Rectangle(54, 440, 234, 566), extraPageIndex, signatureName);
+		signatureAppearance.setExternalDigest(new byte[128], new byte[20], "RSA");
 		signatureAppearance.preClose();
 
-		byte[] content = IOUtils.toByteArray(signatureAppearance
-				.getRangeStream());
+		byte[] content = IOUtils.toByteArray(signatureAppearance.getRangeStream());
 		byte[] hash = MessageDigest.getInstance("SHA-1").digest(content);
 		byte[] signatureBytes = pcscEid.sign(hash, "SHA-1");
 		pcscEid.close();
@@ -151,8 +140,7 @@ public class PdfSpikeTest {
 		PdfPKCS7 signature = sigStandard.getSigner();
 		signature.setExternalDigest(signatureBytes, hash, "RSA");
 		PdfDictionary dictionary = new PdfDictionary();
-		dictionary.put(PdfName.CONTENTS,
-				new PdfString(signature.getEncodedPKCS1()).setHexWriting(true));
+		dictionary.put(PdfName.CONTENTS, new PdfString(signature.getEncodedPKCS1()).setHexWriting(true));
 		signatureAppearance.close(dictionary);
 
 		LOG.debug("signed tmp file: " + signedTmpFile.getAbsolutePath());
@@ -163,21 +151,18 @@ public class PdfSpikeTest {
 		ArrayList<String> signatureNames = acroFields.getSignatureNames();
 		for (String signName : signatureNames) {
 			LOG.debug("signature name: " + signName);
-			LOG.debug("signature covers whole document: "
-					+ acroFields.signatureCoversWholeDocument(signName));
-			LOG.debug("document revision " + acroFields.getRevision(signName)
-					+ " of " + acroFields.getTotalRevisions());
+			LOG.debug("signature covers whole document: " + acroFields.signatureCoversWholeDocument(signName));
+			LOG.debug(
+					"document revision " + acroFields.getRevision(signName) + " of " + acroFields.getTotalRevisions());
 			PdfPKCS7 pkcs7 = acroFields.verifySignature(signName);
 			Calendar signDate = pkcs7.getSignDate();
 			LOG.debug("signing date: " + signDate.getTime());
-			LOG.debug("Subject: "
-					+ PdfPKCS7.getSubjectFields(pkcs7.getSigningCertificate()));
+			LOG.debug("Subject: " + PdfPKCS7.getSubjectFields(pkcs7.getSigningCertificate()));
 			LOG.debug("Document modified: " + !pkcs7.verify());
 			Certificate[] verifyCerts = pkcs7.getCertificates();
 			for (Certificate certificate : verifyCerts) {
 				X509Certificate x509Certificate = (X509Certificate) certificate;
-				LOG.debug("cert subject: "
-						+ x509Certificate.getSubjectX500Principal());
+				LOG.debug("cert subject: " + x509Certificate.getSubjectX500Principal());
 			}
 		}
 
@@ -190,38 +175,31 @@ public class PdfSpikeTest {
 		 * PDF Reference - third edition - Adobe Portable Document Format -
 		 * Version 1.4 - 3.6.1 Document Catalog
 		 */
-		COSDictionary documentCatalog = (COSDictionary) trailer
-				.getDictionaryObject(COSName.ROOT);
+		COSDictionary documentCatalog = (COSDictionary) trailer.getDictionaryObject(COSName.ROOT);
 
 		/*
 		 * 8.6.1 Interactive Form Dictionary
 		 */
-		COSDictionary acroForm = (COSDictionary) documentCatalog
-				.getDictionaryObject(COSName.ACRO_FORM);
+		COSDictionary acroForm = (COSDictionary) documentCatalog.getDictionaryObject(COSName.ACRO_FORM);
 
-		COSArray fields = (COSArray) acroForm
-				.getDictionaryObject(COSName.FIELDS);
+		COSArray fields = (COSArray) acroForm.getDictionaryObject(COSName.FIELDS);
 		for (int fieldIdx = 0; fieldIdx < fields.size(); fieldIdx++) {
 			COSDictionary field = (COSDictionary) fields.getObject(fieldIdx);
 			String fieldType = field.getNameAsString("FT");
 			if ("Sig".equals(fieldType)) {
-				COSDictionary signatureDictionary = (COSDictionary) field
-						.getDictionaryObject(COSName.V);
+				COSDictionary signatureDictionary = (COSDictionary) field.getDictionaryObject(COSName.V);
 				/*
 				 * TABLE 8.60 Entries in a signature dictionary
 				 */
-				COSString signatoryName = (COSString) signatureDictionary
-						.getDictionaryObject(COSName.NAME);
+				COSString signatoryName = (COSString) signatureDictionary.getDictionaryObject(COSName.NAME);
 				if (null != signatoryName) {
 					LOG.debug("signatory name: " + signatoryName.getString());
 				}
-				COSString reason = (COSString) signatureDictionary
-						.getDictionaryObject(COSName.REASON);
+				COSString reason = (COSString) signatureDictionary.getDictionaryObject(COSName.REASON);
 				if (null != reason) {
 					LOG.debug("reason: " + reason.getString());
 				}
-				COSString location = (COSString) signatureDictionary
-						.getDictionaryObject(COSName.LOCATION);
+				COSString location = (COSString) signatureDictionary.getDictionaryObject(COSName.LOCATION);
 				if (null != location) {
 					LOG.debug("location: " + location.getString());
 				}
@@ -229,8 +207,7 @@ public class PdfSpikeTest {
 				if (null != signingTime) {
 					LOG.debug("signing time: " + signingTime.getTime());
 				}
-				String signatureHandler = signatureDictionary
-						.getNameAsString(COSName.FILTER);
+				String signatureHandler = signatureDictionary.getNameAsString(COSName.FILTER);
 				LOG.debug("signature handler: " + signatureHandler);
 			}
 		}

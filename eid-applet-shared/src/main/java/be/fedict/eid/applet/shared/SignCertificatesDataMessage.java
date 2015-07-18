@@ -50,8 +50,7 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator
-	public static final String TYPE = SignCertificatesDataMessage.class
-			.getSimpleName();
+	public static final String TYPE = SignCertificatesDataMessage.class.getSimpleName();
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "SignCertFileSize")
 	@NotNull
@@ -114,11 +113,9 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 	 *            optional
 	 * @throws IOException
 	 */
-	public SignCertificatesDataMessage(byte[] signCertFile,
-			byte[] citizenCaCertFile, byte[] rootCaCertFile,
-			byte[] identityFile, byte[] addressFile, byte[] photoFile,
-			byte[] identitySignFile, byte[] addressSignFile, byte[] nrnCertFile)
-			throws IOException {
+	public SignCertificatesDataMessage(byte[] signCertFile, byte[] citizenCaCertFile, byte[] rootCaCertFile,
+			byte[] identityFile, byte[] addressFile, byte[] photoFile, byte[] identitySignFile, byte[] addressSignFile,
+			byte[] nrnCertFile) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		baos.write(signCertFile);
@@ -160,9 +157,8 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 
 	public SignCertificatesDataMessage(X509Certificate[] signCertChain)
 			throws IOException, CertificateEncodingException {
-		this(signCertChain[0].getEncoded(), signCertChain[1].getEncoded(),
-				signCertChain[2].getEncoded(), null, null, null, null, null,
-				null);
+		this(signCertChain[0].getEncoded(), signCertChain[1].getEncoded(), signCertChain[2].getEncoded(), null, null,
+				null, null, null, null);
 	}
 
 	private byte[] copy(byte[] source, int idx, int count) {
@@ -204,13 +200,11 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 			idx += this.photoFileSize;
 		}
 		if (null != this.identitySignatureFileSize) {
-			this.identitySignatureData = copy(this.body, idx,
-					this.identitySignatureFileSize);
+			this.identitySignatureData = copy(this.body, idx, this.identitySignatureFileSize);
 			idx += this.identitySignatureFileSize;
 		}
 		if (null != this.addressSignatureFileSize) {
-			this.addressSignatureData = copy(this.body, idx,
-					this.addressSignatureFileSize);
+			this.addressSignatureData = copy(this.body, idx, this.addressSignatureFileSize);
 			idx += this.addressSignatureFileSize;
 		}
 		if (null != this.rrnCertFileSize) {
@@ -239,8 +233,7 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 		try {
 			certificateFactory = CertificateFactory.getInstance("X.509");
 		} catch (CertificateException e) {
-			throw new RuntimeException("cert factory error: " + e.getMessage(),
-					e);
+			throw new RuntimeException("cert factory error: " + e.getMessage(), e);
 		}
 		try {
 			X509Certificate certificate = (X509Certificate) certificateFactory

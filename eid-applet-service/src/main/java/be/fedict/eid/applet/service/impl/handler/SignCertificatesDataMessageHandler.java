@@ -66,11 +66,9 @@ import be.fedict.eid.applet.shared.SignRequestMessage;
  * 
  */
 @HandlesMessage(SignCertificatesDataMessage.class)
-public class SignCertificatesDataMessageHandler implements
-		MessageHandler<SignCertificatesDataMessage> {
+public class SignCertificatesDataMessageHandler implements MessageHandler<SignCertificatesDataMessage> {
 
-	private static final Log LOG = LogFactory
-			.getLog(SignCertificatesDataMessageHandler.class);
+	private static final Log LOG = LogFactory.getLog(SignCertificatesDataMessageHandler.class);
 
 	@InitParam(HelloMessageHandler.SIGNATURE_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<SignatureService> signatureServiceLocator;
@@ -93,19 +91,16 @@ public class SignCertificatesDataMessageHandler implements
 	@InitParam(HelloMessageHandler.IDENTITY_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<IdentityService> identityServiceLocator;
 
-	public Object handleMessage(SignCertificatesDataMessage message,
-			Map<String, String> httpHeaders, HttpServletRequest request,
-			HttpSession session) throws ServletException {
-		SignatureService signatureService = this.signatureServiceLocator
-				.locateService();
+	public Object handleMessage(SignCertificatesDataMessage message, Map<String, String> httpHeaders,
+			HttpServletRequest request, HttpSession session) throws ServletException {
+		SignatureService signatureService = this.signatureServiceLocator.locateService();
 
 		List<X509Certificate> signingCertificateChain = message.certificateChain;
 		X509Certificate signingCertificate = signingCertificateChain.get(0);
 		if (null == signingCertificate) {
 			throw new ServletException("missing non-repudiation certificate");
 		}
-		LOG.debug("signing certificate: "
-				+ signingCertificateChain.get(0).getSubjectX500Principal());
+		LOG.debug("signing certificate: " + signingCertificateChain.get(0).getSubjectX500Principal());
 
 		RequestContext requestContext = new RequestContext(session);
 		boolean includeIdentity = requestContext.includeIdentity();
@@ -122,8 +117,7 @@ public class SignCertificatesDataMessageHandler implements
 				if (null == message.identityData) {
 					throw new ServletException("identity data missing");
 				}
-				identity = TlvParser
-						.parse(message.identityData, Identity.class);
+				identity = TlvParser.parse(message.identityData, Identity.class);
 			}
 
 			if (includeAddress) {
@@ -142,47 +136,36 @@ public class SignCertificatesDataMessageHandler implements
 					byte[] actualPhotoDigest;
 
 					try {
-						actualPhotoDigest = digestPhoto(
-								getDigestAlgo(expectedPhotoDigest.length),
-								message.photoData);
+						actualPhotoDigest = digestPhoto(getDigestAlgo(expectedPhotoDigest.length), message.photoData);
 					} catch (NoSuchAlgorithmException e) {
-						throw new ServletException(
-								"photo signed with unsupported algorithm");
+						throw new ServletException("photo signed with unsupported algorithm");
 					}
 
-					if (false == Arrays.equals(expectedPhotoDigest,
-							actualPhotoDigest)) {
+					if (false == Arrays.equals(expectedPhotoDigest, actualPhotoDigest)) {
 						throw new ServletException("photo digest incorrect");
 					}
 				}
 			}
 
-			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
-					.locateService();
+			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator.locateService();
 			if (null != identityIntegrityService) {
 				if (null == message.rrnCertificate) {
-					throw new ServletException(
-							"national registry certificate not included while requested");
+					throw new ServletException("national registry certificate not included while requested");
 				}
 				PublicKey rrnPublicKey = message.rrnCertificate.getPublicKey();
 				if (null != message.identityData) {
 					if (null == message.identitySignatureData) {
-						throw new ServletException(
-								"missing identity data signature");
+						throw new ServletException("missing identity data signature");
 					}
-					verifySignature(message.rrnCertificate.getSigAlgName(),
-							message.identitySignatureData, rrnPublicKey,
+					verifySignature(message.rrnCertificate.getSigAlgName(), message.identitySignatureData, rrnPublicKey,
 							request, message.identityData);
 					if (null != message.addressData) {
 						if (null == message.addressSignatureData) {
-							throw new ServletException(
-									"missing address data signature");
+							throw new ServletException("missing address data signature");
 						}
 						byte[] addressFile = trimRight(message.addressData);
-						verifySignature(message.rrnCertificate.getSigAlgName(),
-								message.addressSignatureData, rrnPublicKey,
-								request, addressFile,
-								message.identitySignatureData);
+						verifySignature(message.rrnCertificate.getSigAlgName(), message.addressSignatureData,
+								rrnPublicKey, request, addressFile, message.identitySignatureData);
 					}
 				}
 
@@ -191,8 +174,7 @@ public class SignCertificatesDataMessageHandler implements
 				List<X509Certificate> rrnCertificateChain = new LinkedList<X509Certificate>();
 				rrnCertificateChain.add(message.rrnCertificate);
 				rrnCertificateChain.add(message.rootCertificate);
-				identityIntegrityService
-						.checkNationalRegistrationCertificate(rrnCertificateChain);
+				identityIntegrityService.checkNationalRegistrationCertificate(rrnCertificateChain);
 			}
 		}
 
@@ -201,8 +183,7 @@ public class SignCertificatesDataMessageHandler implements
 		IdentityDTO identityDTO = dtoMapper.map(identity, IdentityDTO.class);
 		AddressDTO addressDTO = dtoMapper.map(address, AddressDTO.class);
 		try {
-			digestInfo = signatureService.preSign(null,
-					signingCertificateChain, identityDTO, addressDTO,
+			digestInfo = signatureService.preSign(null, signingCertificateChain, identityDTO, addressDTO,
 					message.photoData);
 		} catch (NoSuchAlgorithmException e) {
 			throw new ServletException("no such algo: " + e.getMessage(), e);
@@ -211,24 +192,19 @@ public class SignCertificatesDataMessageHandler implements
 		}
 
 		// also save it in the session for later verification
-		SignatureDataMessageHandler.setDigestValue(digestInfo.digestValue,
-				digestInfo.digestAlgo, session);
+		SignatureDataMessageHandler.setDigestValue(digestInfo.digestValue, digestInfo.digestAlgo, session);
 
-		IdentityService identityService = this.identityServiceLocator
-				.locateService();
+		IdentityService identityService = this.identityServiceLocator.locateService();
 		boolean removeCard;
 		if (null != identityService) {
-			IdentityRequest identityRequest = identityService
-					.getIdentityRequest();
+			IdentityRequest identityRequest = identityService.getIdentityRequest();
 			removeCard = identityRequest.removeCard();
 		} else {
 			removeCard = this.removeCard;
 		}
 
-		SignRequestMessage signRequestMessage = new SignRequestMessage(
-				digestInfo.digestValue, digestInfo.digestAlgo,
-				digestInfo.description, this.logoff, removeCard,
-				this.requireSecureReader);
+		SignRequestMessage signRequestMessage = new SignRequestMessage(digestInfo.digestValue, digestInfo.digestAlgo,
+				digestInfo.description, this.logoff, removeCard, this.requireSecureReader);
 		return signRequestMessage;
 	}
 
@@ -247,8 +223,7 @@ public class SignCertificatesDataMessageHandler implements
 		return photoDigest;
 	}
 
-	private void verifySignature(String signatureAlgoName,
-			byte[] signatureData, PublicKey publicKey,
+	private void verifySignature(String signatureAlgoName, byte[] signatureData, PublicKey publicKey,
 			HttpServletRequest request, byte[]... data) throws ServletException {
 		Signature signature;
 		try {
@@ -267,8 +242,7 @@ public class SignCertificatesDataMessageHandler implements
 			}
 			boolean result = signature.verify(signatureData);
 			if (false == result) {
-				AuditService auditService = this.auditServiceLocator
-						.locateService();
+				AuditService auditService = this.auditServiceLocator.locateService();
 				if (null != auditService) {
 					String remoteAddress = request.getRemoteAddr();
 					auditService.identityIntegrityError(remoteAddress);
@@ -292,8 +266,7 @@ public class SignCertificatesDataMessageHandler implements
 		return result;
 	}
 
-	private String getDigestAlgo(final int hashSize)
-			throws NoSuchAlgorithmException {
+	private String getDigestAlgo(final int hashSize) throws NoSuchAlgorithmException {
 		switch (hashSize) {
 		case 20:
 			return "SHA-1";
@@ -306,8 +279,6 @@ public class SignCertificatesDataMessageHandler implements
 		case 64:
 			return "SHA-512";
 		}
-		throw new NoSuchAlgorithmException(
-				"Failed to find guess algorithm for hash size of " + hashSize
-						+ " bytes");
+		throw new NoSuchAlgorithmException("Failed to find guess algorithm for hash size of " + hashSize + " bytes");
 	}
 }

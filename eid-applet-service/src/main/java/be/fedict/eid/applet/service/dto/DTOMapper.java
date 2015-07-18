@@ -48,8 +48,7 @@ public class DTOMapper {
 		try {
 			to = toClass.newInstance();
 		} catch (Exception e) {
-			throw new RuntimeException("could not create new instance of "
-					+ toClass.getName());
+			throw new RuntimeException("could not create new instance of " + toClass.getName());
 		}
 		Class<?> fromClass = from.getClass();
 		Field[] fromFields = fromClass.getDeclaredFields();
@@ -71,42 +70,33 @@ public class DTOMapper {
 				try {
 					toField = toClass.getDeclaredField(toFieldName);
 				} catch (Exception e) {
-					throw new RuntimeException("no such target field: "
-							+ toFieldName);
+					throw new RuntimeException("no such target field: " + toFieldName);
 				}
 				Object value;
 				try {
 					value = fromField.get(from);
 				} catch (Exception e) {
-					throw new RuntimeException("could not read field: "
-							+ fromField.getName());
+					throw new RuntimeException("could not read field: " + fromField.getName());
 				}
-				Class<? extends ValueConvertor<?, ?>> valueConvertorClass = mapsToAnnotation
-						.convertor();
-				if (false == IdenticalValueConvertor.class
-						.equals(valueConvertorClass)) {
+				Class<? extends ValueConvertor<?, ?>> valueConvertorClass = mapsToAnnotation.convertor();
+				if (false == IdenticalValueConvertor.class.equals(valueConvertorClass)) {
 					ValueConvertor<Object, Object> valueConvertor;
 					try {
-						valueConvertor = (ValueConvertor<Object, Object>) valueConvertorClass
-								.newInstance();
+						valueConvertor = (ValueConvertor<Object, Object>) valueConvertorClass.newInstance();
 					} catch (Exception e) {
 						throw new RuntimeException(
-								"could not instantiate value convertor: "
-										+ valueConvertorClass.getName());
+								"could not instantiate value convertor: " + valueConvertorClass.getName());
 					}
 					try {
 						value = valueConvertor.convert(value);
 					} catch (ValueConvertorException e) {
-						throw new RuntimeException(
-								"could not convert value of field: "
-										+ fromField.getName());
+						throw new RuntimeException("could not convert value of field: " + fromField.getName());
 					}
 				}
 				try {
 					toField.set(to, value);
 				} catch (Exception e) {
-					throw new RuntimeException("could not write field "
-							+ toFieldName + ": " + e.getMessage(), e);
+					throw new RuntimeException("could not write field " + toFieldName + ": " + e.getMessage(), e);
 				}
 			}
 		}

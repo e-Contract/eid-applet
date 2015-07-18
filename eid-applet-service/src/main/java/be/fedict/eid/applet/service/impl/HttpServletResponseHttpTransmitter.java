@@ -40,8 +40,7 @@ public class HttpServletResponseHttpTransmitter implements HttpTransmitter {
 	 * 
 	 * @param httpServletResponse
 	 */
-	public HttpServletResponseHttpTransmitter(
-			HttpServletResponse httpServletResponse) {
+	public HttpServletResponseHttpTransmitter(HttpServletResponse httpServletResponse) {
 		this.httpServletResponse = httpServletResponse;
 	}
 
@@ -51,8 +50,7 @@ public class HttpServletResponseHttpTransmitter implements HttpTransmitter {
 
 	public void setBody(byte[] bodyValue) {
 		try {
-			ServletOutputStream outputStream = this.httpServletResponse
-					.getOutputStream();
+			ServletOutputStream outputStream = this.httpServletResponse.getOutputStream();
 			outputStream.write(bodyValue);
 			outputStream.close();
 		} catch (IOException e) {

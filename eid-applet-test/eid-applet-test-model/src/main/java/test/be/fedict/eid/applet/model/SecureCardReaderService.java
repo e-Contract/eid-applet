@@ -18,7 +18,6 @@
 
 package test.be.fedict.eid.applet.model;
 
-public interface SecureCardReaderService extends
-		be.fedict.eid.applet.service.spi.SecureCardReaderService {
+public interface SecureCardReaderService extends be.fedict.eid.applet.service.spi.SecureCardReaderService {
 
 }

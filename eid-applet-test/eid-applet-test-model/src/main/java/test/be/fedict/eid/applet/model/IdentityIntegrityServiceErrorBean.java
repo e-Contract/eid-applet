@@ -32,14 +32,11 @@ import be.fedict.eid.applet.service.spi.RevokedCertificateSecurityException;
 
 @Stateless
 @EJB(name = "java:global/test/IdentityIntegrityServiceErrorBean", beanInterface = IdentityIntegrityServiceError.class)
-public class IdentityIntegrityServiceErrorBean implements
-		IdentityIntegrityServiceError {
+public class IdentityIntegrityServiceErrorBean implements IdentityIntegrityServiceError {
 
-	private static final Log LOG = LogFactory
-			.getLog(IdentityIntegrityServiceErrorBean.class);
+	private static final Log LOG = LogFactory.getLog(IdentityIntegrityServiceErrorBean.class);
 
-	public void checkNationalRegistrationCertificate(
-			List<X509Certificate> certificateChain) throws SecurityException {
+	public void checkNationalRegistrationCertificate(List<X509Certificate> certificateChain) throws SecurityException {
 		LOG.debug("checking national registry certificate...");
 
 		throw new RevokedCertificateSecurityException();

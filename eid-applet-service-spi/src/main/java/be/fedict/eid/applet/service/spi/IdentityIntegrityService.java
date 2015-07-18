@@ -50,6 +50,5 @@ public interface IdentityIntegrityService {
 	 * @throws SecurityException
 	 *             in case the certificate is invalid/not accepted.
 	 */
-	void checkNationalRegistrationCertificate(
-			List<X509Certificate> certificateChain) throws SecurityException;
+	void checkNationalRegistrationCertificate(List<X509Certificate> certificateChain) throws SecurityException;
 }

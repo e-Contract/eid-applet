@@ -51,8 +51,7 @@ import be.fedict.eid.applet.shared.SignRequestMessage;
  * 
  */
 @HandlesMessage(FileDigestsDataMessage.class)
-public class FileDigestsDataMessageHandler implements
-		MessageHandler<FileDigestsDataMessage> {
+public class FileDigestsDataMessageHandler implements MessageHandler<FileDigestsDataMessage> {
 
 	@InitParam(HelloMessageHandler.SIGNATURE_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<SignatureService> signatureServiceLocator;
@@ -69,9 +68,8 @@ public class FileDigestsDataMessageHandler implements
 	@InitParam(HelloMessageHandler.IDENTITY_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<IdentityService> identityServiceLocator;
 
-	public Object handleMessage(FileDigestsDataMessage message,
-			Map<String, String> httpHeaders, HttpServletRequest request,
-			HttpSession session) throws ServletException {
+	public Object handleMessage(FileDigestsDataMessage message, Map<String, String> httpHeaders,
+			HttpServletRequest request, HttpSession session) throws ServletException {
 		List<DigestInfo> fileDigestInfos = new LinkedList<DigestInfo>();
 
 		List<String> messageFileDigestInfos = message.fileDigestInfos;
@@ -84,21 +82,17 @@ public class FileDigestsDataMessageHandler implements
 			try {
 				digestValue = Hex.decodeHex(hexDigestValue.toCharArray());
 			} catch (DecoderException e) {
-				throw new ServletException("digest value decode error: "
-						+ e.getMessage(), e);
+				throw new ServletException("digest value decode error: " + e.getMessage(), e);
 			}
-			fileDigestInfos.add(new DigestInfo(digestValue, digestAlgo,
-					description));
+			fileDigestInfos.add(new DigestInfo(digestValue, digestAlgo, description));
 		}
 
 		// TODO DRY refactor: is a copy-paste from HelloMessageHandler
-		SignatureService signatureService = this.signatureServiceLocator
-				.locateService();
+		SignatureService signatureService = this.signatureServiceLocator.locateService();
 
 		DigestInfo digestInfo;
 		try {
-			digestInfo = signatureService.preSign(fileDigestInfos, null, null,
-					null, null);
+			digestInfo = signatureService.preSign(fileDigestInfos, null, null, null, null);
 		} catch (NoSuchAlgorithmException e) {
 			throw new ServletException("no such algo: " + e.getMessage(), e);
 		} catch (AuthorizationException e) {
@@ -106,24 +100,19 @@ public class FileDigestsDataMessageHandler implements
 		}
 
 		// also save it in the session for later verification
-		SignatureDataMessageHandler.setDigestValue(digestInfo.digestValue,
-				digestInfo.digestAlgo, session);
+		SignatureDataMessageHandler.setDigestValue(digestInfo.digestValue, digestInfo.digestAlgo, session);
 
-		IdentityService identityService = this.identityServiceLocator
-				.locateService();
+		IdentityService identityService = this.identityServiceLocator.locateService();
 		boolean removeCard;
 		if (null != identityService) {
-			IdentityRequest identityRequest = identityService
-					.getIdentityRequest();
+			IdentityRequest identityRequest = identityService.getIdentityRequest();
 			removeCard = identityRequest.removeCard();
 		} else {
 			removeCard = this.removeCard;
 		}
 
-		SignRequestMessage signRequestMessage = new SignRequestMessage(
-				digestInfo.digestValue, digestInfo.digestAlgo,
-				digestInfo.description, this.logoff, removeCard,
-				this.requireSecureReader);
+		SignRequestMessage signRequestMessage = new SignRequestMessage(digestInfo.digestValue, digestInfo.digestAlgo,
+				digestInfo.description, this.logoff, removeCard, this.requireSecureReader);
 		return signRequestMessage;
 	}
 

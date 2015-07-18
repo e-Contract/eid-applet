@@ -38,8 +38,7 @@ public class MiscTest {
 
 	@Test
 	public void siteName() throws Exception {
-		URI documentBase = new URI(
-				"https://dev.eid.belgium.be/eid-applet-beta/identification.seam");
+		URI documentBase = new URI("https://dev.eid.belgium.be/eid-applet-beta/identification.seam");
 		LOG.debug("document base URI: " + documentBase);
 		String host = documentBase.getHost();
 		LOG.debug("host: " + host);

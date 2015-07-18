@@ -61,8 +61,7 @@ public class TaskRunner {
 				Throwable cause = e.getCause();
 				if (null != cause) {
 					addDetailMessage("exception cause: " + cause.getMessage());
-					addDetailMessage("exception cause type: "
-							+ cause.getClass().getName());
+					addDetailMessage("exception cause type: " + cause.getClass().getName());
 				}
 				addDetailMessage("will sleep and retry...");
 			}

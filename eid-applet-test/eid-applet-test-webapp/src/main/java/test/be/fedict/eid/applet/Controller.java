@@ -108,8 +108,7 @@ public class Controller implements Serializable {
 	public void loadAction() {
 		if (null != this.message) {
 			FacesContext facesContext = FacesContext.getCurrentInstance();
-			facesContext.addMessage(null, new FacesMessage(
-					FacesMessage.SEVERITY_WARN, this.message, null));
+			facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, this.message, null));
 			this.message = null;
 		}
 	}
@@ -220,17 +219,14 @@ public class Controller implements Serializable {
 	public void perform() throws IOException {
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		ExternalContext externalContext = facesContext.getExternalContext();
-		externalContext.redirect(externalContext.getRequestContextPath()
-				+ "/cdi.html");
+		externalContext.redirect(externalContext.getRequestContextPath() + "/cdi.html");
 	}
 
-	public void handleStart(
-			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) StartEvent startEvent) {
+	public void handleStart(@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) StartEvent startEvent) {
 		LOG.debug("start event");
 		switch (this.operation) {
 		case IDENTIFICATION: {
-			IdentificationRequest identificationRequest = startEvent
-					.performIdentification();
+			IdentificationRequest identificationRequest = startEvent.performIdentification();
 			if (this.includeAddress) {
 				identificationRequest.includeAddress();
 			}
@@ -243,8 +239,7 @@ public class Controller implements Serializable {
 			break;
 		}
 		case AUTHENTICATION: {
-			AuthenticationRequest authenticationRequest = startEvent
-					.performAuthentication();
+			AuthenticationRequest authenticationRequest = startEvent.performAuthentication();
 			if (this.includeIdentity) {
 				authenticationRequest.includeIdentity();
 			}
@@ -282,25 +277,22 @@ public class Controller implements Serializable {
 			break;
 		}
 		default:
-			throw new IllegalStateException("unsupported operation: "
-					+ this.operation);
+			throw new IllegalStateException("unsupported operation: " + this.operation);
 		}
 	}
 
-	public void handleReset(
-			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) StartEvent startEvent) {
+	public void handleReset(@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) StartEvent startEvent) {
 		reset();
 	}
 
 	public void handleIdentification(
 			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) IdentificationEvent identificationEvent)
-			throws Exception {
+					throws Exception {
 		emulatePkiValidation();
 		identificationEvent.valid();
 	}
 
-	public void handleIdentity(
-			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) IdentityEvent identityEvent) {
+	public void handleIdentity(@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) IdentityEvent identityEvent) {
 		LOG.debug("handle identity");
 		LOG.debug("hello: " + identityEvent.getIdentity().getFirstName());
 		this.identity = identityEvent.getIdentity();
@@ -309,7 +301,7 @@ public class Controller implements Serializable {
 
 	public void handleAuthCertValidation(
 			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) AuthenticationEvent authenticationEvent)
-			throws Exception {
+					throws Exception {
 		emulatePkiValidation();
 		authenticationEvent.valid();
 	}
@@ -321,14 +313,12 @@ public class Controller implements Serializable {
 
 	public void handleSignatureDigest(
 			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) SignatureDigestEvent signatureDigestEvent)
-			throws Exception {
-		if (this.includeCertificates
-				&& null == signatureDigestEvent.getSigningCertificateChain()) {
+					throws Exception {
+		if (this.includeCertificates && null == signatureDigestEvent.getSigningCertificateChain()) {
 			throw new RuntimeException("signing certificates not included");
 		}
 		if (this.includeCertificates) {
-			if (this.pkiValidation != null
-					&& this.pkiValidation == PKIValidation.AUTHORIZATION) {
+			if (this.pkiValidation != null && this.pkiValidation == PKIValidation.AUTHORIZATION) {
 				throw new AuthorizationException();
 			}
 		}
@@ -346,8 +336,7 @@ public class Controller implements Serializable {
 		}
 	}
 
-	public void handleSignature(
-			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) SignatureEvent signatureEvent)
+	public void handleSignature(@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) SignatureEvent signatureEvent)
 			throws Exception {
 		LOG.debug("signature event");
 		emulatePkiValidation();
@@ -375,10 +364,8 @@ public class Controller implements Serializable {
 	public void handleSecureChannelBinding(
 			@Observes @BeIDContext(IdentifyCDIServlet.CONTEXT) SecureChannelBindingEvent secureChannelBindingEvent) {
 		LOG.debug("secure channel identity: "
-				+ secureChannelBindingEvent.getServerCertificate()
-						.getSubjectX500Principal());
-		this.serverCertificate = secureChannelBindingEvent
-				.getServerCertificate();
+				+ secureChannelBindingEvent.getServerCertificate().getSubjectX500Principal());
+		this.serverCertificate = secureChannelBindingEvent.getServerCertificate();
 		secureChannelBindingEvent.valid();
 	}
 }

@@ -32,10 +32,10 @@ import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
-import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import be.fedict.eid.applet.service.signer.SignatureFacet;
 
 /**
@@ -66,31 +66,24 @@ public class EnvelopedSignatureFacet implements SignatureFacet {
 		this.digestAlgo = digestAlgorithm;
 	}
 
-	public void postSign(Element signatureElement,
-			List<X509Certificate> signingCertificateChain) {
+	public void postSign(Element signatureElement, List<X509Certificate> signingCertificateChain) {
 		// empty
 	}
 
-	public void preSign(XMLSignatureFactory signatureFactory,
-			Document document, String signatureId,
-			List<X509Certificate> signingCertificateChain,
-			List<Reference> references, List<XMLObject> objects)
-			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				this.digestAlgo.getXmlAlgoId(), null);
+	public void preSign(XMLSignatureFactory signatureFactory, Document document, String signatureId,
+			List<X509Certificate> signingCertificateChain, List<Reference> references, List<XMLObject> objects)
+					throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+		DigestMethod digestMethod = signatureFactory.newDigestMethod(this.digestAlgo.getXmlAlgoId(), null);
 
 		List<Transform> transforms = new LinkedList<Transform>();
-		Transform envelopedTransform = signatureFactory
-				.newTransform(CanonicalizationMethod.ENVELOPED,
-						(TransformParameterSpec) null);
+		Transform envelopedTransform = signatureFactory.newTransform(CanonicalizationMethod.ENVELOPED,
+				(TransformParameterSpec) null);
 		transforms.add(envelopedTransform);
-		Transform exclusiveTransform = signatureFactory
-				.newTransform(CanonicalizationMethod.EXCLUSIVE,
-						(TransformParameterSpec) null);
+		Transform exclusiveTransform = signatureFactory.newTransform(CanonicalizationMethod.EXCLUSIVE,
+				(TransformParameterSpec) null);
 		transforms.add(exclusiveTransform);
 
-		Reference reference = signatureFactory.newReference("", digestMethod,
-				transforms, null, null);
+		Reference reference = signatureFactory.newReference("", digestMethod, transforms, null, null);
 
 		references.add(reference);
 	}

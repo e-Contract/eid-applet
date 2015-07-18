@@ -31,8 +31,7 @@ import be.fedict.eid.applet.service.DocumentType;
  */
 public class DocumentTypeConvertor implements DataConvertor<DocumentType> {
 
-	private static final Log LOG = LogFactory
-			.getLog(DocumentTypeConvertor.class);
+	private static final Log LOG = LogFactory.getLog(DocumentTypeConvertor.class);
 
 	public DocumentType convert(byte[] value) throws DataConvertorException {
 		LOG.debug("# bytes for document type field: " + value.length);

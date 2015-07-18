@@ -24,7 +24,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 /**
  * Marks that a field will be converted during TLV parsing.
  * 
@@ -40,5 +39,5 @@ public @interface ConvertData {
 	 * 
 	 * @return
 	 */
-	Class<? extends DataConvertor<?>> value();
+	Class<? extends DataConvertor<?>>value();
 }

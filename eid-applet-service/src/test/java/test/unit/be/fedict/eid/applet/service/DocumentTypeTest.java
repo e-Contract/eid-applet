@@ -33,8 +33,7 @@ public class DocumentTypeTest {
 	@Test
 	public void testkeys() throws Exception {
 		for (DocumentType documentType : DocumentType.values()) {
-			LOG.debug("document type: " + documentType + ", key: "
-					+ documentType.getKey());
+			LOG.debug("document type: " + documentType + ", key: " + documentType.getKey());
 		}
 		assertEquals(1, DocumentType.BELGIAN_CITIZEN.getKey());
 		assertEquals(6, DocumentType.KIDS_CARD.getKey());

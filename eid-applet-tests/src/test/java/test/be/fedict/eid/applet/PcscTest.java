@@ -147,9 +147,7 @@ public class PcscTest {
 			LOG.debug("dt: " + (t1 - t0));
 
 			authnCertChain = pcscEid.getAuthnCertificateChain();
-			LOG.debug("key size: "
-					+ authnCertChain.get(0).getPublicKey().getEncoded().length
-					* 8);
+			LOG.debug("key size: " + authnCertChain.get(0).getPublicKey().getEncoded().length * 8);
 			// pcscEid.logoff();
 		} finally {
 			pcscEid.close();
@@ -160,9 +158,7 @@ public class PcscTest {
 		signature.update(challenge);
 		boolean result = signature.verify(signatureValue);
 		assertTrue(result);
-		LOG.debug("sha1 hex: "
-				+ DigestUtils.shaHex(authnCertChain.get(0).getPublicKey()
-						.getEncoded()));
+		LOG.debug("sha1 hex: " + DigestUtils.shaHex(authnCertChain.get(0).getPublicKey().getEncoded()));
 	}
 
 	@Test
@@ -220,8 +216,7 @@ public class PcscTest {
 
 			pcscEid.verifyPin();
 
-			CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00,
-					0x2A, 0x9E, 0x9A, digest);
+			CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A, 0x9E, 0x9A, digest);
 			responseAPDU = cardChannel.transmit(computeDigitalSignatureApdu);
 			assertEquals(0x9000, responseAPDU.getSW());
 
@@ -229,11 +224,9 @@ public class PcscTest {
 
 			LOG.debug("signature value length: " + signatureValue.length);
 
-			List<X509Certificate> authnCertificateChain = pcscEid
-					.getAuthnCertificateChain();
+			List<X509Certificate> authnCertificateChain = pcscEid.getAuthnCertificateChain();
 
-			Signature signature = Signature
-					.getInstance("SHA1withRSA/PSS", "BC");
+			Signature signature = Signature.getInstance("SHA1withRSA/PSS", "BC");
 			signature.initVerify(authnCertificateChain.get(0).getPublicKey());
 			signature.update(message);
 			boolean result = signature.verify(signatureValue);
@@ -279,13 +272,10 @@ public class PcscTest {
 		byte[] signatureDigestInfoValue = cipher.doFinal(signatureValue1);
 		LOG.debug("encrypted signature value: " + signatureValue1.length);
 		ASN1InputStream aIn = new ASN1InputStream(signatureDigestInfoValue);
-		DigestInfo signatureDigestInfo = new DigestInfo(
-				(ASN1Sequence) aIn.readObject());
-		LOG.debug("algo OID: "
-				+ signatureDigestInfo.getAlgorithmId().getObjectId().getId());
+		DigestInfo signatureDigestInfo = new DigestInfo((ASN1Sequence) aIn.readObject());
+		LOG.debug("algo OID: " + signatureDigestInfo.getAlgorithmId().getObjectId().getId());
 		LOG.debug("digest size: " + signatureDigestInfo.getDigest().length);
-		int digestIndex = findSubArray(signatureDigestInfoValue,
-				signatureDigestInfo.getDigest());
+		int digestIndex = findSubArray(signatureDigestInfoValue, signatureDigestInfo.getDigest());
 		assertTrue(-1 != digestIndex);
 		LOG.debug("digest index: " + digestIndex);
 
@@ -296,15 +286,11 @@ public class PcscTest {
 		cipher.init(Cipher.DECRYPT_MODE, authnCertChain.get(0).getPublicKey());
 		signatureValue2 = Arrays.copyOf(signatureValue2, 13 + 20);
 		byte[] signatureDigestInfoValue2 = cipher.doFinal(signatureValue2);
-		LOG.debug("decrypted structure size: "
-				+ signatureDigestInfoValue2.length);
-		signatureDigestInfoValue2 = Arrays.copyOf(signatureDigestInfoValue2,
-				13 + 20);
-		LOG.debug("decrypted structure size (truncated): "
-				+ signatureDigestInfoValue2.length);
+		LOG.debug("decrypted structure size: " + signatureDigestInfoValue2.length);
+		signatureDigestInfoValue2 = Arrays.copyOf(signatureDigestInfoValue2, 13 + 20);
+		LOG.debug("decrypted structure size (truncated): " + signatureDigestInfoValue2.length);
 		ASN1InputStream aIn2 = new ASN1InputStream(signatureDigestInfoValue2);
-		DigestInfo signatureDigestInfo2 = new DigestInfo(
-				(ASN1Sequence) aIn2.readObject());
+		DigestInfo signatureDigestInfo2 = new DigestInfo((ASN1Sequence) aIn2.readObject());
 		LOG.debug("digest size: " + signatureDigestInfo2.getDigest().length);
 		LOG.debug("digest: " + new String(signatureDigestInfo2.getDigest()));
 	}
@@ -313,8 +299,7 @@ public class PcscTest {
 		LOG.debug("array size: " + array.length);
 		LOG.debug("subarray size: " + subarray.length);
 		for (int idx = 0; idx < array.length - subarray.length + 1; idx++) {
-			byte[] currentSubArray = Arrays.copyOfRange(array, idx, idx
-					+ subarray.length);
+			byte[] currentSubArray = Arrays.copyOfRange(array, idx, idx + subarray.length);
 			LOG.debug("subarray size: " + currentSubArray.length);
 			if (Arrays.equals(currentSubArray, subarray)) {
 				return idx;
@@ -374,12 +359,10 @@ public class PcscTest {
 			ByteArrayOutputStream digestInfo = new ByteArrayOutputStream();
 			digestInfo.write(Constants.SHA1_DIGEST_INFO_PREFIX);
 			digestInfo.write(digestValue);
-			CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00,
-					0x2A, 0x9E, 0x9A, digestInfo.toByteArray());
+			CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A, 0x9E, 0x9A, digestInfo.toByteArray());
 			responseApdu = cardChannel.transmit(computeDigitalSignatureApdu);
 			if (0x9000 != responseApdu.getSW()) {
-				throw new RuntimeException("error CDS: "
-						+ Integer.toHexString(responseApdu.getSW()));
+				throw new RuntimeException("error CDS: " + Integer.toHexString(responseApdu.getSW()));
 			}
 
 		} finally {
@@ -449,22 +432,20 @@ public class PcscTest {
 		// 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12,
 		// 0x13, 0x14 });
 
-		CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A,
-				0x9E, 0x9A, "Hello world encrypted".getBytes());
+		CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A, 0x9E, 0x9A,
+				"Hello world encrypted".getBytes());
 
 		responseApdu = cardChannel.transmit(computeDigitalSignatureApdu);
 		assertEquals(0x9000, responseApdu.getSW());
 		byte[] signatureValue = responseApdu.getData();
 		LOG.debug("signature value size: " + signatureValue.length);
 
-		List<X509Certificate> authnCertChain = pcscEid
-				.getAuthnCertificateChain();
+		List<X509Certificate> authnCertChain = pcscEid.getAuthnCertificateChain();
 
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.DECRYPT_MODE, authnCertChain.get(0).getPublicKey());
 		byte[] decryptedSignatureValue = cipher.doFinal(signatureValue);
-		LOG.debug("decrypted signature value: "
-				+ new String(decryptedSignatureValue));
+		LOG.debug("decrypted signature value: " + new String(decryptedSignatureValue));
 
 		pcscEid.close();
 	}
@@ -549,20 +530,18 @@ public class PcscTest {
 		Card card = cardTerminal.connect("T=0");
 		CardChannel cardChannel = card.getBasicChannel();
 		// select file
-		cardChannel.transmit(new CommandAPDU(0x00, 0xA4, 0x08, 0x0C,
-				new byte[] { 0x3F, 0x00, (byte) 0xDF, 0x01, 0x40, 0x35 }));
+		cardChannel.transmit(
+				new CommandAPDU(0x00, 0xA4, 0x08, 0x0C, new byte[] { 0x3F, 0x00, (byte) 0xDF, 0x01, 0x40, 0x35 }));
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		int offset = 0;
 		ResponseAPDU responseApdu;
 		do {
 			// read binary
-			responseApdu = cardChannel.transmit(new CommandAPDU(0x00, 0xB0,
-					offset >> 8, offset & 0xFF, 0xff));
+			responseApdu = cardChannel.transmit(new CommandAPDU(0x00, 0xB0, offset >> 8, offset & 0xFF, 0xff));
 			baos.write(responseApdu.getData());
 			offset += responseApdu.getData().length;
 		} while (responseApdu.getData().length == 0xff);
-		BufferedImage photo = ImageIO.read(new ByteArrayInputStream(baos
-				.toByteArray()));
+		BufferedImage photo = ImageIO.read(new ByteArrayInputStream(baos.toByteArray()));
 		JOptionPane.showMessageDialog(null, new ImageIcon(photo));
 	}
 
@@ -598,25 +577,18 @@ public class PcscTest {
 		byte[] signCert = pcscEidSpi.readFile(PcscEid.SIGN_CERT_FILE_ID);
 		FileUtils.writeByteArrayToFile(tmpFile, signCert);
 
-		LOG.debug("ASN1 dump: "
-				+ ASN1Dump.dumpAsString(new ASN1InputStream(signCert)
-						.readObject()));
+		LOG.debug("ASN1 dump: " + ASN1Dump.dumpAsString(new ASN1InputStream(signCert).readObject()));
 
 		LOG.debug("tmp file: " + tmpFile.getAbsolutePath());
 
-		CertificateFactory certificateFactory = CertificateFactory
-				.getInstance("X.509");
+		CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
 		X509Certificate certificate = (X509Certificate) certificateFactory
 				.generateCertificate(new ByteArrayInputStream(signCert));
-		X509Principal issuerPrincipal = PrincipalUtil
-				.getIssuerX509Principal(certificate);
+		X509Principal issuerPrincipal = PrincipalUtil.getIssuerX509Principal(certificate);
 		LOG.debug("BC issuer principal: " + issuerPrincipal.getName());
-		LOG.debug("Sun issuer (getName): "
-				+ certificate.getIssuerX500Principal().getName());
-		LOG.debug("Sun issuer (toString): "
-				+ certificate.getIssuerX500Principal());
-		String issuerName = PrincipalUtil.getIssuerX509Principal(certificate)
-				.getName().replace(",", ", ");
+		LOG.debug("Sun issuer (getName): " + certificate.getIssuerX500Principal().getName());
+		LOG.debug("Sun issuer (toString): " + certificate.getIssuerX500Principal());
+		String issuerName = PrincipalUtil.getIssuerX509Principal(certificate).getName().replace(",", ", ");
 		LOG.debug("issuer name: " + issuerName);
 		LOG.debug("certificate: " + certificate);
 
@@ -633,8 +605,7 @@ public class PcscTest {
 
 		try {
 			byte[] authnCert = pcscEidSpi.readFile(PcscEid.AUTHN_CERT_FILE_ID);
-			DERSequence sequence = (DERSequence) new ASN1InputStream(
-					new ByteArrayInputStream(authnCert)).readObject();
+			DERSequence sequence = (DERSequence) new ASN1InputStream(new ByteArrayInputStream(authnCert)).readObject();
 			String str = ASN1Dump.dumpAsString(sequence);
 			LOG.debug(str);
 		} finally {
@@ -643,8 +614,7 @@ public class PcscTest {
 	}
 
 	private void selectCardManager(CardChannel cardChannel) {
-		CommandAPDU selectApplicationApdu = new CommandAPDU(0x00, 0xA4, 0x04,
-				0x00);
+		CommandAPDU selectApplicationApdu = new CommandAPDU(0x00, 0xA4, 0x04, 0x00);
 		ResponseAPDU responseApdu;
 		try {
 			responseApdu = cardChannel.transmit(selectApplicationApdu);
@@ -718,26 +688,22 @@ public class PcscTest {
 		}
 	}
 
-	private void unblockPin(byte[] puk12, CardChannel cardChannel)
-			throws CardException {
-		byte[] unblockPinData = new byte[] { 0x2C, puk12[0], puk12[1],
-				puk12[2], puk12[3], puk12[4], puk12[5], (byte) 0xFF };
+	private void unblockPin(byte[] puk12, CardChannel cardChannel) throws CardException {
+		byte[] unblockPinData = new byte[] { 0x2C, puk12[0], puk12[1], puk12[2], puk12[3], puk12[4], puk12[5],
+				(byte) 0xFF };
 
-		CommandAPDU changePinApdu = new CommandAPDU(0x00, 0x2C, 0x00, 0x01,
-				unblockPinData);
+		CommandAPDU changePinApdu = new CommandAPDU(0x00, 0x2C, 0x00, 0x01, unblockPinData);
 		ResponseAPDU responseApdu = cardChannel.transmit(changePinApdu);
 		if (0x9000 != responseApdu.getSW()) {
 			throw new RuntimeException("could not unblock PIN code");
 		}
 	}
 
-	private ResponseAPDU verifyPin(byte[] pin, CardChannel cardChannel)
-			throws CardException {
-		byte[] verifyData = new byte[] { 0x24, pin[0], pin[1], (byte) 0xFF,
-				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
+	private ResponseAPDU verifyPin(byte[] pin, CardChannel cardChannel) throws CardException {
+		byte[] verifyData = new byte[] { 0x24, pin[0], pin[1], (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+				(byte) 0xFF };
 
-		CommandAPDU verifyApdu = new CommandAPDU(0x00, 0x20, 0x00, 0x01,
-				verifyData);
+		CommandAPDU verifyApdu = new CommandAPDU(0x00, 0x20, 0x00, 0x01, verifyData);
 		ResponseAPDU responseApdu = cardChannel.transmit(verifyApdu);
 		return responseApdu;
 	}
@@ -780,11 +746,9 @@ public class PcscTest {
 		byte[] signCertData = pcscEidSpi.readFile(PcscEid.SIGN_CERT_FILE_ID);
 		byte[] citizenCaCertData = pcscEidSpi.readFile(PcscEid.CA_CERT_FILE_ID);
 		byte[] rootCaCertData = pcscEidSpi.readFile(PcscEid.ROOT_CERT_FILE_ID);
-		byte[] nationalRegitryCertData = pcscEidSpi
-				.readFile(PcscEid.RRN_CERT_FILE_ID);
+		byte[] nationalRegitryCertData = pcscEidSpi.readFile(PcscEid.RRN_CERT_FILE_ID);
 
-		CertificateFactory certificateFactory = CertificateFactory
-				.getInstance("X.509");
+		CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
 		X509Certificate authnCert = (X509Certificate) certificateFactory
 				.generateCertificate(new ByteArrayInputStream(authnCertData));
 		X509Certificate signCert = (X509Certificate) certificateFactory
@@ -794,8 +758,7 @@ public class PcscTest {
 		X509Certificate rootCaCert = (X509Certificate) certificateFactory
 				.generateCertificate(new ByteArrayInputStream(rootCaCertData));
 		X509Certificate nationalRegitryCert = (X509Certificate) certificateFactory
-				.generateCertificate(new ByteArrayInputStream(
-						nationalRegitryCertData));
+				.generateCertificate(new ByteArrayInputStream(nationalRegitryCertData));
 
 		LOG.debug("authentication certificate: " + authnCert);
 		LOG.debug("signature certificate: " + signCert);
@@ -805,8 +768,7 @@ public class PcscTest {
 		LOG.debug("citizen CA certificate: " + citizenCaCert);
 		LOG.debug("root CA certificate: " + rootCaCert);
 		LOG.debug("authn cert serial number: " + authnCert.getSerialNumber());
-		LOG.debug("authn certificate issuer: "
-				+ authnCert.getIssuerX500Principal());
+		LOG.debug("authn certificate issuer: " + authnCert.getIssuerX500Principal());
 
 		File rootCaFile = File.createTempFile("test-root-ca-", ".pem");
 		FileWriter rootCaFileWriter = new FileWriter(rootCaFile);
@@ -840,28 +802,21 @@ public class PcscTest {
 		File tmpAddressSignatureFile;
 		try {
 			identityFile = pcscEidSpi.readFile(PcscEid.IDENTITY_FILE_ID);
-			byte[] identitySignatureData = pcscEidSpi
-					.readFile(PcscEid.IDENTITY_SIGN_FILE_ID);
-			tmpIdentitySignatureFile = File.createTempFile("identity-sign-",
-					".der");
-			FileUtils.writeByteArrayToFile(tmpIdentitySignatureFile,
-					identitySignatureData);
+			byte[] identitySignatureData = pcscEidSpi.readFile(PcscEid.IDENTITY_SIGN_FILE_ID);
+			tmpIdentitySignatureFile = File.createTempFile("identity-sign-", ".der");
+			FileUtils.writeByteArrayToFile(tmpIdentitySignatureFile, identitySignatureData);
 			byte[] rrnCertData = pcscEidSpi.readFile(PcscEid.RRN_CERT_FILE_ID);
 			tmpRRNCertFile = File.createTempFile("rrn-cert-", ".der");
 			FileUtils.writeByteArrayToFile(tmpRRNCertFile, rrnCertData);
 
 			tmpPhotoFile = File.createTempFile("test-photo-", ".jpg");
-			FileUtils.writeByteArrayToFile(tmpPhotoFile,
-					pcscEidSpi.readFile(PcscEid.PHOTO_FILE_ID));
+			FileUtils.writeByteArrayToFile(tmpPhotoFile, pcscEidSpi.readFile(PcscEid.PHOTO_FILE_ID));
 
 			tmpAddressFile = File.createTempFile("test-address-", ".tlv");
-			FileUtils.writeByteArrayToFile(tmpAddressFile,
-					pcscEidSpi.readFile(PcscEid.ADDRESS_FILE_ID));
+			FileUtils.writeByteArrayToFile(tmpAddressFile, pcscEidSpi.readFile(PcscEid.ADDRESS_FILE_ID));
 
-			tmpAddressSignatureFile = File.createTempFile("test-address-sign-",
-					".der");
-			FileUtils.writeByteArrayToFile(tmpAddressSignatureFile,
-					pcscEidSpi.readFile(PcscEid.ADDRESS_SIGN_FILE_ID));
+			tmpAddressSignatureFile = File.createTempFile("test-address-sign-", ".der");
+			FileUtils.writeByteArrayToFile(tmpAddressSignatureFile, pcscEidSpi.readFile(PcscEid.ADDRESS_SIGN_FILE_ID));
 		} finally {
 			pcscEidSpi.close();
 		}
@@ -875,13 +830,11 @@ public class PcscTest {
 		LOG.debug("special status: " + identity.getSpecialStatus());
 		LOG.debug("duplicate: " + identity.getDuplicate());
 		LOG.debug("tmp identity file: " + tmpIdentityFile.getAbsolutePath());
-		LOG.debug("tmp identity signature file: "
-				+ tmpIdentitySignatureFile.getAbsolutePath());
+		LOG.debug("tmp identity signature file: " + tmpIdentitySignatureFile.getAbsolutePath());
 		LOG.debug("tmp RRN cert file: " + tmpRRNCertFile.getAbsolutePath());
 		LOG.debug("tmp photo file: " + tmpPhotoFile.getAbsolutePath());
 		LOG.debug("tmp address file: " + tmpAddressFile.getAbsolutePath());
-		LOG.debug("tmp address signature file: "
-				+ tmpAddressSignatureFile.getAbsolutePath());
+		LOG.debug("tmp address signature file: " + tmpAddressSignatureFile.getAbsolutePath());
 	}
 
 	@Test
@@ -896,12 +849,12 @@ public class PcscTest {
 			CardChannel cardChannel = pcscEid.getCardChannel();
 
 			while (true) {
-				CommandAPDU getCardApdu = new CommandAPDU(0x80, 0xe4, 0x00,
-						0x00, 0x1c); // Le = 0x1c
+				CommandAPDU getCardApdu = new CommandAPDU(0x80, 0xe4, 0x00, 0x00, 0x1c); // Le
+																							// =
+																							// 0x1c
 				ResponseAPDU responseApdu = cardChannel.transmit(getCardApdu);
 				if (0x9000 != responseApdu.getSW()) {
-					fail("SW error: "
-							+ Integer.toHexString(responseApdu.getSW()));
+					fail("SW error: " + Integer.toHexString(responseApdu.getSW()));
 				}
 				LOG.debug(Hex.encodeHexString(responseApdu.getData()));
 			}
@@ -921,13 +874,11 @@ public class PcscTest {
 		CardChannel cardChannel = pcscEid.getCardChannel();
 
 		int size = 256;
-		CommandAPDU getChallengeApdu = new CommandAPDU(0x00, 0x84, 0x00, 0x00,
-				new byte[] {}, 0, 0, size);
+		CommandAPDU getChallengeApdu = new CommandAPDU(0x00, 0x84, 0x00, 0x00, new byte[] {}, 0, 0, size);
 		ResponseAPDU responseApdu;
 		responseApdu = cardChannel.transmit(getChallengeApdu);
 		if (0x9000 != responseApdu.getSW()) {
-			fail("get challenge failure: "
-					+ Integer.toHexString(responseApdu.getSW()));
+			fail("get challenge failure: " + Integer.toHexString(responseApdu.getSW()));
 		}
 		LOG.debug("challenge: " + Hex.encodeHexString(responseApdu.getData()));
 		assertEquals(size, responseApdu.getData().length);
@@ -978,27 +929,21 @@ public class PcscTest {
 		LOG.debug("feature list: " + new String(Hex.encodeHex(features)));
 		CCIDFeatures ccidFeatures = new CCIDFeatures(features);
 		for (int idx = 0; idx < 0x14; idx++) {
-			LOG.debug("has feature " + Integer.toHexString(idx) + " "
-					+ ccidFeatures.findFeature((byte) idx));
+			LOG.debug("has feature " + Integer.toHexString(idx) + " " + ccidFeatures.findFeature((byte) idx));
 		}
 		if (null != ccidFeatures.findFeature((byte) 0x12)) {
-			byte[] tlvFeatures = card.transmitControlCommand(
-					ccidFeatures.findFeature((byte) 0x12), new byte[0]);
-			LOG.debug("TLV feature list: "
-					+ new String(Hex.encodeHex(tlvFeatures)));
-			FeatureGetTlvProperties featureGetTlvProperties = TlvParser.parse(
-					tlvFeatures, FeatureGetTlvProperties.class);
+			byte[] tlvFeatures = card.transmitControlCommand(ccidFeatures.findFeature((byte) 0x12), new byte[0]);
+			LOG.debug("TLV feature list: " + new String(Hex.encodeHex(tlvFeatures)));
+			FeatureGetTlvProperties featureGetTlvProperties = TlvParser.parse(tlvFeatures,
+					FeatureGetTlvProperties.class);
 			if (null != featureGetTlvProperties.bPPDUSupport) {
-				LOG.debug("PPDU support: "
-						+ featureGetTlvProperties.bPPDUSupport[0]);
+				LOG.debug("PPDU support: " + featureGetTlvProperties.bPPDUSupport[0]);
 			}
 			if (null != featureGetTlvProperties.usbVendorId) {
-				LOG.debug("USB vendor id: "
-						+ Hex.encodeHexString(featureGetTlvProperties.usbVendorId));
+				LOG.debug("USB vendor id: " + Hex.encodeHexString(featureGetTlvProperties.usbVendorId));
 			}
 			if (null != featureGetTlvProperties.usbProductId) {
-				LOG.debug("USB product id: "
-						+ Hex.encodeHexString(featureGetTlvProperties.usbProductId));
+				LOG.debug("USB product id: " + Hex.encodeHexString(featureGetTlvProperties.usbProductId));
 			}
 		}
 	}
@@ -1062,12 +1007,9 @@ public class PcscTest {
 			return;
 		}
 		LOG.debug("feature list: " + new String(Hex.encodeHex(features)));
-		LOG.debug("feature verify pin direct: "
-				+ hasFeature(FEATURE_VERIFY_PIN_DIRECT_TAG, features));
-		Integer verifyPinControl = findFeature(FEATURE_VERIFY_PIN_DIRECT_TAG,
-				features);
-		LOG.debug("VERIFY PIN control: 0x"
-				+ Integer.toHexString(verifyPinControl));
+		LOG.debug("feature verify pin direct: " + hasFeature(FEATURE_VERIFY_PIN_DIRECT_TAG, features));
+		Integer verifyPinControl = findFeature(FEATURE_VERIFY_PIN_DIRECT_TAG, features);
+		LOG.debug("VERIFY PIN control: 0x" + Integer.toHexString(verifyPinControl));
 
 		CardChannel cardChannel = pcscEid.getCardChannel();
 		CommandAPDU setApdu = new CommandAPDU(0x00, 0x22, 0x41, 0xB6,
@@ -1083,8 +1025,7 @@ public class PcscTest {
 
 		byte[] verifyCommandData = createPINVerificationDataStructure();
 
-		byte[] result = card.transmitControlCommand(verifyPinControl,
-				verifyCommandData);
+		byte[] result = card.transmitControlCommand(verifyPinControl, verifyCommandData);
 		responseApdu = new ResponseAPDU(result);
 		LOG.debug("status work: " + Integer.toHexString(responseApdu.getSW()));
 		if (0x9000 == responseApdu.getSW()) {
@@ -1159,14 +1100,12 @@ public class PcscTest {
 		/*
 		 * bTeoPrologue : only significant for T=1 protocol.
 		 */
-		byte[] verifyApdu = new byte[] {
-				0x00, // CLA
+		byte[] verifyApdu = new byte[] { 0x00, // CLA
 				0x20, // INS
 				0x00, // P1
 				0x01, // P2
 				0x08, // Lc = 8 bytes in command data
-				0x20, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
-				(byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
+				0x20, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
 		verifyCommand.write(verifyApdu.length & 0xff); // ulDataLength[0]
 		verifyCommand.write(0x00); // ulDataLength[1]
 		verifyCommand.write(0x00); // ulDataLength[2]
@@ -1229,8 +1168,7 @@ public class PcscTest {
 			List<X509Certificate> certChain = pcscEid.getSignCertificateChain();
 			LOG.debug("certificate: " + certChain.get(0));
 
-			NetworkConfig networkConfig = new NetworkConfig(
-					"proxy.yourict.net", 8080);
+			NetworkConfig networkConfig = new NetworkConfig("proxy.yourict.net", 8080);
 			TrustValidator trustValidator = BelgianTrustValidatorFactory
 					.createNonRepudiationTrustValidator(networkConfig);
 
@@ -1256,8 +1194,7 @@ public class PcscTest {
 		}
 		LOG.debug("certificate: " + certChain.get(0));
 
-		NetworkConfig networkConfig = new NetworkConfig("proxy.yourict.net",
-				8080);
+		NetworkConfig networkConfig = new NetworkConfig("proxy.yourict.net", 8080);
 
 		MemoryCertificateRepository memoryCertificateRepository = new MemoryCertificateRepository();
 		X509Certificate rootCaCertificate = loadCertificate("be/fedict/trust/belgiumrca.crt");
@@ -1266,13 +1203,11 @@ public class PcscTest {
 		memoryCertificateRepository.addTrustPoint(rootCa2Certificate);
 
 		RevocationData revocationData = new RevocationData();
-		TrustValidator trustValidator = new TrustValidator(
-				memoryCertificateRepository);
+		TrustValidator trustValidator = new TrustValidator(memoryCertificateRepository);
 		trustValidator.setRevocationData(revocationData);
 
 		trustValidator.addTrustLinker(new PublicKeyTrustLinker());
-		OnlineCrlRepository crlRepository = new OnlineCrlRepository(
-				networkConfig);
+		OnlineCrlRepository crlRepository = new OnlineCrlRepository(networkConfig);
 		trustValidator.addTrustLinker(new CrlTrustLinker(crlRepository));
 
 		try {
@@ -1282,10 +1217,8 @@ public class PcscTest {
 		}
 
 		byte[] crlData = revocationData.getCrlRevocationData().get(1).getData();
-		CertificateList certificateList = CertificateList
-				.getInstance(new ASN1InputStream(crlData).readObject());
-		X509Extensions crlExtensions = certificateList.getTBSCertList()
-				.getExtensions();
+		CertificateList certificateList = CertificateList.getInstance(new ASN1InputStream(crlData).readObject());
+		X509Extensions crlExtensions = certificateList.getTBSCertList().getExtensions();
 		Enumeration<DERObjectIdentifier> oids = crlExtensions.oids();
 		while (oids.hasMoreElements()) {
 			LOG.debug("oid type: " + oids.nextElement().getId());
@@ -1307,29 +1240,21 @@ public class PcscTest {
 			}
 
 			MemoryCertificateRepository certificateRepository = new MemoryCertificateRepository();
-			certificateRepository
-					.addTrustPoint(certChain.get(certChain.size() - 1));
+			certificateRepository.addTrustPoint(certChain.get(certChain.size() - 1));
 
-			TrustValidator trustValidator = new TrustValidator(
-					certificateRepository);
+			TrustValidator trustValidator = new TrustValidator(certificateRepository);
 			trustValidator.addTrustLinker(new PublicKeyTrustLinker());
 
-			NetworkConfig networkConfig = new NetworkConfig(
-					"proxy.yourict.net", 8080);
+			NetworkConfig networkConfig = new NetworkConfig("proxy.yourict.net", 8080);
 
-			OnlineOcspRepository ocspRepository = new OnlineOcspRepository(
-					networkConfig);
+			OnlineOcspRepository ocspRepository = new OnlineOcspRepository(networkConfig);
 
-			OnlineCrlRepository crlRepository = new OnlineCrlRepository(
-					networkConfig);
-			CachedCrlRepository cachedCrlRepository = new CachedCrlRepository(
-					crlRepository);
+			OnlineCrlRepository crlRepository = new OnlineCrlRepository(networkConfig);
+			CachedCrlRepository cachedCrlRepository = new CachedCrlRepository(crlRepository);
 
 			FallbackTrustLinker fallbackTrustLinker = new FallbackTrustLinker();
-			fallbackTrustLinker.addTrustLinker(new OcspTrustLinker(
-					ocspRepository));
-			fallbackTrustLinker.addTrustLinker(new CrlTrustLinker(
-					cachedCrlRepository));
+			fallbackTrustLinker.addTrustLinker(new OcspTrustLinker(ocspRepository));
+			fallbackTrustLinker.addTrustLinker(new CrlTrustLinker(cachedCrlRepository));
 
 			trustValidator.addTrustLinker(fallbackTrustLinker);
 
@@ -1343,15 +1268,12 @@ public class PcscTest {
 		LOG.debug("loading certificate: " + resourceName);
 		Thread currentThread = Thread.currentThread();
 		ClassLoader classLoader = currentThread.getContextClassLoader();
-		InputStream certificateInputStream = classLoader
-				.getResourceAsStream(resourceName);
+		InputStream certificateInputStream = classLoader.getResourceAsStream(resourceName);
 		if (null == certificateInputStream) {
-			throw new IllegalArgumentException("resource not found: "
-					+ resourceName);
+			throw new IllegalArgumentException("resource not found: " + resourceName);
 		}
 		try {
-			CertificateFactory certificateFactory = CertificateFactory
-					.getInstance("X.509");
+			CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
 			X509Certificate certificate = (X509Certificate) certificateFactory
 					.generateCertificate(certificateInputStream);
 			return certificate;

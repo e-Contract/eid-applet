@@ -31,9 +31,7 @@ public class TestReportFactory {
 
 	private static final Log LOG = LogFactory.getLog(TestReportFactory.class);
 
-	private static final String TEST_REPORT_ID_SESSION_ATTRIBUTE = TestReportFactory.class
-			.getName()
-			+ ".testReportId";
+	private static final String TEST_REPORT_ID_SESSION_ATTRIBUTE = TestReportFactory.class.getName() + ".testReportId";
 
 	private final HttpSession httpSession;
 
@@ -48,41 +46,33 @@ public class TestReportFactory {
 	private HttpServletRequest getHttpServletRequest() {
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}
 		return httpServletRequest;
 	}
 
-	public void startTestReport(String javaVersion, String javaVendor,
-			String osName, String osArch, String osVersion, String userAgent,
-			String navigatorAppName, String navigatorAppVersion,
-			String navigatorUserAgent) {
-		TestReportEntity testReportEntity = new TestReportEntity(javaVersion,
-				javaVendor, osName, osArch, osVersion, userAgent,
-				navigatorAppName, navigatorAppVersion, navigatorUserAgent);
+	public void startTestReport(String javaVersion, String javaVendor, String osName, String osArch, String osVersion,
+			String userAgent, String navigatorAppName, String navigatorAppVersion, String navigatorUserAgent) {
+		TestReportEntity testReportEntity = new TestReportEntity(javaVersion, javaVendor, osName, osArch, osVersion,
+				userAgent, navigatorAppName, navigatorAppVersion, navigatorUserAgent);
 		this.entityManager.persist(testReportEntity);
 		int testReportId = testReportEntity.getId();
 		LOG.debug("test report Id: " + testReportId);
-		this.httpSession.setAttribute(TEST_REPORT_ID_SESSION_ATTRIBUTE,
-				testReportId);
+		this.httpSession.setAttribute(TEST_REPORT_ID_SESSION_ATTRIBUTE, testReportId);
 	}
 
 	public void finalizeTestReport(TestReportType test, TestReportResult result) {
-		Integer testReportId = (Integer) this.httpSession
-				.getAttribute(TEST_REPORT_ID_SESSION_ATTRIBUTE);
+		Integer testReportId = (Integer) this.httpSession.getAttribute(TEST_REPORT_ID_SESSION_ATTRIBUTE);
 		if (null == testReportId) {
 			throw new IllegalStateException("start the test report first");
 		}
-		TestReportEntity testReportEntity = this.entityManager.find(
-				TestReportEntity.class, testReportId);
+		TestReportEntity testReportEntity = this.entityManager.find(TestReportEntity.class, testReportId);
 		if (null == testReportEntity) {
 			throw new IllegalStateException("test report not found");
 		}
-		LOG.debug("updating test report " + testReportId + " " + test
-				+ " result " + result);
+		LOG.debug("updating test report " + testReportId + " " + test + " result " + result);
 		testReportEntity.setTest(test);
 		testReportEntity.setResult(result);
 		this.httpSession.removeAttribute(TEST_REPORT_ID_SESSION_ATTRIBUTE);

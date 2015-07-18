@@ -84,8 +84,7 @@ import be.fedict.eid.applet.service.signer.ooxml.OOXMLURIDereferencer;
 
 public class OOXMLSignatureVerifierTest {
 
-	private static final Log LOG = LogFactory
-			.getLog(OOXMLSignatureVerifierTest.class);
+	private static final Log LOG = LogFactory.getLog(OOXMLSignatureVerifierTest.class);
 
 	@BeforeClass
 	public static void setUp() {
@@ -95,8 +94,7 @@ public class OOXMLSignatureVerifierTest {
 	@Test
 	public void testIsOOXMLDocument() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/hello-world-unsigned.docx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/hello-world-unsigned.docx");
 
 		// operate
 		boolean result = OOXMLSignatureVerifier.isOOXML(url);
@@ -108,8 +106,7 @@ public class OOXMLSignatureVerifierTest {
 	@Test
 	public void testIsOOXMLDocument2() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/signed-ooxml.docx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/signed-ooxml.docx");
 
 		// operate
 		boolean result = OOXMLSignatureVerifier.isOOXML(url);
@@ -121,8 +118,7 @@ public class OOXMLSignatureVerifierTest {
 	@Test
 	public void testODFIsNotOOXML() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/hello-world.odt");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/hello-world.odt");
 
 		// operate
 		boolean result = OOXMLSignatureVerifier.isOOXML(url);
@@ -134,8 +130,7 @@ public class OOXMLSignatureVerifierTest {
 	@Test
 	public void testPOI() throws Exception {
 		// setup
-		InputStream inputStream = OOXMLSignatureVerifierTest.class
-				.getResourceAsStream("/hello-world-unsigned.docx");
+		InputStream inputStream = OOXMLSignatureVerifierTest.class.getResourceAsStream("/hello-world-unsigned.docx");
 
 		// operate
 		boolean result = POIXMLDocument.hasOOXMLHeader(inputStream);
@@ -147,8 +142,7 @@ public class OOXMLSignatureVerifierTest {
 	@Test
 	public void testOPC() throws Exception {
 		// setup
-		InputStream inputStream = OOXMLSignatureVerifierTest.class
-				.getResourceAsStream("/hello-world-signed.docx");
+		InputStream inputStream = OOXMLSignatureVerifierTest.class.getResourceAsStream("/hello-world-signed.docx");
 
 		// operate
 		OPCPackage opcPackage = OPCPackage.open(inputStream);
@@ -164,8 +158,7 @@ public class OOXMLSignatureVerifierTest {
 		assertFalse(signatureParts.isEmpty());
 
 		PackagePart signaturePart = signatureParts.get(0);
-		LOG.debug("signature part class type: "
-				+ signaturePart.getClass().getName());
+		LOG.debug("signature part class type: " + signaturePart.getClass().getName());
 
 		PackageDigitalSignatureManager packageDigitalSignatureManager = new PackageDigitalSignatureManager();
 		// yeah... POI implementation still missing
@@ -174,8 +167,7 @@ public class OOXMLSignatureVerifierTest {
 	@Test
 	public void testGetSignerUnsigned() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/hello-world-unsigned.docx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/hello-world-unsigned.docx");
 
 		// operate
 		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
@@ -204,8 +196,7 @@ public class OOXMLSignatureVerifierTest {
 	@Test
 	public void testGetSignerUnsignedPowerpoint() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/hello-world-unsigned.pptx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/hello-world-unsigned.pptx");
 
 		// operate
 		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
@@ -219,8 +210,7 @@ public class OOXMLSignatureVerifierTest {
 	@Test
 	public void testGetSignerUnsignedExcel() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/hello-world-unsigned.xlsx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/hello-world-unsigned.xlsx");
 
 		// operate
 		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
@@ -234,8 +224,7 @@ public class OOXMLSignatureVerifierTest {
 	@Test
 	public void testGetSigner() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/hello-world-signed.docx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/hello-world-signed.docx");
 
 		// operate
 		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
@@ -251,8 +240,7 @@ public class OOXMLSignatureVerifierTest {
 	@Test
 	public void testSignedOOXML() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/signed-ooxml.docx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/signed-ooxml.docx");
 
 		// operate
 		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
@@ -264,12 +252,11 @@ public class OOXMLSignatureVerifierTest {
 		X509Certificate signer = result.get(0);
 		LOG.debug("signer: " + signer.getSubjectX500Principal());
 	}
-	
+
 	@Test
 	public void testSignedOOXML2() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/signed.docx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/signed.docx");
 
 		// operate
 		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
@@ -280,37 +267,29 @@ public class OOXMLSignatureVerifierTest {
 		assertEquals(1, result.size());
 		X509Certificate signer = result.get(0);
 		LOG.debug("signer: " + signer.getSubjectX500Principal());
-		
+
 		byte[] document = IOUtils.toByteArray(url.openStream());
-		List<String> signatureResourceNames = verifier
-				.getSignatureResourceNames(document);
-		Document signatureDocument = verifier.getSignatureDocument(
-				new ByteArrayInputStream(document),
+		List<String> signatureResourceNames = verifier.getSignatureResourceNames(document);
+		Document signatureDocument = verifier.getSignatureDocument(new ByteArrayInputStream(document),
 				signatureResourceNames.get(0));
-		NodeList signatureNodeList = signatureDocument.getElementsByTagNameNS(
-				XMLSignature.XMLNS, "Signature");
+		NodeList signatureNodeList = signatureDocument.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 
 		Element signatureElement = (Element) signatureNodeList.item(0);
 		KeyInfoKeySelector keySelector = new KeyInfoKeySelector();
-		DOMValidateContext domValidateContext = new DOMValidateContext(
-				keySelector, signatureElement);
-		domValidateContext.setProperty("org.jcp.xml.dsig.validateManifests",
-				Boolean.TRUE);
+		DOMValidateContext domValidateContext = new DOMValidateContext(keySelector, signatureElement);
+		domValidateContext.setProperty("org.jcp.xml.dsig.validateManifests", Boolean.TRUE);
 		OOXMLURIDereferencer dereferencer = new OOXMLURIDereferencer(document);
 		domValidateContext.setURIDereferencer(dereferencer);
 
-		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-				.getInstance();
-		XMLSignature xmlSignature = xmlSignatureFactory
-				.unmarshalXMLSignature(domValidateContext);
+		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
+		XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
 		assertTrue(verifier.isValidOOXMLSignature(xmlSignature, document));
 	}
 
 	@Test
 	public void testSignedOOXMLOffice2010() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/ms-office-2010-signed.docx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/ms-office-2010-signed.docx");
 
 		// operate
 		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
@@ -339,35 +318,27 @@ public class OOXMLSignatureVerifierTest {
 		LOG.debug("signer: " + signer.getSubjectX500Principal());
 
 		byte[] document = IOUtils.toByteArray(url.openStream());
-		List<String> signatureResourceNames = verifier
-				.getSignatureResourceNames(document);
-		Document signatureDocument = verifier.getSignatureDocument(
-				new ByteArrayInputStream(document),
+		List<String> signatureResourceNames = verifier.getSignatureResourceNames(document);
+		Document signatureDocument = verifier.getSignatureDocument(new ByteArrayInputStream(document),
 				signatureResourceNames.get(0));
-		NodeList signatureNodeList = signatureDocument.getElementsByTagNameNS(
-				XMLSignature.XMLNS, "Signature");
+		NodeList signatureNodeList = signatureDocument.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 
 		Element signatureElement = (Element) signatureNodeList.item(0);
 		KeyInfoKeySelector keySelector = new KeyInfoKeySelector();
-		DOMValidateContext domValidateContext = new DOMValidateContext(
-				keySelector, signatureElement);
-		domValidateContext.setProperty("org.jcp.xml.dsig.validateManifests",
-				Boolean.TRUE);
+		DOMValidateContext domValidateContext = new DOMValidateContext(keySelector, signatureElement);
+		domValidateContext.setProperty("org.jcp.xml.dsig.validateManifests", Boolean.TRUE);
 		OOXMLURIDereferencer dereferencer = new OOXMLURIDereferencer(document);
 		domValidateContext.setURIDereferencer(dereferencer);
 
-		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-				.getInstance();
-		XMLSignature xmlSignature = xmlSignatureFactory
-				.unmarshalXMLSignature(domValidateContext);
+		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
+		XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
 		assertTrue(verifier.isValidOOXMLSignature(xmlSignature, document));
 	}
 
 	@Test
 	public void testSignedOOXMLOffice2010Powerpoint() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/ms-office-2010-signed.pptx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/ms-office-2010-signed.pptx");
 
 		// operate
 		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
@@ -383,8 +354,7 @@ public class OOXMLSignatureVerifierTest {
 	@Test
 	public void testSignedOOXMLOffice2010Excel() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/ms-office-2010-signed.xlsx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/ms-office-2010-signed.xlsx");
 
 		// operate
 		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
@@ -400,8 +370,7 @@ public class OOXMLSignatureVerifierTest {
 	// @Test
 	public void testOffice2010TechnicalPreview() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/hello-world-office-2010-technical-preview.docx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/hello-world-office-2010-technical-preview.docx");
 
 		// operate
 		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
@@ -417,8 +386,7 @@ public class OOXMLSignatureVerifierTest {
 	// @Test
 	public void testGetSignerPowerpoint() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/hello-world-signed.pptx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/hello-world-signed.pptx");
 
 		// operate
 		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
@@ -434,8 +402,7 @@ public class OOXMLSignatureVerifierTest {
 	@Test
 	public void testGetSignerExcel() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/hello-world-signed.xlsx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/hello-world-signed.xlsx");
 
 		// operate
 		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
@@ -451,8 +418,7 @@ public class OOXMLSignatureVerifierTest {
 	@Test
 	public void testGetSigners() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/hello-world-signed-twice.docx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/hello-world-signed-twice.docx");
 
 		// operate
 		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
@@ -470,8 +436,7 @@ public class OOXMLSignatureVerifierTest {
 	@Test
 	public void testVerifyHyperlink() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/hyperlink-example-signed.docx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/hyperlink-example-signed.docx");
 
 		// operate
 		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
@@ -485,8 +450,7 @@ public class OOXMLSignatureVerifierTest {
 	@Test
 	public void testGetSignersOffice2010SP1() throws Exception {
 		// setup
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/Office2010-SP1-XAdES-X-L.docx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/Office2010-SP1-XAdES-X-L.docx");
 
 		// operate
 		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
@@ -500,12 +464,10 @@ public class OOXMLSignatureVerifierTest {
 	@Test
 	public void testVerifySignature() throws Exception {
 
-		java.util.logging.Logger logger = java.util.logging.Logger
-				.getLogger("org.jcp.xml.dsig.internal.dom");
+		java.util.logging.Logger logger = java.util.logging.Logger.getLogger("org.jcp.xml.dsig.internal.dom");
 		logger.log(Level.FINE, "test");
 
-		URL url = OOXMLSignatureVerifierTest.class
-				.getResource("/hello-world-signed.docx");
+		URL url = OOXMLSignatureVerifierTest.class.getResource("/hello-world-signed.docx");
 		String signatureResourceName = getSignatureResourceName(url);
 		LOG.debug("signature resource name: " + signatureResourceName);
 
@@ -519,36 +481,30 @@ public class OOXMLSignatureVerifierTest {
 			}
 			Document signatureDocument = loadDocument(zipInputStream);
 			LOG.debug("signature loaded");
-			NodeList signatureNodeList = signatureDocument
-					.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
+			NodeList signatureNodeList = signatureDocument.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 			assertEquals(1, signatureNodeList.getLength());
 			Node signatureNode = signatureNodeList.item(0);
 			KeyInfoKeySelector keySelector = new KeyInfoKeySelector();
-			DOMValidateContext domValidateContext = new DOMValidateContext(
-					keySelector, signatureNode);
-			domValidateContext.setProperty(
-					"org.jcp.xml.dsig.validateManifests", Boolean.TRUE);
+			DOMValidateContext domValidateContext = new DOMValidateContext(keySelector, signatureNode);
+			domValidateContext.setProperty("org.jcp.xml.dsig.validateManifests", Boolean.TRUE);
 
 			OOXMLURIDereferencer dereferencer = new OOXMLURIDereferencer(url);
 			domValidateContext.setURIDereferencer(dereferencer);
 
-			XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-					.getInstance();
-			XMLSignature xmlSignature = xmlSignatureFactory
-					.unmarshalXMLSignature(domValidateContext);
+			XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
+			XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
 			boolean validity = xmlSignature.validate(domValidateContext);
 			assertTrue(validity);
 			List<?> objects = xmlSignature.getObjects();
 			for (Object object : objects) {
-				LOG.debug("ds:Object class type: "
-						+ object.getClass().getName());
+				LOG.debug("ds:Object class type: " + object.getClass().getName());
 			}
 			break;
 		}
 	}
 
-	private String getSignatureResourceName(URL url) throws IOException,
-			ParserConfigurationException, SAXException, TransformerException {
+	private String getSignatureResourceName(URL url)
+			throws IOException, ParserConfigurationException, SAXException, TransformerException {
 		InputStream inputStream = url.openStream();
 		ZipInputStream zipInputStream = new ZipInputStream(inputStream);
 		ZipEntry zipEntry;
@@ -558,14 +514,11 @@ public class OOXMLSignatureVerifierTest {
 			}
 			Document contentTypesDocument = loadDocument(zipInputStream);
 			Element nsElement = contentTypesDocument.createElement("ns");
-			nsElement
-					.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
-							"http://schemas.openxmlformats.org/package/2006/content-types");
-			NodeList nodeList = XPathAPI
-					.selectNodeList(
-							contentTypesDocument,
-							"/tns:Types/tns:Override[@ContentType='application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml']/@PartName",
-							nsElement);
+			nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
+					"http://schemas.openxmlformats.org/package/2006/content-types");
+			NodeList nodeList = XPathAPI.selectNodeList(contentTypesDocument,
+					"/tns:Types/tns:Override[@ContentType='application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml']/@PartName",
+					nsElement);
 			if (nodeList.getLength() == 0) {
 				return null;
 			}
@@ -580,11 +533,9 @@ public class OOXMLSignatureVerifierTest {
 	private Document loadDocument(InputStream documentInputStream)
 			throws ParserConfigurationException, SAXException, IOException {
 		InputSource inputSource = new InputSource(documentInputStream);
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.parse(inputSource);
 		return document;
 	}

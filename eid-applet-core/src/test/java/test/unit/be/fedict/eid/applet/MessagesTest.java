@@ -59,11 +59,9 @@ public class MessagesTest {
 	public void testGermanMessages() throws Exception {
 		Locale locale = Locale.GERMAN;
 		Messages messages = new Messages(locale);
-		String message = messages
-				.getMessage(Messages.MESSAGE_ID.INSERT_CARD_QUESTION);
+		String message = messages.getMessage(Messages.MESSAGE_ID.INSERT_CARD_QUESTION);
 		LOG.debug("message: " + message);
-		LOG.debug("connectReader: "
-				+ messages.getMessage(Messages.MESSAGE_ID.CONNECT_READER));
+		LOG.debug("connectReader: " + messages.getMessage(Messages.MESSAGE_ID.CONNECT_READER));
 	}
 
 	@Test
@@ -77,8 +75,7 @@ public class MessagesTest {
 	}
 
 	@Test
-	public void testUnsupportedLanguageUnsupportedDefaultLanguage()
-			throws Exception {
+	public void testUnsupportedLanguageUnsupportedDefaultLanguage() throws Exception {
 		Locale.setDefault(Locale.CHINESE);
 		Locale locale = Locale.JAPANESE;
 		Messages messages = new Messages(locale);
@@ -111,13 +108,11 @@ public class MessagesTest {
 			language = "_" + language;
 		}
 		InputStream messagesInputStream = MessagesTest.class
-				.getResourceAsStream("/be/fedict/eid/applet/Messages"
-						+ language + ".properties");
+				.getResourceAsStream("/be/fedict/eid/applet/Messages" + language + ".properties");
 		Properties properties = new Properties();
 		properties.load(messagesInputStream);
 		for (MESSAGE_ID messageId : MESSAGE_ID.values()) {
-			assertTrue("missing message \"" + messageId.getId()
-					+ "\" for language \"" + language + "\"",
+			assertTrue("missing message \"" + messageId.getId() + "\" for language \"" + language + "\"",
 					properties.containsKey(messageId.getId()));
 		}
 	}

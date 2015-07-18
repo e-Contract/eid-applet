@@ -37,12 +37,12 @@ import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
-import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import be.fedict.eid.applet.service.signer.SignatureFacet;
 
 /**
@@ -56,33 +56,27 @@ public class ODFSignatureFacet implements SignatureFacet {
 	private static final Log LOG = LogFactory.getLog(ODFSignatureFacet.class);
 
 	private final AbstractODFSignatureService signatureService;
-    private final DigestAlgo digestAlgo;
+	private final DigestAlgo digestAlgo;
 
-	public ODFSignatureFacet(AbstractODFSignatureService signatureService,
-                             DigestAlgo digestAlgo) {
+	public ODFSignatureFacet(AbstractODFSignatureService signatureService, DigestAlgo digestAlgo) {
 		this.signatureService = signatureService;
-        this.digestAlgo = digestAlgo;
+		this.digestAlgo = digestAlgo;
 	}
 
-	public void postSign(Element signatureElement,
-			List<X509Certificate> signingCertificateChain) {
+	public void postSign(Element signatureElement, List<X509Certificate> signingCertificateChain) {
 		// empty
 	}
 
-	public void preSign(XMLSignatureFactory signatureFactory,
-			Document document, String signatureId,
-			List<X509Certificate> signingCertificateChain,
-			List<Reference> references, List<XMLObject> objects)
-			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+	public void preSign(XMLSignatureFactory signatureFactory, Document document, String signatureId,
+			List<X509Certificate> signingCertificateChain, List<Reference> references, List<XMLObject> objects)
+					throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		try {
 			URL odfUrl = this.signatureService.getOpenDocumentURL();
 			InputStream odfInputStream = odfUrl.openStream();
-			ZipInputStream odfZipInputStream = new ZipInputStream(
-					odfInputStream);
+			ZipInputStream odfZipInputStream = new ZipInputStream(odfInputStream);
 			ZipEntry zipEntry;
 
-			DigestMethod digestMethod = signatureFactory.newDigestMethod(
-					this.digestAlgo.getXmlAlgoId(), null);
+			DigestMethod digestMethod = signatureFactory.newDigestMethod(this.digestAlgo.getXmlAlgoId(), null);
 
 			while (null != (zipEntry = odfZipInputStream.getNextEntry())) {
 				if (ODFUtil.isToBeSigned(zipEntry)) {
@@ -100,15 +94,12 @@ public class ODFSignatureFacet implements SignatureFacet {
 					if (name.endsWith(".xml") && !isEmpty(odfZipInputStream)) {
 						/* apply transformation on non-empty XML files only */
 						List<Transform> transforms = new LinkedList<Transform>();
-						Transform transform = signatureFactory.newTransform(
-								CanonicalizationMethod.INCLUSIVE,
+						Transform transform = signatureFactory.newTransform(CanonicalizationMethod.INCLUSIVE,
 								(TransformParameterSpec) null);
 						transforms.add(transform);
-						reference = signatureFactory.newReference(uri,
-								digestMethod, transforms, null, null);
+						reference = signatureFactory.newReference(uri, digestMethod, transforms, null, null);
 					} else {
-						reference = signatureFactory.newReference(uri,
-								digestMethod);
+						reference = signatureFactory.newReference(uri, digestMethod);
 					}
 					references.add(reference);
 					LOG.debug("entry: " + name);

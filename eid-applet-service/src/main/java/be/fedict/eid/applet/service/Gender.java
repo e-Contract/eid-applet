@@ -31,6 +31,7 @@ public enum Gender implements Serializable {
 	 * Male.
 	 */
 	MALE,
+
 	/**
 	 * Female.
 	 */

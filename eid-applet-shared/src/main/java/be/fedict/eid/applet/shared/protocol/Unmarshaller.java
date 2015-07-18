@@ -76,16 +76,13 @@ public class Unmarshaller {
 		for (Class<?> messageClass : messageClasses) {
 			Field discriminatorField = findDiscriminatorField(messageClass);
 
-			HttpHeader httpHeaderAnnotation = discriminatorField
-					.getAnnotation(HttpHeader.class);
+			HttpHeader httpHeaderAnnotation = discriminatorField.getAnnotation(HttpHeader.class);
 			String discriminatorHttpHeaderName = httpHeaderAnnotation.value();
 			if (null == this.protocolMessageDiscriminatorHeaderName) {
 				this.protocolMessageDiscriminatorHeaderName = discriminatorHttpHeaderName;
 			} else {
-				if (false == this.protocolMessageDiscriminatorHeaderName
-						.equals(discriminatorHttpHeaderName)) {
-					throw new RuntimeException(
-							"discriminator field not the same over all message classes");
+				if (false == this.protocolMessageDiscriminatorHeaderName.equals(discriminatorHttpHeaderName)) {
+					throw new RuntimeException("discriminator field not the same over all message classes");
 				}
 			}
 
@@ -93,27 +90,21 @@ public class Unmarshaller {
 			try {
 				discriminatorValue = (String) discriminatorField.get(null);
 			} catch (Exception e) {
-				throw new RuntimeException("error reading field: "
-						+ e.getMessage());
+				throw new RuntimeException("error reading field: " + e.getMessage());
 			}
 			if (this.protocolMessageClasses.containsValue(discriminatorValue)) {
-				throw new RuntimeException(
-						"discriminator field not unique for: "
-								+ messageClass.getName());
+				throw new RuntimeException("discriminator field not unique for: " + messageClass.getName());
 			}
 			this.protocolMessageClasses.put(discriminatorValue, messageClass);
 
 			Field protocolVersionField = findProtocolVersionField(messageClass);
-			httpHeaderAnnotation = protocolVersionField
-					.getAnnotation(HttpHeader.class);
+			httpHeaderAnnotation = protocolVersionField.getAnnotation(HttpHeader.class);
 			String protocolVersionHttpHeaderName = httpHeaderAnnotation.value();
 			if (null == this.protocolVersionHeaderName) {
 				this.protocolVersionHeaderName = protocolVersionHttpHeaderName;
 			} else {
-				if (false == this.protocolVersionHeaderName
-						.equals(protocolVersionHeaderName)) {
-					throw new RuntimeException(
-							"protocol version field not the same over all message classes");
+				if (false == this.protocolVersionHeaderName.equals(protocolVersionHeaderName)) {
+					throw new RuntimeException("protocol version field not the same over all message classes");
 				}
 			}
 
@@ -121,15 +112,13 @@ public class Unmarshaller {
 			try {
 				protocolVersion = (Integer) protocolVersionField.get(null);
 			} catch (Exception e) {
-				throw new RuntimeException("error reading field: "
-						+ e.getMessage());
+				throw new RuntimeException("error reading field: " + e.getMessage());
 			}
 			if (null == this.protocolVersion) {
 				this.protocolVersion = protocolVersion;
 			} else {
 				if (false == this.protocolVersion.equals(protocolVersion)) {
-					throw new RuntimeException(
-							"protocol version not the same over all message classes");
+					throw new RuntimeException("protocol version not the same over all message classes");
 				}
 			}
 		}
@@ -138,65 +127,51 @@ public class Unmarshaller {
 	private Field findDiscriminatorField(Class<?> messageClass) {
 		Field[] fields = messageClass.getFields();
 		for (Field field : fields) {
-			MessageDiscriminator messageDiscriminatorAnnotation = field
-					.getAnnotation(MessageDiscriminator.class);
+			MessageDiscriminator messageDiscriminatorAnnotation = field.getAnnotation(MessageDiscriminator.class);
 			if (null == messageDiscriminatorAnnotation) {
 				continue;
 			}
 			if (Modifier.FINAL != (field.getModifiers() & Modifier.FINAL)) {
-				throw new RuntimeException(
-						"message discriminator should be final");
+				throw new RuntimeException("message discriminator should be final");
 			}
 			if (Modifier.STATIC != (field.getModifiers() & Modifier.STATIC)) {
-				throw new RuntimeException(
-						"message discriminator should be static");
+				throw new RuntimeException("message discriminator should be static");
 			}
 			if (false == String.class.equals(field.getType())) {
-				throw new RuntimeException(
-						"message discriminator should be a String");
+				throw new RuntimeException("message discriminator should be a String");
 			}
-			HttpHeader httpHeaderAnnotation = field
-					.getAnnotation(HttpHeader.class);
+			HttpHeader httpHeaderAnnotation = field.getAnnotation(HttpHeader.class);
 			if (null == httpHeaderAnnotation) {
-				throw new RuntimeException(
-						"message discriminator should be a HTTP header");
+				throw new RuntimeException("message discriminator should be a HTTP header");
 			}
 			return field;
 		}
-		throw new RuntimeException("no message discriminator field found on "
-				+ messageClass.getName());
+		throw new RuntimeException("no message discriminator field found on " + messageClass.getName());
 	}
 
 	private Field findProtocolVersionField(Class<?> messageClass) {
 		Field[] fields = messageClass.getFields();
 		for (Field field : fields) {
-			ProtocolVersion protocolVersionAnnotation = field
-					.getAnnotation(ProtocolVersion.class);
+			ProtocolVersion protocolVersionAnnotation = field.getAnnotation(ProtocolVersion.class);
 			if (null == protocolVersionAnnotation) {
 				continue;
 			}
 			if (Modifier.FINAL != (field.getModifiers() & Modifier.FINAL)) {
-				throw new RuntimeException(
-						"protocol version field should be final");
+				throw new RuntimeException("protocol version field should be final");
 			}
 			if (Modifier.STATIC != (field.getModifiers() & Modifier.STATIC)) {
-				throw new RuntimeException(
-						"protocol version field should be static");
+				throw new RuntimeException("protocol version field should be static");
 			}
 			if (false == Integer.TYPE.equals(field.getType())) {
-				throw new RuntimeException(
-						"protocol version field should be an int");
+				throw new RuntimeException("protocol version field should be an int");
 			}
-			HttpHeader httpHeaderAnnotation = field
-					.getAnnotation(HttpHeader.class);
+			HttpHeader httpHeaderAnnotation = field.getAnnotation(HttpHeader.class);
 			if (null == httpHeaderAnnotation) {
-				throw new RuntimeException(
-						"protocol version field should be a HTTP header");
+				throw new RuntimeException("protocol version field should be a HTTP header");
 			}
 			return field;
 		}
-		throw new RuntimeException("no protocol version field field found on "
-				+ messageClass.getName());
+		throw new RuntimeException("no protocol version field field found on " + messageClass.getName());
 	}
 
 	/**
@@ -216,8 +191,7 @@ public class Unmarshaller {
 		/*
 		 * Message protocol check
 		 */
-		String protocolVersionHeader = httpReceiver
-				.getHeaderValue(this.protocolVersionHeaderName);
+		String protocolVersionHeader = httpReceiver.getHeaderValue(this.protocolVersionHeaderName);
 		if (null == protocolVersionHeader) {
 			throw new RuntimeException("no protocol version header");
 		}
@@ -229,13 +203,10 @@ public class Unmarshaller {
 		/*
 		 * Message discriminator
 		 */
-		String discriminatorValue = httpReceiver
-				.getHeaderValue(this.protocolMessageDiscriminatorHeaderName);
-		Class<?> protocolMessageClass = this.protocolMessageClasses
-				.get(discriminatorValue);
+		String discriminatorValue = httpReceiver.getHeaderValue(this.protocolMessageDiscriminatorHeaderName);
+		Class<?> protocolMessageClass = this.protocolMessageClasses.get(discriminatorValue);
 		if (null == protocolMessageClass) {
-			throw new RuntimeException("unsupported message: "
-					+ discriminatorValue);
+			throw new RuntimeException("unsupported message: " + discriminatorValue);
 		}
 
 		/*
@@ -253,8 +224,7 @@ public class Unmarshaller {
 		 * input validation.
 		 */
 		try {
-			injectHttpHeaderFields(httpReceiver, protocolMessageClass,
-					transferObject);
+			injectHttpHeaderFields(httpReceiver, protocolMessageClass, transferObject);
 		} catch (Exception e) {
 			throw new RuntimeException("error: " + e.getMessage(), e);
 		}
@@ -283,8 +253,7 @@ public class Unmarshaller {
 		return transferObject;
 	}
 
-	private void injectHttpBody(HttpReceiver httpReceiver,
-			Object transferObject, Field[] fields) {
+	private void injectHttpBody(HttpReceiver httpReceiver, Object transferObject, Field[] fields) {
 		Field bodyField = null;
 		for (Field field : fields) {
 			HttpBody httpBodyAnnotation = field.getAnnotation(HttpBody.class);
@@ -301,8 +270,7 @@ public class Unmarshaller {
 			Object bodyValue;
 			if (List.class.equals(bodyField.getType())) {
 				List<String> bodyList = new LinkedList<String>();
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(new ByteArrayInputStream(body)));
+				BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(body)));
 				String line;
 				try {
 					while (null != (line = reader.readLine())) {
@@ -323,12 +291,10 @@ public class Unmarshaller {
 		}
 	}
 
-	private void postConstructSemantics(Class<?> protocolMessageClass,
-			Object transferObject) {
+	private void postConstructSemantics(Class<?> protocolMessageClass, Object transferObject) {
 		Method[] methods = protocolMessageClass.getMethods();
 		for (Method method : methods) {
-			PostConstruct postConstructAnnotation = method
-					.getAnnotation(PostConstruct.class);
+			PostConstruct postConstructAnnotation = method.getAnnotation(PostConstruct.class);
 			if (null != postConstructAnnotation) {
 				try {
 					method.invoke(transferObject, new Object[] {});
@@ -343,25 +309,20 @@ public class Unmarshaller {
 						throw runtimeException;
 					}
 					throw new RuntimeException(
-							"@PostConstruct method invocation error: "
-									+ methodException.getMessage(),
-							methodException);
+							"@PostConstruct method invocation error: " + methodException.getMessage(), methodException);
 				} catch (Exception e) {
-					throw new RuntimeException("@PostConstruct error: "
-							+ e.getMessage(), e);
+					throw new RuntimeException("@PostConstruct error: " + e.getMessage(), e);
 				}
 			}
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private void semanticValidation(Class<?> protocolMessageClass,
-			Object transferObject) {
+	private void semanticValidation(Class<?> protocolMessageClass, Object transferObject) {
 		ValidateSemanticalIntegrity validateSemanticalIntegrity = protocolMessageClass
 				.getAnnotation(ValidateSemanticalIntegrity.class);
 		if (null != validateSemanticalIntegrity) {
-			Class<? extends SemanticValidator<?>> validatorClass = validateSemanticalIntegrity
-					.value();
+			Class<? extends SemanticValidator<?>> validatorClass = validateSemanticalIntegrity.value();
 			SemanticValidator validator;
 			try {
 				validator = validatorClass.newInstance();
@@ -371,8 +332,7 @@ public class Unmarshaller {
 			try {
 				validator.validate(transferObject);
 			} catch (SemanticValidatorException e) {
-				throw new RuntimeException("semantic validation error: "
-						+ e.getMessage());
+				throw new RuntimeException("semantic validation error: " + e.getMessage());
 			}
 		}
 	}
@@ -391,19 +351,16 @@ public class Unmarshaller {
 				throw new RuntimeException("error: " + e.getMessage(), e);
 			}
 			if (null == fieldValue) {
-				throw new RuntimeException("field should not be null: "
-						+ field.getName());
+				throw new RuntimeException("field should not be null: " + field.getName());
 			}
 		}
 	}
 
-	private void injectHttpHeaderFields(HttpReceiver httpReceiver,
-			Class<?> protocolMessageClass, Object transferObject)
+	private void injectHttpHeaderFields(HttpReceiver httpReceiver, Class<?> protocolMessageClass, Object transferObject)
 			throws IllegalArgumentException, IllegalAccessException {
 		List<String> headerNames = httpReceiver.getHeaderNames();
 		for (String headerName : headerNames) {
-			Field httpHeaderField = findHttpHeaderField(protocolMessageClass,
-					headerName);
+			Field httpHeaderField = findHttpHeaderField(protocolMessageClass, headerName);
 			if (null != httpHeaderField) {
 				String headerValue = httpReceiver.getHeaderValue(headerName);
 				if (0 != (httpHeaderField.getModifiers() & Modifier.FINAL)) {
@@ -412,20 +369,15 @@ public class Unmarshaller {
 					 */
 					String constantValue;
 					if (String.class.equals(httpHeaderField.getType())) {
-						constantValue = (String) httpHeaderField
-								.get(transferObject);
+						constantValue = (String) httpHeaderField.get(transferObject);
 					} else if (Integer.TYPE.equals(httpHeaderField.getType())) {
-						constantValue = ((Integer) httpHeaderField
-								.get(transferObject)).toString();
+						constantValue = ((Integer) httpHeaderField.get(transferObject)).toString();
 					} else {
-						throw new RuntimeException("unsupported type: "
-								+ httpHeaderField.getType().getName());
+						throw new RuntimeException("unsupported type: " + httpHeaderField.getType().getName());
 					}
 					if (false == constantValue.equals(headerValue)) {
-						throw new RuntimeException("constant value mismatch: "
-								+ httpHeaderField.getName()
-								+ "; expected value: " + constantValue
-								+ "; actual value: " + headerValue);
+						throw new RuntimeException("constant value mismatch: " + httpHeaderField.getName()
+								+ "; expected value: " + constantValue + "; actual value: " + headerValue);
 					}
 				} else {
 					if (String.class.equals(httpHeaderField.getType())) {
@@ -440,29 +392,24 @@ public class Unmarshaller {
 						Boolean boolValue = Boolean.parseBoolean(headerValue);
 						httpHeaderField.set(transferObject, boolValue);
 					} else if (httpHeaderField.getType().isEnum()) {
-						Enum<?> e = (Enum<?>) httpHeaderField.getType()
-								.getEnumConstants()[0];
+						Enum<?> e = (Enum<?>) httpHeaderField.getType().getEnumConstants()[0];
 						Object value = e.valueOf(e.getClass(), headerValue);
 						httpHeaderField.set(transferObject, value);
 					} else {
-						throw new RuntimeException(
-								"unsupported http header field type: "
-										+ httpHeaderField.getType());
+						throw new RuntimeException("unsupported http header field type: " + httpHeaderField.getType());
 					}
 				}
 			}
 		}
 	}
 
-	private Field findHttpHeaderField(Class<?> protocolMessageClass,
-			String headerName) {
+	private Field findHttpHeaderField(Class<?> protocolMessageClass, String headerName) {
 		if (null == headerName) {
 			throw new RuntimeException("header name should not be null");
 		}
 		Field[] fields = protocolMessageClass.getFields();
 		for (Field field : fields) {
-			HttpHeader httpHeaderAnnotation = field
-					.getAnnotation(HttpHeader.class);
+			HttpHeader httpHeaderAnnotation = field.getAnnotation(HttpHeader.class);
 			if (null == httpHeaderAnnotation) {
 				continue;
 			}

@@ -18,8 +18,6 @@
 
 package be.fedict.eid.applet.shared.protocol;
 
-
-
 /**
  * Interface for protocol context component.
  * 

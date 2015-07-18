@@ -63,8 +63,7 @@ public class OOXMLTest {
 		OOXMLProvider.install();
 	}
 
-	private static class OOXMLTestSignatureService extends
-			AbstractOOXMLSignatureService {
+	private static class OOXMLTestSignatureService extends AbstractOOXMLSignatureService {
 
 		private final URL ooxmlUrl;
 
@@ -103,8 +102,7 @@ public class OOXMLTest {
 		// setup
 		assertNotNull(ooxmlUrl);
 
-		OOXMLTestSignatureService signatureService = new OOXMLTestSignatureService(
-				ooxmlUrl);
+		OOXMLTestSignatureService signatureService = new OOXMLTestSignatureService(ooxmlUrl);
 
 		Messages messages = new Messages(Locale.ENGLISH);
 		PcscEid pcscEid = new PcscEid(new TestView(), messages);
@@ -116,8 +114,7 @@ public class OOXMLTest {
 		List<X509Certificate> certChain = pcscEid.getSignCertificateChain();
 
 		// operate
-		DigestInfo digestInfo = signatureService.preSign(null, certChain, null,
-				null, null);
+		DigestInfo digestInfo = signatureService.preSign(null, certChain, null, null, null);
 
 		// verify
 		assertNotNull(digestInfo);
@@ -127,10 +124,8 @@ public class OOXMLTest {
 		assertNotNull(digestInfo.digestAlgo);
 		assertNotNull(digestInfo.digestValue);
 
-		TemporaryDataStorage temporaryDataStorage = signatureService
-				.getTemporaryDataStorage();
-		String preSignResult = IOUtils.toString(temporaryDataStorage
-				.getTempInputStream());
+		TemporaryDataStorage temporaryDataStorage = signatureService.getTemporaryDataStorage();
+		String preSignResult = IOUtils.toString(temporaryDataStorage.getTempInputStream());
 		LOG.debug("pre-sign result: " + preSignResult);
 		File tmpFile = File.createTempFile("ooxml-pre-sign-", ".xml");
 		FileUtils.writeStringToFile(tmpFile, preSignResult);
@@ -138,16 +133,14 @@ public class OOXMLTest {
 
 		// setup: key material, signature value
 		LOG.debug("digest algo: " + digestInfo.digestAlgo);
-		byte[] signatureValue = pcscEid.sign(digestInfo.digestValue,
-				digestInfo.digestAlgo);
+		byte[] signatureValue = pcscEid.sign(digestInfo.digestValue, digestInfo.digestAlgo);
 		pcscEid.close();
 
 		// operate: postSign
 		signatureService.postSign(signatureValue, certChain);
 
 		// verify: signature
-		byte[] signedOOXMLData = signatureService
-				.getSignedOfficeOpenXMLDocumentData();
+		byte[] signedOOXMLData = signatureService.getSignedOfficeOpenXMLDocumentData();
 		assertNotNull(signedOOXMLData);
 		LOG.debug("signed OOXML size: " + signedOOXMLData.length);
 		String extension = FilenameUtils.getExtension(ooxmlUrl.getFile());
@@ -155,8 +148,7 @@ public class OOXMLTest {
 		FileUtils.writeByteArrayToFile(tmpFile, signedOOXMLData);
 		LOG.debug("signed OOXML file: " + tmpFile.getAbsolutePath());
 		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
-		List<X509Certificate> signers = verifier.getSigners(tmpFile.toURI()
-				.toURL());
+		List<X509Certificate> signers = verifier.getSigners(tmpFile.toURI().toURL());
 		assertEquals(signerCount, signers.size());
 		// assertEquals(certificate, signers.get(0));
 		LOG.debug("signed OOXML file: " + tmpFile.getAbsolutePath());
@@ -168,23 +160,18 @@ public class OOXMLTest {
 		// setup
 		URL ooxmlUrl = OOXMLTest.class.getResource("/ms-office-2010.docx");
 
-		OOXMLTestSignatureService signatureService = new OOXMLTestSignatureService(
-				ooxmlUrl);
+		OOXMLTestSignatureService signatureService = new OOXMLTestSignatureService(ooxmlUrl);
 
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
-				.getPrivate(), true, 0, null, null, new KeyUsage(
-				KeyUsage.digitalSignature));
+		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair.getPublic(), "CN=Test", notBefore,
+				notAfter, null, keyPair.getPrivate(), true, 0, null, null, new KeyUsage(KeyUsage.digitalSignature));
 
-		List<X509Certificate> certChain = Collections
-				.singletonList(certificate);
+		List<X509Certificate> certChain = Collections.singletonList(certificate);
 
 		// operate
-		DigestInfo digestInfo = signatureService.preSign(null, certChain, null,
-				null, null);
+		DigestInfo digestInfo = signatureService.preSign(null, certChain, null, null, null);
 
 		// verify
 		assertNotNull(digestInfo);
@@ -194,10 +181,8 @@ public class OOXMLTest {
 		assertNotNull(digestInfo.digestAlgo);
 		assertNotNull(digestInfo.digestValue);
 
-		TemporaryDataStorage temporaryDataStorage = signatureService
-				.getTemporaryDataStorage();
-		String preSignResult = IOUtils.toString(temporaryDataStorage
-				.getTempInputStream());
+		TemporaryDataStorage temporaryDataStorage = signatureService.getTemporaryDataStorage();
+		String preSignResult = IOUtils.toString(temporaryDataStorage.getTempInputStream());
 		LOG.debug("pre-sign result: " + preSignResult);
 		File tmpFile = File.createTempFile("ooxml-pre-sign-", ".xml");
 		FileUtils.writeStringToFile(tmpFile, preSignResult);
@@ -207,16 +192,14 @@ public class OOXMLTest {
 		LOG.debug("digest algo: " + digestInfo.digestAlgo);
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
-		byte[] digestInfoValue = ArrayUtils.addAll(
-				PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
+		byte[] digestInfoValue = ArrayUtils.addAll(PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
 		byte[] signatureValue = cipher.doFinal(digestInfoValue);
 
 		// operate: postSign
 		signatureService.postSign(signatureValue, certChain);
 
 		// verify: signature
-		byte[] signedOOXMLData = signatureService
-				.getSignedOfficeOpenXMLDocumentData();
+		byte[] signedOOXMLData = signatureService.getSignedOfficeOpenXMLDocumentData();
 		assertNotNull(signedOOXMLData);
 		LOG.debug("signed OOXML size: " + signedOOXMLData.length);
 		String extension = FilenameUtils.getExtension(ooxmlUrl.getFile());
@@ -224,8 +207,7 @@ public class OOXMLTest {
 		FileUtils.writeByteArrayToFile(tmpFile, signedOOXMLData);
 		LOG.debug("signed OOXML file: " + tmpFile.getAbsolutePath());
 		OOXMLSignatureVerifier verifier = new OOXMLSignatureVerifier();
-		List<X509Certificate> signers = verifier.getSigners(tmpFile.toURI()
-				.toURL());
+		List<X509Certificate> signers = verifier.getSigners(tmpFile.toURI().toURL());
 		assertEquals(1, signers.size());
 		// assertEquals(certificate, signers.get(0));
 		LOG.debug("signed OOXML file: " + tmpFile.getAbsolutePath());
@@ -240,8 +222,7 @@ public class OOXMLTest {
 		sign(documentResourceName, 1);
 	}
 
-	private File sign(String documentResourceName, int signerCount)
-			throws Exception {
+	private File sign(String documentResourceName, int signerCount) throws Exception {
 		URL ooxmlUrl = OOXMLTest.class.getResource(documentResourceName);
 		return sign(ooxmlUrl, signerCount);
 	}

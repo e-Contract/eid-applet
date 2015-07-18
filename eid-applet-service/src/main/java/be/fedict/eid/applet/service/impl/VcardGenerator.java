@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.EIdData;
 import be.fedict.eid.applet.service.Identity;
-
+import be.fedict.eid.applet.service.VcardServlet;
 import be.fedict.eid.applet.service.util.VcardLight;
 
 /**
@@ -38,44 +38,43 @@ import be.fedict.eid.applet.service.util.VcardLight;
  * @see VcardServlet
  */
 public class VcardGenerator {
-    private static final Log LOG = LogFactory.getLog(VcardGenerator.class);
+	private static final Log LOG = LogFactory.getLog(VcardGenerator.class);
 
-    /**
-     * Generate vCard using data from the eID card
-     *
-     * @param eIdData ID data retrieved from eID card
-     * @return vCard as raw bytes
-     * @throws IOException
-     */
-    public byte[] generateVcard(EIdData eIdData) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        VcardLight vcard = new VcardLight(baos);
-        vcard.open();
+	/**
+	 * Generate vCard using data from the eID card
+	 *
+	 * @param eIdData
+	 *            ID data retrieved from eID card
+	 * @return vCard as raw bytes
+	 * @throws IOException
+	 */
+	public byte[] generateVcard(EIdData eIdData) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		VcardLight vcard = new VcardLight(baos);
+		vcard.open();
 
-        if (null != eIdData && null != eIdData.getIdentity()) {
-            Identity identity = eIdData.getIdentity();
+		if (null != eIdData && null != eIdData.getIdentity()) {
+			Identity identity = eIdData.getIdentity();
 
-            vcard.addName(identity.firstName, identity.middleName,
-                    identity.name);
+			vcard.addName(identity.firstName, identity.middleName, identity.name);
 
-            if (null != eIdData.getAddress()) {
-                Address address = eIdData.getAddress();
-                vcard.addAddress(address.streetAndNumber, address.zip,
-                        address.municipality);
-            } else {
-                LOG.debug("no address");
-            }
-            vcard.addBorn(identity.dateOfBirth.getTime());
+			if (null != eIdData.getAddress()) {
+				Address address = eIdData.getAddress();
+				vcard.addAddress(address.streetAndNumber, address.zip, address.municipality);
+			} else {
+				LOG.debug("no address");
+			}
+			vcard.addBorn(identity.dateOfBirth.getTime());
 
-            if (null != eIdData.getPhoto()) {
-                byte[] photoData = eIdData.getPhoto();
-		vcard.addImage(photoData);
-            } else {
-                LOG.debug("no photo");
-            }
-        }
-        vcard.close();
-        
-        return baos.toByteArray();
-    }
+			if (null != eIdData.getPhoto()) {
+				byte[] photoData = eIdData.getPhoto();
+				vcard.addImage(photoData);
+			} else {
+				LOG.debug("no photo");
+			}
+		}
+		vcard.close();
+
+		return baos.toByteArray();
+	}
 }

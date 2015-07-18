@@ -30,12 +30,9 @@ public class SecureCardReaderServiceBean implements SecureCardReaderService {
 
 	public String getTransactionMessage() {
 		Calendar calendar = Calendar.getInstance();
-		String message = "Test Application @ "
-				+ calendar.get(Calendar.DAY_OF_MONTH) + "/"
-				+ (calendar.get(Calendar.MONTH) + 1) + "/"
-				+ calendar.get(Calendar.YEAR) + " "
-				+ calendar.get(Calendar.HOUR_OF_DAY) + ":"
-				+ calendar.get(Calendar.MINUTE) + ":"
+		String message = "Test Application @ " + calendar.get(Calendar.DAY_OF_MONTH) + "/"
+				+ (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.YEAR) + " "
+				+ calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + ":"
 				+ calendar.get(Calendar.SECOND);
 		return message;
 	}

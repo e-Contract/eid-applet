@@ -95,8 +95,7 @@ public class Applet extends JApplet {
 
 	private boolean securityConditionTrustedWebApp;
 
-	private void setStatusMessage(final Status status,
-			Messages.MESSAGE_ID messageId) {
+	private void setStatusMessage(final Status status, Messages.MESSAGE_ID messageId) {
 		final String statusMessage = this.messages.getMessage(messageId);
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
@@ -107,8 +106,7 @@ public class Applet extends JApplet {
 					 * not seem to work, at least not with Win2003 + JAB 2 +
 					 * JSE6u20 + JAWS 10
 					 */
-					Applet.this.statusLabel.getAccessibleContext()
-							.setAccessibleName(statusMessage);
+					Applet.this.statusLabel.getAccessibleContext().setAccessibleName(statusMessage);
 
 					if (Status.ERROR == status) {
 						Applet.this.statusLabel.setForeground(Color.RED);
@@ -118,8 +116,7 @@ public class Applet extends JApplet {
 					if (false == Applet.this.hideDetailsButtonParam) {
 						Applet.this.detailMessages.append(statusMessage + "\n");
 						Applet.this.detailMessages
-								.setCaretPosition(Applet.this.detailMessages
-										.getDocument().getLength());
+								.setCaretPosition(Applet.this.detailMessages.getDocument().getLength());
 					} else {
 						System.out.println(statusMessage);
 					}
@@ -131,56 +128,45 @@ public class Applet extends JApplet {
 		}
 	}
 
-	protected void invokeMessageCallback(Status status,
-			Messages.MESSAGE_ID messageId) {
-		if (null == this.messageCallbackParam
-				&& null == this.messageCallbackExParam) {
+	protected void invokeMessageCallback(Status status, Messages.MESSAGE_ID messageId) {
+		if (null == this.messageCallbackParam && null == this.messageCallbackExParam) {
 			return;
 		}
 		ClassLoader classLoader = Applet.class.getClassLoader();
 		Class<?> jsObjectClass;
 		try {
-			jsObjectClass = classLoader
-					.loadClass("netscape.javascript.JSObject");
+			jsObjectClass = classLoader.loadClass("netscape.javascript.JSObject");
 		} catch (ClassNotFoundException e) {
 			String msg = "JSObject class not found";
 			if (false == this.hideDetailsButtonParam) {
 				this.detailMessages.append(msg + "\n");
-				this.detailMessages.setCaretPosition(Applet.this.detailMessages
-						.getDocument().getLength());
+				this.detailMessages.setCaretPosition(Applet.this.detailMessages.getDocument().getLength());
 			} else {
 				System.out.println(msg);
 			}
 			return;
 		}
 		try {
-			Method getWindowMethod = jsObjectClass.getMethod("getWindow",
-					new Class<?>[] { java.applet.Applet.class });
+			Method getWindowMethod = jsObjectClass.getMethod("getWindow", new Class<?>[] { java.applet.Applet.class });
 			Object jsObject = getWindowMethod.invoke(null, this);
-			Method callMethod = jsObjectClass.getMethod("call", new Class<?>[] {
-					String.class, Class.forName("[Ljava.lang.Object;") });
+			Method callMethod = jsObjectClass.getMethod("call",
+					new Class<?>[] { String.class, Class.forName("[Ljava.lang.Object;") });
 			if (null != this.messageCallbackParam) {
-				addDetailMessage("invoking Javascript message callback: "
-						+ this.messageCallbackParam);
+				addDetailMessage("invoking Javascript message callback: " + this.messageCallbackParam);
 				String statusMessage = this.messages.getMessage(messageId);
-				callMethod.invoke(jsObject, this.messageCallbackParam,
-						new Object[] { status.name(), statusMessage });
+				callMethod.invoke(jsObject, this.messageCallbackParam, new Object[] { status.name(), statusMessage });
 			}
 			if (null != this.messageCallbackExParam) {
-				addDetailMessage("invoking Javascript message callback (ex): "
-						+ this.messageCallbackExParam);
+				addDetailMessage("invoking Javascript message callback (ex): " + this.messageCallbackExParam);
 				String statusMessage = this.messages.getMessage(messageId);
 				callMethod.invoke(jsObject, this.messageCallbackExParam,
-						new Object[] { status.name(), messageId.name(),
-								statusMessage });
+						new Object[] { status.name(), messageId.name(), statusMessage });
 			}
 		} catch (Exception e) {
-			String msg = "error locating: JSObject.getWindow().call: "
-					+ e.getMessage();
+			String msg = "error locating: JSObject.getWindow().call: " + e.getMessage();
 			if (false == this.hideDetailsButtonParam) {
 				this.detailMessages.append(msg + "\n");
-				this.detailMessages.setCaretPosition(Applet.this.detailMessages
-						.getDocument().getLength());
+				this.detailMessages.setCaretPosition(Applet.this.detailMessages.getDocument().getLength());
 			} else {
 				System.out.println(msg);
 			}
@@ -197,12 +183,10 @@ public class Applet extends JApplet {
 				}
 			});
 		} catch (Exception e) {
-			System.err.println("initUI didn't successfully complete: "
-					+ e.getMessage());
+			System.err.println("initUI didn't successfully complete: " + e.getMessage());
 			StackTraceElement[] stackTrace = e.getStackTrace();
 			for (StackTraceElement stackTraceElement : stackTrace) {
-				System.err.println(stackTraceElement.getClassName() + "."
-						+ stackTraceElement.getMethodName() + ":"
+				System.err.println(stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName() + ":"
 						+ stackTraceElement.getLineNumber());
 			}
 		}
@@ -282,8 +266,7 @@ public class Applet extends JApplet {
 					if (false == Applet.this.hideDetailsButtonParam) {
 						Applet.this.detailMessages.append(detailMessage + "\n");
 						Applet.this.detailMessages
-								.setCaretPosition(Applet.this.detailMessages
-										.getDocument().getLength());
+								.setCaretPosition(Applet.this.detailMessages.getDocument().getLength());
 					} else {
 						System.out.println(detailMessage);
 					}
@@ -333,14 +316,11 @@ public class Applet extends JApplet {
 		initStyle();
 
 		this.messageCallbackParam = super.getParameter(MESSAGE_CALLBACK_PARAM);
-		this.messageCallbackExParam = super
-				.getParameter(MESSAGE_CALLBACK_EX_PARAM);
+		this.messageCallbackExParam = super.getParameter(MESSAGE_CALLBACK_EX_PARAM);
 
-		String hideDetailsButtonParam = super
-				.getParameter(HIDE_DETAILS_BUTTON_PARAM);
+		String hideDetailsButtonParam = super.getParameter(HIDE_DETAILS_BUTTON_PARAM);
 		if (null != hideDetailsButtonParam) {
-			this.hideDetailsButtonParam = Boolean
-					.parseBoolean(hideDetailsButtonParam);
+			this.hideDetailsButtonParam = Boolean.parseBoolean(hideDetailsButtonParam);
 		} else {
 			this.hideDetailsButtonParam = false;
 		}
@@ -390,8 +370,7 @@ public class Applet extends JApplet {
 		container.add(detailPanel);
 	}
 
-	private void initDetailButton(final Container container,
-			final CardLayout cardLayout) {
+	private void initDetailButton(final Container container, final CardLayout cardLayout) {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		String msg = this.messages.getMessage(MESSAGE_ID.DETAILS_BUTTON);
 		JButton detailButton = new JButton(msg + " >>");
@@ -411,26 +390,22 @@ public class Applet extends JApplet {
 		this.detailMessages.setEditable(false);
 		/* Detailed messages are only available in English */
 		this.detailMessages.setLocale(Locale.ENGLISH);
-		this.detailMessages.getAccessibleContext().setAccessibleDescription(
-				"Detailed log messages");
+		this.detailMessages.getAccessibleContext().setAccessibleDescription("Detailed log messages");
 
 		JPopupMenu popupMenu = new JPopupMenu();
-		JMenuItem copyMenuItem = new JMenuItem(
-				this.messages.getMessage(MESSAGE_ID.COPY_ALL));
+		JMenuItem copyMenuItem = new JMenuItem(this.messages.getMessage(MESSAGE_ID.COPY_ALL));
 		copyMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Toolkit toolkit = Toolkit.getDefaultToolkit();
 				Clipboard clipboard = toolkit.getSystemClipboard();
-				StringSelection stringSelection = new StringSelection(
-						Applet.this.detailMessages.getText());
+				StringSelection stringSelection = new StringSelection(Applet.this.detailMessages.getText());
 				clipboard.setContents(stringSelection, null);
 			}
 		});
 		popupMenu.add(copyMenuItem);
 		addMailMenuItem(popupMenu);
 		this.detailMessages.setComponentPopupMenu(popupMenu);
-		JScrollPane scrollPane = new JScrollPane(this.detailMessages,
-				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+		JScrollPane scrollPane = new JScrollPane(this.detailMessages, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		container.add(scrollPane, "details");
 	}
@@ -455,8 +430,7 @@ public class Applet extends JApplet {
 	}
 
 	private void setupColors(Container container) {
-		String backgroundColorParam = super
-				.getParameter(BACKGROUND_COLOR_PARAM);
+		String backgroundColorParam = super.getParameter(BACKGROUND_COLOR_PARAM);
 		Color backgroundColor;
 		if (null != backgroundColorParam) {
 			backgroundColor = Color.decode(backgroundColorParam);
@@ -465,8 +439,7 @@ public class Applet extends JApplet {
 		}
 		setBackgroundColor(container, backgroundColor);
 
-		String foregroundColorParam = super
-				.getParameter(FOREGROUND_COLOR_PARAM);
+		String foregroundColorParam = super.getParameter(FOREGROUND_COLOR_PARAM);
 		if (null != foregroundColorParam) {
 			Color foregroundColor = Color.decode(foregroundColorParam);
 			this.statusLabel.setForeground(foregroundColor);
@@ -489,35 +462,26 @@ public class Applet extends JApplet {
 			return;
 		}
 		try {
-			Method isDesktopSupportedMethod = desktopClass
-					.getMethod("isDesktopSupported");
-			Boolean desktopSupported = (Boolean) isDesktopSupportedMethod
-					.invoke(null);
+			Method isDesktopSupportedMethod = desktopClass.getMethod("isDesktopSupported");
+			Boolean desktopSupported = (Boolean) isDesktopSupportedMethod.invoke(null);
 			if (false == desktopSupported) {
 				return;
 			}
 			Method getDesktopMethod = desktopClass.getMethod("getDesktop");
 			final Object desktop = getDesktopMethod.invoke(null);
 			final Method mailMethod = desktopClass.getMethod("mail", URI.class);
-			JMenuItem emailMenuItem = new JMenuItem(
-					this.messages.getMessage(MESSAGE_ID.MAIL));
+			JMenuItem emailMenuItem = new JMenuItem(this.messages.getMessage(MESSAGE_ID.MAIL));
 			emailMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					String message = Applet.this.detailMessages.getText();
 					try {
-						URI mailUri = new URI("mailto:"
-								+ URLEncoder.encode(
-										"eid-applet@googlegroups.com", "UTF-8")
-								+ "?subject="
-								+ URLEncoder.encode("eID Applet Feedback",
-										"UTF-8").replaceAll("\\+", "%20")
-								+ "&body="
-								+ URLEncoder.encode(message, "UTF-8")
-										.replaceAll("\\+", "%20"));
+						URI mailUri = new URI(
+								"mailto:" + URLEncoder.encode("eid-applet@googlegroups.com", "UTF-8") + "?subject="
+										+ URLEncoder.encode("eID Applet Feedback", "UTF-8").replaceAll("\\+", "%20")
+										+ "&body=" + URLEncoder.encode(message, "UTF-8").replaceAll("\\+", "%20"));
 						mailMethod.invoke(desktop, mailUri);
 					} catch (Exception mailException) {
-						Applet.this.addDetailMessage("error mailing message: "
-								+ mailException.getMessage());
+						Applet.this.addDetailMessage("error mailing message: " + mailException.getMessage());
 					}
 				}
 			});
@@ -566,21 +530,17 @@ public class Applet extends JApplet {
 				addDetailMessage("security manager permission check for java 1.6...");
 				Permission permission;
 				try {
-					Class<?> cardPermissionClass = Class
-							.forName("javax.smartcardio.CardPermission");
-					Constructor<?> cardPermissionConstructor = cardPermissionClass
-							.getConstructor(String.class, String.class);
-					permission = (Permission) cardPermissionConstructor
-							.newInstance("*", "*");
+					Class<?> cardPermissionClass = Class.forName("javax.smartcardio.CardPermission");
+					Constructor<?> cardPermissionConstructor = cardPermissionClass.getConstructor(String.class,
+							String.class);
+					permission = (Permission) cardPermissionConstructor.newInstance("*", "*");
 				} catch (Exception e) {
 					setStatusMessage(Status.ERROR, MESSAGE_ID.GENERIC_ERROR);
-					addDetailMessage("javax.smartcardio not available: "
-							+ e.getMessage());
+					addDetailMessage("javax.smartcardio not available: " + e.getMessage());
 					return;
 				}
 				try {
-					securityManager
-							.checkPermission(permission, securityContext);
+					securityManager.checkPermission(permission, securityContext);
 				} catch (SecurityException e) {
 					setStatusMessage(Status.ERROR, MESSAGE_ID.SECURITY_ERROR);
 					addDetailMessage("applet not authorized to access smart card. applet not signed?");
@@ -631,8 +591,7 @@ public class Applet extends JApplet {
 			AccessController.doPrivileged(new PrivilegedAction<Object>() {
 				public Object run() {
 					addDetailMessage("running privileged code...");
-					Controller controller = new Controller(new AppletView(),
-							new AppletRuntime(), Applet.this.messages);
+					Controller controller = new Controller(new AppletView(), new AppletRuntime(), Applet.this.messages);
 					controller.run();
 					return null;
 				}
@@ -683,14 +642,11 @@ public class Applet extends JApplet {
 			return Applet.this.getParentComponent();
 		}
 
-		public boolean privacyQuestion(boolean includeAddress,
-				boolean includePhoto, String identityDataUsage) {
-			return Applet.this.privacyQuestion(includeAddress, includePhoto,
-					identityDataUsage);
+		public boolean privacyQuestion(boolean includeAddress, boolean includePhoto, String identityDataUsage) {
+			return Applet.this.privacyQuestion(includeAddress, includePhoto, identityDataUsage);
 		}
 
-		public void setStatusMessage(Status status,
-				Messages.MESSAGE_ID messageId) {
+		public void setStatusMessage(Status status, Messages.MESSAGE_ID messageId) {
 			Applet.this.setStatusMessage(status, messageId);
 		}
 
@@ -717,11 +673,10 @@ public class Applet extends JApplet {
 		}
 	}
 
-	private boolean privacyQuestion(boolean includeAddress,
-			boolean includePhoto, String identityDataUsage) {
-		String msg = this.messages.getMessage(MESSAGE_ID.PRIVACY_QUESTION)
-				+ "\n" + this.messages.getMessage(MESSAGE_ID.IDENTITY_INFO)
-				+ ": " + this.messages.getMessage(MESSAGE_ID.IDENTITY_IDENTITY);
+	private boolean privacyQuestion(boolean includeAddress, boolean includePhoto, String identityDataUsage) {
+		String msg = this.messages.getMessage(MESSAGE_ID.PRIVACY_QUESTION) + "\n"
+				+ this.messages.getMessage(MESSAGE_ID.IDENTITY_INFO) + ": "
+				+ this.messages.getMessage(MESSAGE_ID.IDENTITY_IDENTITY);
 		if (includeAddress) {
 			msg += ", " + this.messages.getMessage(MESSAGE_ID.IDENTITY_ADDRESS);
 		}
@@ -729,31 +684,26 @@ public class Applet extends JApplet {
 			msg += ", " + this.messages.getMessage(MESSAGE_ID.IDENTITY_PHOTO);
 		}
 		if (null != identityDataUsage) {
-			msg += "\n" + this.messages.getMessage(MESSAGE_ID.USAGE) + ": "
-					+ identityDataUsage;
+			msg += "\n" + this.messages.getMessage(MESSAGE_ID.USAGE) + ": " + identityDataUsage;
 		}
-		int response = JOptionPane.showConfirmDialog(this, msg, "Privacy",
-				JOptionPane.YES_NO_OPTION);
+		int response = JOptionPane.showConfirmDialog(this, msg, "Privacy", JOptionPane.YES_NO_OPTION);
 		return response == JOptionPane.YES_OPTION;
 	}
 
 	private int confirmSigning(String description, String digestAlgo) {
-		String signatureCreationLabel = this.messages
-				.getMessage(MESSAGE_ID.SIGNATURE_CREATION);
-		String signQuestionLabel = this.messages
-				.getMessage(MESSAGE_ID.SIGN_QUESTION);
-		String signatureAlgoLabel = this.messages
-				.getMessage(MESSAGE_ID.SIGNATURE_ALGO);
-		int response = JOptionPane.showConfirmDialog(this.getParentComponent(),
-				signQuestionLabel + " \"" + description + "\"?\n"
-						+ signatureAlgoLabel + ": " + digestAlgo + " with RSA",
-				signatureCreationLabel, JOptionPane.YES_NO_OPTION);
+		String signatureCreationLabel = this.messages.getMessage(MESSAGE_ID.SIGNATURE_CREATION);
+		String signQuestionLabel = this.messages.getMessage(MESSAGE_ID.SIGN_QUESTION);
+		String signatureAlgoLabel = this.messages.getMessage(MESSAGE_ID.SIGNATURE_ALGO);
+		int response = JOptionPane
+				.showConfirmDialog(
+						this.getParentComponent(), signQuestionLabel + " \"" + description + "\"?\n"
+								+ signatureAlgoLabel + ": " + digestAlgo + " with RSA",
+						signatureCreationLabel, JOptionPane.YES_NO_OPTION);
 		return response;
 	}
 
 	private void confirmAuthenticationSignature(String message) {
-		int response = JOptionPane.showConfirmDialog(this.getParentComponent(),
-				message, "eID Authentication Signature",
+		int response = JOptionPane.showConfirmDialog(this.getParentComponent(), message, "eID Authentication Signature",
 				JOptionPane.YES_NO_OPTION);
 		if (response != JOptionPane.YES_OPTION) {
 			throw new SecurityException("user cancelled");

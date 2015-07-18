@@ -24,8 +24,7 @@ package be.fedict.eid.applet.service.spi;
  * @author Frank Cornelis
  * 
  */
-public class ExpiredCertificateSecurityException extends
-		CertificateSecurityException {
+public class ExpiredCertificateSecurityException extends CertificateSecurityException {
 
 	private static final long serialVersionUID = 1L;
 

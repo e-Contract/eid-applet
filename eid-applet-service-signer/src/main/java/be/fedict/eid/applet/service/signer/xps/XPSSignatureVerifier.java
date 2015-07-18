@@ -67,58 +67,46 @@ import be.fedict.eid.applet.service.signer.ooxml.OPCKeySelector;
  */
 public class XPSSignatureVerifier {
 
-	private static final Log LOG = LogFactory
-			.getLog(XPSSignatureVerifier.class);
+	private static final Log LOG = LogFactory.getLog(XPSSignatureVerifier.class);
 
 	private final Unmarshaller relationshipsUnmarshaller;
 
 	public XPSSignatureVerifier() {
 		try {
-			JAXBContext relationshipsJAXBContext = JAXBContext
-					.newInstance(ObjectFactory.class);
-			this.relationshipsUnmarshaller = relationshipsJAXBContext
-					.createUnmarshaller();
+			JAXBContext relationshipsJAXBContext = JAXBContext.newInstance(ObjectFactory.class);
+			this.relationshipsUnmarshaller = relationshipsJAXBContext.createUnmarshaller();
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
 		}
 	}
 
-	public List<X509Certificate> getSigners(URL url) throws IOException,
-			ParserConfigurationException, SAXException, TransformerException,
-			MarshalException, XMLSignatureException, JAXBException {
+	public List<X509Certificate> getSigners(URL url) throws IOException, ParserConfigurationException, SAXException,
+			TransformerException, MarshalException, XMLSignatureException, JAXBException {
 		List<X509Certificate> signers = new LinkedList<X509Certificate>();
 		List<String> signatureResourceNames = getSignatureResourceNames(url);
 		for (String signatureResourceName : signatureResourceNames) {
 			LOG.debug("signature resource name: " + signatureResourceName);
-			Document signatureDocument = loadDocument(url,
-					signatureResourceName);
+			Document signatureDocument = loadDocument(url, signatureResourceName);
 			if (null == signatureDocument) {
-				LOG.warn("signature resource not found: "
-						+ signatureResourceName);
+				LOG.warn("signature resource not found: " + signatureResourceName);
 				continue;
 			}
 
-			NodeList signatureNodeList = signatureDocument
-					.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
+			NodeList signatureNodeList = signatureDocument.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 			if (0 == signatureNodeList.getLength()) {
 				LOG.debug("no signature elements present");
 				continue;
 			}
 			Node signatureNode = signatureNodeList.item(0);
 
-			OPCKeySelector keySelector = new OPCKeySelector(url,
-					signatureResourceName);
-			DOMValidateContext domValidateContext = new DOMValidateContext(
-					keySelector, signatureNode);
-			domValidateContext.setProperty(
-					"org.jcp.xml.dsig.validateManifests", Boolean.TRUE);
+			OPCKeySelector keySelector = new OPCKeySelector(url, signatureResourceName);
+			DOMValidateContext domValidateContext = new DOMValidateContext(keySelector, signatureNode);
+			domValidateContext.setProperty("org.jcp.xml.dsig.validateManifests", Boolean.TRUE);
 			OOXMLURIDereferencer dereferencer = new OOXMLURIDereferencer(url);
 			domValidateContext.setURIDereferencer(dereferencer);
 
-			XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-					.getInstance();
-			XMLSignature xmlSignature = xmlSignatureFactory
-					.unmarshalXMLSignature(domValidateContext);
+			XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
+			XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
 			boolean validity = xmlSignature.validate(domValidateContext);
 
 			if (false == validity) {
@@ -135,8 +123,7 @@ public class XPSSignatureVerifier {
 
 	private Document loadDocument(URL url, String signatureResourceName)
 			throws IOException, ParserConfigurationException, SAXException {
-		ZipArchiveInputStream zipInputStream = new ZipArchiveInputStream(
-				url.openStream(), "UTF8", true, true);
+		ZipArchiveInputStream zipInputStream = new ZipArchiveInputStream(url.openStream(), "UTF8", true, true);
 		ZipArchiveEntry zipEntry;
 		while (null != (zipEntry = zipInputStream.getNextZipEntry())) {
 			if (false == signatureResourceName.equals(zipEntry.getName())) {
@@ -148,12 +135,10 @@ public class XPSSignatureVerifier {
 		return null;
 	}
 
-	private List<String> getSignatureResourceNames(URL url) throws IOException,
-			ParserConfigurationException, SAXException, TransformerException,
-			JAXBException {
+	private List<String> getSignatureResourceNames(URL url)
+			throws IOException, ParserConfigurationException, SAXException, TransformerException, JAXBException {
 		List<String> signatureResourceNames = new LinkedList<String>();
-		ZipArchiveInputStream zipInputStream = new ZipArchiveInputStream(
-				url.openStream(), "UTF8", true, true);
+		ZipArchiveInputStream zipInputStream = new ZipArchiveInputStream(url.openStream(), "UTF8", true, true);
 		ZipArchiveEntry zipEntry;
 		while (null != (zipEntry = zipInputStream.getNextZipEntry())) {
 			if ("_rels/.rels".equals(zipEntry.getName())) {
@@ -168,13 +153,10 @@ public class XPSSignatureVerifier {
 		String dsOriginPart = null;
 		JAXBElement<CTRelationships> packageRelationshipsElement = (JAXBElement<CTRelationships>) this.relationshipsUnmarshaller
 				.unmarshal(zipInputStream);
-		CTRelationships packageRelationships = packageRelationshipsElement
-				.getValue();
-		List<CTRelationship> packageRelationshipList = packageRelationships
-				.getRelationship();
+		CTRelationships packageRelationships = packageRelationshipsElement.getValue();
+		List<CTRelationship> packageRelationshipList = packageRelationships.getRelationship();
 		for (CTRelationship packageRelationship : packageRelationshipList) {
-			if (OOXMLSignatureVerifier.DIGITAL_SIGNATURE_ORIGIN_REL_TYPE
-					.equals(packageRelationship.getType())) {
+			if (OOXMLSignatureVerifier.DIGITAL_SIGNATURE_ORIGIN_REL_TYPE.equals(packageRelationship.getType())) {
 				dsOriginPart = packageRelationship.getTarget();
 				break;
 			}
@@ -184,22 +166,17 @@ public class XPSSignatureVerifier {
 			return signatureResourceNames;
 		}
 		LOG.debug("Digital Signature Origin part: " + dsOriginPart);
-		String dsOriginName = dsOriginPart.substring(dsOriginPart
-				.lastIndexOf("/") + 1);
+		String dsOriginName = dsOriginPart.substring(dsOriginPart.lastIndexOf("/") + 1);
 		LOG.debug("Digital Signature Origin base: " + dsOriginName);
-		String dsOriginSegment = dsOriginPart.substring(0,
-				dsOriginPart.lastIndexOf("/"))
-				+ "/";
+		String dsOriginSegment = dsOriginPart.substring(0, dsOriginPart.lastIndexOf("/")) + "/";
 		LOG.debug("Digital Signature Origin segment: " + dsOriginSegment);
-		String dsOriginRels = dsOriginSegment + "_rels/" + dsOriginName
-				+ ".rels";
+		String dsOriginRels = dsOriginSegment + "_rels/" + dsOriginName + ".rels";
 		LOG.debug("Digital Signature Origin relationship part: " + dsOriginRels);
 		if (dsOriginRels.startsWith("/")) {
 			dsOriginRels = dsOriginRels.substring(1);
 		}
 
-		zipInputStream = new ZipArchiveInputStream(url.openStream(), "UTF8",
-				true, true);
+		zipInputStream = new ZipArchiveInputStream(url.openStream(), "UTF8", true, true);
 		while (null != (zipEntry = zipInputStream.getNextZipEntry())) {
 			if (dsOriginRels.equals(zipEntry.getName())) {
 				break;
@@ -213,17 +190,14 @@ public class XPSSignatureVerifier {
 		JAXBElement<CTRelationships> dsoRelationshipsElement = (JAXBElement<CTRelationships>) this.relationshipsUnmarshaller
 				.unmarshal(zipInputStream);
 		CTRelationships dsoRelationships = dsoRelationshipsElement.getValue();
-		List<CTRelationship> dsoRelationshipList = dsoRelationships
-				.getRelationship();
+		List<CTRelationship> dsoRelationshipList = dsoRelationships.getRelationship();
 		for (CTRelationship dsoRelationship : dsoRelationshipList) {
-			if (OOXMLSignatureVerifier.DIGITAL_SIGNATURE_REL_TYPE
-					.equals(dsoRelationship.getType())) {
+			if (OOXMLSignatureVerifier.DIGITAL_SIGNATURE_REL_TYPE.equals(dsoRelationship.getType())) {
 				String signatureResourceName;
 				if (dsoRelationship.getTarget().startsWith("/")) {
 					signatureResourceName = dsoRelationship.getTarget();
 				} else {
-					signatureResourceName = dsOriginSegment
-							+ dsoRelationship.getTarget();
+					signatureResourceName = dsOriginSegment + dsoRelationship.getTarget();
 				}
 				if (signatureResourceName.startsWith("/")) {
 					signatureResourceName = signatureResourceName.substring(1);
@@ -239,11 +213,9 @@ public class XPSSignatureVerifier {
 	private Document loadDocument(InputStream documentInputStream)
 			throws ParserConfigurationException, SAXException, IOException {
 		InputSource inputSource = new InputSource(documentInputStream);
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.parse(inputSource);
 		return document;
 	}

@@ -40,8 +40,7 @@ import be.fedict.eid.applet.shared.protocol.HttpReceiver;
  */
 public class HttpServletRequestHttpReceiver implements HttpReceiver {
 
-	private static final Log LOG = LogFactory
-			.getLog(HttpServletRequestHttpReceiver.class);
+	private static final Log LOG = LogFactory.getLog(HttpServletRequestHttpReceiver.class);
 
 	private final HttpServletRequest httpServletRequest;
 
@@ -55,17 +54,14 @@ public class HttpServletRequestHttpReceiver implements HttpReceiver {
 	 *            set to <code>true</code> to skip the check on a secure SSL
 	 *            connection.
 	 */
-	public HttpServletRequestHttpReceiver(
-			HttpServletRequest httpServletRequest,
-			boolean skipSecureConnectionCheck) {
+	public HttpServletRequestHttpReceiver(HttpServletRequest httpServletRequest, boolean skipSecureConnectionCheck) {
 		this.httpServletRequest = httpServletRequest;
 		this.skipSecureConnectionCheck = skipSecureConnectionCheck;
 	}
 
 	public byte[] getBody() {
 		try {
-			ServletInputStream inputStream = this.httpServletRequest
-					.getInputStream();
+			ServletInputStream inputStream = this.httpServletRequest.getInputStream();
 			byte[] body = IOUtils.toByteArray(inputStream);
 			return body;
 		} catch (IOException e) {
@@ -75,8 +71,7 @@ public class HttpServletRequestHttpReceiver implements HttpReceiver {
 
 	@SuppressWarnings("unchecked")
 	public List<String> getHeaderNames() {
-		Enumeration headerNamesEnumeration = this.httpServletRequest
-				.getHeaderNames();
+		Enumeration headerNamesEnumeration = this.httpServletRequest.getHeaderNames();
 		List<String> headerNames = new LinkedList<String>();
 		while (headerNamesEnumeration.hasMoreElements()) {
 			String headerName = (String) headerNamesEnumeration.nextElement();

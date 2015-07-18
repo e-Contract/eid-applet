@@ -42,8 +42,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ASiCSignatureOutputStream extends ByteArrayOutputStream {
 
-	private static final Log LOG = LogFactory
-			.getLog(ASiCSignatureOutputStream.class);
+	private static final Log LOG = LogFactory.getLog(ASiCSignatureOutputStream.class);
 
 	private final File originalZipFile;
 
@@ -58,8 +57,7 @@ public class ASiCSignatureOutputStream extends ByteArrayOutputStream {
 	 *            the output stream in which to copy the original ASiC document,
 	 *            together with the new ASiC signature.
 	 */
-	public ASiCSignatureOutputStream(File originalZipFile,
-			OutputStream targetOutputStream) {
+	public ASiCSignatureOutputStream(File originalZipFile, OutputStream targetOutputStream) {
 		this.originalZipFile = originalZipFile;
 		this.targetOutputStream = targetOutputStream;
 	}
@@ -73,10 +71,8 @@ public class ASiCSignatureOutputStream extends ByteArrayOutputStream {
 		/*
 		 * Copy the original ZIP content.
 		 */
-		ZipOutputStream zipOutputStream = new ZipOutputStream(
-				this.targetOutputStream);
-		ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(
-				this.originalZipFile));
+		ZipOutputStream zipOutputStream = new ZipOutputStream(this.targetOutputStream);
+		ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(this.originalZipFile));
 		ZipEntry zipEntry;
 		while (null != (zipEntry = zipInputStream.getNextEntry())) {
 			if (!zipEntry.getName().equals(ASiCUtil.SIGNATURE_FILE)) {

@@ -18,34 +18,28 @@
 
 package be.fedict.eid.applet.service.signer.odf;
 
-import java.io.InputStream;
 import java.io.IOException;
-
+import java.io.InputStream;
 import java.net.URL;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.xml.sax.SAXException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Helper class to remove some code duplication
@@ -94,11 +88,9 @@ public class ODFUtil {
 	 * @return DOM Document Builder
 	 * @throws ParserConfigurationException
 	 */
-	public static DocumentBuilder getNewDocumentBuilder()
-			throws ParserConfigurationException {
+	public static DocumentBuilder getNewDocumentBuilder() throws ParserConfigurationException {
 		LOG.debug("new DOM document builder");
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
 		return documentBuilderFactory.newDocumentBuilder();
 	}
@@ -112,8 +104,7 @@ public class ODFUtil {
 	 * @return inputstream for the file / zip entry
 	 * @throws IOException
 	 */
-	public static InputStream findDataInputStream(InputStream inputStream,
-			String uri) throws IOException {
+	public static InputStream findDataInputStream(InputStream inputStream, String uri) throws IOException {
 		ZipInputStream zipInputStream = new ZipInputStream(inputStream);
 		ZipEntry zipEntry;
 		while (null != (zipEntry = zipInputStream.getNextEntry())) {
@@ -181,8 +172,7 @@ public class ODFUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List getZipEntriesAsList(InputStream odfInputStream)
-			throws IOException {
+	public static List getZipEntriesAsList(InputStream odfInputStream) throws IOException {
 		ArrayList list = new ArrayList();
 
 		ZipInputStream odfZipInputStream = new ZipInputStream(odfInputStream);
@@ -205,9 +195,8 @@ public class ODFUtil {
 	 * @throws SAXException
 	 * @throws XPathExpressionException
 	 */
-	public static boolean isSelfContained(URL odfUrl) throws IOException,
-			ParserConfigurationException, SAXException,
-			XPathExpressionException {
+	public static boolean isSelfContained(URL odfUrl)
+			throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
 		InputStream odfInputStream = odfUrl.openStream();
 		List zipEntries = getZipEntriesAsList(odfInputStream);
 
@@ -221,17 +210,14 @@ public class ODFUtil {
 
 		XPath xpath = factory.newXPath();
 		xpath.setNamespaceContext(namespaceContext);
-		XPathExpression expression = xpath.compile("//draw:object/@xlink:href|"
-				+ "//draw:object-ole/@xlink:href|"
-				+ "//draw:image/@xlink:href|"
-				+ "//draw:floating-frame/@xlink:href");
+		XPathExpression expression = xpath.compile("//draw:object/@xlink:href|" + "//draw:object-ole/@xlink:href|"
+				+ "//draw:image/@xlink:href|" + "//draw:floating-frame/@xlink:href");
 
 		while (null != (zipEntry = odfZipInputStream.getNextEntry())) {
 			if (isContentFile(zipEntry)) {
 				/* TODO: pure SAX is probably more memory-efficient */
 				Document content = ODFUtil.loadDocument(odfZipInputStream);
-				NodeList nodes = (NodeList) expression.evaluate(content,
-						XPathConstants.NODESET);
+				NodeList nodes = (NodeList) expression.evaluate(content, XPathConstants.NODESET);
 				return checkNodes(nodes, zipEntries);
 			}
 		}

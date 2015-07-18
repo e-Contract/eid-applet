@@ -18,7 +18,7 @@
 
 package test.be.fedict.eid.applet.model;
 
-public interface AuthenticationSignatureService extends
-		be.fedict.eid.applet.service.spi.AuthenticationSignatureService {
+public interface AuthenticationSignatureService
+		extends be.fedict.eid.applet.service.spi.AuthenticationSignatureService {
 
 }

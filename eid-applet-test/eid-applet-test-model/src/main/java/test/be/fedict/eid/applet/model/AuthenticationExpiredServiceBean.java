@@ -32,14 +32,11 @@ import be.fedict.eid.applet.service.spi.ExpiredCertificateSecurityException;
 
 @Stateless
 @EJB(name = "java:global/test/AuthenticationExpiredServiceBean", beanInterface = AuthenticationExpiredService.class)
-public class AuthenticationExpiredServiceBean implements
-		AuthenticationExpiredService {
+public class AuthenticationExpiredServiceBean implements AuthenticationExpiredService {
 
-	private static final Log LOG = LogFactory
-			.getLog(AuthenticationExpiredServiceBean.class);
+	private static final Log LOG = LogFactory.getLog(AuthenticationExpiredServiceBean.class);
 
-	public void validateCertificateChain(List<X509Certificate> certificateChain)
-			throws SecurityException {
+	public void validateCertificateChain(List<X509Certificate> certificateChain) throws SecurityException {
 		LOG.debug("validate certificate chain: " + certificateChain);
 		throw new ExpiredCertificateSecurityException();
 	}

@@ -22,35 +22,40 @@ import javax.xml.crypto.dsig.DigestMethod;
 
 public enum DigestAlgo {
 
-    SHA1("SHA-1", DigestMethod.SHA1),
-    SHA256("SHA-256", DigestMethod.SHA256),
-    SHA512("SHA-512", DigestMethod.SHA512);
-//    SHA384("SHA-384");
-//    TODO: no support exists atm in java 6's XMLDSigRI provider nor in apache's xml-security head for RIPEMD160("RIPEMD160");
+	SHA1("SHA-1", DigestMethod.SHA1),
 
-    private final String algoId;
-    private final String xmlAlgoId;
+	SHA256("SHA-256", DigestMethod.SHA256),
 
-    /**
-     * @param algoId the digest algorithm
-     * @param xmlAlgoId the XML digest algorithm
-     */
-    private DigestAlgo(String algoId, String xmlAlgoId) {
-        this.algoId = algoId;
-        this.xmlAlgoId = xmlAlgoId;
-    }
+	SHA512("SHA-512", DigestMethod.SHA512);
+	// SHA384("SHA-384");
+	// TODO: no support exists atm in java 6's XMLDSigRI provider nor in
+	// apache's xml-security head for RIPEMD160("RIPEMD160");
 
-    @Override
-    public String toString() {
-        return this.algoId;
-    }
+	private final String algoId;
+	private final String xmlAlgoId;
 
-    public String getAlgoId() {
-        return this.algoId;
-    }
+	/**
+	 * @param algoId
+	 *            the digest algorithm
+	 * @param xmlAlgoId
+	 *            the XML digest algorithm
+	 */
+	private DigestAlgo(String algoId, String xmlAlgoId) {
+		this.algoId = algoId;
+		this.xmlAlgoId = xmlAlgoId;
+	}
 
-    public String getXmlAlgoId() {
+	@Override
+	public String toString() {
+		return this.algoId;
+	}
 
-        return this.xmlAlgoId;
-    }
+	public String getAlgoId() {
+		return this.algoId;
+	}
+
+	public String getXmlAlgoId() {
+
+		return this.xmlAlgoId;
+	}
 }

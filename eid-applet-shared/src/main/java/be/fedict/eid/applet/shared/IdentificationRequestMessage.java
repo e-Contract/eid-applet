@@ -34,8 +34,7 @@ public class IdentificationRequestMessage extends AbstractProtocolMessage {
 
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator
-	public static final String TYPE = IdentificationRequestMessage.class
-			.getSimpleName();
+	public static final String TYPE = IdentificationRequestMessage.class.getSimpleName();
 
 	/**
 	 * Default constructor.
@@ -54,10 +53,8 @@ public class IdentificationRequestMessage extends AbstractProtocolMessage {
 	 * @param removeCard
 	 * @param identityDataUsage
 	 */
-	public IdentificationRequestMessage(boolean includeAddress,
-			boolean includePhoto, boolean includeIntegrityData,
-			boolean includeCertificates, boolean removeCard,
-			String identityDataUsage) {
+	public IdentificationRequestMessage(boolean includeAddress, boolean includePhoto, boolean includeIntegrityData,
+			boolean includeCertificates, boolean removeCard, String identityDataUsage) {
 		this.includeAddress = includeAddress;
 		this.includePhoto = includePhoto;
 		this.includeIntegrityData = includeIntegrityData;

@@ -31,9 +31,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import be.fedict.eid.applet.service.impl.PdfGenerator;
-
 import com.lowagie.text.DocumentException;
+
+import be.fedict.eid.applet.service.impl.PdfGenerator;
 
 /**
  * Servlet that outputs the eID identity data from the HTTP session to a PDF.
@@ -58,8 +58,8 @@ public class PdfServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		LOG.debug("doGet");
 
 		HttpSession httpSession = request.getSession();
@@ -69,13 +69,11 @@ public class PdfServlet extends HttpServlet {
 		try {
 			document = this.pdfGenerator.generatePdf(eIdData);
 		} catch (DocumentException e) {
-			throw new ServletException(
-					"PDF generator error: " + e.getMessage(), e);
+			throw new ServletException("PDF generator error: " + e.getMessage(), e);
 		}
 
 		response.setHeader("Expires", "0");
-		response.setHeader("Cache-Control",
-				"must-revalidate, post-check=0, pre-check=0");
+		response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
 		response.setHeader("Pragma", "public");
 
 		response.setContentType("application/pdf");

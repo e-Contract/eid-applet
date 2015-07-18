@@ -35,12 +35,9 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
  */
 public class HttpServletProtocolContext implements ProtocolContext {
 
-	public static final String PROTOCOL_STATE_SESSION_ATTRIBUTE = HttpServletProtocolContext.class
-			.getName()
-			+ ".state";
+	public static final String PROTOCOL_STATE_SESSION_ATTRIBUTE = HttpServletProtocolContext.class.getName() + ".state";
 
-	private static final Log LOG = LogFactory
-			.getLog(HttpServletProtocolContext.class);
+	private static final Log LOG = LogFactory.getLog(HttpServletProtocolContext.class);
 
 	private final HttpSession session;
 
@@ -54,16 +51,14 @@ public class HttpServletProtocolContext implements ProtocolContext {
 	}
 
 	public ProtocolState getProtocolState() {
-		ProtocolState protocolState = (ProtocolState) this.session
-				.getAttribute(PROTOCOL_STATE_SESSION_ATTRIBUTE);
+		ProtocolState protocolState = (ProtocolState) this.session.getAttribute(PROTOCOL_STATE_SESSION_ATTRIBUTE);
 		LOG.debug("current protocol state: " + protocolState);
 		return protocolState;
 	}
 
 	public void setProtocolState(ProtocolState protocolState) {
 		LOG.debug("protocol state transition: " + protocolState);
-		this.session.setAttribute(PROTOCOL_STATE_SESSION_ATTRIBUTE,
-				protocolState);
+		this.session.setAttribute(PROTOCOL_STATE_SESSION_ATTRIBUTE, protocolState);
 	}
 
 	public void removeProtocolState() {

@@ -19,6 +19,7 @@
 package be.fedict.eid.applet.service.spi;
 
 import java.io.Serializable;
+import java.security.Identity;
 
 /**
  * Address Data Transfer Object.

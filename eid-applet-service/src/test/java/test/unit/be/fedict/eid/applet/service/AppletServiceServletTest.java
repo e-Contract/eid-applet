@@ -91,8 +91,7 @@ import be.fedict.eid.applet.shared.protocol.Unmarshaller;
 
 public class AppletServiceServletTest {
 
-	private static final Log LOG = LogFactory
-			.getLog(AppletServiceServletTest.class);
+	private static final Log LOG = LogFactory.getLog(AppletServiceServletTest.class);
 
 	private ServletTester servletTester;
 
@@ -103,53 +102,40 @@ public class AppletServiceServletTest {
 	private KeyPair generateKeyPair() throws Exception {
 		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
 		SecureRandom random = new SecureRandom();
-		keyPairGenerator.initialize(new RSAKeyGenParameterSpec(1024,
-				RSAKeyGenParameterSpec.F4), random);
+		keyPairGenerator.initialize(new RSAKeyGenParameterSpec(1024, RSAKeyGenParameterSpec.F4), random);
 		KeyPair keyPair = keyPairGenerator.generateKeyPair();
 		return keyPair;
 	}
 
-	private SubjectKeyIdentifier createSubjectKeyId(PublicKey publicKey)
-			throws IOException {
-		ByteArrayInputStream bais = new ByteArrayInputStream(
-				publicKey.getEncoded());
-		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo(
-				(ASN1Sequence) new ASN1InputStream(bais).readObject());
+	private SubjectKeyIdentifier createSubjectKeyId(PublicKey publicKey) throws IOException {
+		ByteArrayInputStream bais = new ByteArrayInputStream(publicKey.getEncoded());
+		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(bais).readObject());
 		return new SubjectKeyIdentifier(info);
 	}
 
-	private AuthorityKeyIdentifier createAuthorityKeyId(PublicKey publicKey)
-			throws IOException {
+	private AuthorityKeyIdentifier createAuthorityKeyId(PublicKey publicKey) throws IOException {
 
-		ByteArrayInputStream bais = new ByteArrayInputStream(
-				publicKey.getEncoded());
-		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo(
-				(ASN1Sequence) new ASN1InputStream(bais).readObject());
+		ByteArrayInputStream bais = new ByteArrayInputStream(publicKey.getEncoded());
+		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(bais).readObject());
 
 		return new AuthorityKeyIdentifier(info);
 	}
 
-	private void persistKey(File pkcs12keyStore, PrivateKey privateKey,
-			X509Certificate certificate, char[] keyStorePassword,
-			char[] keyEntryPassword) throws KeyStoreException,
-			NoSuchAlgorithmException, CertificateException, IOException,
-			NoSuchProviderException {
-		KeyStore keyStore = KeyStore.getInstance("pkcs12",
-				BouncyCastleProvider.PROVIDER_NAME);
+	private void persistKey(File pkcs12keyStore, PrivateKey privateKey, X509Certificate certificate,
+			char[] keyStorePassword, char[] keyEntryPassword) throws KeyStoreException, NoSuchAlgorithmException,
+					CertificateException, IOException, NoSuchProviderException {
+		KeyStore keyStore = KeyStore.getInstance("pkcs12", BouncyCastleProvider.PROVIDER_NAME);
 		keyStore.load(null, keyStorePassword);
-		LOG.debug("keystore security provider: "
-				+ keyStore.getProvider().getName());
-		keyStore.setKeyEntry("default", privateKey, keyEntryPassword,
-				new Certificate[] { certificate });
+		LOG.debug("keystore security provider: " + keyStore.getProvider().getName());
+		keyStore.setKeyEntry("default", privateKey, keyEntryPassword, new Certificate[] { certificate });
 		FileOutputStream keyStoreOut = new FileOutputStream(pkcs12keyStore);
 		keyStore.store(keyStoreOut, keyStorePassword);
 		keyStoreOut.close();
 	}
 
-	private X509Certificate generateSelfSignedCertificate(KeyPair keyPair,
-			String subjectDn, DateTime notBefore, DateTime notAfter)
-			throws IOException, InvalidKeyException, IllegalStateException,
-			NoSuchAlgorithmException, SignatureException, CertificateException {
+	private X509Certificate generateSelfSignedCertificate(KeyPair keyPair, String subjectDn, DateTime notBefore,
+			DateTime notAfter) throws IOException, InvalidKeyException, IllegalStateException, NoSuchAlgorithmException,
+					SignatureException, CertificateException {
 		PublicKey subjectPublicKey = keyPair.getPublic();
 		PrivateKey issuerPrivateKey = keyPair.getPrivate();
 		String signatureAlgorithm = "SHA1WithRSAEncryption";
@@ -162,19 +148,16 @@ public class AppletServiceServletTest {
 		X509Principal issuerDN = new X509Principal(subjectDn);
 		certificateGenerator.setIssuerDN(issuerDN);
 		certificateGenerator.setSubjectDN(new X509Principal(subjectDn));
-		certificateGenerator.setSerialNumber(new BigInteger(128,
-				new SecureRandom()));
+		certificateGenerator.setSerialNumber(new BigInteger(128, new SecureRandom()));
 
-		certificateGenerator.addExtension(X509Extensions.SubjectKeyIdentifier,
-				false, createSubjectKeyId(subjectPublicKey));
+		certificateGenerator.addExtension(X509Extensions.SubjectKeyIdentifier, false,
+				createSubjectKeyId(subjectPublicKey));
 		PublicKey issuerPublicKey;
 		issuerPublicKey = subjectPublicKey;
-		certificateGenerator.addExtension(
-				X509Extensions.AuthorityKeyIdentifier, false,
+		certificateGenerator.addExtension(X509Extensions.AuthorityKeyIdentifier, false,
 				createAuthorityKeyId(issuerPublicKey));
 
-		certificateGenerator.addExtension(X509Extensions.BasicConstraints,
-				false, new BasicConstraints(true));
+		certificateGenerator.addExtension(X509Extensions.BasicConstraints, false, new BasicConstraints(true));
 
 		X509Certificate certificate;
 		certificate = certificateGenerator.generate(issuerPrivateKey);
@@ -185,11 +168,9 @@ public class AppletServiceServletTest {
 		 * security provider instead of BouncyCastle. If we don't do this trick
 		 * we might run into trouble when trying to use the CertPath validator.
 		 */
-		CertificateFactory certificateFactory = CertificateFactory
-				.getInstance("X.509");
+		CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
 		certificate = (X509Certificate) certificateFactory
-				.generateCertificate(new ByteArrayInputStream(certificate
-						.getEncoded()));
+				.generateCertificate(new ByteArrayInputStream(certificate.getEncoded()));
 		return certificate;
 	}
 
@@ -210,12 +191,10 @@ public class AppletServiceServletTest {
 		KeyPair keyPair = generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusMonths(1);
-		X509Certificate certificate = generateSelfSignedCertificate(keyPair,
-				"CN=localhost", notBefore, notAfter);
+		X509Certificate certificate = generateSelfSignedCertificate(keyPair, "CN=localhost", notBefore, notAfter);
 		File tmpP12File = File.createTempFile("ssl-", ".p12");
 		LOG.debug("p12 file: " + tmpP12File.getAbsolutePath());
-		persistKey(tmpP12File, keyPair.getPrivate(), certificate,
-				"secret".toCharArray(), "secret".toCharArray());
+		persistKey(tmpP12File, keyPair.getPrivate(), certificate, "secret".toCharArray(), "secret".toCharArray());
 
 		SslSocketConnector sslSocketConnector = new SslSocketConnector();
 		sslSocketConnector.setKeystore(tmpP12File.getAbsolutePath());
@@ -228,8 +207,7 @@ public class AppletServiceServletTest {
 		sslSocketConnector.setMaxIdleTime(30000);
 		int sslPort = getFreePort();
 		sslSocketConnector.setPort(sslPort);
-		this.servletTester.getContext().getServer()
-				.addConnector(sslSocketConnector);
+		this.servletTester.getContext().getServer().addConnector(sslSocketConnector);
 		this.sslLocation = "https://localhost:" + sslPort + "/";
 
 		this.servletTester.start();
@@ -249,13 +227,11 @@ public class AppletServiceServletTest {
 			this.serverCertificate = serverCertificate;
 		}
 
-		public void checkClientTrusted(X509Certificate[] chain, String authnType)
-				throws CertificateException {
+		public void checkClientTrusted(X509Certificate[] chain, String authnType) throws CertificateException {
 			throw new CertificateException("not implemented");
 		}
 
-		public void checkServerTrusted(X509Certificate[] chain, String authnType)
-				throws CertificateException {
+		public void checkServerTrusted(X509Certificate[] chain, String authnType) throws CertificateException {
 			if (false == this.serverCertificate.equals(chain[0])) {
 				throw new CertificateException("server certificate not trusted");
 			}
@@ -302,37 +278,32 @@ public class AppletServiceServletTest {
 		assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, result);
 	}
 
-	//@Test
+	// @Test
 	public void sslPostIdentityMessage() throws Exception {
 		// setup
-		byte[] idFile = IOUtils.toByteArray(AppletServiceServletTest.class
-				.getResourceAsStream("/id-alice.tlv")); // XXX: expired
+		byte[] idFile = IOUtils.toByteArray(AppletServiceServletTest.class.getResourceAsStream("/id-alice.tlv")); // XXX:
+																													// expired
 
 		LOG.debug("SSL URL: " + this.sslLocation);
 		HttpClient httpClient = new HttpClient();
 
 		HelloMessage helloMessage = new HelloMessage();
 		PostMethod postMethod = new PostMethod(this.sslLocation);
-		PostMethodHttpTransmitter httpTransmitter = new PostMethodHttpTransmitter(
-				postMethod);
+		PostMethodHttpTransmitter httpTransmitter = new PostMethodHttpTransmitter(postMethod);
 		Transport.transfer(helloMessage, httpTransmitter);
 		int result = httpClient.executeMethod(postMethod);
 		assertEquals(HttpServletResponse.SC_OK, result);
 
 		Header setCookieHeader = postMethod.getResponseHeader("Set-Cookie");
 		String setCookieValue = setCookieHeader.getValue();
-		int sessionIdIdx = setCookieValue.indexOf("JSESSIONID=")
-				+ "JESSSIONID=".length();
-		String sessionId = setCookieValue.substring(sessionIdIdx,
-				setCookieValue.indexOf(";", sessionIdIdx));
+		int sessionIdIdx = setCookieValue.indexOf("JSESSIONID=") + "JESSSIONID=".length();
+		String sessionId = setCookieValue.substring(sessionIdIdx, setCookieValue.indexOf(";", sessionIdIdx));
 		LOG.debug("session id: " + sessionId);
 
 		postMethod = new PostMethod(this.sslLocation);
 		postMethod.addRequestHeader("X-AppletProtocol-Version", "1");
-		postMethod.addRequestHeader("X-AppletProtocol-Type",
-				"IdentityDataMessage");
-		postMethod.addRequestHeader("X-AppletProtocol-IdentityFileSize",
-				Integer.toString(idFile.length));
+		postMethod.addRequestHeader("X-AppletProtocol-Type", "IdentityDataMessage");
+		postMethod.addRequestHeader("X-AppletProtocol-IdentityFileSize", Integer.toString(idFile.length));
 		RequestEntity requestEntity = new ByteArrayRequestEntity(idFile);
 		postMethod.setRequestEntity(requestEntity);
 
@@ -342,8 +313,7 @@ public class AppletServiceServletTest {
 		// verify
 		assertEquals(HttpServletResponse.SC_OK, result);
 
-		HttpSession httpSession = this.servletTester.getContext()
-				.getSessionHandler().getSessionManager()
+		HttpSession httpSession = this.servletTester.getContext().getSessionHandler().getSessionManager()
 				.getHttpSession(sessionId);
 		Identity identity = (Identity) httpSession.getAttribute("eid.identity");
 		assertNotNull(identity);
@@ -353,29 +323,26 @@ public class AppletServiceServletTest {
 		assertNull(address);
 	}
 
-	//@Test
+	// @Test
 	public void sslPostIdentityMessageViaTransport() throws Exception {
 		// setup
-		byte[] idFile = IOUtils.toByteArray(AppletServiceServletTest.class
-				.getResourceAsStream("/id-alice.tlv")); // XXX: expired
+		byte[] idFile = IOUtils.toByteArray(AppletServiceServletTest.class.getResourceAsStream("/id-alice.tlv")); // XXX:
+																													// expired
 
 		LOG.debug("SSL URL: " + this.sslLocation);
 		HttpClient httpClient = new HttpClient();
 
 		HelloMessage helloMessage = new HelloMessage();
 		PostMethod postMethod = new PostMethod(this.sslLocation);
-		PostMethodHttpTransmitter httpTransmitter = new PostMethodHttpTransmitter(
-				postMethod);
+		PostMethodHttpTransmitter httpTransmitter = new PostMethodHttpTransmitter(postMethod);
 		Transport.transfer(helloMessage, httpTransmitter);
 		int result = httpClient.executeMethod(postMethod);
 		assertEquals(HttpServletResponse.SC_OK, result);
 
 		Header setCookieHeader = postMethod.getResponseHeader("Set-Cookie");
 		String setCookieValue = setCookieHeader.getValue();
-		int sessionIdIdx = setCookieValue.indexOf("JSESSIONID=")
-				+ "JSESSIONID=".length();
-		String sessionId = setCookieValue.substring(sessionIdIdx,
-				setCookieValue.indexOf(";", sessionIdIdx));
+		int sessionIdIdx = setCookieValue.indexOf("JSESSIONID=") + "JSESSIONID=".length();
+		String sessionId = setCookieValue.substring(sessionIdIdx, setCookieValue.indexOf(";", sessionIdIdx));
 		LOG.debug("session id: " + sessionId);
 
 		postMethod = new PostMethod(this.sslLocation);
@@ -391,8 +358,7 @@ public class AppletServiceServletTest {
 		// verify
 		assertEquals(HttpServletResponse.SC_OK, result);
 
-		HttpSession httpSession = this.servletTester.getContext()
-				.getSessionHandler().getSessionManager()
+		HttpSession httpSession = this.servletTester.getContext().getSessionHandler().getSessionManager()
 				.getHttpSession(sessionId);
 		Identity identity = (Identity) httpSession.getAttribute("eid.identity");
 		assertNotNull(identity);
@@ -408,8 +374,7 @@ public class AppletServiceServletTest {
 		HttpClient httpClient = new HttpClient();
 		PostMethod postMethod = new PostMethod(this.sslLocation);
 		HelloMessage helloMessage = new HelloMessage();
-		PostMethodHttpTransmitter httpTransmitter = new PostMethodHttpTransmitter(
-				postMethod);
+		PostMethodHttpTransmitter httpTransmitter = new PostMethodHttpTransmitter(postMethod);
 		Transport.transfer(helloMessage, httpTransmitter);
 
 		// operate
@@ -418,11 +383,9 @@ public class AppletServiceServletTest {
 		// verify
 		assertEquals(HttpServletResponse.SC_OK, result);
 
-		Unmarshaller unmarshaller = new Unmarshaller(
-				new AppletProtocolMessageCatalog());
+		Unmarshaller unmarshaller = new Unmarshaller(new AppletProtocolMessageCatalog());
 
-		PostMethodHttpReceiver httpReceiver = new PostMethodHttpReceiver(
-				postMethod);
+		PostMethodHttpReceiver httpReceiver = new PostMethodHttpReceiver(postMethod);
 		Object resultMessageObject = unmarshaller.receive(httpReceiver);
 		assertTrue(resultMessageObject instanceof IdentificationRequestMessage);
 	}

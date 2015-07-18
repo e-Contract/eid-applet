@@ -69,10 +69,8 @@ public class TestReportEntity implements Serializable {
 		super();
 	}
 
-	public TestReportEntity(String javaVersion, String javaVendor,
-			String osName, String osArch, String osVersion, String userAgent,
-			String navigatorAppName, String navigatorAppVersion,
-			String navigatorUserAgent) {
+	public TestReportEntity(String javaVersion, String javaVendor, String osName, String osArch, String osVersion,
+			String userAgent, String navigatorAppName, String navigatorAppVersion, String navigatorUserAgent) {
 		this.result = TestReportResult.UNFINISHED;
 		this.created = Calendar.getInstance();
 		this.javaVersion = javaVersion;

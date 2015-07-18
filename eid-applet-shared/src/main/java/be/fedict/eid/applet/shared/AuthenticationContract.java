@@ -92,8 +92,7 @@ public class AuthenticationContract {
 	 *            the optional DER encoded X509 server certificate.
 	 * @param challenge
 	 */
-	public AuthenticationContract(byte[] salt, String hostname,
-			InetAddress inetAddress, byte[] sessionId,
+	public AuthenticationContract(byte[] salt, String hostname, InetAddress inetAddress, byte[] sessionId,
 			byte[] encodedServerCertificate, byte[] challenge) {
 		this.salt = salt;
 		this.hostname = hostname;
@@ -118,8 +117,7 @@ public class AuthenticationContract {
 			 * trusted but that have been compromised. If at the same time the
 			 * DNS is also attacked, well then everything is lost anyway.
 			 */
-			writeTag(HOSTNAME_TAG, this.hostname.getBytes(),
-					toBeSignedOutputStream);
+			writeTag(HOSTNAME_TAG, this.hostname.getBytes(), toBeSignedOutputStream);
 		}
 		if (null != this.inetAddress) {
 			byte[] address = this.inetAddress.getAddress();
@@ -129,14 +127,12 @@ public class AuthenticationContract {
 		 * Next is to prevent abuse of the challenge in the context of a digital
 		 * signature claim on this cryptographic authentication signature.
 		 */
-		writeTag(LEGAL_NOTICE_TAG, LEGAL_NOTICE.getBytes(),
-				toBeSignedOutputStream);
+		writeTag(LEGAL_NOTICE_TAG, LEGAL_NOTICE.getBytes(), toBeSignedOutputStream);
 		if (null != this.sessionId) {
 			writeTag(SESSION_ID_TAG, this.sessionId, toBeSignedOutputStream);
 		}
 		if (null != this.encodedServerCertificate) {
-			writeTag(ENCODED_SERVER_CERTIFICATE_TAG,
-					this.encodedServerCertificate, toBeSignedOutputStream);
+			writeTag(ENCODED_SERVER_CERTIFICATE_TAG, this.encodedServerCertificate, toBeSignedOutputStream);
 		}
 		/*
 		 * Of course we also digest the challenge as the server needs some mean
@@ -155,8 +151,7 @@ public class AuthenticationContract {
 	 * @param outputStream
 	 * @throws IOException
 	 */
-	private void writeTag(int tag, byte[] value, OutputStream outputStream)
-			throws IOException {
+	private void writeTag(int tag, byte[] value, OutputStream outputStream) throws IOException {
 		outputStream.write(intToByteArray(tag));
 		if (null == value) {
 			outputStream.write(intToByteArray(0));
@@ -167,7 +162,6 @@ public class AuthenticationContract {
 	}
 
 	private byte[] intToByteArray(int value) {
-		return new byte[] { (byte) (value >>> 24), (byte) (value >>> 16),
-				(byte) (value >>> 8), (byte) value };
+		return new byte[] { (byte) (value >>> 24), (byte) (value >>> 16), (byte) (value >>> 8), (byte) value };
 	}
 }

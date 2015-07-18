@@ -34,5 +34,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Documented
 public @interface ResponsesAllowed {
-	Class<?>[] value();
+	Class<?>[]value();
 }

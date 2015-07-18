@@ -48,6 +48,7 @@ public class HttpURLConnectionHttpReceiver implements HttpReceiver {
 		this.connection = connection;
 	}
 
+	@Override
 	public byte[] getBody() {
 		try {
 			InputStream inputStream = this.connection.getInputStream();
@@ -66,9 +67,9 @@ public class HttpURLConnectionHttpReceiver implements HttpReceiver {
 		}
 	}
 
+	@Override
 	public List<String> getHeaderNames() {
-		Map<String, List<String>> headerFields = this.connection
-				.getHeaderFields();
+		Map<String, List<String>> headerFields = this.connection.getHeaderFields();
 		List<String> headerNames = new LinkedList<String>();
 		for (String headerName : headerFields.keySet()) {
 			if (null == headerName) {
@@ -83,10 +84,12 @@ public class HttpURLConnectionHttpReceiver implements HttpReceiver {
 		return headerNames;
 	}
 
+	@Override
 	public String getHeaderValue(String headerName) {
 		return this.connection.getHeaderField(headerName);
 	}
 
+	@Override
 	public boolean isSecure() {
 		if ("localhost".equals(this.connection.getURL().getHost())) {
 			/*

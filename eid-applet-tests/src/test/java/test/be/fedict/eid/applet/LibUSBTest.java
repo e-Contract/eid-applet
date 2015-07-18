@@ -58,8 +58,7 @@ public class LibUSBTest {
 								.toArray(usbInterfaces[j].num_altsetting);
 						for (int k = 0; k < usbInterfaceDescriptors.length; k++) {
 							if (usbInterfaceDescriptors[k].bInterfaceClass == 11) {
-								CCIDTerminal t = new CCIDTerminal(usbDevice,
-										usbInterfaceDescriptors[k]);
+								CCIDTerminal t = new CCIDTerminal(usbDevice, usbInterfaceDescriptors[k]);
 
 								t.setBusNumber(usbBus.location);
 								t.setDeviceNumber(usbDevice.devnum);
@@ -79,8 +78,7 @@ public class LibUSBTest {
 	public void testListReaders() throws Exception {
 		ArrayList<CCIDTerminal> ccidTerminals = listCCIDTerminals();
 		for (int i = 0; i < ccidTerminals.size(); i++) {
-			LOG.debug(String.format(
-					"Card terminal found. Vendor: 0x%x Product: 0x%x",
+			LOG.debug(String.format("Card terminal found. Vendor: 0x%x Product: 0x%x",
 					ccidTerminals.get(i).getUsbDevice().descriptor.idProduct,
 					ccidTerminals.get(i).getUsbDevice().descriptor.idVendor));
 
@@ -97,8 +95,7 @@ public class LibUSBTest {
 			ct.open();
 			ct.powerOff();
 			byte[] answer = ct.powerOn();
-			LOG.debug(String.format("Card terminal powered on. ATR: %s",
-					bytesToString(answer)));
+			LOG.debug(String.format("Card terminal powered on. ATR: %s", bytesToString(answer)));
 			ct.close();
 		}
 	}
@@ -107,8 +104,8 @@ public class LibUSBTest {
 	public void testSelectIdentityFile() throws Exception {
 		ArrayList<CCIDTerminal> ccidTerminals = listCCIDTerminals();
 
-		byte[] apdu = { 0x00, (byte) 0xA4, 0x08, 0x0C, 0x06, 0x3F, 0x00,
-				(byte) 0xDF, 0x01, 0x40, 0x31 }; // Identity File
+		byte[] apdu = { 0x00, (byte) 0xA4, 0x08, 0x0C, 0x06, 0x3F, 0x00, (byte) 0xDF, 0x01, 0x40, 0x31 }; // Identity
+																											// File
 		// 00 A4 02 0C 02 3F 00 DF 01 40 31
 		for (int i = 0; i < ccidTerminals.size(); i++) {
 			CCIDTerminal ct = ccidTerminals.get(i);
@@ -117,8 +114,7 @@ public class LibUSBTest {
 			ct.powerOn();
 			ct.transmit(apdu);
 			byte[] answer = ct.receive();
-			LOG.debug(String.format("SELECT Identity file sent. Answer: %s",
-					bytesToString(answer)));
+			LOG.debug(String.format("SELECT Identity file sent. Answer: %s", bytesToString(answer)));
 			ct.close();
 		}
 	}
@@ -127,8 +123,8 @@ public class LibUSBTest {
 	public void testReadIdentity() throws Exception {
 		ArrayList<CCIDTerminal> ccidTerminals = listCCIDTerminals();
 
-		byte[] apduSelectIdentity = { 0x00, (byte) 0xA4, 0x08, 0x0C, 0x06,
-				0x3F, 0x00, (byte) 0xDF, 0x01, 0x40, 0x31 }; // Identity File
+		byte[] apduSelectIdentity = { 0x00, (byte) 0xA4, 0x08, 0x0C, 0x06, 0x3F, 0x00, (byte) 0xDF, 0x01, 0x40, 0x31 }; // Identity
+																														// File
 		byte[] apduReadBinary = { 0x00, (byte) 0xB0, 0, 0, (byte) 0x80 };
 
 		for (int i = 0; i < ccidTerminals.size(); i++) {
@@ -138,26 +134,20 @@ public class LibUSBTest {
 			ct.open();
 			ct.getSlotStatus();
 			answer = ct.powerOn();
-			LOG.debug(String.format("PowerOn. Answer: %s",
-					bytesToString(answer)));
+			LOG.debug(String.format("PowerOn. Answer: %s", bytesToString(answer)));
 
 			do {
 				ct.transmit(apduSelectIdentity);
 				answer = ct.receive();
-				LOG.debug(String.format(
-						"SELECT Identity file sent. Answer: %s",
-						bytesToString(answer)));
+				LOG.debug(String.format("SELECT Identity file sent. Answer: %s", bytesToString(answer)));
 
 				if (!(answer[0] == (byte) 0x90 && answer[1] == 0x00))
-					throw new RuntimeException(
-							"Bad response on select identity file");
+					throw new RuntimeException("Bad response on select identity file");
 				ct.transmit(apduReadBinary);
 				answer = ct.receive();
-				LOG.debug(String.format("SELECT Read binary sent. Answer: %s",
-						bytesToString(answer)));
+				LOG.debug(String.format("SELECT Read binary sent. Answer: %s", bytesToString(answer)));
 				if (answer[answer.length - 2] == 0x6C) {//
-					LOG.debug(String
-							.format("SELECT Read binary: wrong expected length"));
+					LOG.debug(String.format("SELECT Read binary: wrong expected length"));
 				}
 				apduReadBinary[4] = answer[answer.length - 1];
 			} while (answer[answer.length - 2] == 0x6C);

@@ -18,16 +18,15 @@
 
 package test.unit.be.fedict.eid.applet.service.signer;
 
-import java.net.URL;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.net.URL;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 import be.fedict.eid.applet.service.signer.odf.ODFUtil;
 
@@ -36,46 +35,44 @@ import be.fedict.eid.applet.service.signer.odf.ODFUtil;
  * @author Bart Hanssens
  */
 public class ODFUtilTest {
-    private static final Log LOG = LogFactory.getLog(ODFUtilTest.class);
+	private static final Log LOG = LogFactory.getLog(ODFUtilTest.class);
 
-    @Test
-    public void testSelfContained() throws Exception {
-        // setup
-        URL odfUrl = ODFUtilTest.class.getResource("/hello-world.odt");
-	assertNotNull(odfUrl);
+	@Test
+	public void testSelfContained() throws Exception {
+		// setup
+		URL odfUrl = ODFUtilTest.class.getResource("/hello-world.odt");
+		assertNotNull(odfUrl);
 
-        // operate
-        boolean result = ODFUtil.isSelfContained(odfUrl);
+		// operate
+		boolean result = ODFUtil.isSelfContained(odfUrl);
 
-        // verify
-        assertTrue(result);
-    }
+		// verify
+		assertTrue(result);
+	}
 
-    @Test
-    public void testNotSelfContainedLocal() throws Exception {
-        testNotSelfContained("/hello-ole-local.odt");
-    }
-   
-    @Test
-    public void testNotSelfContainedPath() throws Exception {
-        testNotSelfContained("/hello-ole-path.odt");
-    }
-/*
-    @Test
-    public void testNotSelfContainedNetwork() throws Exception {
-        testNotSelfContained("/hello-ole-network.odt");
-    }
-*/
+	@Test
+	public void testNotSelfContainedLocal() throws Exception {
+		testNotSelfContained("/hello-ole-local.odt");
+	}
 
-    private void testNotSelfContained(String url) throws Exception {
-        // setup
-        URL odfUrl = ODFUtilTest.class.getResource(url);
-	assertNotNull(odfUrl);
+	@Test
+	public void testNotSelfContainedPath() throws Exception {
+		testNotSelfContained("/hello-ole-path.odt");
+	}
+	/*
+	 * @Test public void testNotSelfContainedNetwork() throws Exception {
+	 * testNotSelfContained("/hello-ole-network.odt"); }
+	 */
 
-        // operate
-        boolean result = ODFUtil.isSelfContained(odfUrl);
+	private void testNotSelfContained(String url) throws Exception {
+		// setup
+		URL odfUrl = ODFUtilTest.class.getResource(url);
+		assertNotNull(odfUrl);
 
-        // verify
-        assertFalse(result);
-    }
+		// operate
+		boolean result = ODFUtil.isSelfContained(odfUrl);
+
+		// verify
+		assertFalse(result);
+	}
 }

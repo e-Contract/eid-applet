@@ -48,8 +48,7 @@ import javax.xml.crypto.dsig.spec.TransformParameterSpec;
  * @author Frank Cornelis
  * 
  */
-public class RelationshipTransformParameterSpec implements
-		TransformParameterSpec {
+public class RelationshipTransformParameterSpec implements TransformParameterSpec {
 
 	private final List<String> sourceIds;
 

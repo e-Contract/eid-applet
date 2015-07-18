@@ -104,11 +104,9 @@ public class IdentityDataMessage extends AbstractProtocolMessage {
 	 * @param caCertFile
 	 * @throws IOException
 	 */
-	public IdentityDataMessage(byte[] idFile, byte[] addressFile,
-			byte[] photoFile, byte[] identitySignatureFile,
-			byte[] addressSignatureFile, byte[] rrnCertFile,
-			byte[] rootCertFile, byte[] authnCertFile, byte[] signCertFile,
-			byte[] caCertFile) throws IOException {
+	public IdentityDataMessage(byte[] idFile, byte[] addressFile, byte[] photoFile, byte[] identitySignatureFile,
+			byte[] addressSignatureFile, byte[] rrnCertFile, byte[] rootCertFile, byte[] authnCertFile,
+			byte[] signCertFile, byte[] caCertFile) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		this.identityFileSize = idFile.length;
 		baos.write(idFile);
@@ -174,14 +172,12 @@ public class IdentityDataMessage extends AbstractProtocolMessage {
 		}
 
 		if (null != this.identitySignatureFileSize) {
-			this.identitySignatureFile = copy(this.body, idx,
-					this.identitySignatureFileSize);
+			this.identitySignatureFile = copy(this.body, idx, this.identitySignatureFileSize);
 			idx += this.identitySignatureFileSize;
 		}
 
 		if (null != this.addressSignatureFileSize) {
-			this.addressSignatureFile = copy(this.body, idx,
-					this.addressSignatureFileSize);
+			this.addressSignatureFile = copy(this.body, idx, this.addressSignatureFileSize);
 			idx += this.addressSignatureFileSize;
 		}
 

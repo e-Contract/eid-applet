@@ -69,7 +69,7 @@ public class Pkcs15Test {
 	}
 
 	@Documented
-	@Target( { ElementType.TYPE, ElementType.FIELD })
+	@Target({ ElementType.TYPE, ElementType.FIELD })
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface Tag {
 		byte value();
@@ -102,16 +102,14 @@ public class Pkcs15Test {
 		if (null != tagAnnotation) {
 			byte tag = tagAnnotation.value();
 			if (tag != data[0]) {
-				throw new RuntimeException("incorrect tag: "
-						+ Integer.toHexString(tag));
+				throw new RuntimeException("incorrect tag: " + Integer.toHexString(tag));
 			}
 			dataIdx++;
 			int size = data[1];
 			dataIdx++;
 			LOG.debug("size: " + size);
 			if (data.length - dataIdx != size) {
-				throw new RuntimeException("data size incorrect: " + size
-						+ " for tag " + Integer.toHexString(tag));
+				throw new RuntimeException("data size incorrect: " + size + " for tag " + Integer.toHexString(tag));
 			}
 		}
 		Field[] fields = type.getDeclaredFields();
@@ -137,21 +135,15 @@ public class Pkcs15Test {
 				if (null != fieldTagAnnotation) {
 					byte fieldTag = fieldTagAnnotation.value();
 					if (fieldTag == tag) {
-						LOG.debug("field found for tag "
-								+ Integer.toHexString(tag) + ": "
-								+ field.getName());
+						LOG.debug("field found for tag " + Integer.toHexString(tag) + ": " + field.getName());
 						Object value;
 						if (String.class.equals(field.getType())) {
-							value = new String(Arrays.copyOfRange(data,
-									dataIdx, dataIdx + size));
+							value = new String(Arrays.copyOfRange(data, dataIdx, dataIdx + size));
 						} else if (byte[].class.equals(field.getType())) {
-							value = Arrays.copyOfRange(data, dataIdx, dataIdx
-									+ size);
+							value = Arrays.copyOfRange(data, dataIdx, dataIdx + size);
 						} else {
-							throw new RuntimeException(
-									"unsupported field type: "
-											+ field.getType().getName()
-											+ " for field " + field.getName());
+							throw new RuntimeException("unsupported field type: " + field.getType().getName()
+									+ " for field " + field.getName());
 						}
 						field.set(result, value);
 					}
@@ -176,27 +168,20 @@ public class Pkcs15Test {
 		assertNotNull(applicationTemplate);
 		assertNotNull(applicationTemplate.label);
 		LOG.debug("application label: " + applicationTemplate.label);
-		LOG.debug("application id: "
-				+ new String(Hex.encodeHex(applicationTemplate.id)));
-		LOG.debug("application path: "
-				+ new String(Hex.encodeHex(applicationTemplate.path)));
-		LOG
-				.debug("application discretionary data objects: "
-						+ new String(
-								Hex
-										.encodeHex(applicationTemplate.discretionaryDataObjects)));
+		LOG.debug("application id: " + new String(Hex.encodeHex(applicationTemplate.id)));
+		LOG.debug("application path: " + new String(Hex.encodeHex(applicationTemplate.path)));
+		LOG.debug("application discretionary data objects: "
+				+ new String(Hex.encodeHex(applicationTemplate.discretionaryDataObjects)));
 	}
 
-	private Pkcs15ApplicationTemplate getApplication(Pkcs15_EF_DIR dir,
-			byte[] applicationId) {
+	private Pkcs15ApplicationTemplate getApplication(Pkcs15_EF_DIR dir, byte[] applicationId) {
 		for (Pkcs15ApplicationTemplate applicationTemplate : dir.applicationTemplates) {
 			if (Arrays.equals(applicationId, applicationTemplate.id)) {
 				return applicationTemplate;
 			}
 		}
 		throw new RuntimeException(
-				"no application template found for application id: "
-						+ new String(Hex.encodeHex(applicationId)));
+				"no application template found for application id: " + new String(Hex.encodeHex(applicationId)));
 	}
 
 	@Test
@@ -205,12 +190,10 @@ public class Pkcs15Test {
 		Pkcs15_EF_DIR dir = parsePkcs15File(dirData, Pkcs15_EF_DIR.class);
 
 		Pkcs15ApplicationTemplate applicationTemplate = getApplication(dir,
-				new byte[] { (byte) 0xa0, 0x00, 0x00, 0x01, 0x77, 0x50, 0x4b,
-						0x43, 0x53, 0x2d, 0x31, 0x35 });
+				new byte[] { (byte) 0xa0, 0x00, 0x00, 0x01, 0x77, 0x50, 0x4b, 0x43, 0x53, 0x2d, 0x31, 0x35 });
 
 		byte[] odfFileId = new byte[applicationTemplate.path.length + 2];
-		System.arraycopy(applicationTemplate.path, 0, odfFileId, 0,
-				applicationTemplate.path.length);
+		System.arraycopy(applicationTemplate.path, 0, odfFileId, 0, applicationTemplate.path.length);
 		System.arraycopy(new byte[] { 0x50, 0x31 }, 0, odfFileId, 4, 2);
 
 		byte[] odf = this.pcscEid.readFile(odfFileId);
@@ -221,10 +204,8 @@ public class Pkcs15Test {
 	@Test
 	public void testSelectPkcs15Application() throws Exception {
 		CardChannel cardChannel = this.pcscEid.getCardChannel();
-		byte[] aId = new byte[] { (byte) 0xa0, 0x00, 0x00, 0x01, 0x77, 0x50,
-				0x4b, 0x43, 0x53, 0x2d, 0x31, 0x35 };
-		CommandAPDU selectApplicationApdu = new CommandAPDU(0x00, 0xA4, 0x04,
-				0x0C, aId);
+		byte[] aId = new byte[] { (byte) 0xa0, 0x00, 0x00, 0x01, 0x77, 0x50, 0x4b, 0x43, 0x53, 0x2d, 0x31, 0x35 };
+		CommandAPDU selectApplicationApdu = new CommandAPDU(0x00, 0xA4, 0x04, 0x0C, aId);
 		ResponseAPDU responseApdu = cardChannel.transmit(selectApplicationApdu);
 		assertEquals(0x9000, responseApdu.getSW());
 	}
@@ -232,11 +213,9 @@ public class Pkcs15Test {
 	@Test
 	public void testSelectBelpicApplication() throws Exception {
 		CardChannel cardChannel = this.pcscEid.getCardChannel();
-		byte[] belpicAID = new byte[] { (byte) 0xA0, 0x00, 0x00, 0x00, 0x30,
-				0x29, 0x05, 0x70, 0x00, (byte) 0xAD, 0x13, 0x10, 0x01, 0x01,
-				(byte) 0xFF };
-		CommandAPDU selectApplicationApdu = new CommandAPDU(0x00, 0xA4, 0x04,
-				0x0C, belpicAID);
+		byte[] belpicAID = new byte[] { (byte) 0xA0, 0x00, 0x00, 0x00, 0x30, 0x29, 0x05, 0x70, 0x00, (byte) 0xAD, 0x13,
+				0x10, 0x01, 0x01, (byte) 0xFF };
+		CommandAPDU selectApplicationApdu = new CommandAPDU(0x00, 0xA4, 0x04, 0x0C, belpicAID);
 		ResponseAPDU responseApdu = cardChannel.transmit(selectApplicationApdu);
 		assertEquals(0x9000, responseApdu.getSW());
 	}

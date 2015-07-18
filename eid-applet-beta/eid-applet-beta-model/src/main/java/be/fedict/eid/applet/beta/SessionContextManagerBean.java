@@ -35,8 +35,7 @@ import org.apache.commons.logging.LogFactory;
 @Stateless
 public class SessionContextManagerBean implements SessionContextManager {
 
-	private static final Log LOG = LogFactory
-			.getLog(SessionContextManagerBean.class);
+	private static final Log LOG = LogFactory.getLog(SessionContextManagerBean.class);
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -59,8 +58,7 @@ public class SessionContextManagerBean implements SessionContextManager {
 			}
 			String userAgent = httpServletRequest.getHeader("user-agent");
 			LOG.debug("user agent: " + userAgent);
-			SessionContextEntity sessionContextEntity = new SessionContextEntity(
-					httpSessionId, userAgent);
+			SessionContextEntity sessionContextEntity = new SessionContextEntity(httpSessionId, userAgent);
 			this.entityManager.persist(sessionContextEntity);
 			int contextId = sessionContextEntity.getContextId();
 			LOG.debug("new context Id: " + contextId);
@@ -79,17 +77,14 @@ public class SessionContextManagerBean implements SessionContextManager {
 		LOG.debug("deactivate context for HTTP session: " + httpSessionId);
 		SessionContextEntity sessionContextEntity = getSessionContextEntity(httpSessionId);
 		sessionContextEntity.setActive(false);
-		LOG
-				.debug("context deactivated: "
-						+ sessionContextEntity.getContextId());
+		LOG.debug("context deactivated: " + sessionContextEntity.getContextId());
 	}
 
 	private SessionContextEntity getSessionContextEntity(String httpSessionId) {
 		Query query = this.entityManager
 				.createQuery("FROM SessionContextEntity AS sc WHERE sc.httpSessionId = :httpSessionId");
 		query.setParameter("httpSessionId", httpSessionId);
-		SessionContextEntity sessionContextEntity = (SessionContextEntity) query
-				.getSingleResult();
+		SessionContextEntity sessionContextEntity = (SessionContextEntity) query.getSingleResult();
 		return sessionContextEntity;
 	}
 
@@ -102,8 +97,7 @@ public class SessionContextManagerBean implements SessionContextManager {
 	public SessionContextEntity getSessionContext() {
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}

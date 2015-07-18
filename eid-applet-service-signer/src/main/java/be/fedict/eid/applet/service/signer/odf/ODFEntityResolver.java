@@ -38,23 +38,19 @@ public class ODFEntityResolver implements EntityResolver {
 
 	private static final Log LOG = LogFactory.getLog(ODFEntityResolver.class);
 
-	public InputSource resolveEntity(String publicId, String systemId)
-			throws SAXException, IOException {
+	public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
 		LOG.debug("resolveEntity");
 		LOG.debug("publicId: " + publicId);
 		LOG.debug("systemId: " + systemId);
-		if ("-//OpenOffice.org//DTD Modified W3C MathML 1.01//EN"
-				.equals(publicId)) {
-			InputStream mathmlDtdInputStream = ODFEntityResolver.class
-					.getResourceAsStream("/mmlents/mathml.dtd");
+		if ("-//OpenOffice.org//DTD Modified W3C MathML 1.01//EN".equals(publicId)) {
+			InputStream mathmlDtdInputStream = ODFEntityResolver.class.getResourceAsStream("/mmlents/mathml.dtd");
 			InputSource inputSource = new InputSource(mathmlDtdInputStream);
 			return inputSource;
 		}
 		if (systemId.endsWith(".ent")) {
 			String filename = FilenameUtils.getBaseName(systemId);
 			LOG.debug("ent filename: " + filename);
-			InputStream entInputStream = ODFEntityResolver.class
-					.getResourceAsStream("/mmlents/" + filename + ".ent");
+			InputStream entInputStream = ODFEntityResolver.class.getResourceAsStream("/mmlents/" + filename + ".ent");
 			InputSource inputSource = new InputSource(entInputStream);
 			return inputSource;
 		}

@@ -102,8 +102,7 @@ import be.fedict.eid.applet.service.signer.jaxb.opc.relationships.STTargetMode;
  */
 public class OOXMLSignatureVerifier {
 
-	private static final Log LOG = LogFactory
-			.getLog(OOXMLSignatureVerifier.class);
+	private static final Log LOG = LogFactory.getLog(OOXMLSignatureVerifier.class);
 
 	public static final String DIGITAL_SIGNATURE_ORIGIN_REL_TYPE = "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin";
 
@@ -113,10 +112,8 @@ public class OOXMLSignatureVerifier {
 
 	public OOXMLSignatureVerifier() {
 		try {
-			JAXBContext relationshipsJAXBContext = JAXBContext
-					.newInstance(ObjectFactory.class);
-			this.relationshipsUnmarshaller = relationshipsJAXBContext
-					.createUnmarshaller();
+			JAXBContext relationshipsJAXBContext = JAXBContext.newInstance(ObjectFactory.class);
+			this.relationshipsUnmarshaller = relationshipsJAXBContext.createUnmarshaller();
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
 		}
@@ -141,23 +138,20 @@ public class OOXMLSignatureVerifier {
 		return false;
 	}
 
-	public List<X509Certificate> getSigners(URL url) throws IOException,
-			ParserConfigurationException, SAXException, TransformerException,
-			MarshalException, XMLSignatureException, JAXBException {
+	public List<X509Certificate> getSigners(URL url) throws IOException, ParserConfigurationException, SAXException,
+			TransformerException, MarshalException, XMLSignatureException, JAXBException {
 		List<X509Certificate> signers = new LinkedList<X509Certificate>();
 		List<String> signatureResourceNames = getSignatureResourceNames(url);
 		if (signatureResourceNames.isEmpty()) {
 			LOG.debug("no signature resources");
 		}
 		for (String signatureResourceName : signatureResourceNames) {
-			Document signatureDocument = getSignatureDocument(url,
-					signatureResourceName);
+			Document signatureDocument = getSignatureDocument(url, signatureResourceName);
 			if (null == signatureDocument) {
 				continue;
 			}
 
-			NodeList signatureNodeList = signatureDocument
-					.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
+			NodeList signatureNodeList = signatureDocument.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 			if (0 == signatureNodeList.getLength()) {
 				return null;
 			}
@@ -165,25 +159,19 @@ public class OOXMLSignatureVerifier {
 
 			// work-around for Java 7
 			Element signedPropertiesElement = (Element) ((Element) signatureNode)
-					.getElementsByTagNameNS(
-							XAdESXLSignatureFacet.XADES_NAMESPACE,
-							"SignedProperties").item(0);
+					.getElementsByTagNameNS(XAdESXLSignatureFacet.XADES_NAMESPACE, "SignedProperties").item(0);
 			if (null != signedPropertiesElement) {
 				signedPropertiesElement.setIdAttribute("Id", true);
 			}
 
 			KeyInfoKeySelector keySelector = new KeyInfoKeySelector();
-			DOMValidateContext domValidateContext = new DOMValidateContext(
-					keySelector, signatureNode);
-			domValidateContext.setProperty(
-					"org.jcp.xml.dsig.validateManifests", Boolean.TRUE);
+			DOMValidateContext domValidateContext = new DOMValidateContext(keySelector, signatureNode);
+			domValidateContext.setProperty("org.jcp.xml.dsig.validateManifests", Boolean.TRUE);
 			OOXMLURIDereferencer dereferencer = new OOXMLURIDereferencer(url);
 			domValidateContext.setURIDereferencer(dereferencer);
 
-			XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-					.getInstance();
-			XMLSignature xmlSignature = xmlSignatureFactory
-					.unmarshalXMLSignature(domValidateContext);
+			XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
+			XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
 			boolean valid = xmlSignature.validate(domValidateContext);
 
 			if (!valid) {
@@ -206,8 +194,7 @@ public class OOXMLSignatureVerifier {
 				LOG.debug("idPackageObject ds:Object not present");
 				continue;
 			}
-			List<XMLStructure> idPackageObjectContent = idPackageObject
-					.getContent();
+			List<XMLStructure> idPackageObjectContent = idPackageObject.getContent();
 			Manifest idPackageObjectManifest = null;
 			for (XMLStructure content : idPackageObjectContent) {
 				if (content instanceof Manifest) {
@@ -220,26 +207,20 @@ public class OOXMLSignatureVerifier {
 				continue;
 			}
 			LOG.debug("ds:Manifest present within idPackageObject ds:Object");
-			List<Reference> idPackageObjectReferences = idPackageObjectManifest
-					.getReferences();
+			List<Reference> idPackageObjectReferences = idPackageObjectManifest.getReferences();
 			Set<String> idPackageObjectReferenceUris = new HashSet<String>();
 			Set<String> remainingIdPackageObjectReferenceUris = new HashSet<String>();
 			for (Reference idPackageObjectReference : idPackageObjectReferences) {
-				idPackageObjectReferenceUris.add(idPackageObjectReference
-						.getURI());
-				remainingIdPackageObjectReferenceUris
-						.add(idPackageObjectReference.getURI());
+				idPackageObjectReferenceUris.add(idPackageObjectReference.getURI());
+				remainingIdPackageObjectReferenceUris.add(idPackageObjectReference.getURI());
 			}
-			LOG.debug("idPackageObject ds:Reference URIs: "
-					+ idPackageObjectReferenceUris);
+			LOG.debug("idPackageObject ds:Reference URIs: " + idPackageObjectReferenceUris);
 			CTTypes contentTypes = getContentTypes(url);
 			List<String> relsEntryNames = getRelsEntryNames(url);
 			for (String relsEntryName : relsEntryNames) {
 				LOG.debug("---- relationship entry name: " + relsEntryName);
-				CTRelationships relationships = getRelationships(url,
-						relsEntryName);
-				List<CTRelationship> relationshipList = relationships
-						.getRelationship();
+				CTRelationships relationships = getRelationships(url, relsEntryName);
+				List<CTRelationship> relationshipList = relationships.getRelationship();
 				boolean includeRelationshipInSignature = false;
 				for (CTRelationship relationship : relationshipList) {
 					String relationshipType = relationship.getType();
@@ -257,60 +238,45 @@ public class OOXMLSignatureVerifier {
 							continue;
 						}
 					}
-					if (false == OOXMLSignatureFacet
-							.isSignedRelationship(relationshipType)) {
+					if (false == OOXMLSignatureFacet.isSignedRelationship(relationshipType)) {
 						continue;
 					}
 					String relationshipTarget = relationship.getTarget();
-					String baseUri = "/"
-							+ relsEntryName.substring(0,
-									relsEntryName.indexOf("_rels/"));
+					String baseUri = "/" + relsEntryName.substring(0, relsEntryName.indexOf("_rels/"));
 					String streamEntry = baseUri + relationshipTarget;
 					LOG.debug("stream entry: " + streamEntry);
-					streamEntry = FilenameUtils.separatorsToUnix(FilenameUtils
-							.normalize(streamEntry));
+					streamEntry = FilenameUtils.separatorsToUnix(FilenameUtils.normalize(streamEntry));
 					LOG.debug("normalized stream entry: " + streamEntry);
-					String contentType = getContentType(contentTypes,
-							streamEntry);
+					String contentType = getContentType(contentTypes, streamEntry);
 					if (relationshipType.endsWith("customXml")) {
-						if (false == contentType.equals("inkml+xml")
-								&& false == contentType.equals("text/xml")) {
-							LOG.debug("skipping customXml with content type: "
-									+ contentType);
+						if (false == contentType.equals("inkml+xml") && false == contentType.equals("text/xml")) {
+							LOG.debug("skipping customXml with content type: " + contentType);
 							continue;
 						}
 					}
 					includeRelationshipInSignature = true;
 					LOG.debug("content type: " + contentType);
-					String referenceUri = streamEntry + "?ContentType="
-							+ contentType;
+					String referenceUri = streamEntry + "?ContentType=" + contentType;
 					LOG.debug("reference URI: " + referenceUri);
-					if (false == idPackageObjectReferenceUris
-							.contains(referenceUri)) {
+					if (false == idPackageObjectReferenceUris.contains(referenceUri)) {
 						throw new RuntimeException(
-								"no reference in idPackageObject ds:Object for relationship target: "
-										+ streamEntry);
+								"no reference in idPackageObject ds:Object for relationship target: " + streamEntry);
 					}
 					remainingIdPackageObjectReferenceUris.remove(referenceUri);
 				}
-				String relsReferenceUri = "/"
-						+ relsEntryName
+				String relsReferenceUri = "/" + relsEntryName
 						+ "?ContentType=application/vnd.openxmlformats-package.relationships+xml";
 				if (includeRelationshipInSignature
-						&& false == idPackageObjectReferenceUris
-								.contains(relsReferenceUri)) {
+						&& false == idPackageObjectReferenceUris.contains(relsReferenceUri)) {
 					LOG.debug("missing ds:Reference for: " + relsEntryName);
-					throw new RuntimeException("missing ds:Reference for: "
-							+ relsEntryName);
+					throw new RuntimeException("missing ds:Reference for: " + relsEntryName);
 				}
 				remainingIdPackageObjectReferenceUris.remove(relsReferenceUri);
 			}
 			if (false == remainingIdPackageObjectReferenceUris.isEmpty()) {
-				LOG.debug("remaining idPackageObject reference URIs"
-						+ idPackageObjectReferenceUris);
-				throw new RuntimeException(
-						"idPackageObject manifest contains unknown ds:References: "
-								+ remainingIdPackageObjectReferenceUris);
+				LOG.debug("remaining idPackageObject reference URIs" + idPackageObjectReferenceUris);
+				throw new RuntimeException("idPackageObject manifest contains unknown ds:References: "
+						+ remainingIdPackageObjectReferenceUris);
 			}
 
 			X509Certificate signer = keySelector.getCertificate();
@@ -320,8 +286,7 @@ public class OOXMLSignatureVerifier {
 	}
 
 	private String getContentType(CTTypes contentTypes, String partName) {
-		List<Object> defaultOrOverrideList = contentTypes
-				.getDefaultOrOverride();
+		List<Object> defaultOrOverrideList = contentTypes.getDefaultOrOverride();
 		for (Object defaultOrOverride : defaultOrOverrideList) {
 			if (defaultOrOverride instanceof CTOverride) {
 				CTOverride override = (CTOverride) defaultOrOverride;
@@ -341,8 +306,7 @@ public class OOXMLSignatureVerifier {
 		return null;
 	}
 
-	private CTRelationships getRelationships(URL url,
-			String relationshipsEntryName) throws IOException, JAXBException {
+	private CTRelationships getRelationships(URL url, String relationshipsEntryName) throws IOException, JAXBException {
 		ZipInputStream zipInputStream = new ZipInputStream(url.openStream());
 		ZipEntry zipEntry;
 		InputStream relationshipsInputStream = null;
@@ -377,8 +341,8 @@ public class OOXMLSignatureVerifier {
 		return relsEntryNames;
 	}
 
-	private CTTypes getContentTypes(URL url) throws IOException,
-			ParserConfigurationException, SAXException, JAXBException {
+	private CTTypes getContentTypes(URL url)
+			throws IOException, ParserConfigurationException, SAXException, JAXBException {
 		ZipInputStream zipInputStream = new ZipInputStream(url.openStream());
 		ZipEntry zipEntry;
 		InputStream contentTypesInputStream = null;
@@ -405,9 +369,8 @@ public class OOXMLSignatureVerifier {
 		return getSignatureDocument(url.openStream(), signatureResourceName);
 	}
 
-	public Document getSignatureDocument(InputStream documentInputStream,
-			String signatureResourceName) throws IOException,
-			ParserConfigurationException, SAXException {
+	public Document getSignatureDocument(InputStream documentInputStream, String signatureResourceName)
+			throws IOException, ParserConfigurationException, SAXException {
 		ZipInputStream zipInputStream = new ZipInputStream(documentInputStream);
 		ZipEntry zipEntry;
 		while (null != (zipEntry = zipInputStream.getNextEntry())) {
@@ -420,11 +383,9 @@ public class OOXMLSignatureVerifier {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<String> getSignatureResourceNames(byte[] document)
-			throws IOException, JAXBException {
+	public List<String> getSignatureResourceNames(byte[] document) throws IOException, JAXBException {
 		List<String> signatureResourceNames = new LinkedList<String>();
-		ZipInputStream zipInputStream = new ZipInputStream(
-				new ByteArrayInputStream(document));
+		ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(document));
 		ZipEntry zipEntry;
 		while (null != (zipEntry = zipInputStream.getNextEntry())) {
 			if ("_rels/.rels".equals(zipEntry.getName())) {
@@ -439,13 +400,10 @@ public class OOXMLSignatureVerifier {
 		String dsOriginPart = null;
 		JAXBElement<CTRelationships> packageRelationshipsElement = (JAXBElement<CTRelationships>) this.relationshipsUnmarshaller
 				.unmarshal(zipInputStream);
-		CTRelationships packageRelationships = packageRelationshipsElement
-				.getValue();
-		List<CTRelationship> packageRelationshipList = packageRelationships
-				.getRelationship();
+		CTRelationships packageRelationships = packageRelationshipsElement.getValue();
+		List<CTRelationship> packageRelationshipList = packageRelationships.getRelationship();
 		for (CTRelationship packageRelationship : packageRelationshipList) {
-			if (DIGITAL_SIGNATURE_ORIGIN_REL_TYPE.equals(packageRelationship
-					.getType())) {
+			if (DIGITAL_SIGNATURE_ORIGIN_REL_TYPE.equals(packageRelationship.getType())) {
 				dsOriginPart = packageRelationship.getTarget();
 				break;
 			}
@@ -455,15 +413,11 @@ public class OOXMLSignatureVerifier {
 			return signatureResourceNames;
 		}
 		LOG.debug("Digital Signature Origin part: " + dsOriginPart);
-		String dsOriginName = dsOriginPart.substring(dsOriginPart
-				.lastIndexOf("/") + 1);
+		String dsOriginName = dsOriginPart.substring(dsOriginPart.lastIndexOf("/") + 1);
 		LOG.debug("Digital Signature Origin base: " + dsOriginName);
-		String dsOriginSegment = dsOriginPart.substring(0,
-				dsOriginPart.lastIndexOf("/"))
-				+ "/";
+		String dsOriginSegment = dsOriginPart.substring(0, dsOriginPart.lastIndexOf("/")) + "/";
 		LOG.debug("Digital Signature Origin segment: " + dsOriginSegment);
-		String dsOriginRels = dsOriginSegment + "_rels/" + dsOriginName
-				+ ".rels";
+		String dsOriginRels = dsOriginSegment + "_rels/" + dsOriginName + ".rels";
 		LOG.debug("Digital Signature Origin relationship part: " + dsOriginRels);
 
 		zipInputStream = new ZipInputStream(new ByteArrayInputStream(document));
@@ -480,12 +434,10 @@ public class OOXMLSignatureVerifier {
 		JAXBElement<CTRelationships> dsoRelationshipsElement = (JAXBElement<CTRelationships>) this.relationshipsUnmarshaller
 				.unmarshal(zipInputStream);
 		CTRelationships dsoRelationships = dsoRelationshipsElement.getValue();
-		List<CTRelationship> dsoRelationshipList = dsoRelationships
-				.getRelationship();
+		List<CTRelationship> dsoRelationshipList = dsoRelationships.getRelationship();
 		for (CTRelationship dsoRelationship : dsoRelationshipList) {
 			if (DIGITAL_SIGNATURE_REL_TYPE.equals(dsoRelationship.getType())) {
-				String signatureResourceName = dsOriginSegment
-						+ dsoRelationship.getTarget();
+				String signatureResourceName = dsOriginSegment + dsoRelationship.getTarget();
 				signatureResourceNames.add(signatureResourceName);
 			}
 		}
@@ -494,13 +446,12 @@ public class OOXMLSignatureVerifier {
 	}
 
 	@SuppressWarnings("unchecked")
-	public boolean isValidOOXMLSignature(XMLSignature xmlSignature,
-			byte[] document) throws IOException, TransformerException,
-			SAXException, ParserConfigurationException {
+	public boolean isValidOOXMLSignature(XMLSignature xmlSignature, byte[] document)
+			throws IOException, TransformerException, SAXException, ParserConfigurationException {
 
 		// check c18n == http://www.w3.org/TR/2001/REC-xml-c14n-20010315
-		if (!xmlSignature.getSignedInfo().getCanonicalizationMethod()
-				.getAlgorithm().equals(CanonicalizationMethod.INCLUSIVE)) {
+		if (!xmlSignature.getSignedInfo().getCanonicalizationMethod().getAlgorithm()
+				.equals(CanonicalizationMethod.INCLUSIVE)) {
 			LOG.error("Invalid c18n method on OOXML Signature");
 			return false;
 		}
@@ -508,8 +459,7 @@ public class OOXMLSignatureVerifier {
 		List<Reference> refs = xmlSignature.getSignedInfo().getReferences();
 
 		// check #idPackageObject reference
-		Reference idPackageObjectRef = findReferenceFromURI(refs,
-				"#idPackageObject");
+		Reference idPackageObjectRef = findReferenceFromURI(refs, "#idPackageObject");
 		if (null == idPackageObjectRef) {
 			LOG.error("No \"idPackageObject\" reference found!");
 			return false;
@@ -521,15 +471,13 @@ public class OOXMLSignatureVerifier {
 			LOG.error("No \"idPackageObject\" object found!");
 			return false;
 		}
-		if (!isIdPackageObjectValid(xmlSignature.getId(), idPackageObject,
-				document)) {
+		if (!isIdPackageObjectValid(xmlSignature.getId(), idPackageObject, document)) {
 			LOG.error("Invalid \"idPackageObject\".");
 			return false;
 		}
 
 		// check #idOfficeObject reference
-		Reference idOfficeObjectRef = findReferenceFromURI(refs,
-				"#idOfficeObject");
+		Reference idOfficeObjectRef = findReferenceFromURI(refs, "#idOfficeObject");
 		if (null == idOfficeObjectRef) {
 			LOG.error("No \"idOfficeObject\" reference found!");
 			return false;
@@ -550,16 +498,14 @@ public class OOXMLSignatureVerifier {
 	}
 
 	@SuppressWarnings("unchecked")
-	private boolean isIdOfficeObjectValid(String signatureId,
-			XMLObject idOfficeObject) {
+	private boolean isIdOfficeObjectValid(String signatureId, XMLObject idOfficeObject) {
 
 		SignatureProperties signatureProperties;
 		if (1 != idOfficeObject.getContent().size()) {
 			LOG.error("Expect SignatureProperties element in \"idPackageObject\".");
 			return false;
 		}
-		signatureProperties = (SignatureProperties) idOfficeObject.getContent()
-				.get(0);
+		signatureProperties = (SignatureProperties) idOfficeObject.getContent().get(0);
 
 		if (signatureProperties.getProperties().size() != 1) {
 			LOG.error("Unexpected # of SignatureProperty's in idOfficeObject");
@@ -567,16 +513,14 @@ public class OOXMLSignatureVerifier {
 		}
 
 		// SignatureInfo
-		SignatureProperty signatureInfoProperty = (SignatureProperty) signatureProperties
-				.getProperties().get(0);
+		SignatureProperty signatureInfoProperty = (SignatureProperty) signatureProperties.getProperties().get(0);
 		if (!signatureInfoProperty.getId().equals("idOfficeV1Details")) {
-			LOG.error("Unexpected SignatureProperty: expected id=idOfficeV1Details "
-					+ "but got: " + signatureInfoProperty.getId());
+			LOG.error("Unexpected SignatureProperty: expected id=idOfficeV1Details " + "but got: "
+					+ signatureInfoProperty.getId());
 			return false;
 		}
 		if (!signatureInfoProperty.getTarget().equals("#" + signatureId)) {
-			LOG.error("Unexpected SignatureProperty: expected target=#"
-					+ signatureId + " but got: "
+			LOG.error("Unexpected SignatureProperty: expected target=#" + signatureId + " but got: "
 					+ signatureInfoProperty.getTarget());
 			LOG.warn("Allowing this error because of a bug in Office2010");
 			// work-around for existing bug in Office2011
@@ -588,13 +532,10 @@ public class OOXMLSignatureVerifier {
 			LOG.error("Unexpected content in SignatureInfoProperty.");
 			return false;
 		}
-		DOMStructure signatureInfoV1DOM = (DOMStructure) signatureInfoProperty
-				.getContent().get(0);
+		DOMStructure signatureInfoV1DOM = (DOMStructure) signatureInfoProperty.getContent().get(0);
 		Node signatureInfoElement = signatureInfoV1DOM.getNode();
-		if (!signatureInfoElement.getNamespaceURI().equals(
-				OOXMLSignatureFacet.OFFICE_DIGSIG_NS)) {
-			LOG.error("Unexpected SignatureInfoProperty content: NS="
-					+ signatureInfoElement.getNamespaceURI());
+		if (!signatureInfoElement.getNamespaceURI().equals(OOXMLSignatureFacet.OFFICE_DIGSIG_NS)) {
+			LOG.error("Unexpected SignatureInfoProperty content: NS=" + signatureInfoElement.getNamespaceURI());
 			return false;
 		}
 
@@ -605,9 +546,8 @@ public class OOXMLSignatureVerifier {
 	}
 
 	@SuppressWarnings("unchecked")
-	private boolean isIdPackageObjectValid(String signatureId,
-			XMLObject idPackageObject, byte[] document) throws IOException,
-			TransformerException, SAXException, ParserConfigurationException {
+	private boolean isIdPackageObjectValid(String signatureId, XMLObject idPackageObject, byte[] document)
+			throws IOException, TransformerException, SAXException, ParserConfigurationException {
 
 		Manifest manifest;
 		SignatureProperties signatureProperties;
@@ -616,8 +556,7 @@ public class OOXMLSignatureVerifier {
 			return false;
 		}
 		manifest = (Manifest) idPackageObject.getContent().get(0);
-		signatureProperties = (SignatureProperties) idPackageObject
-				.getContent().get(1);
+		signatureProperties = (SignatureProperties) idPackageObject.getContent().get(1);
 
 		// Manifest
 		List<Reference> refs = manifest.getReferences();
@@ -628,11 +567,9 @@ public class OOXMLSignatureVerifier {
 
 			if (validZipEntryStream(zipEntry.getName())) {
 				// check relationship refs
-				String relationshipReferenceURI = OOXMLSignatureFacet
-						.getRelationshipReferenceURI(zipEntry.getName());
+				String relationshipReferenceURI = OOXMLSignatureFacet.getRelationshipReferenceURI(zipEntry.getName());
 				if (null == findReferenceFromURI(refs, relationshipReferenceURI)) {
-					LOG.error("Did not find relationship ref: \""
-							+ relationshipReferenceURI + "\"");
+					LOG.error("Did not find relationship ref: \"" + relationshipReferenceURI + "\"");
 					if (relationshipReferenceURI.startsWith("/customXml")) {
 						continue;
 					}
@@ -642,15 +579,12 @@ public class OOXMLSignatureVerifier {
 		}
 
 		// check streams signed
-		for (Map.Entry<String, String> resourceEntry : getResources(document)
-				.entrySet()) {
+		for (Map.Entry<String, String> resourceEntry : getResources(document).entrySet()) {
 
-			String resourceReferenceURI = OOXMLSignatureFacet
-					.getResourceReferenceURI(resourceEntry.getKey(),
-							resourceEntry.getValue());
+			String resourceReferenceURI = OOXMLSignatureFacet.getResourceReferenceURI(resourceEntry.getKey(),
+					resourceEntry.getValue());
 			if (null == findReferenceFromURI(refs, resourceReferenceURI)) {
-				LOG.error("Did not find resource ref: \""
-						+ resourceReferenceURI + "\"");
+				LOG.error("Did not find resource ref: \"" + resourceReferenceURI + "\"");
 				return false;
 			}
 		}
@@ -660,8 +594,7 @@ public class OOXMLSignatureVerifier {
 			LOG.error("Unexpected # of SignatureProperty's in idPackageObject");
 			return false;
 		}
-		if (!validateSignatureProperty((SignatureProperty) signatureProperties
-				.getProperties().get(0), signatureId)) {
+		if (!validateSignatureProperty((SignatureProperty) signatureProperties.getProperties().get(0), signatureId)) {
 			return false;
 		}
 
@@ -669,71 +602,58 @@ public class OOXMLSignatureVerifier {
 	}
 
 	@SuppressWarnings("unchecked")
-	private boolean validateSignatureProperty(
-			SignatureProperty signatureProperty, String signatureId) {
+	private boolean validateSignatureProperty(SignatureProperty signatureProperty, String signatureId) {
 
 		if (!signatureProperty.getId().equals("idSignatureTime")) {
-			LOG.error("Unexpected SignatureProperty: expected id=idSignatureTime "
-					+ "but got: " + signatureProperty.getId());
+			LOG.error("Unexpected SignatureProperty: expected id=idSignatureTime " + "but got: "
+					+ signatureProperty.getId());
 			return false;
 		}
 		if (!signatureProperty.getTarget().equals("#" + signatureId)) {
-			LOG.error("Unexpected SignatureProperty: expected target=#"
-					+ signatureId + "but got: " + signatureProperty.getTarget());
+			LOG.error("Unexpected SignatureProperty: expected target=#" + signatureId + "but got: "
+					+ signatureProperty.getTarget());
 			return false;
 		}
-		List<XMLStructure> signatureTimeContent = signatureProperty
-				.getContent();
+		List<XMLStructure> signatureTimeContent = signatureProperty.getContent();
 		if (signatureTimeContent.size() != 1) {
 			LOG.error("Unexpected SignatureTime content.");
 			return false;
 		}
-		DOMStructure signatureTimeDOM = (DOMStructure) signatureTimeContent
-				.get(0);
+		DOMStructure signatureTimeDOM = (DOMStructure) signatureTimeContent.get(0);
 		Node signatureTimeElement = signatureTimeDOM.getNode();
-		if (!signatureTimeElement.getNamespaceURI().equals(
-				OOXMLSignatureFacet.OOXML_DIGSIG_NS)) {
-			LOG.error("Invalid SignatureTime element: NS="
-					+ signatureTimeElement.getNamespaceURI());
+		if (!signatureTimeElement.getNamespaceURI().equals(OOXMLSignatureFacet.OOXML_DIGSIG_NS)) {
+			LOG.error("Invalid SignatureTime element: NS=" + signatureTimeElement.getNamespaceURI());
 			return false;
 		}
 		if (!signatureTimeElement.getLocalName().equals("SignatureTime")) {
-			LOG.error("Invalid SignatureTime element: Name="
-					+ signatureTimeElement.getLocalName());
+			LOG.error("Invalid SignatureTime element: Name=" + signatureTimeElement.getLocalName());
 			return false;
 		}
 		if (signatureTimeElement.getChildNodes().getLength() != 2) {
-			LOG.error("Invalid SignatureTime element: Childs="
-					+ signatureTimeElement.getChildNodes().getLength()
+			LOG.error("Invalid SignatureTime element: Childs=" + signatureTimeElement.getChildNodes().getLength()
 					+ ", expected 2 (Format+Value)");
 			return false;
 		}
 
 		// format element
 		Node formatElement = signatureTimeElement.getChildNodes().item(0);
-		if (!formatElement.getNamespaceURI().equals(
-				OOXMLSignatureFacet.OOXML_DIGSIG_NS)) {
-			LOG.error("Invalid SignatureTime.Format element: NS="
-					+ formatElement.getNamespaceURI());
+		if (!formatElement.getNamespaceURI().equals(OOXMLSignatureFacet.OOXML_DIGSIG_NS)) {
+			LOG.error("Invalid SignatureTime.Format element: NS=" + formatElement.getNamespaceURI());
 			return false;
 		}
 		if (!formatElement.getLocalName().equals("Format")) {
-			LOG.error("Invalid SignatureTime.Format element: Name="
-					+ formatElement.getLocalName());
+			LOG.error("Invalid SignatureTime.Format element: Name=" + formatElement.getLocalName());
 			return false;
 		}
 
 		// value element
 		Node valueElement = signatureTimeElement.getChildNodes().item(1);
-		if (!valueElement.getNamespaceURI().equals(
-				OOXMLSignatureFacet.OOXML_DIGSIG_NS)) {
-			LOG.error("Invalid SignatureTime.Value element: NS="
-					+ valueElement.getNamespaceURI());
+		if (!valueElement.getNamespaceURI().equals(OOXMLSignatureFacet.OOXML_DIGSIG_NS)) {
+			LOG.error("Invalid SignatureTime.Value element: NS=" + valueElement.getNamespaceURI());
 			return false;
 		}
 		if (!valueElement.getLocalName().equals("Value")) {
-			LOG.error("Invalid SignatureTime.Value element: Name="
-					+ valueElement.getLocalName());
+			LOG.error("Invalid SignatureTime.Value element: Name=" + valueElement.getLocalName());
 			return false;
 		}
 
@@ -758,8 +678,7 @@ public class OOXMLSignatureVerifier {
 
 	// returns map of <partName,contentType> entries of the document
 	private Map<String, String> getResources(byte[] document)
-			throws IOException, ParserConfigurationException, SAXException,
-			TransformerException {
+			throws IOException, ParserConfigurationException, SAXException, TransformerException {
 
 		Map<String, String> signatureResources = new HashMap<String, String>();
 
@@ -770,18 +689,14 @@ public class OOXMLSignatureVerifier {
 			if (!"[Content_Types].xml".equals(zipEntry.getName())) {
 				continue;
 			}
-			Document contentTypesDocument = OOXMLSignatureFacet
-					.loadDocument(zipInputStream);
+			Document contentTypesDocument = OOXMLSignatureFacet.loadDocument(zipInputStream);
 			Element nsElement = contentTypesDocument.createElement("ns");
-			nsElement
-					.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
-							"http://schemas.openxmlformats.org/package/2006/content-types");
+			nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
+					"http://schemas.openxmlformats.org/package/2006/content-types");
 
 			for (String contentType : OOXMLSignatureFacet.contentTypes) {
-				NodeList nodeList = XPathAPI.selectNodeList(
-						contentTypesDocument,
-						"/tns:Types/tns:Override[@ContentType='" + contentType
-								+ "']/@PartName", nsElement);
+				NodeList nodeList = XPathAPI.selectNodeList(contentTypesDocument,
+						"/tns:Types/tns:Override[@ContentType='" + contentType + "']/@PartName", nsElement);
 				for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
 					String partName = nodeList.item(nodeIdx).getTextContent();
 					LOG.debug("part name: " + partName);
@@ -807,8 +722,7 @@ public class OOXMLSignatureVerifier {
 		return null;
 	}
 
-	private Reference findReferenceFromURI(List<Reference> refs,
-			String referenceURI) {
+	private Reference findReferenceFromURI(List<Reference> refs, String referenceURI) {
 
 		for (Reference ref : refs) {
 			if (ref.getURI().equals(referenceURI)) {
@@ -819,16 +733,14 @@ public class OOXMLSignatureVerifier {
 		return null;
 	}
 
-	public List<String> getSignatureResourceNames(URL url) throws IOException,
-			ParserConfigurationException, SAXException, TransformerException,
-			JAXBException {
+	public List<String> getSignatureResourceNames(URL url)
+			throws IOException, ParserConfigurationException, SAXException, TransformerException, JAXBException {
 		byte[] document = IOUtils.toByteArray(url.openStream());
 		return getSignatureResourceNames(document);
 	}
 
 	public static String[] excludedStreams = {
 
-	"0x05Bagaaqy23kudbhchAaq5u2chNd", "0x06DataSpaces", "Xmlsignatures",
-			"MsoDataStore", "0x09DRMContent", "_signatures", "_xmlsignatures",
-			"0x05SummaryInformation", "0x05DocumentSummaryInformation" };
+			"0x05Bagaaqy23kudbhchAaq5u2chNd", "0x06DataSpaces", "Xmlsignatures", "MsoDataStore", "0x09DRMContent",
+			"_signatures", "_xmlsignatures", "0x05SummaryInformation", "0x05DocumentSummaryInformation" };
 }

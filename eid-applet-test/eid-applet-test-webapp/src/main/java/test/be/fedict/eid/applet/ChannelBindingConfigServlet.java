@@ -38,25 +38,22 @@ public class ChannelBindingConfigServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		Provider provider = null;
 		if (null == Security.getProvider(BouncyCastleProvider.PROVIDER_NAME)) {
 			provider = new BouncyCastleProvider();
 			Security.addProvider(provider);
 		}
 		String serverCertificatePem = request.getParameter("serverCertificate");
-		PEMReader pemReader = new PEMReader(new StringReader(
-				serverCertificatePem));
+		PEMReader pemReader = new PEMReader(new StringReader(serverCertificatePem));
 		Object object = pemReader.readObject();
 		pemReader.close();
 		if (object instanceof X509Certificate) {
 			X509Certificate serverCertificate = (X509Certificate) object;
 			HttpSession httpSession = request.getSession();
-			httpSession
-					.setAttribute(
-							"test.be.fedict.eid.applet.model.ChannelBindingServiceBean.serverCertificate",
-							serverCertificate);
+			httpSession.setAttribute("test.be.fedict.eid.applet.model.ChannelBindingServiceBean.serverCertificate",
+					serverCertificate);
 		}
 		response.sendRedirect("channel-binding.jsp");
 		if (null != provider) {

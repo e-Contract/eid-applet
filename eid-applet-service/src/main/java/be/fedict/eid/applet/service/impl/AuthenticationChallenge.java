@@ -38,11 +38,9 @@ public class AuthenticationChallenge implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Log LOG = LogFactory
-			.getLog(AuthenticationChallenge.class);
+	private static final Log LOG = LogFactory.getLog(AuthenticationChallenge.class);
 
-	public static final String AUTHN_CHALLENGE_SESSION_ATTRIBUTE = AuthenticationChallenge.class
-			.getName();
+	public static final String AUTHN_CHALLENGE_SESSION_ATTRIBUTE = AuthenticationChallenge.class.getName();
 
 	/**
 	 * The default maximum allowed maturity of the challenge in milliseconds.
@@ -89,8 +87,7 @@ public class AuthenticationChallenge implements Serializable {
 		if (null != session.getAttribute(AUTHN_CHALLENGE_SESSION_ATTRIBUTE)) {
 			LOG.warn("overwriting a previous authentication challenge");
 		}
-		session.setAttribute(AUTHN_CHALLENGE_SESSION_ATTRIBUTE,
-				authenticationChallenge);
+		session.setAttribute(AUTHN_CHALLENGE_SESSION_ATTRIBUTE, authenticationChallenge);
 		byte[] challenge = authenticationChallenge.getChallenge();
 		return challenge;
 	}
@@ -126,8 +123,7 @@ public class AuthenticationChallenge implements Serializable {
 		if (null == maxMaturity) {
 			maxMaturity = DEFAULT_MAX_MATURITY;
 		}
-		long dt = now.getTime()
-				- authenticationChallenge.getTimestamp().getTime();
+		long dt = now.getTime() - authenticationChallenge.getTimestamp().getTime();
 		if (dt > maxMaturity) {
 			throw new SecurityException("maximum challenge maturity reached");
 		}

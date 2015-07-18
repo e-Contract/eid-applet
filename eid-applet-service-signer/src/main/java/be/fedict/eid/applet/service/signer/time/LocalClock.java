@@ -20,7 +20,6 @@ package be.fedict.eid.applet.service.signer.time;
 
 import java.util.Date;
 
-
 /**
  * Implementation of a clock using the local system time.
  * 

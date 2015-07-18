@@ -31,8 +31,7 @@ public class SignatureEvent {
 
 	private ErrorCode errorCode;
 
-	public SignatureEvent(byte[] signatureValue,
-			List<X509Certificate> certificateChain) {
+	public SignatureEvent(byte[] signatureValue, List<X509Certificate> certificateChain) {
 		this.signatureValue = signatureValue;
 		this.certificateChain = certificateChain;
 	}

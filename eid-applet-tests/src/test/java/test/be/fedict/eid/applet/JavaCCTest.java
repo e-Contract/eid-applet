@@ -58,16 +58,14 @@ public class JavaCCTest {
 
 	@Test
 	public void testAdder() throws Exception {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(
-				"1 + 2\n".getBytes());
+		ByteArrayInputStream inputStream = new ByteArrayInputStream("1 + 2\n".getBytes());
 		Adder adder = new Adder(inputStream);
 		adder.Start();
 	}
 
 	@Test
 	public void testAdderSyntaxError() throws Exception {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(
-				"1 + 2 +\n".getBytes());
+		ByteArrayInputStream inputStream = new ByteArrayInputStream("1 + 2 +\n".getBytes());
 		Adder adder = new Adder(inputStream);
 		try {
 			adder.Start();
@@ -79,8 +77,7 @@ public class JavaCCTest {
 
 	@Test
 	public void testAdder2() throws Exception {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(
-				"1 + 2\n".getBytes());
+		ByteArrayInputStream inputStream = new ByteArrayInputStream("1 + 2\n".getBytes());
 		Adder2 adder = new Adder2(inputStream);
 		int result = adder.Start();
 		LOG.debug("result: " + result);
@@ -89,8 +86,7 @@ public class JavaCCTest {
 
 	@Test
 	public void testAdder3() throws Exception {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(
-				"2 + 3\n".getBytes());
+		ByteArrayInputStream inputStream = new ByteArrayInputStream("2 + 3\n".getBytes());
 		Adder3 adder = new Adder3(inputStream);
 		int result = adder.Start();
 		LOG.debug("result: " + result);
@@ -99,24 +95,21 @@ public class JavaCCTest {
 
 	@Test
 	public void testCalculator() throws Exception {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(
-				"2 + 3.\n.1 + 1.5\n".getBytes());
+		ByteArrayInputStream inputStream = new ByteArrayInputStream("2 + 3.\n.1 + 1.5\n".getBytes());
 		Calculator calculator = new Calculator(inputStream);
 		calculator.Start(System.out);
 	}
 
 	@Test
 	public void testCalculator1() throws Exception {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(
-				"2 + 3.\n.1 - 1.5\n".getBytes());
+		ByteArrayInputStream inputStream = new ByteArrayInputStream("2 + 3.\n.1 - 1.5\n".getBytes());
 		Calculator1 calculator = new Calculator1(inputStream);
 		calculator.Start(System.out);
 	}
 
 	@Test
 	public void testCalculator2() throws Exception {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(
-				"2 + 3.\n.1 - 1.5\n2 * 3\n1 + 2 * 3\n".getBytes());
+		ByteArrayInputStream inputStream = new ByteArrayInputStream("2 + 3.\n.1 - 1.5\n2 * 3\n1 + 2 * 3\n".getBytes());
 		Calculator2 calculator = new Calculator2(inputStream);
 		calculator.Start(System.out);
 	}
@@ -131,24 +124,21 @@ public class JavaCCTest {
 
 	@Test
 	public void testLanguage() throws Exception {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(
-				"BEGIN END".getBytes());
+		ByteArrayInputStream inputStream = new ByteArrayInputStream("BEGIN END".getBytes());
 		Language language = new Language(inputStream);
 		language.Start();
 	}
 
 	@Test
 	public void testLanguageNewLines() throws Exception {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(
-				"\rBEGIN\nEND\n \n".getBytes());
+		ByteArrayInputStream inputStream = new ByteArrayInputStream("\rBEGIN\nEND\n \n".getBytes());
 		Language language = new Language(inputStream);
 		language.Start();
 	}
 
 	@Test
 	public void testLanguageExit() throws Exception {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(
-				"BEGIN\nEXIT\nEND".getBytes());
+		ByteArrayInputStream inputStream = new ByteArrayInputStream("BEGIN\nEXIT\nEND".getBytes());
 		Language language = new Language(inputStream);
 		Program program = language.Start();
 		assertNotNull(program);
@@ -160,8 +150,7 @@ public class JavaCCTest {
 
 	@Test
 	public void testLanguageOutput() throws Exception {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(
-				"BEGIN\nOUT 1234\nEND".getBytes());
+		ByteArrayInputStream inputStream = new ByteArrayInputStream("BEGIN\nOUT 1234\nEND".getBytes());
 		Language language = new Language(inputStream);
 		Program program = language.Start();
 		assertNotNull(program);
@@ -217,8 +206,7 @@ public class JavaCCTest {
 
 	@Test
 	public void testLanguageAssignment() throws Exception {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(
-				"BEGIN\nMyVar = 1234\nEND".getBytes());
+		ByteArrayInputStream inputStream = new ByteArrayInputStream("BEGIN\nMyVar = 1234\nEND".getBytes());
 		Language language = new Language(inputStream);
 		Program program = language.Start();
 		LOG.debug("program size: " + program.getInstructions().size());
@@ -252,7 +240,6 @@ public class JavaCCTest {
 		interpreter.run();
 		EasyMock.verify(mockRuntime);
 
-		assertEquals(-1234 + 5678 - 1 * (1 + 2),
-				interpreter.getVariable("MyVar"));
+		assertEquals(-1234 + 5678 - 1 * (1 + 2), interpreter.getVariable("MyVar"));
 	}
 }

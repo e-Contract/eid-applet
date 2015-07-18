@@ -86,15 +86,13 @@ import be.fedict.eid.applet.shared.FinishedMessage;
  * 
  */
 @HandlesMessage(AuthenticationDataMessage.class)
-public class AuthenticationDataMessageHandler implements
-		MessageHandler<AuthenticationDataMessage> {
+public class AuthenticationDataMessageHandler implements MessageHandler<AuthenticationDataMessage> {
 
 	public static final String AUTHENTICATED_USER_IDENTIFIER_SESSION_ATTRIBUTE = "eid.identifier";
 
 	public static String PLAIN_TEXT_DIGEST_ALGO_OID = "2.16.56.1.2.1.3.1";
 
-	private static final Log LOG = LogFactory
-			.getLog(AuthenticationDataMessageHandler.class);
+	private static final Log LOG = LogFactory.getLog(AuthenticationDataMessageHandler.class);
 
 	@InitParam(AuthenticationDataMessageHandler.AUTHN_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<AuthenticationService> authenticationServiceLocator;
@@ -151,9 +149,8 @@ public class AuthenticationDataMessageHandler implements
 	@InitParam(AUTHN_SIGNATURE_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<AuthenticationSignatureService> authenticationSignatureServiceLocator;
 
-	public Object handleMessage(AuthenticationDataMessage message,
-			Map<String, String> httpHeaders, HttpServletRequest request,
-			HttpSession session) throws ServletException {
+	public Object handleMessage(AuthenticationDataMessage message, Map<String, String> httpHeaders,
+			HttpServletRequest request, HttpSession session) throws ServletException {
 		LOG.debug("authentication data message received");
 
 		if (null == message.authnCert) {
@@ -166,8 +163,7 @@ public class AuthenticationDataMessageHandler implements
 			throw new ServletException(msg);
 		}
 		byte[] signatureValue = message.signatureValue;
-		LOG.debug("authn signing certificate subject: "
-				+ message.authnCert.getSubjectX500Principal());
+		LOG.debug("authn signing certificate subject: " + message.authnCert.getSubjectX500Principal());
 		PublicKey signingKey = message.authnCert.getPublicKey();
 
 		if (this.sessionIdChannelBinding) {
@@ -177,29 +173,23 @@ public class AuthenticationDataMessageHandler implements
 			}
 		}
 
-		ChannelBindingService channelBindingService = this.channelBindingServiceLocator
-				.locateService();
+		ChannelBindingService channelBindingService = this.channelBindingServiceLocator.locateService();
 		if (null != this.serverCertificate || null != channelBindingService) {
 			LOG.debug("using server certificate channel binding");
 		}
 
-		if (false == this.sessionIdChannelBinding
-				&& null == this.serverCertificate
-				&& null == channelBindingService) {
+		if (false == this.sessionIdChannelBinding && null == this.serverCertificate && null == channelBindingService) {
 			LOG.warn("not using any secure channel binding");
 		}
 
 		byte[] challenge;
 		try {
-			challenge = AuthenticationChallenge.getAuthnChallenge(session,
-					this.maxMaturity);
+			challenge = AuthenticationChallenge.getAuthnChallenge(session, this.maxMaturity);
 		} catch (SecurityException e) {
-			AuditService auditService = this.auditServiceLocator
-					.locateService();
+			AuditService auditService = this.auditServiceLocator.locateService();
 			if (null != auditService) {
 				String remoteAddress = request.getRemoteAddr();
-				auditService.authenticationError(remoteAddress,
-						message.authnCert);
+				auditService.authenticationError(remoteAddress, message.authnCert);
 			}
 			throw new ServletException("security error: " + e.getMessage(), e);
 		}
@@ -207,21 +197,18 @@ public class AuthenticationDataMessageHandler implements
 		byte[] serverCertificateClientPOV = null;
 		try {
 			if (null != message.serverCertificate) {
-				serverCertificateClientPOV = message.serverCertificate
-						.getEncoded();
+				serverCertificateClientPOV = message.serverCertificate.getEncoded();
 			}
 		} catch (CertificateEncodingException e) {
-			throw new ServletException("server cert decoding error: "
-					+ e.getMessage(), e);
+			throw new ServletException("server cert decoding error: " + e.getMessage(), e);
 		}
 		/*
 		 * We validate the authentication contract using the client-side
 		 * communicated server SSL certificate in case of secure channel
 		 * binding.
 		 */
-		AuthenticationContract authenticationContract = new AuthenticationContract(
-				message.saltValue, this.hostname, this.inetAddress,
-				message.sessionId, serverCertificateClientPOV, challenge);
+		AuthenticationContract authenticationContract = new AuthenticationContract(message.saltValue, this.hostname,
+				this.inetAddress, message.sessionId, serverCertificateClientPOV, challenge);
 		byte[] toBeSigned;
 		try {
 			toBeSigned = authenticationContract.calculateToBeSigned();
@@ -235,12 +222,10 @@ public class AuthenticationDataMessageHandler implements
 			signature.update(toBeSigned);
 			boolean result = signature.verify(signatureValue);
 			if (false == result) {
-				AuditService auditService = this.auditServiceLocator
-						.locateService();
+				AuditService auditService = this.auditServiceLocator.locateService();
 				if (null != auditService) {
 					String remoteAddress = request.getRemoteAddr();
-					auditService.authenticationError(remoteAddress,
-							message.authnCert);
+					auditService.authenticationError(remoteAddress, message.authnCert);
 				}
 				throw new SecurityException("authn signature incorrect");
 			}
@@ -258,42 +243,30 @@ public class AuthenticationDataMessageHandler implements
 			LOG.debug("verifying TransactionMessage signature");
 			byte[] transactionMessageSignature = message.transactionMessageSignature;
 			if (null == transactionMessageSignature) {
-				throw new SecurityException(
-						"missing TransactionMessage signature");
+				throw new SecurityException("missing TransactionMessage signature");
 			}
 			try {
 				Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 				cipher.init(Cipher.DECRYPT_MODE, signingKey);
-				byte[] signatureDigestInfoValue = cipher
-						.doFinal(transactionMessageSignature);
-				ASN1InputStream aIn = new ASN1InputStream(
-						signatureDigestInfoValue);
-				DigestInfo signatureDigestInfo = new DigestInfo(
-						(ASN1Sequence) aIn.readObject());
+				byte[] signatureDigestInfoValue = cipher.doFinal(transactionMessageSignature);
+				ASN1InputStream aIn = new ASN1InputStream(signatureDigestInfoValue);
+				DigestInfo signatureDigestInfo = new DigestInfo((ASN1Sequence) aIn.readObject());
 				if (false == PLAIN_TEXT_DIGEST_ALGO_OID
-						.equals(signatureDigestInfo.getAlgorithmId()
-								.getObjectId().getId())) {
-					throw new SecurityException(
-							"TransactionMessage signature algo OID incorrect");
+						.equals(signatureDigestInfo.getAlgorithmId().getObjectId().getId())) {
+					throw new SecurityException("TransactionMessage signature algo OID incorrect");
 				}
-				if (false == Arrays.equals(transactionMessage.getBytes(),
-						signatureDigestInfo.getDigest())) {
-					throw new SecurityException(
-							"signed TransactionMessage incorrect");
+				if (false == Arrays.equals(transactionMessage.getBytes(), signatureDigestInfo.getDigest())) {
+					throw new SecurityException("signed TransactionMessage incorrect");
 				}
 				LOG.debug("TransactionMessage signature validated");
 			} catch (Exception e) {
 				LOG.error("error verifying TransactionMessage signature", e);
-				AuditService auditService = this.auditServiceLocator
-						.locateService();
+				AuditService auditService = this.auditServiceLocator.locateService();
 				if (null != auditService) {
 					String remoteAddress = request.getRemoteAddr();
-					auditService.authenticationError(remoteAddress,
-							message.authnCert);
+					auditService.authenticationError(remoteAddress, message.authnCert);
 				}
-				throw new SecurityException(
-						"error verifying TransactionMessage signature: "
-								+ e.getMessage());
+				throw new SecurityException("error verifying TransactionMessage signature: " + e.getMessage());
 			}
 		}
 
@@ -301,45 +274,35 @@ public class AuthenticationDataMessageHandler implements
 		 * Secure channel binding verification.
 		 */
 		if (null != channelBindingService) {
-			X509Certificate serverCertificate = channelBindingService
-					.getServerCertificate();
+			X509Certificate serverCertificate = channelBindingService.getServerCertificate();
 			if (null == serverCertificate) {
 				LOG.warn("could not verify secure channel binding as the server does not know its identity yet");
 			} else {
-				if (false == serverCertificate
-						.equals(message.serverCertificate)) {
-					AuditService auditService = this.auditServiceLocator
-							.locateService();
+				if (false == serverCertificate.equals(message.serverCertificate)) {
+					AuditService auditService = this.auditServiceLocator.locateService();
 					if (null != auditService) {
 						String remoteAddress = request.getRemoteAddr();
-						auditService.authenticationError(remoteAddress,
-								message.authnCert);
+						auditService.authenticationError(remoteAddress, message.authnCert);
 					}
-					throw new SecurityException(
-							"secure channel binding identity mismatch");
+					throw new SecurityException("secure channel binding identity mismatch");
 				}
 				LOG.debug("secure channel binding verified");
 			}
 		} else {
 			if (null != this.serverCertificate) {
-				if (false == this.serverCertificate
-						.equals(message.serverCertificate)) {
-					AuditService auditService = this.auditServiceLocator
-							.locateService();
+				if (false == this.serverCertificate.equals(message.serverCertificate)) {
+					AuditService auditService = this.auditServiceLocator.locateService();
 					if (null != auditService) {
 						String remoteAddress = request.getRemoteAddr();
-						auditService.authenticationError(remoteAddress,
-								message.authnCert);
+						auditService.authenticationError(remoteAddress, message.authnCert);
 					}
-					throw new SecurityException(
-							"secure channel binding identity mismatch");
+					throw new SecurityException("secure channel binding identity mismatch");
 				}
 				LOG.debug("secure channel binding verified");
 			}
 		}
 
-		AuthenticationService authenticationService = this.authenticationServiceLocator
-				.locateService();
+		AuthenticationService authenticationService = this.authenticationServiceLocator.locateService();
 		List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
 		certificateChain.add(message.authnCert);
 		certificateChain.add(message.citizenCaCert);
@@ -362,15 +325,11 @@ public class AuthenticationDataMessageHandler implements
 			if ("javax.ejb.EJBException".equals(e.getClass().getName())) {
 				Exception exception;
 				try {
-					Method getCausedByExceptionMethod = e.getClass().getMethod(
-							"getCausedByException", new Class[] {});
-					exception = (Exception) getCausedByExceptionMethod.invoke(
-							e, new Object[] {});
+					Method getCausedByExceptionMethod = e.getClass().getMethod("getCausedByException", new Class[] {});
+					exception = (Exception) getCausedByExceptionMethod.invoke(e, new Object[] {});
 				} catch (Exception e2) {
 					LOG.debug("error: " + e.getMessage(), e);
-					throw new SecurityException(
-							"error retrieving the root cause: "
-									+ e2.getMessage());
+					throw new SecurityException("error retrieving the root cause: " + e2.getMessage());
 				}
 				if (exception instanceof ExpiredCertificateSecurityException) {
 					return new FinishedMessage(ErrorCode.CERTIFICATE_EXPIRED);
@@ -379,22 +338,20 @@ public class AuthenticationDataMessageHandler implements
 					return new FinishedMessage(ErrorCode.CERTIFICATE_REVOKED);
 				}
 				if (exception instanceof TrustCertificateSecurityException) {
-					return new FinishedMessage(
-							ErrorCode.CERTIFICATE_NOT_TRUSTED);
+					return new FinishedMessage(ErrorCode.CERTIFICATE_NOT_TRUSTED);
 				}
 				if (exception instanceof CertificateSecurityException) {
 					return new FinishedMessage(ErrorCode.CERTIFICATE);
 				}
 			}
-			throw new SecurityException("authn service error: "
-					+ e.getMessage());
+			throw new SecurityException("authn service error: " + e.getMessage());
 		}
 
 		String userId = UserIdentifierUtil.getUserId(message.authnCert);
 		LOG.info("authenticated: " + userId + " @ " + request.getRemoteAddr());
 		if (null != this.nrcidSecret) {
-			userId = UserIdentifierUtil.getNonReversibleCitizenIdentifier(
-					userId, this.nrcidOrgId, this.nrcidAppId, this.nrcidSecret);
+			userId = UserIdentifierUtil.getNonReversibleCitizenIdentifier(userId, this.nrcidOrgId, this.nrcidAppId,
+					this.nrcidSecret);
 		}
 		/*
 		 * Some people state that you cannot use the national register number
@@ -407,15 +364,12 @@ public class AuthenticationDataMessageHandler implements
 		/*
 		 * Push authenticated used Id into the HTTP session.
 		 */
-		session.setAttribute(AUTHENTICATED_USER_IDENTIFIER_SESSION_ATTRIBUTE,
-				userId);
+		session.setAttribute(AUTHENTICATED_USER_IDENTIFIER_SESSION_ATTRIBUTE, userId);
 
-		EIdData eidData = (EIdData) session
-				.getAttribute(IdentityDataMessageHandler.EID_SESSION_ATTRIBUTE);
+		EIdData eidData = (EIdData) session.getAttribute(IdentityDataMessageHandler.EID_SESSION_ATTRIBUTE);
 		if (null == eidData) {
 			eidData = new EIdData();
-			session.setAttribute(
-					IdentityDataMessageHandler.EID_SESSION_ATTRIBUTE, eidData);
+			session.setAttribute(IdentityDataMessageHandler.EID_SESSION_ATTRIBUTE, eidData);
 		}
 		eidData.identifier = userId;
 
@@ -434,36 +388,30 @@ public class AuthenticationDataMessageHandler implements
 		 */
 		if (includeIdentity) {
 			if (null == message.identityData) {
-				throw new ServletException(
-						"identity data not included while requested");
+				throw new ServletException("identity data not included while requested");
 			}
 		}
 		if (includeAddress) {
 			if (null == message.addressData) {
-				throw new ServletException(
-						"address data not included while requested");
+				throw new ServletException("address data not included while requested");
 			}
 		}
 		if (includePhoto) {
 			if (null == message.photoData) {
-				throw new ServletException(
-						"photo data not included while requested");
+				throw new ServletException("photo data not included while requested");
 			}
 		}
-		IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
-				.locateService();
+		IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator.locateService();
 		if (null != identityIntegrityService) {
 			if (null == message.rrnCertificate) {
-				throw new ServletException(
-						"national registry certificate not included while requested");
+				throw new ServletException("national registry certificate not included while requested");
 			}
 			List<X509Certificate> rrnCertificateChain = new LinkedList<X509Certificate>();
 			rrnCertificateChain.add(message.rrnCertificate);
 			rrnCertificateChain.add(message.rootCaCert);
 
 			try {
-				identityIntegrityService
-						.checkNationalRegistrationCertificate(rrnCertificateChain);
+				identityIntegrityService.checkNationalRegistrationCertificate(rrnCertificateChain);
 			} catch (ExpiredCertificateSecurityException e) {
 				return new FinishedMessage(ErrorCode.CERTIFICATE_EXPIRED);
 			} catch (RevokedCertificateSecurityException e) {
@@ -476,69 +424,52 @@ public class AuthenticationDataMessageHandler implements
 				if ("javax.ejb.EJBException".equals(e.getClass().getName())) {
 					Exception exception;
 					try {
-						Method getCausedByExceptionMethod = e.getClass()
-								.getMethod("getCausedByException",
-										new Class[] {});
-						exception = (Exception) getCausedByExceptionMethod
-								.invoke(e, new Object[] {});
+						Method getCausedByExceptionMethod = e.getClass().getMethod("getCausedByException",
+								new Class[] {});
+						exception = (Exception) getCausedByExceptionMethod.invoke(e, new Object[] {});
 					} catch (Exception e2) {
 						LOG.debug("error: " + e.getMessage(), e);
-						throw new SecurityException(
-								"error retrieving the root cause: "
-										+ e2.getMessage());
+						throw new SecurityException("error retrieving the root cause: " + e2.getMessage());
 					}
 					if (exception instanceof ExpiredCertificateSecurityException) {
-						return new FinishedMessage(
-								ErrorCode.CERTIFICATE_EXPIRED);
+						return new FinishedMessage(ErrorCode.CERTIFICATE_EXPIRED);
 					}
 					if (exception instanceof RevokedCertificateSecurityException) {
-						return new FinishedMessage(
-								ErrorCode.CERTIFICATE_REVOKED);
+						return new FinishedMessage(ErrorCode.CERTIFICATE_REVOKED);
 					}
 					if (exception instanceof TrustCertificateSecurityException) {
-						return new FinishedMessage(
-								ErrorCode.CERTIFICATE_NOT_TRUSTED);
+						return new FinishedMessage(ErrorCode.CERTIFICATE_NOT_TRUSTED);
 					}
 					if (exception instanceof CertificateSecurityException) {
 						return new FinishedMessage(ErrorCode.CERTIFICATE);
 					}
 				}
-				throw new SecurityException(
-						"error checking the NRN certificate: " + e.getMessage(),
-						e);
+				throw new SecurityException("error checking the NRN certificate: " + e.getMessage(), e);
 			}
 
 			PublicKey rrnPublicKey = message.rrnCertificate.getPublicKey();
 			if (includeIdentity) {
 				if (null == message.identitySignatureData) {
-					throw new ServletException(
-							"identity signature data not included while requested");
+					throw new ServletException("identity signature data not included while requested");
 				}
-				verifySignature(message.rrnCertificate.getSigAlgName(),
-						message.identitySignatureData, rrnPublicKey, request,
-						message.identityData);
+				verifySignature(message.rrnCertificate.getSigAlgName(), message.identitySignatureData, rrnPublicKey,
+						request, message.identityData);
 			}
 			if (includeAddress) {
 				if (null == message.addressSignatureData) {
-					throw new ServletException(
-							"address signature data not included while requested");
+					throw new ServletException("address signature data not included while requested");
 				}
 				byte[] addressFile = trimRight(message.addressData);
-				verifySignature(message.rrnCertificate.getSigAlgName(),
-						message.addressSignatureData, rrnPublicKey, request,
-						addressFile, message.identitySignatureData);
+				verifySignature(message.rrnCertificate.getSigAlgName(), message.addressSignatureData, rrnPublicKey,
+						request, addressFile, message.identitySignatureData);
 			}
 		}
 		if (includeIdentity) {
-			Identity identity = TlvParser.parse(message.identityData,
-					Identity.class);
-			if (false == UserIdentifierUtil.getUserId(message.authnCert)
-					.equals(identity.nationalNumber)) {
+			Identity identity = TlvParser.parse(message.identityData, Identity.class);
+			if (false == UserIdentifierUtil.getUserId(message.authnCert).equals(identity.nationalNumber)) {
 				throw new ServletException("national number mismatch");
 			}
-			session.setAttribute(
-					IdentityDataMessageHandler.IDENTITY_SESSION_ATTRIBUTE,
-					identity);
+			session.setAttribute(IdentityDataMessageHandler.IDENTITY_SESSION_ATTRIBUTE, identity);
 			eidData.identity = identity;
 			auditService = this.auditServiceLocator.locateService();
 			if (null != auditService) {
@@ -546,27 +477,19 @@ public class AuthenticationDataMessageHandler implements
 			}
 		}
 		if (includeAddress) {
-			Address address = TlvParser.parse(message.addressData,
-					Address.class);
-			session.setAttribute(
-					IdentityDataMessageHandler.ADDRESS_SESSION_ATTRIBUTE,
-					address);
+			Address address = TlvParser.parse(message.addressData, Address.class);
+			session.setAttribute(IdentityDataMessageHandler.ADDRESS_SESSION_ATTRIBUTE, address);
 			eidData.address = address;
 		}
 		if (includePhoto) {
 			if (includeIdentity) {
 				byte[] expectedPhotoDigest = eidData.identity.photoDigest;
-				byte[] actualPhotoDigest = digestPhoto(
-						getDigestAlgo(expectedPhotoDigest.length),
-						message.photoData);
-				if (false == Arrays.equals(expectedPhotoDigest,
-						actualPhotoDigest)) {
+				byte[] actualPhotoDigest = digestPhoto(getDigestAlgo(expectedPhotoDigest.length), message.photoData);
+				if (false == Arrays.equals(expectedPhotoDigest, actualPhotoDigest)) {
 					throw new ServletException("photo digest incorrect");
 				}
 			}
-			session.setAttribute(
-					IdentityDataMessageHandler.PHOTO_SESSION_ATTRIBUTE,
-					message.photoData);
+			session.setAttribute(IdentityDataMessageHandler.PHOTO_SESSION_ATTRIBUTE, message.photoData);
 			eidData.photo = message.photoData;
 		}
 		if (includeCertificates) {
@@ -577,27 +500,15 @@ public class AuthenticationDataMessageHandler implements
 				eidData.certs.root = message.rootCaCert;
 				eidData.certs.sign = message.signCert;
 			}
-			session.setAttribute(
-					IdentityDataMessageHandler.AUTHN_CERT_SESSION_ATTRIBUTE,
-					message.authnCert);
-			session.setAttribute(
-					IdentityDataMessageHandler.CA_CERT_SESSION_ATTRIBUTE,
-					message.citizenCaCert);
-			session.setAttribute(
-					IdentityDataMessageHandler.ROOT_CERT_SESSION_ATTRIBTUE,
-					message.rootCaCert);
-			session.setAttribute(
-					IdentityDataMessageHandler.SIGN_CERT_SESSION_ATTRIBUTE,
-					message.signCert);
+			session.setAttribute(IdentityDataMessageHandler.AUTHN_CERT_SESSION_ATTRIBUTE, message.authnCert);
+			session.setAttribute(IdentityDataMessageHandler.CA_CERT_SESSION_ATTRIBUTE, message.citizenCaCert);
+			session.setAttribute(IdentityDataMessageHandler.ROOT_CERT_SESSION_ATTRIBTUE, message.rootCaCert);
+			session.setAttribute(IdentityDataMessageHandler.SIGN_CERT_SESSION_ATTRIBUTE, message.signCert);
 		}
 
 		if (this.includeDataFiles) {
-			session.setAttribute(
-					IdentityDataMessageHandler.EID_DATA_IDENTITY_SESSION_ATTRIBUTE,
-					message.identityData);
-			session.setAttribute(
-					IdentityDataMessageHandler.EID_DATA_ADDRESS_SESSION_ATTRIBUTE,
-					message.addressData);
+			session.setAttribute(IdentityDataMessageHandler.EID_DATA_IDENTITY_SESSION_ATTRIBUTE, message.identityData);
+			session.setAttribute(IdentityDataMessageHandler.EID_DATA_ADDRESS_SESSION_ATTRIBUTE, message.addressData);
 		}
 
 		AuthenticationSignatureService authenticationSignatureService = this.authenticationSignatureServiceLocator
@@ -614,9 +525,8 @@ public class AuthenticationDataMessageHandler implements
 			}
 			AuthenticationSignatureContext authenticationSignatureContext = new AuthenticationSignatureContextImpl(
 					session);
-			PreSignResult preSignResult = authenticationSignatureService
-					.preSign(authnCertificateChain,
-							authenticationSignatureContext);
+			PreSignResult preSignResult = authenticationSignatureService.preSign(authnCertificateChain,
+					authenticationSignatureContext);
 			if (null == preSignResult) {
 				return new FinishedMessage();
 			}
@@ -624,8 +534,8 @@ public class AuthenticationDataMessageHandler implements
 			byte[] computedDigestValue = preSignResult.getDigestInfo().digestValue;
 			String digestAlgo = preSignResult.getDigestInfo().digestAlgo;
 			String authnMessage = preSignResult.getDigestInfo().description;
-			AuthSignRequestMessage authSignRequestMessage = new AuthSignRequestMessage(
-					computedDigestValue, digestAlgo, authnMessage, logoff);
+			AuthSignRequestMessage authSignRequestMessage = new AuthSignRequestMessage(computedDigestValue, digestAlgo,
+					authnMessage, logoff);
 			return authSignRequestMessage;
 		}
 		return new FinishedMessage();
@@ -667,14 +577,11 @@ public class AuthenticationDataMessageHandler implements
 		case 64:
 			return "SHA-512";
 		}
-		throw new RuntimeException(
-				"Failed to find guess algorithm for hash size of " + hashSize
-						+ " bytes");
+		throw new RuntimeException("Failed to find guess algorithm for hash size of " + hashSize + " bytes");
 	}
 
-	private void verifySignature(String signatureAlgo, byte[] signatureData,
-			PublicKey publicKey, HttpServletRequest request, byte[]... data)
-			throws ServletException {
+	private void verifySignature(String signatureAlgo, byte[] signatureData, PublicKey publicKey,
+			HttpServletRequest request, byte[]... data) throws ServletException {
 		Signature signature;
 		try {
 			signature = Signature.getInstance(signatureAlgo);
@@ -692,8 +599,7 @@ public class AuthenticationDataMessageHandler implements
 			}
 			boolean result = signature.verify(signatureData);
 			if (false == result) {
-				AuditService auditService = this.auditServiceLocator
-						.locateService();
+				AuditService auditService = this.auditServiceLocator.locateService();
 				if (null != auditService) {
 					String remoteAddress = request.getRemoteAddr();
 					auditService.identityIntegrityError(remoteAddress);
@@ -705,21 +611,18 @@ public class AuthenticationDataMessageHandler implements
 		}
 	}
 
-	private void checkSessionIdChannelBinding(
-			AuthenticationDataMessage message, HttpServletRequest request) {
+	private void checkSessionIdChannelBinding(AuthenticationDataMessage message, HttpServletRequest request) {
 		LOG.debug("using TLS session Id channel binding");
 		byte[] sessionId = message.sessionId;
 		/*
 		 * Next is Tomcat specific.
 		 */
-		String actualSessionId = (String) request
-				.getAttribute("javax.servlet.request.ssl_session");
+		String actualSessionId = (String) request.getAttribute("javax.servlet.request.ssl_session");
 		if (null == actualSessionId) {
 			/*
 			 * Servlet specs v3.0
 			 */
-			actualSessionId = (String) request
-					.getAttribute("javax.servlet.request.ssl_session_id");
+			actualSessionId = (String) request.getAttribute("javax.servlet.request.ssl_session_id");
 		}
 		if (null == actualSessionId) {
 			LOG.warn("could not verify the SSL session identifier");
@@ -727,8 +630,7 @@ public class AuthenticationDataMessageHandler implements
 		}
 		if (false == Arrays.equals(sessionId, Hex.decode(actualSessionId))) {
 			LOG.warn("SSL session Id mismatch");
-			LOG.debug("signed SSL session Id: "
-					+ new String(Hex.encode(sessionId)));
+			LOG.debug("signed SSL session Id: " + new String(Hex.encode(sessionId)));
 			LOG.debug("actual SSL session Id: " + actualSessionId);
 			throw new SecurityException("SSL session Id mismatch");
 		}
@@ -739,19 +641,15 @@ public class AuthenticationDataMessageHandler implements
 		String channelBindingServerCertificate = config
 				.getInitParameter(HelloMessageHandler.CHANNEL_BINDING_SERVER_CERTIFICATE);
 		if (null != channelBindingServerCertificate) {
-			File serverCertificateFile = new File(
-					channelBindingServerCertificate);
+			File serverCertificateFile = new File(channelBindingServerCertificate);
 			if (false == serverCertificateFile.exists()) {
-				throw new ServletException("server certificate not found: "
-						+ serverCertificateFile);
+				throw new ServletException("server certificate not found: " + serverCertificateFile);
 			}
 			byte[] encodedServerCertificate;
 			try {
-				encodedServerCertificate = FileUtils
-						.readFileToByteArray(serverCertificateFile);
+				encodedServerCertificate = FileUtils.readFileToByteArray(serverCertificateFile);
 			} catch (IOException e) {
-				throw new ServletException("error reading server certificate: "
-						+ e.getMessage(), e);
+				throw new ServletException("error reading server certificate: " + e.getMessage(), e);
 			}
 			this.serverCertificate = getCertificate(encodedServerCertificate);
 		}
@@ -762,16 +660,14 @@ public class AuthenticationDataMessageHandler implements
 		try {
 			certificateFactory = CertificateFactory.getInstance("X.509");
 		} catch (CertificateException e) {
-			throw new RuntimeException("cert factory error: " + e.getMessage(),
-					e);
+			throw new RuntimeException("cert factory error: " + e.getMessage(), e);
 		}
 		try {
 			X509Certificate certificate = (X509Certificate) certificateFactory
 					.generateCertificate(new ByteArrayInputStream(certData));
 			return certificate;
 		} catch (CertificateException e) {
-			throw new RuntimeException("certificate decoding error: "
-					+ e.getMessage(), e);
+			throw new RuntimeException("certificate decoding error: " + e.getMessage(), e);
 		}
 	}
 }

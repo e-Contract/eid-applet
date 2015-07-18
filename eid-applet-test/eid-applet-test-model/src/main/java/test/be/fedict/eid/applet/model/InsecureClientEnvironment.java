@@ -20,7 +20,6 @@ package test.be.fedict.eid.applet.model;
 
 import be.fedict.eid.applet.service.spi.SecureClientEnvironmentService;
 
-public interface InsecureClientEnvironment extends
-		SecureClientEnvironmentService {
+public interface InsecureClientEnvironment extends SecureClientEnvironmentService {
 
 }

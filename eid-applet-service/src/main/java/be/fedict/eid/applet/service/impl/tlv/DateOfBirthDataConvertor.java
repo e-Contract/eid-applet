@@ -30,14 +30,11 @@ import org.apache.commons.logging.LogFactory;
  * @author Frank Cornelis
  * 
  */
-public class DateOfBirthDataConvertor implements
-		DataConvertor<GregorianCalendar> {
+public class DateOfBirthDataConvertor implements DataConvertor<GregorianCalendar> {
 
-	private static final Log LOG = LogFactory
-			.getLog(DateOfBirthDataConvertor.class);
+	private static final Log LOG = LogFactory.getLog(DateOfBirthDataConvertor.class);
 
-	public GregorianCalendar convert(byte[] value)
-			throws DataConvertorException {
+	public GregorianCalendar convert(byte[] value) throws DataConvertorException {
 		String dateOfBirthStr;
 		try {
 			dateOfBirthStr = new String(value, "UTF-8").trim();
@@ -58,14 +55,12 @@ public class DateOfBirthDataConvertor implements
 			String dayStr = dateOfBirthStr.substring(0, spaceIdx);
 			LOG.debug("day: \"" + dayStr + "\"");
 			int day = Integer.parseInt(dayStr);
-			String monthStr = dateOfBirthStr.substring(spaceIdx + 1,
-					dateOfBirthStr.length() - 4 - 1);
+			String monthStr = dateOfBirthStr.substring(spaceIdx + 1, dateOfBirthStr.length() - 4 - 1);
 			if (monthStr.endsWith(".")) {
 				monthStr = monthStr.substring(0, monthStr.length() - 1);
 			}
 			LOG.debug("month: \"" + monthStr + "\"");
-			String yearStr = dateOfBirthStr
-					.substring(dateOfBirthStr.length() - 4);
+			String yearStr = dateOfBirthStr.substring(dateOfBirthStr.length() - 4);
 			LOG.debug("year: \"" + yearStr + "\"");
 			int year = Integer.parseInt(yearStr);
 			int month = toMonth(monthStr);
@@ -82,17 +77,13 @@ public class DateOfBirthDataConvertor implements
 			return new GregorianCalendar(Integer.parseInt(dateOfBirthStr), 0, 1);
 		}
 
-		throw new DataConvertorException("Unsupported Birth Date Format ["
-				+ dateOfBirthStr + "]");
+		throw new DataConvertorException("Unsupported Birth Date Format [" + dateOfBirthStr + "]");
 	}
 
-	private static final String[][] MONTHS = new String[][] {
-			new String[] { "JAN" }, new String[] { "FEV", "FEB" },
-			new String[] { "MARS", "MAAR", "MÄR" },
-			new String[] { "AVR", "APR" }, new String[] { "MAI", "MEI" },
-			new String[] { "JUIN", "JUN" }, new String[] { "JUIL", "JUL" },
-			new String[] { "AOUT", "AUG" }, new String[] { "SEPT", "SEP" },
-			new String[] { "OCT", "OKT" }, new String[] { "NOV" },
+	private static final String[][] MONTHS = new String[][] { new String[] { "JAN" }, new String[] { "FEV", "FEB" },
+			new String[] { "MARS", "MAAR", "MÄR" }, new String[] { "AVR", "APR" }, new String[] { "MAI", "MEI" },
+			new String[] { "JUIN", "JUN" }, new String[] { "JUIL", "JUL" }, new String[] { "AOUT", "AUG" },
+			new String[] { "SEPT", "SEP" }, new String[] { "OCT", "OKT" }, new String[] { "NOV" },
 			new String[] { "DEC", "DEZ" } };
 
 	private int toMonth(String monthStr) throws DataConvertorException {

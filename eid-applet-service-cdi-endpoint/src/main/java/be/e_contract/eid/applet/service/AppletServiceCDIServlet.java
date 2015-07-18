@@ -34,8 +34,7 @@ public class AppletServiceCDIServlet extends AbstractAppletServiceServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Log LOG = LogFactory
-			.getLog(AppletServiceCDIServlet.class);
+	private static final Log LOG = LogFactory.getLog(AppletServiceCDIServlet.class);
 
 	@Inject
 	@Any
@@ -45,8 +44,6 @@ public class AppletServiceCDIServlet extends AbstractAppletServiceServlet {
 	protected <T> MessageHandler<T> getMessageHandler(Class<T> messageClass) {
 		LOG.debug("get message handler: " + messageClass.getName());
 		return (MessageHandler<T>) this.messageHandlers
-				.select(new HandlesQualifier(
-						(Class<? extends AbstractProtocolMessage>) messageClass))
-				.get();
+				.select(new HandlesQualifier((Class<? extends AbstractProtocolMessage>) messageClass)).get();
 	}
 }

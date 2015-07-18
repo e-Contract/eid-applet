@@ -100,9 +100,8 @@ public class JSONServletTest {
 		KeyPair keyPair = MiscTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(5);
-		X509Certificate certificate = MiscTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
-				.getPrivate(), false, 0, null, null);
+		X509Certificate certificate = MiscTestUtils.generateCertificate(keyPair.getPublic(), "CN=Test", notBefore,
+				notAfter, null, keyPair.getPrivate(), false, 0, null, null);
 		eIdData.certs.authn = certificate;
 		eIdData.certs.sign = certificate;
 		eIdData.certs.ca = certificate;
@@ -125,8 +124,7 @@ public class JSONServletTest {
 		JSONObject identityJSONObject = new JSONObject();
 		eidJSONObject.put("identity", identityJSONObject);
 		identityJSONObject.put("nationalNumber", "12345678");
-		identityJSONObject
-				.put("dateOfBirth", new GregorianCalendar().getTime());
+		identityJSONObject.put("dateOfBirth", new GregorianCalendar().getTime());
 
 		LOG.debug("JSON result: " + eidJSONObject.toJSONString());
 	}

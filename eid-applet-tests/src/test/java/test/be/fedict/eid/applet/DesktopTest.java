@@ -34,13 +34,9 @@ public class DesktopTest {
 	public void mailto() throws Exception {
 		Desktop desktop = Desktop.getDesktop();
 		URI mailUri = new URI("mailto:frank.cornelis@fedict.be?subject="
-				+ URLEncoder.encode("Hello World", "UTF-8").replaceAll("\\+",
-						"%20")
-				+ "&cc="
-				+ URLEncoder.encode("frank.cornelis@fedict.be", "UTF-8")
-				+ "&body="
-				+ URLEncoder.encode("test body message", "UTF-8").replaceAll(
-						"\\+", "%20"));
+				+ URLEncoder.encode("Hello World", "UTF-8").replaceAll("\\+", "%20") + "&cc="
+				+ URLEncoder.encode("frank.cornelis@fedict.be", "UTF-8") + "&body="
+				+ URLEncoder.encode("test body message", "UTF-8").replaceAll("\\+", "%20"));
 		LOG.debug("mail uri: " + mailUri);
 		desktop.mail(mailUri);
 	}

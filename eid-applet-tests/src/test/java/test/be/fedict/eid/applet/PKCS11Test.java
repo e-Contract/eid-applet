@@ -47,8 +47,7 @@ public class PKCS11Test {
 	public void testPKCS1viaPKCS11() throws Exception {
 		File tmpConfigFile = File.createTempFile("pkcs11-", "conf");
 		tmpConfigFile.deleteOnExit();
-		PrintWriter configWriter = new PrintWriter(new FileOutputStream(
-				tmpConfigFile), true);
+		PrintWriter configWriter = new PrintWriter(new FileOutputStream(tmpConfigFile), true);
 		configWriter.println("name=SmartCard");
 		configWriter.println("library=/usr/lib/libbeidpkcs11.so.0");
 		configWriter.println("slotListIndex=2");
@@ -57,8 +56,7 @@ public class PKCS11Test {
 		Security.addProvider(provider);
 		KeyStore keyStore = KeyStore.getInstance("PKCS11", provider);
 		keyStore.load(null, null);
-		PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore.getEntry(
-				"Authentication", null);
+		PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore.getEntry("Authentication", null);
 		PrivateKey privateKey = privateKeyEntry.getPrivateKey();
 		Signature signature = Signature.getInstance("SHA1withRSA");
 		signature.initSign(privateKey);
@@ -66,15 +64,13 @@ public class PKCS11Test {
 		signature.update(toBeSigned);
 		byte[] signatureValue = signature.sign();
 
-		X509Certificate certificate = (X509Certificate) privateKeyEntry
-				.getCertificate();
+		X509Certificate certificate = (X509Certificate) privateKeyEntry.getCertificate();
 		RSAPublicKey publicKey = (RSAPublicKey) certificate.getPublicKey();
 		BigInteger signatureValueBigInteger = new BigInteger(signatureValue);
-		BigInteger messageBigInteger = signatureValueBigInteger.modPow(
-				publicKey.getPublicExponent(), publicKey.getModulus());
-		LOG.debug("original message: "
-				+ new String(Hex.encodeHex(messageBigInteger.toByteArray())));
-		
+		BigInteger messageBigInteger = signatureValueBigInteger.modPow(publicKey.getPublicExponent(),
+				publicKey.getModulus());
+		LOG.debug("original message: " + new String(Hex.encodeHex(messageBigInteger.toByteArray())));
+
 		// LOG.debug("ASN.1 signature: " + ASN1Dump.dumpAsString(obj)
 	}
 
@@ -82,8 +78,7 @@ public class PKCS11Test {
 	public void testTokenHasBeenRemovedError() throws Exception {
 		File tmpConfigFile = File.createTempFile("pkcs11-", "conf");
 		tmpConfigFile.deleteOnExit();
-		PrintWriter configWriter = new PrintWriter(new FileOutputStream(
-				tmpConfigFile), true);
+		PrintWriter configWriter = new PrintWriter(new FileOutputStream(tmpConfigFile), true);
 		configWriter.println("name=SmartCard");
 		configWriter.println("library=/usr/lib/libbeidpkcs11.so.0");
 		configWriter.println("slotListIndex=1");
@@ -93,19 +88,16 @@ public class PKCS11Test {
 		KeyStore keyStore = KeyStore.getInstance("PKCS11", provider);
 		keyStore.load(null, null);
 		{
-			PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore
-					.getEntry("Authentication", null);
+			PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore.getEntry("Authentication", null);
 			Signature signature = Signature.getInstance("SHA1withRSA");
 			signature.initSign(privateKeyEntry.getPrivateKey());
 			byte[] toBeSigned = "hello world".getBytes();
 			signature.update(toBeSigned);
 			byte[] signatureValue = signature.sign();
 		}
-		JOptionPane.showMessageDialog(null,
-				"Please remove and re-insert the token...");
+		JOptionPane.showMessageDialog(null, "Please remove and re-insert the token...");
 		{
-			PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore
-					.getEntry("Authentication", null);
+			PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore.getEntry("Authentication", null);
 			Signature signature = Signature.getInstance("SHA1withRSA");
 			signature.initSign(privateKeyEntry.getPrivateKey());
 			byte[] toBeSigned = "hello world".getBytes();
@@ -118,8 +110,7 @@ public class PKCS11Test {
 	public void testTokenHasBeenRemovedWorkaround() throws Exception {
 		File tmpConfigFile = File.createTempFile("pkcs11-", "conf");
 		tmpConfigFile.deleteOnExit();
-		PrintWriter configWriter = new PrintWriter(new FileOutputStream(
-				tmpConfigFile), true);
+		PrintWriter configWriter = new PrintWriter(new FileOutputStream(tmpConfigFile), true);
 		configWriter.println("name=SmartCard");
 		configWriter.println("library=/usr/lib/libbeidpkcs11.so.0");
 		configWriter.println("slotListIndex=1");
@@ -129,8 +120,7 @@ public class PKCS11Test {
 		{
 			KeyStore keyStore = KeyStore.getInstance("PKCS11", provider);
 			keyStore.load(null, null);
-			PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore
-					.getEntry("Authentication", null);
+			PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore.getEntry("Authentication", null);
 			Signature signature = Signature.getInstance("SHA1withRSA");
 			signature.initSign(privateKeyEntry.getPrivateKey());
 			byte[] toBeSigned = "hello world".getBytes();
@@ -138,16 +128,14 @@ public class PKCS11Test {
 			byte[] signatureValue = signature.sign();
 
 		}
-		JOptionPane.showMessageDialog(null,
-				"Please remove and re-insert the token...");
+		JOptionPane.showMessageDialog(null, "Please remove and re-insert the token...");
 		Security.removeProvider(provider.getName());
 		{
 			SunPKCS11 provider2 = new SunPKCS11(tmpConfigFile.getAbsolutePath());
 			Security.addProvider(provider2);
 			KeyStore keyStore = KeyStore.getInstance("PKCS11", provider2);
 			keyStore.load(null, null);
-			PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore
-					.getEntry("Authentication", null);
+			PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore.getEntry("Authentication", null);
 			Signature signature = Signature.getInstance("SHA1withRSA");
 			signature.initSign(privateKeyEntry.getPrivateKey());
 			byte[] toBeSigned = "hello world".getBytes();

@@ -45,9 +45,8 @@ public class ExplicitSignaturePolicyService implements SignaturePolicyService {
 	 * @param signaturePolicyDownloadUrl
 	 *            the optional download URL.
 	 */
-	public ExplicitSignaturePolicyService(String signaturePolicyIdentifier,
-			byte[] signaturePolicyDocument, String signaturePolicyDescription,
-			String signaturePolicyDownloadUrl) {
+	public ExplicitSignaturePolicyService(String signaturePolicyIdentifier, byte[] signaturePolicyDocument,
+			String signaturePolicyDescription, String signaturePolicyDownloadUrl) {
 		super();
 		this.signaturePolicyIdentifier = signaturePolicyIdentifier;
 		this.signaturePolicyDocument = signaturePolicyDocument;

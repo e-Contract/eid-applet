@@ -63,11 +63,9 @@ import be.fedict.eid.applet.shared.SignRequestMessage;
  * 
  */
 @HandlesMessage(ClientEnvironmentMessage.class)
-public class ClientEnvironmentMessageHandler implements
-		MessageHandler<ClientEnvironmentMessage> {
+public class ClientEnvironmentMessageHandler implements MessageHandler<ClientEnvironmentMessage> {
 
-	private static final Log LOG = LogFactory
-			.getLog(ClientEnvironmentMessageHandler.class);
+	private static final Log LOG = LogFactory.getLog(ClientEnvironmentMessageHandler.class);
 
 	@InitParam(HelloMessageHandler.SECURE_CLIENT_ENV_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<SecureClientEnvironmentService> secureClientEnvServiceLocator;
@@ -131,39 +129,29 @@ public class ClientEnvironmentMessageHandler implements
 	@InitParam(HelloMessageHandler.SECURE_CARD_READER_SERVICE_INIT_PARAM_NAME)
 	private ServiceLocator<SecureCardReaderService> secureCardReaderServiceLocator;
 
-	public Object handleMessage(ClientEnvironmentMessage message,
-			Map<String, String> httpHeaders, HttpServletRequest request,
-			HttpSession session) throws ServletException {
-		SecureClientEnvironmentService secureClientEnvService = this.secureClientEnvServiceLocator
-				.locateService();
+	public Object handleMessage(ClientEnvironmentMessage message, Map<String, String> httpHeaders,
+			HttpServletRequest request, HttpSession session) throws ServletException {
+		SecureClientEnvironmentService secureClientEnvService = this.secureClientEnvServiceLocator.locateService();
 		if (null == secureClientEnvService) {
-			throw new ServletException(
-					"no secure client env service configured");
+			throw new ServletException("no secure client env service configured");
 		}
 		String remoteAddress = request.getRemoteAddr();
-		Integer sslKeySize = (Integer) request
-				.getAttribute("javax.servlet.request.key_size");
+		Integer sslKeySize = (Integer) request.getAttribute("javax.servlet.request.key_size");
 		String userAgent = httpHeaders.get("user-agent");
-		String sslCipherSuite = (String) request
-				.getAttribute("javax.servlet.request.cipher_suite");
+		String sslCipherSuite = (String) request.getAttribute("javax.servlet.request.cipher_suite");
 		try {
-			secureClientEnvService.checkSecureClientEnvironment(
-					message.javaVersion, message.javaVendor, message.osName,
-					message.osArch, message.osVersion, userAgent,
-					message.navigatorAppName, message.navigatorAppVersion,
-					message.navigatorUserAgent, remoteAddress, sslKeySize,
-					sslCipherSuite, message.readerList);
+			secureClientEnvService.checkSecureClientEnvironment(message.javaVersion, message.javaVendor, message.osName,
+					message.osArch, message.osVersion, userAgent, message.navigatorAppName, message.navigatorAppVersion,
+					message.navigatorUserAgent, remoteAddress, sslKeySize, sslCipherSuite, message.readerList);
 		} catch (InsecureClientEnvironmentException e) {
 			return new InsecureClientMessage(e.isWarnOnly());
 		}
 		if (this.changePin || this.unblockPin) {
-			AdministrationMessage administrationMessage = new AdministrationMessage(
-					this.changePin, this.unblockPin, this.logoff,
-					this.removeCard, this.requireSecureReader);
+			AdministrationMessage administrationMessage = new AdministrationMessage(this.changePin, this.unblockPin,
+					this.logoff, this.removeCard, this.requireSecureReader);
 			return administrationMessage;
 		}
-		SignatureService signatureService = this.signatureServiceLocator
-				.locateService();
+		SignatureService signatureService = this.signatureServiceLocator.locateService();
 		if (null != signatureService) {
 			// TODO DRY refactor: is a copy-paste from HelloMessageHandler
 			String filesDigestAlgo = signatureService.getFilesDigestAlgorithm();
@@ -178,14 +166,12 @@ public class ClientEnvironmentMessageHandler implements
 				IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
 						.locateService();
 				boolean includeIntegrityData = null != identityIntegrityService;
-				IdentityService identityService = this.identityServiceLocator
-						.locateService();
+				IdentityService identityService = this.identityServiceLocator.locateService();
 				boolean includeIdentity;
 				boolean includeAddress;
 				boolean includePhoto;
 				if (null != identityService) {
-					IdentityRequest identityRequest = identityService
-							.getIdentityRequest();
+					IdentityRequest identityRequest = identityService.getIdentityRequest();
 					includeIdentity = identityRequest.includeIdentity();
 					includeAddress = identityRequest.includeAddress();
 					includePhoto = identityRequest.includePhoto();
@@ -199,15 +185,13 @@ public class ClientEnvironmentMessageHandler implements
 				requestContext.setIncludeAddress(includeAddress);
 				requestContext.setIncludePhoto(includePhoto);
 				SignCertificatesRequestMessage signCertificatesRequestMessage = new SignCertificatesRequestMessage(
-						includeIdentity, includeAddress, includePhoto,
-						includeIntegrityData);
+						includeIdentity, includeAddress, includePhoto, includeIntegrityData);
 				return signCertificatesRequestMessage;
 			}
 
 			DigestInfo digestInfo;
 			try {
-				digestInfo = signatureService.preSign(null, null, null, null,
-						null);
+				digestInfo = signatureService.preSign(null, null, null, null, null);
 			} catch (NoSuchAlgorithmException e) {
 				throw new ServletException("no such algo: " + e.getMessage(), e);
 			} catch (AuthorizationException e) {
@@ -215,44 +199,34 @@ public class ClientEnvironmentMessageHandler implements
 			}
 
 			// also save it in the session for later verification
-			SignatureDataMessageHandler.setDigestValue(digestInfo.digestValue,
-					digestInfo.digestAlgo, session);
+			SignatureDataMessageHandler.setDigestValue(digestInfo.digestValue, digestInfo.digestAlgo, session);
 
-			IdentityService identityService = this.identityServiceLocator
-					.locateService();
+			IdentityService identityService = this.identityServiceLocator.locateService();
 			boolean removeCard;
 			if (null != identityService) {
-				IdentityRequest identityRequest = identityService
-						.getIdentityRequest();
+				IdentityRequest identityRequest = identityService.getIdentityRequest();
 				removeCard = identityRequest.removeCard();
 			} else {
 				removeCard = this.removeCard;
 			}
 
-			SignRequestMessage signRequestMessage = new SignRequestMessage(
-					digestInfo.digestValue, digestInfo.digestAlgo,
-					digestInfo.description, this.logoff, removeCard,
-					this.requireSecureReader);
+			SignRequestMessage signRequestMessage = new SignRequestMessage(digestInfo.digestValue,
+					digestInfo.digestAlgo, digestInfo.description, this.logoff, removeCard, this.requireSecureReader);
 			return signRequestMessage;
 		}
-		AuthenticationService authenticationService = this.authenticationServiceLocator
-				.locateService();
+		AuthenticationService authenticationService = this.authenticationServiceLocator.locateService();
 		if (null != authenticationService) {
-			byte[] challenge = AuthenticationChallenge
-					.generateChallenge(session);
-			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
-					.locateService();
+			byte[] challenge = AuthenticationChallenge.generateChallenge(session);
+			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator.locateService();
 			boolean includeIntegrityData = null != identityIntegrityService;
 			boolean includeIdentity;
 			boolean includeAddress;
 			boolean includePhoto;
 			boolean includeCertificates;
 			boolean removeCard;
-			IdentityService identityService = this.identityServiceLocator
-					.locateService();
+			IdentityService identityService = this.identityServiceLocator.locateService();
 			if (null != identityService) {
-				IdentityRequest identityRequest = identityService
-						.getIdentityRequest();
+				IdentityRequest identityRequest = identityService.getIdentityRequest();
 				includeIdentity = identityRequest.includeIdentity();
 				includeAddress = identityRequest.includeAddress();
 				includePhoto = identityRequest.includePhoto();
@@ -272,43 +246,32 @@ public class ClientEnvironmentMessageHandler implements
 			requestContext.setIncludeCertificates(includeCertificates);
 
 			String transactionMessage = null;
-			SecureCardReaderService secureCardReaderService = this.secureCardReaderServiceLocator
-					.locateService();
+			SecureCardReaderService secureCardReaderService = this.secureCardReaderServiceLocator.locateService();
 			if (null != secureCardReaderService) {
-				transactionMessage = secureCardReaderService
-						.getTransactionMessage();
+				transactionMessage = secureCardReaderService.getTransactionMessage();
 				if (null != transactionMessage
 						&& transactionMessage.length() > SecureCardReaderService.TRANSACTION_MESSAGE_MAX_SIZE) {
-					transactionMessage = transactionMessage
-							.substring(
-									0,
-									SecureCardReaderService.TRANSACTION_MESSAGE_MAX_SIZE);
+					transactionMessage = transactionMessage.substring(0,
+							SecureCardReaderService.TRANSACTION_MESSAGE_MAX_SIZE);
 				}
 				LOG.debug("transaction message: " + transactionMessage);
 			}
 			requestContext.setTransactionMessage(transactionMessage);
 
-			AuthenticationRequestMessage authenticationRequestMessage = new AuthenticationRequestMessage(
-					challenge, this.includeHostname, this.includeInetAddress,
-					this.logoff, this.preLogoff, removeCard,
-					this.sessionIdChannelBinding,
-					this.serverCertificateChannelBinding, includeIdentity,
-					includeCertificates, includeAddress, includePhoto,
-					includeIntegrityData, this.requireSecureReader,
+			AuthenticationRequestMessage authenticationRequestMessage = new AuthenticationRequestMessage(challenge,
+					this.includeHostname, this.includeInetAddress, this.logoff, this.preLogoff, removeCard,
+					this.sessionIdChannelBinding, this.serverCertificateChannelBinding, includeIdentity,
+					includeCertificates, includeAddress, includePhoto, includeIntegrityData, this.requireSecureReader,
 					transactionMessage);
 			return authenticationRequestMessage;
 		} else {
-			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
-					.locateService();
+			IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator.locateService();
 			boolean includeIntegrityData = null != identityIntegrityService;
-			PrivacyService privacyService = this.privacyServiceLocator
-					.locateService();
+			PrivacyService privacyService = this.privacyServiceLocator.locateService();
 			String identityDataUsage;
 			if (null != privacyService) {
-				String clientLanguage = HelloMessageHandler
-						.getClientLanguage(session);
-				identityDataUsage = privacyService
-						.getIdentityDataUsage(clientLanguage);
+				String clientLanguage = HelloMessageHandler.getClientLanguage(session);
+				identityDataUsage = privacyService.getIdentityDataUsage(clientLanguage);
 			} else {
 				identityDataUsage = null;
 			}
@@ -316,11 +279,9 @@ public class ClientEnvironmentMessageHandler implements
 			boolean includePhoto;
 			boolean includeCertificates;
 			boolean removeCard;
-			IdentityService identityService = this.identityServiceLocator
-					.locateService();
+			IdentityService identityService = this.identityServiceLocator.locateService();
 			if (null != identityService) {
-				IdentityRequest identityRequest = identityService
-						.getIdentityRequest();
+				IdentityRequest identityRequest = identityService.getIdentityRequest();
 				includeAddress = identityRequest.includeAddress();
 				includePhoto = identityRequest.includePhoto();
 				includeCertificates = identityRequest.includeCertificates();
@@ -335,9 +296,8 @@ public class ClientEnvironmentMessageHandler implements
 			requestContext.setIncludeAddress(includeAddress);
 			requestContext.setIncludePhoto(includePhoto);
 			requestContext.setIncludeCertificates(includeCertificates);
-			IdentificationRequestMessage responseMessage = new IdentificationRequestMessage(
-					includeAddress, includePhoto, includeIntegrityData,
-					includeCertificates, removeCard, identityDataUsage);
+			IdentificationRequestMessage responseMessage = new IdentificationRequestMessage(includeAddress,
+					includePhoto, includeIntegrityData, includeCertificates, removeCard, identityDataUsage);
 			return responseMessage;
 		}
 	}
@@ -346,14 +306,12 @@ public class ClientEnvironmentMessageHandler implements
 		this.secureRandom = new SecureRandom();
 		this.secureRandom.setSeed(System.currentTimeMillis());
 
-		String hostname = config
-				.getInitParameter(HelloMessageHandler.HOSTNAME_INIT_PARAM_NAME);
+		String hostname = config.getInitParameter(HelloMessageHandler.HOSTNAME_INIT_PARAM_NAME);
 		if (null != hostname) {
 			this.includeHostname = true;
 		}
 
-		String inetAddress = config
-				.getInitParameter(HelloMessageHandler.INET_ADDRESS_INIT_PARAM_NAME);
+		String inetAddress = config.getInitParameter(HelloMessageHandler.INET_ADDRESS_INIT_PARAM_NAME);
 		if (null != inetAddress) {
 			this.includeInetAddress = true;
 		}
@@ -363,8 +321,7 @@ public class ClientEnvironmentMessageHandler implements
 		if (null != channelBindingServerCertificate) {
 			this.serverCertificateChannelBinding = true;
 		}
-		String channelBindingService = config
-				.getInitParameter(HelloMessageHandler.CHANNEL_BINDING_SERVICE);
+		String channelBindingService = config.getInitParameter(HelloMessageHandler.CHANNEL_BINDING_SERVICE);
 		if (null != channelBindingService) {
 			this.serverCertificateChannelBinding = true;
 		}

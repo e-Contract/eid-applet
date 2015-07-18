@@ -26,11 +26,9 @@ import java.util.GregorianCalendar;
  * @author Frank Cornelis
  * 
  */
-public class ValidityDateDataConvertor implements
-		DataConvertor<GregorianCalendar> {
+public class ValidityDateDataConvertor implements DataConvertor<GregorianCalendar> {
 
-	public GregorianCalendar convert(byte[] value)
-			throws DataConvertorException {
+	public GregorianCalendar convert(byte[] value) throws DataConvertorException {
 		String dateStr = new String(value);
 		int day = Integer.parseInt(dateStr.substring(0, 2));
 		int month = Integer.parseInt(dateStr.substring(3, 5));

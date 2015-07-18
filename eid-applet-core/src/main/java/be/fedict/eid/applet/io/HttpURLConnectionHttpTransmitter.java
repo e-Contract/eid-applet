@@ -46,15 +46,14 @@ public class HttpURLConnectionHttpTransmitter implements HttpTransmitter {
 	 * @param noChunkedTransferEncoding
 	 *            set to <code>true</code> to disable chunked transfer-encoding.
 	 */
-	public HttpURLConnectionHttpTransmitter(HttpURLConnection connection,
-			String userAgent, boolean noChunkedTransferEncoding) {
+	public HttpURLConnectionHttpTransmitter(HttpURLConnection connection, String userAgent,
+			boolean noChunkedTransferEncoding) {
 		this.connection = connection;
 		this.noChunkedTransferEncoding = noChunkedTransferEncoding;
 
 		this.connection.setUseCaches(false);
 		this.connection.setAllowUserInteraction(false);
-		this.connection.setRequestProperty("Content-Type",
-				"application/octet-stream");
+		this.connection.setRequestProperty("Content-Type", "application/octet-stream");
 		if (false == this.noChunkedTransferEncoding) {
 			this.connection.setChunkedStreamingMode(1);
 		}
@@ -70,10 +69,12 @@ public class HttpURLConnectionHttpTransmitter implements HttpTransmitter {
 		}
 	}
 
+	@Override
 	public void addHeader(String headerName, String headerValue) {
 		this.connection.setRequestProperty(headerName, headerValue);
 	}
 
+	@Override
 	public void setBody(byte[] bodyValue) {
 		OutputStream connectionOutputStream;
 		try {
@@ -90,6 +91,7 @@ public class HttpURLConnectionHttpTransmitter implements HttpTransmitter {
 		}
 	}
 
+	@Override
 	public boolean isSecure() {
 		if ("localhost".equals(this.connection.getURL().getHost())) {
 			/*

@@ -85,17 +85,14 @@ import be.fedict.eid.applet.service.spi.IdentityDTO;
 @EJB(name = "java:global/test/XmlSignatureServiceBean", beanInterface = XmlSignatureService.class)
 public class XmlSignatureServiceBean implements XmlSignatureService {
 
-	private static final Log LOG = LogFactory
-			.getLog(XmlSignatureServiceBean.class);
+	private static final Log LOG = LogFactory.getLog(XmlSignatureServiceBean.class);
 
-	public void postSign(byte[] signatureValue,
-			List<X509Certificate> signingCertificateChain) {
+	public void postSign(byte[] signatureValue, List<X509Certificate> signingCertificateChain) {
 		LOG.debug("postSign");
 
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}
@@ -111,10 +108,9 @@ public class XmlSignatureServiceBean implements XmlSignatureService {
 		}
 
 		// insert signature value
-		NodeList signatureValueNodeList = document.getElementsByTagNameNS(
-				javax.xml.crypto.dsig.XMLSignature.XMLNS, "SignatureValue");
-		Element signatureValueElement = (Element) signatureValueNodeList
-				.item(0);
+		NodeList signatureValueNodeList = document.getElementsByTagNameNS(javax.xml.crypto.dsig.XMLSignature.XMLNS,
+				"SignatureValue");
+		Element signatureValueElement = (Element) signatureValueNodeList.item(0);
 		signatureValueElement.setTextContent(Base64.encode(signatureValue));
 
 		try {
@@ -127,8 +123,7 @@ public class XmlSignatureServiceBean implements XmlSignatureService {
 	}
 
 	private String toString(Document document)
-			throws TransformerConfigurationException,
-			TransformerFactoryConfigurationError, TransformerException {
+			throws TransformerConfigurationException, TransformerFactoryConfigurationError, TransformerException {
 		String documentStr;
 		Source source = new DOMSource(document);
 		StringWriter stringWriter = new StringWriter();
@@ -140,28 +135,22 @@ public class XmlSignatureServiceBean implements XmlSignatureService {
 		return documentStr;
 	}
 
-	private Document getDocument(String documentStr)
-			throws ParserConfigurationException, SAXException, IOException {
+	private Document getDocument(String documentStr) throws ParserConfigurationException, SAXException, IOException {
 		StringReader stringReader = new StringReader(documentStr);
 		InputSource inputSource = new InputSource(stringReader);
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.parse(inputSource);
 		return document;
 	}
 
-	public DigestInfo preSign(List<DigestInfo> digestInfos,
-			List<X509Certificate> signingCertificateChain,
-			IdentityDTO identity, AddressDTO address, byte[] photo)
-			throws NoSuchAlgorithmException {
+	public DigestInfo preSign(List<DigestInfo> digestInfos, List<X509Certificate> signingCertificateChain,
+			IdentityDTO identity, AddressDTO address, byte[] photo) throws NoSuchAlgorithmException {
 		LOG.debug("preSign");
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}
@@ -172,34 +161,26 @@ public class XmlSignatureServiceBean implements XmlSignatureService {
 
 		byte[] digestValue;
 		try {
-			digestValue = getXmlSignatureDigestValue(digestAlgo, digestInfos,
-					httpSession);
+			digestValue = getXmlSignatureDigestValue(digestAlgo, digestInfos, httpSession);
 		} catch (Exception e) {
-			throw new RuntimeException(
-					"XML signature error: " + e.getMessage(), e);
+			throw new RuntimeException("XML signature error: " + e.getMessage(), e);
 		}
 
 		String description = "Test XML Document";
 		return new DigestInfo(digestValue, digestAlgo, description);
 	}
 
-	private byte[] getXmlSignatureDigestValue(String digestAlgo,
-			List<DigestInfo> digestInfos, HttpSession httpSession)
-			throws ParserConfigurationException, NoSuchAlgorithmException,
-			InvalidAlgorithmParameterException, MarshalException,
-			javax.xml.crypto.dsig.XMLSignatureException,
-			TransformerFactoryConfigurationError, TransformerException,
-			MalformedURLException {
+	private byte[] getXmlSignatureDigestValue(String digestAlgo, List<DigestInfo> digestInfos, HttpSession httpSession)
+			throws ParserConfigurationException, NoSuchAlgorithmException, InvalidAlgorithmParameterException,
+			MarshalException, javax.xml.crypto.dsig.XMLSignatureException, TransformerFactoryConfigurationError,
+			TransformerException, MalformedURLException {
 
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.newDocument();
 
-		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
-				"DOM", new XMLDSigRI());
+		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM", new XMLDSigRI());
 
 		Key key = new Key() {
 			private static final long serialVersionUID = 1L;
@@ -217,36 +198,28 @@ public class XmlSignatureServiceBean implements XmlSignatureService {
 			}
 		};
 		XMLSignContext signContext = new DOMSignContext(key, document);
-		signContext.putNamespacePrefix(
-				javax.xml.crypto.dsig.XMLSignature.XMLNS, "ds");
+		signContext.putNamespacePrefix(javax.xml.crypto.dsig.XMLSignature.XMLNS, "ds");
 
 		List<Reference> references = new LinkedList<Reference>();
 		for (DigestInfo digestInfo : digestInfos) {
 			byte[] documentDigestValue = digestInfo.digestValue;
 
-			DigestMethod digestMethod = signatureFactory.newDigestMethod(
-					getXmlDigestAlgo(digestInfo.digestAlgo), null);
+			DigestMethod digestMethod = signatureFactory.newDigestMethod(getXmlDigestAlgo(digestInfo.digestAlgo), null);
 
-			String uri = FilenameUtils.getName(new File(digestInfo.description)
-					.toURI().toURL().getFile());
+			String uri = FilenameUtils.getName(new File(digestInfo.description).toURI().toURL().getFile());
 
-			Reference reference = signatureFactory.newReference(uri,
-					digestMethod, null, null, null, documentDigestValue);
+			Reference reference = signatureFactory.newReference(uri, digestMethod, null, null, null,
+					documentDigestValue);
 			references.add(reference);
 		}
 
-		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(
-				getSignatureMethod(digestAlgo), null);
-		CanonicalizationMethod canonicalizationMethod = signatureFactory
-				.newCanonicalizationMethod(
-						CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
-						(C14NMethodParameterSpec) null);
-		javax.xml.crypto.dsig.SignedInfo signedInfo = signatureFactory
-				.newSignedInfo(canonicalizationMethod, signatureMethod,
-						references);
+		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(getSignatureMethod(digestAlgo), null);
+		CanonicalizationMethod canonicalizationMethod = signatureFactory.newCanonicalizationMethod(
+				CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null);
+		javax.xml.crypto.dsig.SignedInfo signedInfo = signatureFactory.newSignedInfo(canonicalizationMethod,
+				signatureMethod, references);
 
-		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory
-				.newXMLSignature(signedInfo, null);
+		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory.newXMLSignature(signedInfo, null);
 		DOMXMLSignature domXmlSignature = (DOMXMLSignature) xmlSignature;
 		domXmlSignature.marshal(document, "ds", (DOMCryptoContext) signContext);
 
@@ -308,15 +281,13 @@ public class XmlSignatureServiceBean implements XmlSignatureService {
 		LOG.debug("getFileDigestAlgoritm()");
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}
 
 		HttpSession session = httpServletRequest.getSession();
-		String filesDigestAlgo = (String) session
-				.getAttribute("filesDigestAlgo");
+		String filesDigestAlgo = (String) session.getAttribute("filesDigestAlgo");
 		LOG.debug("files digest algo: " + filesDigestAlgo);
 
 		return filesDigestAlgo;

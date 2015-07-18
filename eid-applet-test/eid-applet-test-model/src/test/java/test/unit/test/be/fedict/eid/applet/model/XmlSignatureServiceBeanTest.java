@@ -128,8 +128,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import test.be.fedict.eid.applet.model.XmlSignatureServiceBean;
 import be.fedict.eid.applet.service.spi.DigestInfo;
+import test.be.fedict.eid.applet.model.XmlSignatureServiceBean;
 
 public class XmlSignatureServiceBeanTest {
 
@@ -154,8 +154,7 @@ public class XmlSignatureServiceBeanTest {
 		}
 
 		@Override
-		public XMLSignatureInput engineResolve(Attr uri, String baseURI)
-				throws ResourceResolverException {
+		public XMLSignatureInput engineResolve(Attr uri, String baseURI) throws ResourceResolverException {
 			LOG.debug("engine resolve: " + uri.getValue());
 			if (false == this.resources.containsKey(uri.getValue())) {
 				return null;
@@ -164,8 +163,7 @@ public class XmlSignatureServiceBeanTest {
 		}
 	}
 
-	private static final Log LOG = LogFactory
-			.getLog(XmlSignatureServiceBeanTest.class);
+	private static final Log LOG = LogFactory.getLog(XmlSignatureServiceBeanTest.class);
 
 	private XmlSignatureServiceBean testedInstance;
 
@@ -175,32 +173,25 @@ public class XmlSignatureServiceBeanTest {
 		this.testedInstance = new XmlSignatureServiceBean();
 	}
 
-	public static final byte[] SHA1_DIGEST_INFO_PREFIX = new byte[] { 0x30,
-			0x1f, 0x30, 0x07, 0x06, 0x05, 0x2b, 0x0e, 0x03, 0x02, 0x1a, 0x04,
-			0x14 };
+	public static final byte[] SHA1_DIGEST_INFO_PREFIX = new byte[] { 0x30, 0x1f, 0x30, 0x07, 0x06, 0x05, 0x2b, 0x0e,
+			0x03, 0x02, 0x1a, 0x04, 0x14 };
 
 	@Test
 	public void testFilenamesForUri() throws Exception {
 		LOG.debug("test.txt: " + new URI("test.txt"));
 		LOG.debug("1234.txt: " + new URI("1234.txt"));
-		LOG.debug("hello world.txt: "
-				+ new File("hello world.txt").toURI().toURL().getFile());
-		LOG.debug("hello world.txt: "
-				+ FilenameUtils.getName(new File("hello world.txt").toURI()
-						.toURL().getFile()));
+		LOG.debug("hello world.txt: " + new File("hello world.txt").toURI().toURL().getFile());
+		LOG.debug("hello world.txt: " + FilenameUtils.getName(new File("hello world.txt").toURI().toURL().getFile()));
 	}
 
 	@Test
 	public void testExternalXmlSignature() throws Exception {
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.newDocument();
 
-		XMLSignature xmlSignature = new XMLSignature(document, "",
-				XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1,
+		XMLSignature xmlSignature = new XMLSignature(document, "", XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1,
 				Canonicalizer.ALGO_ID_C14N_WITH_COMMENTS);
 
 		Element signatureElement = xmlSignature.getElement();
@@ -214,15 +205,13 @@ public class XmlSignatureServiceBeanTest {
 
 		Transforms transforms = new Transforms(document);
 		transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_WITH_COMMENTS);
-		xmlSignature.addDocument("#" + id, transforms,
-				MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA512, null, null);
+		xmlSignature.addDocument("#" + id, transforms, MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA512, null, null);
 
 		KeyPair keyPair = generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = generateCertificate(keyPair.getPublic(),
-				"CN=Test", notBefore, notAfter, null, keyPair.getPrivate(),
-				true, 0, null, new KeyUsage(KeyUsage.nonRepudiation));
+		X509Certificate certificate = generateCertificate(keyPair.getPublic(), "CN=Test", notBefore, notAfter, null,
+				keyPair.getPrivate(), true, 0, null, new KeyUsage(KeyUsage.nonRepudiation));
 
 		xmlSignature.addKeyInfo(certificate);
 
@@ -232,8 +221,7 @@ public class XmlSignatureServiceBeanTest {
 
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
 		byte[] digestValue = messageDigest.digest(octets);
-		byte[] digestInfoValue = ArrayUtils.addAll(SHA1_DIGEST_INFO_PREFIX,
-				digestValue);
+		byte[] digestInfoValue = ArrayUtils.addAll(SHA1_DIGEST_INFO_PREFIX, digestValue);
 
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
@@ -241,8 +229,7 @@ public class XmlSignatureServiceBeanTest {
 
 		String encodedSignatureValue = Base64.encode(signatureValue);
 		Element xmlSignatureElement = xmlSignature.getElement();
-		Element signatureValueElement = (Element) XPathAPI.selectSingleNode(
-				xmlSignatureElement, "ds:SignatureValue");
+		Element signatureValueElement = (Element) XPathAPI.selectSingleNode(xmlSignatureElement, "ds:SignatureValue");
 		signatureValueElement.setTextContent(encodedSignatureValue);
 
 		xmlSignature = new XMLSignature(xmlSignatureElement, null);
@@ -258,66 +245,51 @@ public class XmlSignatureServiceBeanTest {
 		LOG.debug("signed document: " + signedDocumentStr);
 
 		File tmpFile = File.createTempFile("signature-", ".xml");
-		IOUtils.write(signedDocumentStr.getBytes(), new FileOutputStream(
-				tmpFile));
+		IOUtils.write(signedDocumentStr.getBytes(), new FileOutputStream(tmpFile));
 
 		StringReader stringReader = new StringReader(signedDocumentStr);
 		InputSource inputSource = new InputSource(stringReader);
 		Document signedDocument = documentBuilder.parse(inputSource);
 
-		signatureElement = (Element) XPathAPI.selectSingleNode(signedDocument,
-				"ds:Signature");
+		signatureElement = (Element) XPathAPI.selectSingleNode(signedDocument, "ds:Signature");
 		assertNotNull(signatureElement);
 
 		xmlSignature = new XMLSignature(signatureElement, null);
 		LOG.debug("tmp signature file: " + tmpFile.getAbsolutePath());
-		boolean signatureResult = xmlSignature.checkSignatureValue(keyPair
-				.getPublic());
+		boolean signatureResult = xmlSignature.checkSignatureValue(keyPair.getPublic());
 		assertTrue(signatureResult);
 	}
 
 	@Test
 	public void testJsr105ReferenceUri() throws Exception {
-		String uri = FilenameUtils.getName(new File("foo bar.txt").toURI()
-				.toURL().getFile());
+		String uri = FilenameUtils.getName(new File("foo bar.txt").toURI().toURL().getFile());
 
 		KeyPair keyPair = generateKeyPair();
 
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.newDocument();
 
-		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
-				"DOM", new XMLDSigRI());
+		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM", new XMLDSigRI());
 
-		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(),
-				document);
+		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(), document);
 
 		byte[] externalDocument = "hello world".getBytes();
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
 		messageDigest.update(externalDocument);
 		byte[] documentDigestValue = messageDigest.digest();
 
-		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				DigestMethod.SHA1, null);
-		Reference reference = signatureFactory.newReference(uri, digestMethod,
-				null, null, null, documentDigestValue);
+		DigestMethod digestMethod = signatureFactory.newDigestMethod(DigestMethod.SHA1, null);
+		Reference reference = signatureFactory.newReference(uri, digestMethod, null, null, null, documentDigestValue);
 
-		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(
-				SignatureMethod.RSA_SHA1, null);
-		CanonicalizationMethod canonicalizationMethod = signatureFactory
-				.newCanonicalizationMethod(
-						CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
-						(C14NMethodParameterSpec) null);
-		javax.xml.crypto.dsig.SignedInfo signedInfo = signatureFactory
-				.newSignedInfo(canonicalizationMethod, signatureMethod,
-						Collections.singletonList(reference));
+		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(SignatureMethod.RSA_SHA1, null);
+		CanonicalizationMethod canonicalizationMethod = signatureFactory.newCanonicalizationMethod(
+				CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null);
+		javax.xml.crypto.dsig.SignedInfo signedInfo = signatureFactory.newSignedInfo(canonicalizationMethod,
+				signatureMethod, Collections.singletonList(reference));
 
-		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory
-				.newXMLSignature(signedInfo, null);
+		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory.newXMLSignature(signedInfo, null);
 
 		xmlSignature.sign(signContext);
 	}
@@ -327,53 +299,39 @@ public class XmlSignatureServiceBeanTest {
 		KeyPair keyPair = generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = generateCertificate(keyPair.getPublic(),
-				"CN=Test", notBefore, notAfter, null, keyPair.getPrivate(),
-				true, 0, null, new KeyUsage(KeyUsage.nonRepudiation));
+		X509Certificate certificate = generateCertificate(keyPair.getPublic(), "CN=Test", notBefore, notAfter, null,
+				keyPair.getPrivate(), true, 0, null, new KeyUsage(KeyUsage.nonRepudiation));
 
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.newDocument();
 
-		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
-				"DOM", new XMLDSigRI());
+		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM", new XMLDSigRI());
 
-		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(),
-				document);
-		signContext.putNamespacePrefix(
-				javax.xml.crypto.dsig.XMLSignature.XMLNS, "ds");
+		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(), document);
+		signContext.putNamespacePrefix(javax.xml.crypto.dsig.XMLSignature.XMLNS, "ds");
 
 		byte[] externalDocument = "hello world".getBytes();
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
 		messageDigest.update(externalDocument);
 		byte[] documentDigestValue = messageDigest.digest();
 
-		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				DigestMethod.SHA1, null);
-		Reference reference = signatureFactory.newReference("some-uri",
-				digestMethod, null, null, null, documentDigestValue);
+		DigestMethod digestMethod = signatureFactory.newDigestMethod(DigestMethod.SHA1, null);
+		Reference reference = signatureFactory.newReference("some-uri", digestMethod, null, null, null,
+				documentDigestValue);
 
-		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(
-				SignatureMethod.RSA_SHA1, null);
-		CanonicalizationMethod canonicalizationMethod = signatureFactory
-				.newCanonicalizationMethod(
-						CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
-						(C14NMethodParameterSpec) null);
-		javax.xml.crypto.dsig.SignedInfo signedInfo = signatureFactory
-				.newSignedInfo(canonicalizationMethod, signatureMethod,
-						Collections.singletonList(reference));
+		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(SignatureMethod.RSA_SHA1, null);
+		CanonicalizationMethod canonicalizationMethod = signatureFactory.newCanonicalizationMethod(
+				CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null);
+		javax.xml.crypto.dsig.SignedInfo signedInfo = signatureFactory.newSignedInfo(canonicalizationMethod,
+				signatureMethod, Collections.singletonList(reference));
 
 		KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
-		X509Data x509Data = keyInfoFactory.newX509Data(Collections
-				.singletonList(certificate));
-		KeyInfo keyInfo = keyInfoFactory.newKeyInfo(Collections
-				.singletonList(x509Data));
+		X509Data x509Data = keyInfoFactory.newX509Data(Collections.singletonList(certificate));
+		KeyInfo keyInfo = keyInfoFactory.newKeyInfo(Collections.singletonList(x509Data));
 
-		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory
-				.newXMLSignature(signedInfo, keyInfo);
+		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory.newXMLSignature(signedInfo, keyInfo);
 		DOMXMLSignature domXmlSignature = (DOMXMLSignature) xmlSignature;
 		domXmlSignature.marshal(document, "ds", (DOMCryptoContext) signContext);
 
@@ -384,18 +342,16 @@ public class XmlSignatureServiceBeanTest {
 
 		MessageDigest jcaMessageDigest = MessageDigest.getInstance("SHA1");
 		byte[] digestValue = jcaMessageDigest.digest(octets);
-		byte[] digestInfoValue = ArrayUtils.addAll(SHA1_DIGEST_INFO_PREFIX,
-				digestValue);
+		byte[] digestInfoValue = ArrayUtils.addAll(SHA1_DIGEST_INFO_PREFIX, digestValue);
 
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
 		byte[] signatureValue = cipher.doFinal(digestInfoValue);
 
-		NodeList signatureValueNodeList = document.getElementsByTagNameNS(
-				javax.xml.crypto.dsig.XMLSignature.XMLNS, "SignatureValue");
+		NodeList signatureValueNodeList = document.getElementsByTagNameNS(javax.xml.crypto.dsig.XMLSignature.XMLNS,
+				"SignatureValue");
 		assertEquals(1, signatureValueNodeList.getLength());
-		Element signatureValueElement = (Element) signatureValueNodeList
-				.item(0);
+		Element signatureValueElement = (Element) signatureValueNodeList.item(0);
 		signatureValueElement.setTextContent(Base64.encode(signatureValue));
 
 		Source source = new DOMSource(document);
@@ -414,17 +370,14 @@ public class XmlSignatureServiceBeanTest {
 		InputSource inputSource = new InputSource(stringReader);
 		Document signedDocument = documentBuilder.parse(inputSource);
 
-		Element signatureElement = (Element) XPathAPI.selectSingleNode(
-				signedDocument, "ds:Signature");
+		Element signatureElement = (Element) XPathAPI.selectSingleNode(signedDocument, "ds:Signature");
 		assertNotNull(signatureElement);
 
-		XMLSignature apacheXmlSignature = new XMLSignature(signatureElement,
-				null);
+		XMLSignature apacheXmlSignature = new XMLSignature(signatureElement, null);
 		ResourceTestResolver resourceResolver = new ResourceTestResolver();
 		resourceResolver.addResource("some-uri", "hello world".getBytes());
 		apacheXmlSignature.addResourceResolver(resourceResolver);
-		boolean signatureResult = apacheXmlSignature
-				.checkSignatureValue(keyPair.getPublic());
+		boolean signatureResult = apacheXmlSignature.checkSignatureValue(keyPair.getPublic());
 		assertTrue(signatureResult);
 
 		LOG.debug("file: " + tmpFile.getAbsolutePath());
@@ -433,38 +386,29 @@ public class XmlSignatureServiceBeanTest {
 	private KeyPair generateKeyPair() throws Exception {
 		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
 		SecureRandom random = new SecureRandom();
-		keyPairGenerator.initialize(new RSAKeyGenParameterSpec(1024,
-				RSAKeyGenParameterSpec.F4), random);
+		keyPairGenerator.initialize(new RSAKeyGenParameterSpec(1024, RSAKeyGenParameterSpec.F4), random);
 		KeyPair keyPair = keyPairGenerator.generateKeyPair();
 		return keyPair;
 	}
 
-	private SubjectKeyIdentifier createSubjectKeyId(PublicKey publicKey)
-			throws IOException {
-		ByteArrayInputStream bais = new ByteArrayInputStream(
-				publicKey.getEncoded());
-		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo(
-				(ASN1Sequence) new ASN1InputStream(bais).readObject());
+	private SubjectKeyIdentifier createSubjectKeyId(PublicKey publicKey) throws IOException {
+		ByteArrayInputStream bais = new ByteArrayInputStream(publicKey.getEncoded());
+		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(bais).readObject());
 		return new SubjectKeyIdentifier(info);
 	}
 
-	private AuthorityKeyIdentifier createAuthorityKeyId(PublicKey publicKey)
-			throws IOException {
+	private AuthorityKeyIdentifier createAuthorityKeyId(PublicKey publicKey) throws IOException {
 
-		ByteArrayInputStream bais = new ByteArrayInputStream(
-				publicKey.getEncoded());
-		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo(
-				(ASN1Sequence) new ASN1InputStream(bais).readObject());
+		ByteArrayInputStream bais = new ByteArrayInputStream(publicKey.getEncoded());
+		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(bais).readObject());
 
 		return new AuthorityKeyIdentifier(info);
 	}
 
-	private X509Certificate generateCertificate(PublicKey subjectPublicKey,
-			String subjectDn, DateTime notBefore, DateTime notAfter,
-			X509Certificate issuerCertificate, PrivateKey issuerPrivateKey,
-			boolean caFlag, int pathLength, String ocspUri, KeyUsage keyUsage)
-			throws IOException, InvalidKeyException, IllegalStateException,
-			NoSuchAlgorithmException, SignatureException, CertificateException {
+	private X509Certificate generateCertificate(PublicKey subjectPublicKey, String subjectDn, DateTime notBefore,
+			DateTime notAfter, X509Certificate issuerCertificate, PrivateKey issuerPrivateKey, boolean caFlag,
+			int pathLength, String ocspUri, KeyUsage keyUsage) throws IOException, InvalidKeyException,
+					IllegalStateException, NoSuchAlgorithmException, SignatureException, CertificateException {
 		String signatureAlgorithm = "SHA1withRSA";
 		X509V3CertificateGenerator certificateGenerator = new X509V3CertificateGenerator();
 		certificateGenerator.reset();
@@ -474,49 +418,40 @@ public class XmlSignatureServiceBeanTest {
 		certificateGenerator.setNotAfter(notAfter.toDate());
 		X509Principal issuerDN;
 		if (null != issuerCertificate) {
-			issuerDN = new X509Principal(issuerCertificate
-					.getSubjectX500Principal().toString());
+			issuerDN = new X509Principal(issuerCertificate.getSubjectX500Principal().toString());
 		} else {
 			issuerDN = new X509Principal(subjectDn);
 		}
 		certificateGenerator.setIssuerDN(issuerDN);
 		certificateGenerator.setSubjectDN(new X509Principal(subjectDn));
-		certificateGenerator.setSerialNumber(new BigInteger(128,
-				new SecureRandom()));
+		certificateGenerator.setSerialNumber(new BigInteger(128, new SecureRandom()));
 
-		certificateGenerator.addExtension(X509Extensions.SubjectKeyIdentifier,
-				false, createSubjectKeyId(subjectPublicKey));
+		certificateGenerator.addExtension(X509Extensions.SubjectKeyIdentifier, false,
+				createSubjectKeyId(subjectPublicKey));
 		PublicKey issuerPublicKey;
 		issuerPublicKey = subjectPublicKey;
-		certificateGenerator.addExtension(
-				X509Extensions.AuthorityKeyIdentifier, false,
+		certificateGenerator.addExtension(X509Extensions.AuthorityKeyIdentifier, false,
 				createAuthorityKeyId(issuerPublicKey));
 
 		if (caFlag) {
 			if (-1 == pathLength) {
-				certificateGenerator.addExtension(
-						X509Extensions.BasicConstraints, false,
-						new BasicConstraints(true));
+				certificateGenerator.addExtension(X509Extensions.BasicConstraints, false, new BasicConstraints(true));
 			} else {
-				certificateGenerator.addExtension(
-						X509Extensions.BasicConstraints, false,
+				certificateGenerator.addExtension(X509Extensions.BasicConstraints, false,
 						new BasicConstraints(pathLength));
 			}
 		}
 
 		if (null != ocspUri) {
-			GeneralName ocspName = new GeneralName(
-					GeneralName.uniformResourceIdentifier, ocspUri);
+			GeneralName ocspName = new GeneralName(GeneralName.uniformResourceIdentifier, ocspUri);
 			AuthorityInformationAccess authorityInformationAccess = new AuthorityInformationAccess(
 					X509ObjectIdentifiers.ocspAccessMethod, ocspName);
-			certificateGenerator.addExtension(
-					X509Extensions.AuthorityInfoAccess.getId(), false,
+			certificateGenerator.addExtension(X509Extensions.AuthorityInfoAccess.getId(), false,
 					authorityInformationAccess);
 		}
 
 		if (null != keyUsage) {
-			certificateGenerator.addExtension(X509Extensions.KeyUsage, true,
-					keyUsage);
+			certificateGenerator.addExtension(X509Extensions.KeyUsage, true, keyUsage);
 		}
 
 		X509Certificate certificate;
@@ -528,11 +463,9 @@ public class XmlSignatureServiceBeanTest {
 		 * security provider instead of BouncyCastle. If we don't do this trick
 		 * we might run into trouble when trying to use the CertPath validator.
 		 */
-		CertificateFactory certificateFactory = CertificateFactory
-				.getInstance("X.509");
+		CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
 		certificate = (X509Certificate) certificateFactory
-				.generateCertificate(new ByteArrayInputStream(certificate
-						.getEncoded()));
+				.generateCertificate(new ByteArrayInputStream(certificate.getEncoded()));
 		return certificate;
 	}
 
@@ -542,9 +475,8 @@ public class XmlSignatureServiceBeanTest {
 		KeyPair keyPair = generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = generateCertificate(keyPair.getPublic(),
-				"CN=Test", notBefore, notAfter, null, keyPair.getPrivate(),
-				true, 0, null, new KeyUsage(KeyUsage.nonRepudiation));
+		X509Certificate certificate = generateCertificate(keyPair.getPublic(), "CN=Test", notBefore, notAfter, null,
+				keyPair.getPrivate(), true, 0, null, new KeyUsage(KeyUsage.nonRepudiation));
 
 		byte[] toBeSigned = "hello world".getBytes();
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
@@ -553,30 +485,23 @@ public class XmlSignatureServiceBeanTest {
 		List<DigestInfo> digestInfos = new LinkedList<DigestInfo>();
 		digestInfos.add(new DigestInfo(digestValue, "SHA-1", "test-file-name"));
 
-		HttpServletRequest mockHttpServletRequest = EasyMock
-				.createMock(HttpServletRequest.class);
+		HttpServletRequest mockHttpServletRequest = EasyMock.createMock(HttpServletRequest.class);
 		HttpSession mockHttpSession = EasyMock.createMock(HttpSession.class);
-		EasyMock.expect(mockHttpServletRequest.getSession()).andStubReturn(
-				mockHttpSession);
+		EasyMock.expect(mockHttpServletRequest.getSession()).andStubReturn(mockHttpSession);
 		// XML signature digest algorithm
-		EasyMock.expect(mockHttpSession.getAttribute("signDigestAlgo"))
-				.andStubReturn("SHA-1");
+		EasyMock.expect(mockHttpSession.getAttribute("signDigestAlgo")).andStubReturn("SHA-1");
 
-		PolicyContextHandler handler = new PolicyContextTestHandler(
-				mockHttpServletRequest);
-		PolicyContext.registerHandler("javax.servlet.http.HttpServletRequest",
-				handler, false);
+		PolicyContextHandler handler = new PolicyContextTestHandler(mockHttpServletRequest);
+		PolicyContext.registerHandler("javax.servlet.http.HttpServletRequest", handler, false);
 
 		Capture<String> xmlDocumentCapture = new Capture<String>();
-		mockHttpSession.setAttribute(EasyMock.eq("xmlDocument"),
-				EasyMock.capture(xmlDocumentCapture));
+		mockHttpSession.setAttribute(EasyMock.eq("xmlDocument"), EasyMock.capture(xmlDocumentCapture));
 
 		// prepare
 		EasyMock.replay(mockHttpServletRequest, mockHttpSession);
 
 		// operate
-		DigestInfo resultDigestInfo = this.testedInstance.preSign(digestInfos,
-				null, null, null, null);
+		DigestInfo resultDigestInfo = this.testedInstance.preSign(digestInfos, null, null, null, null);
 
 		// verify
 		EasyMock.verify(mockHttpServletRequest, mockHttpSession);
@@ -588,8 +513,7 @@ public class XmlSignatureServiceBeanTest {
 		LOG.debug("description: " + resultDigestInfo.description);
 
 		// create the external signature
-		byte[] digestInfoValue = ArrayUtils.addAll(SHA1_DIGEST_INFO_PREFIX,
-				resultDigestInfo.digestValue);
+		byte[] digestInfoValue = ArrayUtils.addAll(SHA1_DIGEST_INFO_PREFIX, resultDigestInfo.digestValue);
 
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
@@ -601,12 +525,9 @@ public class XmlSignatureServiceBeanTest {
 		// setup
 		EasyMock.reset(mockHttpServletRequest, mockHttpSession);
 
-		EasyMock.expect(mockHttpServletRequest.getSession()).andStubReturn(
-				mockHttpSession);
-		EasyMock.expect(mockHttpSession.getAttribute("xmlDocument")).andReturn(
-				xmlDocumentCapture.getValue());
-		mockHttpSession.setAttribute(EasyMock.eq("xmlDocument"),
-				EasyMock.capture(xmlDocumentCapture));
+		EasyMock.expect(mockHttpServletRequest.getSession()).andStubReturn(mockHttpSession);
+		EasyMock.expect(mockHttpSession.getAttribute("xmlDocument")).andReturn(xmlDocumentCapture.getValue());
+		mockHttpSession.setAttribute(EasyMock.eq("xmlDocument"), EasyMock.capture(xmlDocumentCapture));
 
 		// prepare
 		EasyMock.replay(mockHttpServletRequest, mockHttpSession);
@@ -620,31 +541,25 @@ public class XmlSignatureServiceBeanTest {
 		String signedDocumentStr = xmlDocumentCapture.getValue();
 		StringReader stringReader = new StringReader(signedDocumentStr);
 		InputSource inputSource = new InputSource(stringReader);
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document signedDocument = documentBuilder.parse(inputSource);
 
-		Element signatureElement = (Element) XPathAPI.selectSingleNode(
-				signedDocument, "ds:Signature");
+		Element signatureElement = (Element) XPathAPI.selectSingleNode(signedDocument, "ds:Signature");
 		assertNotNull(signatureElement);
 
-		XMLSignature apacheXmlSignature = new XMLSignature(signatureElement,
-				null);
+		XMLSignature apacheXmlSignature = new XMLSignature(signatureElement, null);
 		ResourceTestResolver resourceResolver = new ResourceTestResolver();
 		resourceResolver.addResource("test-file-name", toBeSigned);
 		apacheXmlSignature.addResourceResolver(resourceResolver);
-		boolean signatureResult = apacheXmlSignature
-				.checkSignatureValue(keyPair.getPublic());
+		boolean signatureResult = apacheXmlSignature.checkSignatureValue(keyPair.getPublic());
 		assertTrue(signatureResult);
 
 		LOG.debug("XML signature: " + xmlDocumentCapture.getValue());
 	}
 
-	private static class PolicyContextTestHandler implements
-			PolicyContextHandler {
+	private static class PolicyContextTestHandler implements PolicyContextHandler {
 
 		private final HttpServletRequest httpServletRequest;
 
@@ -652,8 +567,7 @@ public class XmlSignatureServiceBeanTest {
 			this.httpServletRequest = httpServletRequest;
 		}
 
-		public Object getContext(String key, Object data)
-				throws PolicyContextException {
+		public Object getContext(String key, Object data) throws PolicyContextException {
 			if (false == "javax.servlet.http.HttpServletRequest".equals(key)) {
 				return null;
 			}
@@ -674,8 +588,7 @@ public class XmlSignatureServiceBeanTest {
 		MyTestProvider provider = new MyTestProvider();
 		assertTrue(-1 != Security.addProvider(provider));
 
-		MessageDigest messageDigest = MessageDigest.getInstance("SHA-1",
-				MyTestProvider.NAME);
+		MessageDigest messageDigest = MessageDigest.getInstance("SHA-1", MyTestProvider.NAME);
 		assertEquals(MyTestProvider.NAME, messageDigest.getProvider().getName());
 
 		messageDigest.update("hello world".getBytes());

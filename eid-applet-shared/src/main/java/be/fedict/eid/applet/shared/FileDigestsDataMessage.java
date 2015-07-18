@@ -40,8 +40,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 public class FileDigestsDataMessage extends AbstractProtocolMessage {
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator
-	public static final String TYPE = FileDigestsDataMessage.class
-			.getSimpleName();
+	public static final String TYPE = FileDigestsDataMessage.class.getSimpleName();
 
 	@HttpBody
 	@NotNull

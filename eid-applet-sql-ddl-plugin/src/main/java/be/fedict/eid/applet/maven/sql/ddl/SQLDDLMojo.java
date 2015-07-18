@@ -138,8 +138,7 @@ public class SQLDDLMojo extends AbstractMojo {
 		getLog().info("SQL DDL script generator");
 
 		File outputFile = new File(this.outputDirectory, this.outputName);
-		getLog().info(
-				"Output SQL DDL script file: " + outputFile.getAbsolutePath());
+		getLog().info("Output SQL DDL script file: " + outputFile.getAbsolutePath());
 
 		this.outputDirectory.mkdirs();
 		try {
@@ -149,35 +148,28 @@ public class SQLDDLMojo extends AbstractMojo {
 		}
 
 		for (ArtifactItem artifactItem : this.artifactItems) {
-			getLog().info(
-					"artifact: " + artifactItem.getGroupId() + ":"
-							+ artifactItem.getArtifactId());
+			getLog().info("artifact: " + artifactItem.getGroupId() + ":" + artifactItem.getArtifactId());
 			List<Dependency> dependencies = this.project.getDependencies();
 			String version = null;
 			for (Dependency dependency : dependencies) {
-				if (StringUtils.equals(dependency.getArtifactId(),
-						artifactItem.getArtifactId())
-						&& StringUtils.equals(dependency.getGroupId(),
-								artifactItem.getGroupId())) {
+				if (StringUtils.equals(dependency.getArtifactId(), artifactItem.getArtifactId())
+						&& StringUtils.equals(dependency.getGroupId(), artifactItem.getGroupId())) {
 					version = dependency.getVersion();
 					break;
 				}
 			}
 			getLog().info("artifact version: " + version);
 			VersionRange versionRange = VersionRange.createFromVersion(version);
-			Artifact artifact = this.artifactFactory.createDependencyArtifact(
-					artifactItem.getGroupId(), artifactItem.getArtifactId(),
-					versionRange, "jar", null, Artifact.SCOPE_COMPILE);
+			Artifact artifact = this.artifactFactory.createDependencyArtifact(artifactItem.getGroupId(),
+					artifactItem.getArtifactId(), versionRange, "jar", null, Artifact.SCOPE_COMPILE);
 			try {
 				this.resolver.resolve(artifact, this.remoteRepos, this.local);
 			} catch (ArtifactResolutionException e) {
-				throw new MojoExecutionException("Unable to resolve artifact.",
-						e);
+				throw new MojoExecutionException("Unable to resolve artifact.", e);
 			} catch (ArtifactNotFoundException e) {
 				throw new MojoExecutionException("Unable to find artifact.", e);
 			}
-			getLog().info(
-					"artifact file: " + artifact.getFile().getAbsolutePath());
+			getLog().info("artifact file: " + artifact.getFile().getAbsolutePath());
 			getLog().info("hibernate dialect: " + this.hibernateDialect);
 
 			URL artifactUrl;
@@ -187,8 +179,8 @@ public class SQLDDLMojo extends AbstractMojo {
 				throw new MojoExecutionException("URL error.", e);
 			}
 
-			URLClassLoader classLoader = new URLClassLoader(
-					new URL[] { artifactUrl }, this.getClass().getClassLoader());
+			URLClassLoader classLoader = new URLClassLoader(new URL[] { artifactUrl },
+					this.getClass().getClassLoader());
 			Thread.currentThread().setContextClassLoader(classLoader);
 
 			AnnotationDB annotationDb = new AnnotationDB();
@@ -197,14 +189,12 @@ public class SQLDDLMojo extends AbstractMojo {
 			} catch (IOException e) {
 				throw new MojoExecutionException("I/O error.", e);
 			}
-			Set<String> classNames = annotationDb.getAnnotationIndex().get(
-					Entity.class.getName());
+			Set<String> classNames = annotationDb.getAnnotationIndex().get(Entity.class.getName());
 			getLog().info("# JPA entity classes: " + classNames.size());
 
 			AnnotationConfiguration configuration = new AnnotationConfiguration();
 
-			configuration.setProperty("hibernate.dialect",
-					this.hibernateDialect);
+			configuration.setProperty("hibernate.dialect", this.hibernateDialect);
 			Dialect dialect = Dialect.getDialect(configuration.getProperties());
 			getLog().info("dialect: " + dialect.toString());
 
@@ -213,9 +203,7 @@ public class SQLDDLMojo extends AbstractMojo {
 				Class<?> entityClass;
 				try {
 					entityClass = classLoader.loadClass(className);
-					getLog().info(
-							"entity class loader: "
-									+ entityClass.getClassLoader());
+					getLog().info("entity class loader: " + entityClass.getClassLoader());
 				} catch (ClassNotFoundException e) {
 					throw new MojoExecutionException("class not found.", e);
 				}
@@ -229,10 +217,7 @@ public class SQLDDLMojo extends AbstractMojo {
 			schemaExport.setDelimiter(";");
 
 			try {
-				getLog().info(
-						"SQL DDL script: "
-								+ IOUtil.toString(new FileInputStream(
-										outputFile)));
+				getLog().info("SQL DDL script: " + IOUtil.toString(new FileInputStream(outputFile)));
 			} catch (FileNotFoundException e) {
 				throw new MojoExecutionException("file not found.", e);
 			} catch (IOException e) {

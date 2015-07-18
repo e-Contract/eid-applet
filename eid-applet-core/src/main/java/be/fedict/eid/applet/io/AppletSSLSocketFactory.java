@@ -51,8 +51,7 @@ import be.fedict.eid.applet.View;
  * @author Frank Cornelis
  * 
  */
-public class AppletSSLSocketFactory extends SSLSocketFactory implements
-		HandshakeCompletedListener {
+public class AppletSSLSocketFactory extends SSLSocketFactory implements HandshakeCompletedListener {
 
 	private View view;
 
@@ -68,8 +67,7 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 	 * @param view
 	 * @param originalSslSocketFactory
 	 */
-	public AppletSSLSocketFactory(View view,
-			SSLSocketFactory originalSslSocketFactory) {
+	public AppletSSLSocketFactory(View view, SSLSocketFactory originalSslSocketFactory) {
 		this.view = view;
 		this.originalSslSocketFactory = originalSslSocketFactory;
 	}
@@ -79,10 +77,8 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 	}
 
 	@Override
-	public Socket createSocket(Socket s, String host, int port,
-			boolean autoClose) throws IOException {
-		Socket socket = this.originalSslSocketFactory.createSocket(s, host,
-				port, autoClose);
+	public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
+		Socket socket = this.originalSslSocketFactory.createSocket(s, host, port, autoClose);
 		/*
 		 * Important here not to try to access the SSL session identifier via
 		 * getSession. This can cause problems when sitting behind an HTTP
@@ -93,8 +89,7 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 		return socket;
 	}
 
-	private void installHandshakeCompletedListener(Socket socket)
-			throws IOException {
+	private void installHandshakeCompletedListener(Socket socket) throws IOException {
 		SSLSocket sslSocket = (SSLSocket) socket;
 		sslSocket.addHandshakeCompletedListener(this);
 	}
@@ -110,8 +105,7 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 	}
 
 	@Override
-	public Socket createSocket(String host, int port) throws IOException,
-			UnknownHostException {
+	public Socket createSocket(String host, int port) throws IOException, UnknownHostException {
 		Socket socket = this.originalSslSocketFactory.createSocket(host, port);
 		installHandshakeCompletedListener(socket);
 		return socket;
@@ -125,19 +119,16 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 	}
 
 	@Override
-	public Socket createSocket(String host, int port, InetAddress localHost,
-			int localPort) throws IOException, UnknownHostException {
-		Socket socket = this.originalSslSocketFactory.createSocket(host, port,
-				localHost, localPort);
+	public Socket createSocket(String host, int port, InetAddress localHost, int localPort)
+			throws IOException, UnknownHostException {
+		Socket socket = this.originalSslSocketFactory.createSocket(host, port, localHost, localPort);
 		installHandshakeCompletedListener(socket);
 		return socket;
 	}
 
 	@Override
-	public Socket createSocket(InetAddress host, int port,
-			InetAddress localHost, int localPort) throws IOException {
-		Socket socket = this.originalSslSocketFactory.createSocket(host, port,
-				localHost, localPort);
+	public Socket createSocket(InetAddress host, int port, InetAddress localHost, int localPort) throws IOException {
+		Socket socket = this.originalSslSocketFactory.createSocket(host, port, localHost, localPort);
 		installHandshakeCompletedListener(socket);
 		return socket;
 	}
@@ -173,14 +164,13 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 		return socket;
 	}
 
+	@Override
 	public void handshakeCompleted(HandshakeCompletedEvent event) {
 		String cipherSuite = event.getCipherSuite();
-		this.view.addDetailMessage("SSL handshake finish cipher suite: "
-				+ cipherSuite);
+		this.view.addDetailMessage("SSL handshake finish cipher suite: " + cipherSuite);
 		SSLSession sslSession = event.getSession();
 		byte[] sslSessionId = sslSession.getId();
-		if (null != this.sslSessionId
-				&& false == Arrays.equals(this.sslSessionId, sslSessionId)) {
+		if (null != this.sslSessionId && false == Arrays.equals(this.sslSessionId, sslSessionId)) {
 			/*
 			 * This could also be caused by an SSL session renewal.
 			 */
@@ -193,14 +183,12 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 		} catch (SSLPeerUnverifiedException e) {
 			this.view.addDetailMessage("SSL peer unverified");
 		} catch (CertificateEncodingException e) {
-			this.view.addDetailMessage("certificate encoding error: "
-					+ e.getMessage());
+			this.view.addDetailMessage("certificate encoding error: " + e.getMessage());
 		}
 	}
 
 	public static SocketFactory getDefault() {
-		SSLSocketFactory sslSocketFactory = HttpsURLConnection
-				.getDefaultSSLSocketFactory();
+		SSLSocketFactory sslSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
 		return sslSocketFactory;
 	}
 
@@ -210,16 +198,13 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 	 * @param view
 	 */
 	public static void installSocketFactory(View view) {
-		SSLSocketFactory sslSocketFactory = HttpsURLConnection
-				.getDefaultSSLSocketFactory();
+		SSLSocketFactory sslSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
 		if (false == sslSocketFactory instanceof AppletSSLSocketFactory) {
 			/*
 			 * Install a new one.
 			 */
-			AppletSSLSocketFactory appletSslSocketFactory = new AppletSSLSocketFactory(
-					view, sslSocketFactory);
-			HttpsURLConnection
-					.setDefaultSSLSocketFactory(appletSslSocketFactory);
+			AppletSSLSocketFactory appletSslSocketFactory = new AppletSSLSocketFactory(view, sslSocketFactory);
+			HttpsURLConnection.setDefaultSSLSocketFactory(appletSslSocketFactory);
 		} else {
 			/*
 			 * Make sure that the existing one reports to us.
@@ -241,8 +226,7 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 	}
 
 	private static AppletSSLSocketFactory getAppletSSLSocketFactory() {
-		SSLSocketFactory sslSocketFactory = HttpsURLConnection
-				.getDefaultSSLSocketFactory();
+		SSLSocketFactory sslSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
 		if (false == sslSocketFactory instanceof AppletSSLSocketFactory) {
 			throw new SecurityException("wrong SSL socket factory");
 		}
@@ -258,8 +242,7 @@ public class AppletSSLSocketFactory extends SSLSocketFactory implements
 	 */
 	public static byte[] getActualEncodedServerCertificate() {
 		AppletSSLSocketFactory appletSslSocketFactory = getAppletSSLSocketFactory();
-		byte[] encodedPeerCertificate = appletSslSocketFactory
-				.getEncodedPeerCertificate();
+		byte[] encodedPeerCertificate = appletSslSocketFactory.getEncodedPeerCertificate();
 		return encodedPeerCertificate;
 	}
 }

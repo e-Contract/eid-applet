@@ -93,11 +93,9 @@ import be.fedict.eid.applet.service.spi.DigestInfo;
 
 public class XAdESSignatureFacetTest {
 
-	private static final Log LOG = LogFactory
-			.getLog(XAdESSignatureFacetTest.class);
+	private static final Log LOG = LogFactory.getLog(XAdESSignatureFacetTest.class);
 
-	private static class XmlSignatureTestService extends
-			AbstractXmlSignatureService {
+	private static class XmlSignatureTestService extends AbstractXmlSignatureService {
 
 		private TemporaryTestDataStorage temporaryDataStorage;
 
@@ -143,32 +141,25 @@ public class XAdESSignatureFacetTest {
 	public void testSignEnvelopingDocument() throws Exception {
 		// setup
 		EnvelopedSignatureFacet envelopedSignatureFacet = new EnvelopedSignatureFacet();
-		KeyInfoSignatureFacet keyInfoSignatureFacet = new KeyInfoSignatureFacet(
-				true, false, false);
+		KeyInfoSignatureFacet keyInfoSignatureFacet = new KeyInfoSignatureFacet(true, false, false);
 		SignaturePolicyService signaturePolicyService = null;
 		// SignaturePolicyService signaturePolicyService = new
 		// ExplicitSignaturePolicyService(
 		// "urn:test", "hello world".getBytes(), "description",
 		// "http://here.com");
-		XAdESSignatureFacet xadesSignatureFacet = new XAdESSignatureFacet(
-				signaturePolicyService);
-		TimeStampService mockTimeStampService = EasyMock
-				.createMock(TimeStampService.class);
-		RevocationDataService mockRevocationDataService = EasyMock
-				.createMock(RevocationDataService.class);
-		XAdESXLSignatureFacet xadesXLSignatureFacet = new XAdESXLSignatureFacet(
-				mockTimeStampService, mockRevocationDataService);
-		XmlSignatureTestService testedInstance = new XmlSignatureTestService(
-				envelopedSignatureFacet, keyInfoSignatureFacet,
-				xadesSignatureFacet, xadesXLSignatureFacet);
+		XAdESSignatureFacet xadesSignatureFacet = new XAdESSignatureFacet(signaturePolicyService);
+		TimeStampService mockTimeStampService = EasyMock.createMock(TimeStampService.class);
+		RevocationDataService mockRevocationDataService = EasyMock.createMock(RevocationDataService.class);
+		XAdESXLSignatureFacet xadesXLSignatureFacet = new XAdESXLSignatureFacet(mockTimeStampService,
+				mockRevocationDataService);
+		XmlSignatureTestService testedInstance = new XmlSignatureTestService(envelopedSignatureFacet,
+				keyInfoSignatureFacet, xadesSignatureFacet, xadesXLSignatureFacet);
 
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
-				.getPrivate(), true, 0, null, null, new KeyUsage(
-				KeyUsage.nonRepudiation));
+		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair.getPublic(), "CN=Test", notBefore,
+				notAfter, null, keyPair.getPrivate(), true, 0, null, null, new KeyUsage(KeyUsage.nonRepudiation));
 		List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
 		/*
 		 * We need at least 2 certificates for the XAdES-C complete certificate
@@ -178,19 +169,15 @@ public class XAdESSignatureFacetTest {
 		certificateChain.add(certificate);
 
 		RevocationData revocationData = new RevocationData();
-		final X509CRL crl = PkiTestUtils.generateCrl(certificate,
-				keyPair.getPrivate());
+		final X509CRL crl = PkiTestUtils.generateCrl(certificate, keyPair.getPrivate());
 		revocationData.addCRL(crl);
-		OCSPResp ocspResp = PkiTestUtils.createOcspResp(certificate, false,
-				certificate, certificate, keyPair.getPrivate(), "SHA1withRSA");
+		OCSPResp ocspResp = PkiTestUtils.createOcspResp(certificate, false, certificate, certificate,
+				keyPair.getPrivate(), "SHA1withRSA");
 		revocationData.addOCSP(ocspResp.getEncoded());
 
 		// expectations
-		EasyMock.expect(
-				mockTimeStampService.timeStamp(
-						EasyMock.anyObject(byte[].class),
-						EasyMock.anyObject(RevocationData.class)))
-				.andStubAnswer(new IAnswer<byte[]>() {
+		EasyMock.expect(mockTimeStampService.timeStamp(EasyMock.anyObject(byte[].class),
+				EasyMock.anyObject(RevocationData.class))).andStubAnswer(new IAnswer<byte[]>() {
 					public byte[] answer() throws Throwable {
 						Object[] arguments = EasyMock.getCurrentArguments();
 						RevocationData revocationData = (RevocationData) arguments[1];
@@ -198,16 +185,14 @@ public class XAdESSignatureFacetTest {
 						return "time-stamp-token".getBytes();
 					}
 				});
-		EasyMock.expect(
-				mockRevocationDataService.getRevocationData(EasyMock
-						.eq(certificateChain))).andStubReturn(revocationData);
+		EasyMock.expect(mockRevocationDataService.getRevocationData(EasyMock.eq(certificateChain)))
+				.andStubReturn(revocationData);
 
 		// prepare
 		EasyMock.replay(mockTimeStampService, mockRevocationDataService);
 
 		// operate
-		DigestInfo digestInfo = testedInstance.preSign(null, certificateChain,
-				null, null, null);
+		DigestInfo digestInfo = testedInstance.preSign(null, certificateChain, null, null, null);
 
 		// verify
 		assertNotNull(digestInfo);
@@ -223,12 +208,9 @@ public class XAdESSignatureFacetTest {
 
 		LOG.debug("tmp document: " + PkiTestUtils.toString(tmpDocument));
 		Element nsElement = tmpDocument.createElement("ns");
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds",
-				Constants.SignatureSpecNS);
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:xades",
-				"http://uri.etsi.org/01903/v1.3.2#");
-		Node digestValueNode = XPathAPI.selectSingleNode(tmpDocument,
-				"//ds:DigestValue", nsElement);
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS);
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:xades", "http://uri.etsi.org/01903/v1.3.2#");
+		Node digestValueNode = XPathAPI.selectSingleNode(tmpDocument, "//ds:DigestValue", nsElement);
 		assertNotNull(digestValueNode);
 		String digestValueTextContent = digestValueNode.getTextContent();
 		LOG.debug("digest value text content: " + digestValueTextContent);
@@ -239,8 +221,7 @@ public class XAdESSignatureFacetTest {
 		 */
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
-		byte[] digestInfoValue = ArrayUtils.addAll(
-				PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
+		byte[] digestInfoValue = ArrayUtils.addAll(PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
 		byte[] signatureValue = cipher.doFinal(digestInfoValue);
 
 		/*
@@ -252,41 +233,32 @@ public class XAdESSignatureFacetTest {
 		EasyMock.verify(mockTimeStampService, mockRevocationDataService);
 		byte[] signedDocumentData = testedInstance.getSignedDocumentData();
 		assertNotNull(signedDocumentData);
-		Document signedDocument = PkiTestUtils
-				.loadDocument(new ByteArrayInputStream(signedDocumentData));
+		Document signedDocument = PkiTestUtils.loadDocument(new ByteArrayInputStream(signedDocumentData));
 		LOG.debug("signed document: " + PkiTestUtils.toString(signedDocument));
 
-		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(
-				XMLSignature.XMLNS, "Signature");
+		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 		assertEquals(1, signatureNodeList.getLength());
 		Element signatureNode = (Element) signatureNodeList.item(0);
 
 		// work-around for Java 7
 		Element signedPropertiesElement = (Element) signatureNode
-				.getElementsByTagNameNS(XAdESXLSignatureFacet.XADES_NAMESPACE,
-						"SignedProperties").item(0);
+				.getElementsByTagNameNS(XAdESXLSignatureFacet.XADES_NAMESPACE, "SignedProperties").item(0);
 		signedPropertiesElement.setIdAttribute("Id", true);
 
 		DOMValidateContext domValidateContext = new DOMValidateContext(
-				KeySelector.singletonKeySelector(keyPair.getPublic()),
-				signatureNode);
-		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-				.getInstance();
-		XMLSignature xmlSignature = xmlSignatureFactory
-				.unmarshalXMLSignature(domValidateContext);
+				KeySelector.singletonKeySelector(keyPair.getPublic()), signatureNode);
+		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
+		XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
 		boolean validity = xmlSignature.validate(domValidateContext);
 		assertTrue(validity);
 
 		File tmpFile = File.createTempFile("xades-x-l-", ".xml");
-		FileUtils.writeStringToFile(tmpFile,
-				PkiTestUtils.toString(signedDocument));
+		FileUtils.writeStringToFile(tmpFile, PkiTestUtils.toString(signedDocument));
 		LOG.debug("tmp file: " + tmpFile.getAbsolutePath());
 
-		Node resultNode = XPathAPI
-				.selectSingleNode(
-						signedDocument,
-						"ds:Signature/ds:Object/xades:QualifyingProperties/xades:SignedProperties/xades:SignedSignatureProperties/xades:SigningCertificate/xades:Cert/xades:CertDigest/ds:DigestValue",
-						nsElement);
+		Node resultNode = XPathAPI.selectSingleNode(signedDocument,
+				"ds:Signature/ds:Object/xades:QualifyingProperties/xades:SignedProperties/xades:SignedSignatureProperties/xades:SigningCertificate/xades:Cert/xades:CertDigest/ds:DigestValue",
+				nsElement);
 		assertNotNull(resultNode);
 
 		// also test whether the XAdES extension is in line with the XAdES XML
@@ -294,15 +266,12 @@ public class XAdESSignatureFacetTest {
 
 		// stax-api 1.0.1 prevents us from using
 		// "XMLConstants.W3C_XML_SCHEMA_NS_URI"
-		Node qualifyingPropertiesNode = XPathAPI.selectSingleNode(
-				signedDocument,
+		Node qualifyingPropertiesNode = XPathAPI.selectSingleNode(signedDocument,
 				"ds:Signature/ds:Object/xades:QualifyingProperties", nsElement);
-		SchemaFactory factory = SchemaFactory
-				.newInstance("http://www.w3.org/2001/XMLSchema");
+		SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
 		LSResourceResolver xadesResourceResolver = new XAdESLSResourceResolver();
 		factory.setResourceResolver(xadesResourceResolver);
-		InputStream schemaInputStream = XAdESSignatureFacetTest.class
-				.getResourceAsStream("/XAdESv141.xsd");
+		InputStream schemaInputStream = XAdESSignatureFacetTest.class.getResourceAsStream("/XAdESv141.xsd");
 		Source schemaSource = new StreamSource(schemaInputStream);
 		Schema schema = factory.newSchema(schemaSource);
 		Validator validator = schema.newValidator();
@@ -320,31 +289,22 @@ public class XAdESSignatureFacetTest {
 	public void testSignEnvelopingDocumentOffice2010() throws Exception {
 		// setup
 		EnvelopedSignatureFacet envelopedSignatureFacet = new EnvelopedSignatureFacet();
-		KeyInfoSignatureFacet keyInfoSignatureFacet = new KeyInfoSignatureFacet(
-				true, false, false);
-		SignaturePolicyService signaturePolicyService = new ExplicitSignaturePolicyService(
-				"urn:test", "hello world".getBytes(), "description",
-				"http://here.com");
-		XAdESSignatureFacet xadesSignatureFacet = new XAdESSignatureFacet(
-				signaturePolicyService);
-		TimeStampService mockTimeStampService = EasyMock
-				.createMock(TimeStampService.class);
-		RevocationDataService mockRevocationDataService = EasyMock
-				.createMock(RevocationDataService.class);
-		XAdESXLSignatureFacet xadesXLSignatureFacet = new XAdESXLSignatureFacet(
-				mockTimeStampService, mockRevocationDataService);
-		XmlSignatureTestService testedInstance = new XmlSignatureTestService(
-				envelopedSignatureFacet, keyInfoSignatureFacet,
-				xadesSignatureFacet, new Office2010SignatureFacet(),
-				xadesXLSignatureFacet);
+		KeyInfoSignatureFacet keyInfoSignatureFacet = new KeyInfoSignatureFacet(true, false, false);
+		SignaturePolicyService signaturePolicyService = new ExplicitSignaturePolicyService("urn:test",
+				"hello world".getBytes(), "description", "http://here.com");
+		XAdESSignatureFacet xadesSignatureFacet = new XAdESSignatureFacet(signaturePolicyService);
+		TimeStampService mockTimeStampService = EasyMock.createMock(TimeStampService.class);
+		RevocationDataService mockRevocationDataService = EasyMock.createMock(RevocationDataService.class);
+		XAdESXLSignatureFacet xadesXLSignatureFacet = new XAdESXLSignatureFacet(mockTimeStampService,
+				mockRevocationDataService);
+		XmlSignatureTestService testedInstance = new XmlSignatureTestService(envelopedSignatureFacet,
+				keyInfoSignatureFacet, xadesSignatureFacet, new Office2010SignatureFacet(), xadesXLSignatureFacet);
 
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
-				.getPrivate(), true, 0, null, null, new KeyUsage(
-				KeyUsage.nonRepudiation));
+		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair.getPublic(), "CN=Test", notBefore,
+				notAfter, null, keyPair.getPrivate(), true, 0, null, null, new KeyUsage(KeyUsage.nonRepudiation));
 		List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
 		/*
 		 * We need at least 2 certificates for the XAdES-C complete certificate
@@ -354,19 +314,15 @@ public class XAdESSignatureFacetTest {
 		certificateChain.add(certificate);
 
 		RevocationData revocationData = new RevocationData();
-		final X509CRL crl = PkiTestUtils.generateCrl(certificate,
-				keyPair.getPrivate());
+		final X509CRL crl = PkiTestUtils.generateCrl(certificate, keyPair.getPrivate());
 		revocationData.addCRL(crl);
-		OCSPResp ocspResp = PkiTestUtils.createOcspResp(certificate, false,
-				certificate, certificate, keyPair.getPrivate(), "SHA1withRSA");
+		OCSPResp ocspResp = PkiTestUtils.createOcspResp(certificate, false, certificate, certificate,
+				keyPair.getPrivate(), "SHA1withRSA");
 		revocationData.addOCSP(ocspResp.getEncoded());
 
 		// expectations
-		EasyMock.expect(
-				mockTimeStampService.timeStamp(
-						EasyMock.anyObject(byte[].class),
-						EasyMock.anyObject(RevocationData.class)))
-				.andStubAnswer(new IAnswer<byte[]>() {
+		EasyMock.expect(mockTimeStampService.timeStamp(EasyMock.anyObject(byte[].class),
+				EasyMock.anyObject(RevocationData.class))).andStubAnswer(new IAnswer<byte[]>() {
 					public byte[] answer() throws Throwable {
 						Object[] arguments = EasyMock.getCurrentArguments();
 						RevocationData revocationData = (RevocationData) arguments[1];
@@ -374,16 +330,14 @@ public class XAdESSignatureFacetTest {
 						return "time-stamp-token".getBytes();
 					}
 				});
-		EasyMock.expect(
-				mockRevocationDataService.getRevocationData(EasyMock
-						.eq(certificateChain))).andStubReturn(revocationData);
+		EasyMock.expect(mockRevocationDataService.getRevocationData(EasyMock.eq(certificateChain)))
+				.andStubReturn(revocationData);
 
 		// prepare
 		EasyMock.replay(mockTimeStampService, mockRevocationDataService);
 
 		// operate
-		DigestInfo digestInfo = testedInstance.preSign(null, certificateChain,
-				null, null, null);
+		DigestInfo digestInfo = testedInstance.preSign(null, certificateChain, null, null, null);
 
 		// verify
 		assertNotNull(digestInfo);
@@ -399,12 +353,9 @@ public class XAdESSignatureFacetTest {
 
 		LOG.debug("tmp document: " + PkiTestUtils.toString(tmpDocument));
 		Element nsElement = tmpDocument.createElement("ns");
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds",
-				Constants.SignatureSpecNS);
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:xades",
-				"http://uri.etsi.org/01903/v1.3.2#");
-		Node digestValueNode = XPathAPI.selectSingleNode(tmpDocument,
-				"//ds:DigestValue", nsElement);
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS);
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:xades", "http://uri.etsi.org/01903/v1.3.2#");
+		Node digestValueNode = XPathAPI.selectSingleNode(tmpDocument, "//ds:DigestValue", nsElement);
 		assertNotNull(digestValueNode);
 		String digestValueTextContent = digestValueNode.getTextContent();
 		LOG.debug("digest value text content: " + digestValueTextContent);
@@ -415,8 +366,7 @@ public class XAdESSignatureFacetTest {
 		 */
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
-		byte[] digestInfoValue = ArrayUtils.addAll(
-				PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
+		byte[] digestInfoValue = ArrayUtils.addAll(PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
 		byte[] signatureValue = cipher.doFinal(digestInfoValue);
 
 		/*
@@ -428,41 +378,32 @@ public class XAdESSignatureFacetTest {
 		EasyMock.verify(mockTimeStampService, mockRevocationDataService);
 		byte[] signedDocumentData = testedInstance.getSignedDocumentData();
 		assertNotNull(signedDocumentData);
-		Document signedDocument = PkiTestUtils
-				.loadDocument(new ByteArrayInputStream(signedDocumentData));
+		Document signedDocument = PkiTestUtils.loadDocument(new ByteArrayInputStream(signedDocumentData));
 		LOG.debug("signed document: " + PkiTestUtils.toString(signedDocument));
 
-		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(
-				XMLSignature.XMLNS, "Signature");
+		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 		assertEquals(1, signatureNodeList.getLength());
 		Element signatureNode = (Element) signatureNodeList.item(0);
 
 		// work-around for Java 7
 		Element signedPropertiesElement = (Element) signatureNode
-				.getElementsByTagNameNS(XAdESXLSignatureFacet.XADES_NAMESPACE,
-						"SignedProperties").item(0);
+				.getElementsByTagNameNS(XAdESXLSignatureFacet.XADES_NAMESPACE, "SignedProperties").item(0);
 		signedPropertiesElement.setIdAttribute("Id", true);
 
 		DOMValidateContext domValidateContext = new DOMValidateContext(
-				KeySelector.singletonKeySelector(keyPair.getPublic()),
-				signatureNode);
-		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-				.getInstance();
-		XMLSignature xmlSignature = xmlSignatureFactory
-				.unmarshalXMLSignature(domValidateContext);
+				KeySelector.singletonKeySelector(keyPair.getPublic()), signatureNode);
+		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
+		XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
 		boolean validity = xmlSignature.validate(domValidateContext);
 		assertTrue(validity);
 
 		File tmpFile = File.createTempFile("xades-bes-", ".xml");
-		FileUtils.writeStringToFile(tmpFile,
-				PkiTestUtils.toString(signedDocument));
+		FileUtils.writeStringToFile(tmpFile, PkiTestUtils.toString(signedDocument));
 		LOG.debug("tmp file: " + tmpFile.getAbsolutePath());
 
-		Node resultNode = XPathAPI
-				.selectSingleNode(
-						signedDocument,
-						"ds:Signature/ds:Object/xades:QualifyingProperties/xades:SignedProperties/xades:SignedSignatureProperties/xades:SigningCertificate/xades:Cert/xades:CertDigest/ds:DigestValue",
-						nsElement);
+		Node resultNode = XPathAPI.selectSingleNode(signedDocument,
+				"ds:Signature/ds:Object/xades:QualifyingProperties/xades:SignedProperties/xades:SignedSignatureProperties/xades:SigningCertificate/xades:Cert/xades:CertDigest/ds:DigestValue",
+				nsElement);
 		assertNotNull(resultNode);
 
 		// also test whether the XAdES extension is in line with the XAdES XML
@@ -470,15 +411,12 @@ public class XAdESSignatureFacetTest {
 
 		// stax-api 1.0.1 prevents us from using
 		// "XMLConstants.W3C_XML_SCHEMA_NS_URI"
-		Node qualifyingPropertiesNode = XPathAPI.selectSingleNode(
-				signedDocument,
+		Node qualifyingPropertiesNode = XPathAPI.selectSingleNode(signedDocument,
 				"ds:Signature/ds:Object/xades:QualifyingProperties", nsElement);
-		SchemaFactory factory = SchemaFactory
-				.newInstance("http://www.w3.org/2001/XMLSchema");
+		SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
 		LSResourceResolver xadesResourceResolver = new XAdESLSResourceResolver();
 		factory.setResourceResolver(xadesResourceResolver);
-		InputStream schemaInputStream = XAdESSignatureFacetTest.class
-				.getResourceAsStream("/XAdESv141.xsd");
+		InputStream schemaInputStream = XAdESSignatureFacetTest.class.getResourceAsStream("/XAdESv141.xsd");
 		Source schemaSource = new StreamSource(schemaInputStream);
 		Schema schema = factory.newSchema(schemaSource);
 		Validator validator = schema.newValidator();
@@ -494,11 +432,10 @@ public class XAdESSignatureFacetTest {
 
 	private static class XAdESLSResourceResolver implements LSResourceResolver {
 
-		private static final Log LOG = LogFactory
-				.getLog(XAdESLSResourceResolver.class);
+		private static final Log LOG = LogFactory.getLog(XAdESLSResourceResolver.class);
 
-		public LSInput resolveResource(String type, String namespaceURI,
-				String publicId, String systemId, String baseURI) {
+		public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId,
+				String baseURI) {
 			LOG.debug("resolve resource");
 			LOG.debug("type: " + type);
 			LOG.debug("namespace URI: " + namespaceURI);
@@ -506,12 +443,10 @@ public class XAdESSignatureFacetTest {
 			LOG.debug("systemId: " + systemId);
 			LOG.debug("base URI: " + baseURI);
 			if ("http://uri.etsi.org/01903/v1.3.2#".equals(namespaceURI)) {
-				return new LocalLSInput(publicId, systemId, baseURI,
-						"/XAdES.xsd");
+				return new LocalLSInput(publicId, systemId, baseURI, "/XAdES.xsd");
 			}
 			if ("http://www.w3.org/2000/09/xmldsig#".equals(namespaceURI)) {
-				return new LocalLSInput(publicId, systemId, baseURI,
-						"/xmldsig-core-schema.xsd");
+				return new LocalLSInput(publicId, systemId, baseURI, "/xmldsig-core-schema.xsd");
 			}
 			throw new RuntimeException("unsupported resource: " + namespaceURI);
 		}
@@ -527,8 +462,7 @@ public class XAdESSignatureFacetTest {
 
 		private final String schemaResourceName;
 
-		public LocalLSInput(String publicId, String systemId, String baseURI,
-				String schemaResourceName) {
+		public LocalLSInput(String publicId, String systemId, String baseURI, String schemaResourceName) {
 			this.publicId = publicId;
 			this.systemId = systemId;
 			this.baseURI = baseURI;
@@ -540,8 +474,7 @@ public class XAdESSignatureFacetTest {
 		}
 
 		public InputStream getByteStream() {
-			InputStream inputStream = XAdESSignatureFacetTest.class
-					.getResourceAsStream(this.schemaResourceName);
+			InputStream inputStream = XAdESSignatureFacetTest.class.getResourceAsStream(this.schemaResourceName);
 			return inputStream;
 		}
 
@@ -551,8 +484,7 @@ public class XAdESSignatureFacetTest {
 
 		public Reader getCharacterStream() {
 			InputStream inputStream = getByteStream();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					inputStream));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 			return reader;
 		}
 

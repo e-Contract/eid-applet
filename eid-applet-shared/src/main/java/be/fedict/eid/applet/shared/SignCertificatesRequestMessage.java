@@ -33,8 +33,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 public class SignCertificatesRequestMessage extends AbstractProtocolMessage {
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator
-	public static final String TYPE = SignCertificatesRequestMessage.class
-			.getSimpleName();
+	public static final String TYPE = SignCertificatesRequestMessage.class.getSimpleName();
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "IncludeIdentity")
 	public boolean includeIdentity;
@@ -52,8 +51,7 @@ public class SignCertificatesRequestMessage extends AbstractProtocolMessage {
 		super();
 	}
 
-	public SignCertificatesRequestMessage(boolean includeIdentity,
-			boolean includeAddress, boolean includePhoto,
+	public SignCertificatesRequestMessage(boolean includeIdentity, boolean includeAddress, boolean includePhoto,
 			boolean includeIntegrityData) {
 		this.includeIdentity = includeIdentity;
 		this.includeAddress = includeAddress;

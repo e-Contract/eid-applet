@@ -51,8 +51,7 @@ import be.fedict.eid.applet.service.spi.DigestInfo;
 
 public class AbstractCMSSignatureServiceTest {
 
-	private static final Log LOG = LogFactory
-			.getLog(AbstractCMSSignatureServiceTest.class);
+	private static final Log LOG = LogFactory.getLog(AbstractCMSSignatureServiceTest.class);
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -69,8 +68,7 @@ public class AbstractCMSSignatureServiceTest {
 
 		private byte[] cmsSignature;
 
-		public CMSTestSignatureService(byte[] toBeSigned,
-				String signatureDescription) {
+		public CMSTestSignatureService(byte[] toBeSigned, String signatureDescription) {
 			this.toBeSigned = toBeSigned;
 			this.signatureDescription = signatureDescription;
 		}
@@ -100,22 +98,18 @@ public class AbstractCMSSignatureServiceTest {
 		// setup
 		byte[] toBeSigned = "hello world".getBytes();
 		String signatureDescription = "Test CMS Signature";
-		CMSTestSignatureService signatureService = new CMSTestSignatureService(
-				toBeSigned, signatureDescription);
+		CMSTestSignatureService signatureService = new CMSTestSignatureService(toBeSigned, signatureDescription);
 
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
-				.getPrivate(), true, 0, null, null, new KeyUsage(
-				KeyUsage.nonRepudiation));
+		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair.getPublic(), "CN=Test", notBefore,
+				notAfter, null, keyPair.getPrivate(), true, 0, null, null, new KeyUsage(KeyUsage.nonRepudiation));
 		List<X509Certificate> signingCertificateChain = new LinkedList<X509Certificate>();
 		signingCertificateChain.add(certificate);
 
 		// operate
-		DigestInfo digestInfo = signatureService.preSign(null,
-				signingCertificateChain, null, null, null);
+		DigestInfo digestInfo = signatureService.preSign(null, signingCertificateChain, null, null, null);
 
 		// verify
 		assertNotNull(digestInfo);
@@ -127,8 +121,7 @@ public class AbstractCMSSignatureServiceTest {
 
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
-		byte[] digestInfoValue = ArrayUtils.addAll(
-				PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestValue);
+		byte[] digestInfoValue = ArrayUtils.addAll(PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestValue);
 		byte[] signatureValue = cipher.doFinal(digestInfoValue);
 		LOG.debug("signature value: " + Hex.encodeHexString(signatureValue));
 
@@ -144,8 +137,7 @@ public class AbstractCMSSignatureServiceTest {
 			SignerInformation signer = iter.next();
 			SignerId signerId = signer.getSID();
 			assertTrue(signerId.match(certificate));
-			assertTrue(signer.verify(keyPair.getPublic(),
-					BouncyCastleProvider.PROVIDER_NAME));
+			assertTrue(signer.verify(keyPair.getPublic(), BouncyCastleProvider.PROVIDER_NAME));
 		}
 		byte[] data = (byte[]) signedData.getSignedContent().getContent();
 		assertArrayEquals(toBeSigned, data);

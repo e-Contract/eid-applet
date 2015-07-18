@@ -36,22 +36,18 @@ import be.fedict.eid.applet.service.spi.TrustCertificateSecurityException;
 
 @Stateless
 @EJB(name = "java:global/test/UnauthorizedSignatureServiceBean", beanInterface = UnauthorizedSignatureService.class)
-public class UnauthorizedSignatureServiceBean implements
-		UnauthorizedSignatureService {
+public class UnauthorizedSignatureServiceBean implements UnauthorizedSignatureService {
 
-	private static final Log LOG = LogFactory
-			.getLog(UnauthorizedSignatureServiceBean.class);
+	private static final Log LOG = LogFactory.getLog(UnauthorizedSignatureServiceBean.class);
 
-	public void postSign(byte[] signatureValue,
-			List<X509Certificate> signingCertificateChain)
+	public void postSign(byte[] signatureValue, List<X509Certificate> signingCertificateChain)
 			throws TrustCertificateSecurityException {
 		LOG.debug("postSign");
 	}
 
-	public DigestInfo preSign(List<DigestInfo> digestInfos,
-			List<X509Certificate> signingCertificateChain,
+	public DigestInfo preSign(List<DigestInfo> digestInfos, List<X509Certificate> signingCertificateChain,
 			IdentityDTO identity, AddressDTO address, byte[] photo)
-			throws NoSuchAlgorithmException, AuthorizationException {
+					throws NoSuchAlgorithmException, AuthorizationException {
 		LOG.debug("preSign");
 		throw new AuthorizationException();
 	}

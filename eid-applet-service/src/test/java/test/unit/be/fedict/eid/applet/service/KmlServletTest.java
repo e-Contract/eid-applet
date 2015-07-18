@@ -68,8 +68,7 @@ public class KmlServletTest {
 
 		// verify
 		assertEquals(HttpServletResponse.SC_OK, statusCode);
-		String resultContentType = getMethod.getResponseHeader("content-type")
-				.getValue();
+		String resultContentType = getMethod.getResponseHeader("content-type").getValue();
 		assertEquals("application/vnd.google-earth.kmz", resultContentType);
 		assertTrue(getMethod.getResponseBody().length > 0);
 	}

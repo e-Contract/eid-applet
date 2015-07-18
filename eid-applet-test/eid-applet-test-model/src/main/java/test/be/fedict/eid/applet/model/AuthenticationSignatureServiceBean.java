@@ -47,11 +47,9 @@ import be.fedict.eid.applet.service.spi.PreSignResult;
 
 @Stateless
 @EJB(name = "java:global/test/AuthenticationSignatureServiceBean", beanInterface = AuthenticationSignatureService.class)
-public class AuthenticationSignatureServiceBean implements
-		AuthenticationSignatureService {
+public class AuthenticationSignatureServiceBean implements AuthenticationSignatureService {
 
-	private static final Log LOG = LogFactory
-			.getLog(AuthenticationSignatureServiceBean.class);
+	private static final Log LOG = LogFactory.getLog(AuthenticationSignatureServiceBean.class);
 
 	static {
 		/*
@@ -72,27 +70,24 @@ public class AuthenticationSignatureServiceBean implements
 		try {
 			proxyKeyStore = KeyStore.getInstance("ProxyBeID");
 			proxyKeyStore.load(null);
-			proxyPrivateKey = (ProxyPrivateKey) proxyKeyStore.getKey(
-					"Signature", null);
+			proxyPrivateKey = (ProxyPrivateKey) proxyKeyStore.getKey("Signature", null);
 		} catch (Exception e) {
 			throw new RuntimeException("error loading ProxyBeID keystore");
 		}
 
-		FutureTask<String> signTask = new FutureTask<String>(
-				new Callable<String>() {
-					public String call() throws Exception {
-						final Signature signature = Signature
-								.getInstance("SHA256withRSA");
-						signature.initSign(proxyPrivateKey);
+		FutureTask<String> signTask = new FutureTask<String>(new Callable<String>() {
+			public String call() throws Exception {
+				final Signature signature = Signature.getInstance("SHA256withRSA");
+				signature.initSign(proxyPrivateKey);
 
-						final byte[] toBeSigned = "hello world".getBytes();
-						signature.update(toBeSigned);
-						final byte[] signatureValue = signature.sign();
-						LOG.debug("received signature value");
-						return "signature result";
-					}
+				final byte[] toBeSigned = "hello world".getBytes();
+				signature.update(toBeSigned);
+				final byte[] signatureValue = signature.sign();
+				LOG.debug("received signature value");
+				return "signature result";
+			}
 
-				});
+		});
 		final ExecutorService executor = Executors.newFixedThreadPool(1);
 		executor.execute(signTask);
 
@@ -105,23 +100,19 @@ public class AuthenticationSignatureServiceBean implements
 		} catch (InterruptedException e) {
 			throw new RuntimeException("signature error: " + e.getMessage(), e);
 		}
-		DigestInfo digestInfo = new DigestInfo(digestValue, "SHA-256",
-				"WS-Security message");
+		DigestInfo digestInfo = new DigestInfo(digestValue, "SHA-256", "WS-Security message");
 		PreSignResult preSignResult = new PreSignResult(digestInfo, true);
 		return preSignResult;
 	}
 
-	public void postSign(byte[] signatureValue,
-			List<X509Certificate> authnCertificateChain,
+	public void postSign(byte[] signatureValue, List<X509Certificate> authnCertificateChain,
 			AuthenticationSignatureContext authenticationSignatureContext) {
 		LOG.debug("postSign: " + (signatureValue != null));
 
-		ProxyPrivateKey proxyPrivateKey = (ProxyPrivateKey) authenticationSignatureContext
-				.load("key");
+		ProxyPrivateKey proxyPrivateKey = (ProxyPrivateKey) authenticationSignatureContext.load("key");
 		proxyPrivateKey.setSignatureValue(signatureValue);
 
-		FutureTask<String> signTask = (FutureTask<String>) authenticationSignatureContext
-				.load("signTask");
+		FutureTask<String> signTask = (FutureTask<String>) authenticationSignatureContext.load("signTask");
 		String signatureResult;
 		try {
 			signatureResult = signTask.get();
@@ -131,14 +122,12 @@ public class AuthenticationSignatureServiceBean implements
 
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}
 
 		HttpSession httpSession = httpServletRequest.getSession();
-		httpSession.setAttribute("AuthenticationSignatureValue",
-				signatureResult);
+		httpSession.setAttribute("AuthenticationSignatureValue", signatureResult);
 	}
 }

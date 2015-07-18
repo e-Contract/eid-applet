@@ -93,10 +93,8 @@ public class DTOMapperTest {
 		assertEquals("nationality", result.nationality);
 		assertEquals("middle-name", result.middleName);
 		assertEquals("national-number", result.nationalNumber);
-		assertEquals("cardDeliveryMunicipality",
-				result.cardDeliveryMunicipality);
-		assertEquals(identity.cardValidityDateBegin,
-				result.cardValidityDateBegin);
+		assertEquals("cardDeliveryMunicipality", result.cardDeliveryMunicipality);
+		assertEquals(identity.cardValidityDateBegin, result.cardValidityDateBegin);
 		assertEquals(identity.cardValidityDateEnd, result.cardValidityDateEnd);
 		assertEquals("nobleCondition", result.nobleCondition);
 		assertEquals("duplicate", result.duplicate);

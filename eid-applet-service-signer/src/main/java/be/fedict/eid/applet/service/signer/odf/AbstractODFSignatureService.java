@@ -29,7 +29,6 @@ import java.util.zip.ZipOutputStream;
 import javax.xml.crypto.URIDereferencer;
 import javax.xml.parsers.ParserConfigurationException;
 
-import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,6 +38,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import be.fedict.eid.applet.service.signer.facets.KeyInfoSignatureFacet;
 import be.fedict.eid.applet.service.signer.facets.XAdESSignatureFacet;
 
@@ -53,11 +53,9 @@ import be.fedict.eid.applet.service.signer.facets.XAdESSignatureFacet;
  * @author fcorneli
  * 
  */
-abstract public class AbstractODFSignatureService extends
-		AbstractXmlSignatureService {
+abstract public class AbstractODFSignatureService extends AbstractXmlSignatureService {
 
-	private static final Log LOG = LogFactory
-			.getLog(AbstractODFSignatureService.class);
+	private static final Log LOG = LogFactory.getLog(AbstractODFSignatureService.class);
 
 	private final XAdESSignatureFacet xadesSignatureFacet;
 
@@ -119,21 +117,17 @@ abstract public class AbstractODFSignatureService extends
 		}
 	}
 
-	private void outputSignedOpenDocument(byte[] signatureData)
-			throws IOException {
+	private void outputSignedOpenDocument(byte[] signatureData) throws IOException {
 		LOG.debug("output signed open document");
 		OutputStream signedOdfOutputStream = getSignedOpenDocumentOutputStream();
 		if (null == signedOdfOutputStream) {
-			throw new NullPointerException(
-					"signedOpenDocumentOutputStream is null");
+			throw new NullPointerException("signedOpenDocumentOutputStream is null");
 		}
 		/*
 		 * Copy the original ODF content to the signed ODF package.
 		 */
-		ZipOutputStream zipOutputStream = new ZipOutputStream(
-				signedOdfOutputStream);
-		ZipInputStream zipInputStream = new ZipInputStream(this
-				.getOpenDocumentURL().openStream());
+		ZipOutputStream zipOutputStream = new ZipOutputStream(signedOdfOutputStream);
+		ZipInputStream zipInputStream = new ZipInputStream(this.getOpenDocumentURL().openStream());
 		ZipEntry zipEntry;
 		while (null != (zipEntry = zipInputStream.getNextEntry())) {
 			if (!zipEntry.getName().equals(ODFUtil.SIGNATURE_FILE)) {
@@ -166,17 +160,14 @@ abstract public class AbstractODFSignatureService extends
 	}
 
 	@Override
-	protected final Document getEnvelopingDocument()
-			throws ParserConfigurationException, IOException, SAXException {
+	protected final Document getEnvelopingDocument() throws ParserConfigurationException, IOException, SAXException {
 		Document document = getODFSignatureDocument();
 		if (null != document) {
 			return document;
 		}
 		document = ODFUtil.getNewDocument();
-		Element rootElement = document.createElementNS(ODFUtil.SIGNATURE_NS,
-				ODFUtil.SIGNATURE_ELEMENT);
-		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns",
-				ODFUtil.SIGNATURE_NS);
+		Element rootElement = document.createElementNS(ODFUtil.SIGNATURE_NS, ODFUtil.SIGNATURE_ELEMENT);
+		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns", ODFUtil.SIGNATURE_NS);
 		document.appendChild(rootElement);
 		return document;
 	}
@@ -189,12 +180,10 @@ abstract public class AbstractODFSignatureService extends
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 */
-	private Document getODFSignatureDocument() throws IOException,
-			ParserConfigurationException, SAXException {
+	private Document getODFSignatureDocument() throws IOException, ParserConfigurationException, SAXException {
 		URL odfUrl = this.getOpenDocumentURL();
 
-		InputStream inputStream = ODFUtil.findDataInputStream(
-				odfUrl.openStream(), ODFUtil.SIGNATURE_FILE);
+		InputStream inputStream = ODFUtil.findDataInputStream(odfUrl.openStream(), ODFUtil.SIGNATURE_FILE);
 		if (null != inputStream) {
 			return ODFUtil.loadDocument(inputStream);
 		}

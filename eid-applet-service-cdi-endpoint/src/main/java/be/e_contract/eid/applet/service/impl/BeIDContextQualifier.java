@@ -23,8 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import be.fedict.eid.applet.service.cdi.BeIDContext;
 
-public class BeIDContextQualifier extends AnnotationLiteral<BeIDContext>
-		implements BeIDContext {
+public class BeIDContextQualifier extends AnnotationLiteral<BeIDContext>implements BeIDContext {
 
 	private static final long serialVersionUID = 1L;
 

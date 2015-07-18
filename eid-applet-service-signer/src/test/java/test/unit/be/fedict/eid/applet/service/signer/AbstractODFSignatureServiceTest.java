@@ -45,8 +45,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import be.fedict.eid.applet.service.signer.DigestAlgo;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
@@ -64,6 +62,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import be.fedict.eid.applet.service.signer.KeyInfoKeySelector;
 import be.fedict.eid.applet.service.signer.TemporaryDataStorage;
 import be.fedict.eid.applet.service.signer.facets.XAdESXLSignatureFacet;
@@ -73,8 +72,7 @@ import be.fedict.eid.applet.service.spi.DigestInfo;
 
 public class AbstractODFSignatureServiceTest {
 
-	private static final Log LOG = LogFactory
-			.getLog(AbstractODFSignatureServiceTest.class);
+	private static final Log LOG = LogFactory.getLog(AbstractODFSignatureServiceTest.class);
 
 	@Before
 	public void setUp() throws Exception {
@@ -83,22 +81,19 @@ public class AbstractODFSignatureServiceTest {
 
 	@Test
 	public void testVerifySignature() throws Exception {
-		URL odfUrl = AbstractODFSignatureServiceTest.class
-				.getResource("/hello-world-signed.odt");
+		URL odfUrl = AbstractODFSignatureServiceTest.class.getResource("/hello-world-signed.odt");
 		assertTrue(hasOdfSignature(odfUrl, 1));
 	}
 
 	@Test
 	public void testVerifyCoSignature() throws Exception {
-		URL odfUrl = AbstractODFSignatureServiceTest.class
-				.getResource("/hello-world-signed-twice.odt");
+		URL odfUrl = AbstractODFSignatureServiceTest.class.getResource("/hello-world-signed-twice.odt");
 		assertTrue(hasOdfSignature(odfUrl, 2));
 	}
 
-	private boolean hasOdfSignature(URL odfUrl, int signatureCount)
-			throws IOException, ParserConfigurationException, SAXException,
-			org.apache.xml.security.signature.XMLSignatureException,
-			XMLSecurityException, MarshalException, XMLSignatureException {
+	private boolean hasOdfSignature(URL odfUrl, int signatureCount) throws IOException, ParserConfigurationException,
+			SAXException, org.apache.xml.security.signature.XMLSignatureException, XMLSecurityException,
+			MarshalException, XMLSignatureException {
 		InputStream odfInputStream = odfUrl.openStream();
 		if (null == odfInputStream) {
 			return false;
@@ -107,11 +102,9 @@ public class AbstractODFSignatureServiceTest {
 		ZipEntry zipEntry;
 		while (null != (zipEntry = odfZipInputStream.getNextEntry())) {
 			LOG.debug(zipEntry.getName());
-			if (true == "META-INF/documentsignatures.xml".equals(zipEntry
-					.getName())) {
+			if (true == "META-INF/documentsignatures.xml".equals(zipEntry.getName())) {
 				Document documentSignatures = loadDocument(odfZipInputStream);
-				NodeList signatureNodeList = documentSignatures
-						.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
+				NodeList signatureNodeList = documentSignatures.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 				assertEquals(signatureCount, signatureNodeList.getLength());
 				for (int idx = 0; idx < signatureNodeList.getLength(); idx++) {
 					Node signatureNode = signatureNodeList.item(idx);
@@ -127,8 +120,7 @@ public class AbstractODFSignatureServiceTest {
 		return false;
 	}
 
-	private static class ODFTestSignatureService extends
-			AbstractODFSignatureService {
+	private static class ODFTestSignatureService extends AbstractODFSignatureService {
 
 		private URL odfUrl;
 
@@ -189,8 +181,7 @@ public class AbstractODFSignatureServiceTest {
 	private void sign(String resourceName, int signatureCount) throws Exception {
 		// setup
 		LOG.debug("test sign: " + resourceName);
-		URL odfUrl = AbstractODFSignatureServiceTest.class
-				.getResource(resourceName);
+		URL odfUrl = AbstractODFSignatureServiceTest.class.getResource(resourceName);
 		assertNotNull(odfUrl);
 		ODFTestSignatureService odfSignatureService = new ODFTestSignatureService();
 		odfSignatureService.setOdfUrl(odfUrl);
@@ -198,14 +189,12 @@ public class AbstractODFSignatureServiceTest {
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
-				.getPrivate(), true, 0, null, null, new KeyUsage(
-				KeyUsage.nonRepudiation));
+		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair.getPublic(), "CN=Test", notBefore,
+				notAfter, null, keyPair.getPrivate(), true, 0, null, null, new KeyUsage(KeyUsage.nonRepudiation));
 
 		// operate
-		DigestInfo digestInfo = odfSignatureService.preSign(null,
-				Collections.singletonList(certificate), null, null, null);
+		DigestInfo digestInfo = odfSignatureService.preSign(null, Collections.singletonList(certificate), null, null,
+				null);
 
 		// verify
 		assertNotNull(digestInfo);
@@ -217,15 +206,13 @@ public class AbstractODFSignatureServiceTest {
 
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
-		byte[] digestInfoValue = ArrayUtils.addAll(
-				PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
+		byte[] digestInfoValue = ArrayUtils.addAll(PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
 		byte[] signatureValue = cipher.doFinal(digestInfoValue);
 
 		/*
 		 * Operate: postSign
 		 */
-		odfSignatureService.postSign(signatureValue,
-				Collections.singletonList(certificate));
+		odfSignatureService.postSign(signatureValue, Collections.singletonList(certificate));
 
 		byte[] signedODFData = odfSignatureService.getSignedODFData();
 		assertNotNull(signedODFData);
@@ -246,30 +233,25 @@ public class AbstractODFSignatureServiceTest {
 	 * @throws MarshalException
 	 * @throws XMLSignatureException
 	 */
-	private boolean verifySignature(URL odfUrl, Node signatureNode)
-			throws MarshalException, XMLSignatureException {
+	private boolean verifySignature(URL odfUrl, Node signatureNode) throws MarshalException, XMLSignatureException {
 
 		// work-around for Java 7
 		Element signedPropertiesElement = (Element) ((Element) signatureNode)
-				.getElementsByTagNameNS(XAdESXLSignatureFacet.XADES_NAMESPACE,
-						"SignedProperties").item(0);
+				.getElementsByTagNameNS(XAdESXLSignatureFacet.XADES_NAMESPACE, "SignedProperties").item(0);
 		if (null != signedPropertiesElement) {
 			signedPropertiesElement.setIdAttribute("Id", true);
 		}
 
-		DOMValidateContext domValidateContext = new DOMValidateContext(
-				new KeyInfoKeySelector(), signatureNode);
+		DOMValidateContext domValidateContext = new DOMValidateContext(new KeyInfoKeySelector(), signatureNode);
 		ODFURIDereferencer dereferencer = new ODFURIDereferencer(odfUrl);
 		domValidateContext.setURIDereferencer(dereferencer);
-		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-				.getInstance();
+		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
 		LOG.debug("java version: " + System.getProperty("java.version"));
 		/*
 		 * Requires Java 6u10 because of a bug. See also:
 		 * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6696582
 		 */
-		XMLSignature xmlSignature = xmlSignatureFactory
-				.unmarshalXMLSignature(domValidateContext);
+		XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
 		boolean validity = xmlSignature.validate(domValidateContext);
 		return validity;
 	}
@@ -277,11 +259,9 @@ public class AbstractODFSignatureServiceTest {
 	private Document loadDocument(InputStream documentInputStream)
 			throws ParserConfigurationException, SAXException, IOException {
 		InputSource inputSource = new InputSource(documentInputStream);
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.parse(inputSource);
 		return document;
 	}

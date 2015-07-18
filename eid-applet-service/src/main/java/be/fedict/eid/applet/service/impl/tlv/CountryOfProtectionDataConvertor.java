@@ -23,8 +23,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class CountryOfProtectionDataConvertor implements DataConvertor<String> {
 
-	private static final Log LOG = LogFactory
-			.getLog(DateOfProtectionDataConvertor.class);
+	private static final Log LOG = LogFactory.getLog(DateOfProtectionDataConvertor.class);
 
 	@Override
 	public String convert(byte[] value) throws DataConvertorException {

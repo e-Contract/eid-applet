@@ -24,15 +24,14 @@ import java.text.SimpleDateFormat;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.w3c.dom.Element;
 
 import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.EIdData;
 import be.fedict.eid.applet.service.Identity;
-
+import be.fedict.eid.applet.service.KmlServlet;
 import be.fedict.eid.applet.service.util.KmlLight;
 import be.fedict.eid.applet.service.util.KmlLightDocument;
-
-import org.w3c.dom.Element;
 
 /**
  * KML generator for eID identity data. The implementation is using a "light"
@@ -42,86 +41,87 @@ import org.w3c.dom.Element;
  * @see KmlServlet
  */
 public class KmlGenerator {
-    private static final Log LOG = LogFactory.getLog(KmlGenerator.class);
+	private static final Log LOG = LogFactory.getLog(KmlGenerator.class);
 
-    /**
-     * Generate zipped KML (.kmz) using data from the eID card
-     *
-     * @param eIdData ID data retrieved from eID card
-     * @return KMZ as raw bytes
-     * @throws IOException
-     */
-    public byte[] generateKml(EIdData eIdData) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        KmlLight kml = new KmlLight(baos);
-        KmlLightDocument doc = new KmlLightDocument();
+	/**
+	 * Generate zipped KML (.kmz) using data from the eID card
+	 *
+	 * @param eIdData
+	 *            ID data retrieved from eID card
+	 * @return KMZ as raw bytes
+	 * @throws IOException
+	 */
+	public byte[] generateKml(EIdData eIdData) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		KmlLight kml = new KmlLight(baos);
+		KmlLightDocument doc = new KmlLightDocument();
 
-        String htmlDescription = "";
+		String htmlDescription = "";
 
-        if (null != eIdData && null != eIdData.getIdentity()) {
-            Identity identity = eIdData.getIdentity();
+		if (null != eIdData && null != eIdData.getIdentity()) {
+			Identity identity = eIdData.getIdentity();
 
-            if (null != eIdData.getPhoto()) {
-                byte[] photoData = eIdData.getPhoto();
-                kml.addImage(photoData);
-                htmlDescription += "<img src='photo.jpg' align='left'>";
-            } else {
-                LOG.debug("no photo");
-            }
+			if (null != eIdData.getPhoto()) {
+				byte[] photoData = eIdData.getPhoto();
+				kml.addImage(photoData);
+				htmlDescription += "<img src='photo.jpg' align='left'>";
+			} else {
+				LOG.debug("no photo");
+			}
 
-            Element elName = doc.createName(identity.firstName + " " + identity.name);
+			Element elName = doc.createName(identity.firstName + " " + identity.name);
 
-            /* name */
-            htmlDescription += identity.firstName + " ";
-            if (null != identity.middleName) {
-                htmlDescription += identity.middleName + " ";
-            }
-            htmlDescription += identity.name;
-            htmlDescription += "<br/>";
+			/* name */
+			htmlDescription += identity.firstName + " ";
+			if (null != identity.middleName) {
+				htmlDescription += identity.middleName + " ";
+			}
+			htmlDescription += identity.name;
+			htmlDescription += "<br/>";
 
-            /* nationality */
-            htmlDescription += identity.nationality;
-            htmlDescription += "<br/>";
+			/* nationality */
+			htmlDescription += identity.nationality;
+			htmlDescription += "<br/>";
 
-            /* day of birth */
-            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-            String birthday = formatter.format(identity.dateOfBirth.getTime());
-            htmlDescription += "(°" + birthday + ", " + identity.placeOfBirth + ")";
-            htmlDescription += "<br/>";
+			/* day of birth */
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+			String birthday = formatter.format(identity.dateOfBirth.getTime());
+			htmlDescription += "(°" + birthday + ", " + identity.placeOfBirth + ")";
+			htmlDescription += "<br/>";
 
-            /* validity of the card */
-            Element elValid = null;
+			/* validity of the card */
+			Element elValid = null;
 
-            if (null != identity.cardValidityDateBegin) {
-                elValid = doc.createTimespan(identity.cardValidityDateBegin.getTime(),
-                                        identity.cardValidityDateEnd.getTime());
-            } else {
-                LOG.debug("card validity begin date is unknown");
-            }
+			if (null != identity.cardValidityDateBegin) {
+				elValid = doc.createTimespan(identity.cardValidityDateBegin.getTime(),
+						identity.cardValidityDateEnd.getTime());
+			} else {
+				LOG.debug("card validity begin date is unknown");
+			}
 
-            /* citizen's address */
-            Element elAddress = null;
+			/* citizen's address */
+			Element elAddress = null;
 
-            if (null != eIdData.getAddress()) {
-                Address address = eIdData.getAddress();
+			if (null != eIdData.getAddress()) {
+				Address address = eIdData.getAddress();
 
-                /* not needed, or it will appear twice in GoogleEarth
-                htmlDescription += address.streetAndNumber + ", " +
-                        address.zip + " " + address.municipality;
-                htmlDescription += "<br/>";
-                */
-                elAddress = doc.createAddress(address.streetAndNumber,
-                        address.municipality, address.zip);
-            } else {
-                LOG.debug("no address");
-            }
+				/*
+				 * not needed, or it will appear twice in GoogleEarth
+				 * htmlDescription += address.streetAndNumber + ", " +
+				 * address.zip + " " + address.municipality; htmlDescription +=
+				 * "<br/>";
+				 */
+				elAddress = doc.createAddress(address.streetAndNumber, address.municipality, address.zip);
+			} else {
+				LOG.debug("no address");
+			}
 
-            Element elDescription = doc.createDescriptionNode(htmlDescription);
-            doc.addPlacemark(elName, elAddress, elDescription, elValid);
-        }
-        kml.addKmlFile(doc.getDocumentAsBytes());
-        kml.close();
-        
-        return baos.toByteArray();
-    }
+			Element elDescription = doc.createDescriptionNode(htmlDescription);
+			doc.addPlacemark(elName, elAddress, elDescription, elValid);
+		}
+		kml.addKmlFile(doc.getDocumentAsBytes());
+		kml.close();
+
+		return baos.toByteArray();
+	}
 }

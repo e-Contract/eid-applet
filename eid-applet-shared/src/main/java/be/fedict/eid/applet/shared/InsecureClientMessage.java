@@ -33,8 +33,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 public class InsecureClientMessage extends AbstractProtocolMessage {
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator
-	public static final String TYPE = InsecureClientMessage.class
-			.getSimpleName();
+	public static final String TYPE = InsecureClientMessage.class.getSimpleName();
 
 	public InsecureClientMessage() {
 		this(false);

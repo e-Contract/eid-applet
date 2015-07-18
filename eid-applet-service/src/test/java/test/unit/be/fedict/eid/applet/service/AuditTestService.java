@@ -64,8 +64,7 @@ public class AuditTestService implements AuditService {
 		AuditTestService.auditUserId = userId;
 	}
 
-	public void authenticationError(String remoteAddress,
-			X509Certificate clientCertificate) {
+	public void authenticationError(String remoteAddress, X509Certificate clientCertificate) {
 		LOG.debug("authentication error: " + remoteAddress);
 		AuditTestService.auditRemoteAddress = remoteAddress;
 		AuditTestService.auditClientCertificate = clientCertificate;
@@ -93,8 +92,7 @@ public class AuditTestService implements AuditService {
 		return AuditTestService.auditSignatureClientCertificate;
 	}
 
-	public void signatureError(String remoteAddress,
-			X509Certificate clientCertificate) {
+	public void signatureError(String remoteAddress, X509Certificate clientCertificate) {
 		AuditTestService.auditSignatureRemoteAddress = remoteAddress;
 		AuditTestService.auditSignatureClientCertificate = clientCertificate;
 	}

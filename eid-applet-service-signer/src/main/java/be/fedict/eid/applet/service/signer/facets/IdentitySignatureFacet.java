@@ -38,11 +38,11 @@ import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
-import be.fedict.eid.applet.service.signer.DigestAlgo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import be.fedict.eid.applet.service.signer.DigestAlgo;
 import be.fedict.eid.applet.service.signer.SignatureFacet;
 import be.fedict.eid.applet.service.signer.jaxb.identity.GenderType;
 import be.fedict.eid.applet.service.signer.jaxb.identity.IdentityType;
@@ -67,27 +67,23 @@ public class IdentitySignatureFacet implements SignatureFacet {
 	private final Marshaller marshaller;
 	private final DigestAlgo digestAlgo;
 
-	public IdentitySignatureFacet(IdentityDTO identity, byte[] photo,
-			DigestAlgo digestAlgo) {
+	public IdentitySignatureFacet(IdentityDTO identity, byte[] photo, DigestAlgo digestAlgo) {
 		this.identityDTO = identity;
 		this.photoData = photo;
-        this.digestAlgo = digestAlgo;
+		this.digestAlgo = digestAlgo;
 		this.objectFactory = new ObjectFactory();
 
 		try {
-			JAXBContext jaxbContext = JAXBContext
-					.newInstance(ObjectFactory.class);
+			JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
 			this.marshaller = jaxbContext.createMarshaller();
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
 		}
 	}
 
-	public void preSign(XMLSignatureFactory signatureFactory,
-			Document document, String signatureId,
-			List<X509Certificate> signingCertificateChain,
-			List<Reference> references, List<XMLObject> objects)
-			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+	public void preSign(XMLSignatureFactory signatureFactory, Document document, String signatureId,
+			List<X509Certificate> signingCertificateChain, List<Reference> references, List<XMLObject> objects)
+					throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		// construct identity document
 		IdentityType identity = this.objectFactory.createIdentityType();
 		String identityId = "identity-" + UUID.randomUUID().toString();
@@ -114,8 +110,7 @@ public class IdentitySignatureFacet implements SignatureFacet {
 		// marshalling
 		Node marshallNode = document.createElement("marshall-node");
 		try {
-			this.marshaller.marshal(
-					this.objectFactory.createIdentity(identity), marshallNode);
+			this.marshaller.marshal(this.objectFactory.createIdentity(identity), marshallNode);
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
 		}
@@ -126,25 +121,21 @@ public class IdentitySignatureFacet implements SignatureFacet {
 
 		List<XMLStructure> identityObjectContent = new LinkedList<XMLStructure>();
 		identityObjectContent.add(new DOMStructure(identityNode));
-		XMLObject identityObject = signatureFactory.newXMLObject(
-				identityObjectContent, objectId, null, null);
+		XMLObject identityObject = signatureFactory.newXMLObject(identityObjectContent, objectId, null, null);
 		objects.add(identityObject);
 
 		// ds:Reference
-		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				this.digestAlgo.getXmlAlgoId(), null);
+		DigestMethod digestMethod = signatureFactory.newDigestMethod(this.digestAlgo.getXmlAlgoId(), null);
 		List<Transform> transforms = new LinkedList<Transform>();
-		Transform exclusiveTransform = signatureFactory
-				.newTransform(CanonicalizationMethod.INCLUSIVE,
-						(TransformParameterSpec) null);
+		Transform exclusiveTransform = signatureFactory.newTransform(CanonicalizationMethod.INCLUSIVE,
+				(TransformParameterSpec) null);
 		transforms.add(exclusiveTransform);
-		Reference reference = signatureFactory.newReference("#" + objectId,
-				digestMethod, transforms, REFERENCE_TYPE, null);
+		Reference reference = signatureFactory.newReference("#" + objectId, digestMethod, transforms, REFERENCE_TYPE,
+				null);
 		references.add(reference);
 	}
 
-	public void postSign(Element signatureElement,
-			List<X509Certificate> signingCertificateChain) {
+	public void postSign(Element signatureElement, List<X509Certificate> signingCertificateChain) {
 		// empty
 	}
 }

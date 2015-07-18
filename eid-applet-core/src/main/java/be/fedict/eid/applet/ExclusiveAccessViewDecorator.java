@@ -55,24 +55,20 @@ public class ExclusiveAccessViewDecorator implements View {
 	}
 
 	@Override
-	public boolean privacyQuestion(boolean includeAddress,
-			boolean includePhoto, String identityDataUsage) {
+	public boolean privacyQuestion(boolean includeAddress, boolean includePhoto, String identityDataUsage) {
 		try {
 			this.pcscEid.endExclusive();
 		} catch (CardException e) {
-			this.delegate
-					.addDetailMessage("could not end exclusive card access");
+			this.delegate.addDetailMessage("could not end exclusive card access");
 			return false;
 		}
 		try {
-			return this.delegate.privacyQuestion(includeAddress, includePhoto,
-					identityDataUsage);
+			return this.delegate.privacyQuestion(includeAddress, includePhoto, identityDataUsage);
 		} finally {
 			try {
 				this.pcscEid.beginExclusive();
 			} catch (CardException e) {
-				this.delegate
-						.addDetailMessage("could not acquire exclusive card access");
+				this.delegate.addDetailMessage("could not acquire exclusive card access");
 				return false;
 			}
 		}
@@ -111,8 +107,7 @@ public class ExclusiveAccessViewDecorator implements View {
 			try {
 				this.pcscEid.beginExclusive();
 			} catch (CardException e) {
-				throw new SecurityException(
-						"could not acquire exclusive card access");
+				throw new SecurityException("could not acquire exclusive card access");
 			}
 		}
 	}
@@ -122,8 +117,7 @@ public class ExclusiveAccessViewDecorator implements View {
 		try {
 			this.pcscEid.endExclusive();
 		} catch (CardException e) {
-			this.delegate
-					.addDetailMessage("could not end exclusive card access");
+			this.delegate.addDetailMessage("could not end exclusive card access");
 			return JOptionPane.CANCEL_OPTION;
 		}
 		try {
@@ -132,8 +126,7 @@ public class ExclusiveAccessViewDecorator implements View {
 			try {
 				this.pcscEid.beginExclusive();
 			} catch (CardException e) {
-				this.delegate
-						.addDetailMessage("could not acquire exclusive card access");
+				this.delegate.addDetailMessage("could not acquire exclusive card access");
 				return JOptionPane.CANCEL_OPTION;
 			}
 		}

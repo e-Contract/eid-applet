@@ -50,8 +50,7 @@ public interface MessageHandler<T> {
 	 * @return the optional response message to send back.
 	 * @throws ServletException
 	 */
-	Object handleMessage(T message, Map<String, String> httpHeaders,
-			HttpServletRequest request, HttpSession session)
+	Object handleMessage(T message, Map<String, String> httpHeaders, HttpServletRequest request, HttpSession session)
 			throws ServletException;
 
 	/**

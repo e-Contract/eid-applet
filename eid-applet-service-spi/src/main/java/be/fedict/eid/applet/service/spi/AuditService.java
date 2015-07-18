@@ -58,8 +58,7 @@ public interface AuditService {
 	 * @param clientCertificate
 	 *            the X509 certificate causing the authentication error.
 	 */
-	void authenticationError(String remoteAddress,
-			X509Certificate clientCertificate);
+	void authenticationError(String remoteAddress, X509Certificate clientCertificate);
 
 	/**
 	 * Called by the eID Applet Service in case the eID Applet detects an

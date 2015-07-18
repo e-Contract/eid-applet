@@ -30,8 +30,7 @@ import java.util.Map;
  */
 public enum SpecialOrganisation implements Serializable {
 
-	UNSPECIFIED(null), SHAPE("1"), NATO("2"), FORMER_BLUE_CARD_HOLDER("4"), RESEARCHER(
-			"5"), UNKNOWN(null);
+	UNSPECIFIED(null), SHAPE("1"), NATO("2"), FORMER_BLUE_CARD_HOLDER("4"), RESEARCHER("5"), UNKNOWN(null);
 
 	private final String key;
 
@@ -47,14 +46,11 @@ public enum SpecialOrganisation implements Serializable {
 
 	static {
 		Map<String, SpecialOrganisation> specialOrganisations = new HashMap<String, SpecialOrganisation>();
-		for (SpecialOrganisation specialOrganisation : SpecialOrganisation
-				.values()) {
+		for (SpecialOrganisation specialOrganisation : SpecialOrganisation.values()) {
 			String key = specialOrganisation.getKey();
 			if (key != null) {
 				if (specialOrganisations.containsKey(key)) {
-					throw new RuntimeException(
-							"duplicate key for special organisation type: "
-									+ key);
+					throw new RuntimeException("duplicate key for special organisation type: " + key);
 				}
 				specialOrganisations.put(key, specialOrganisation);
 			}
@@ -69,8 +65,7 @@ public enum SpecialOrganisation implements Serializable {
 		if (key.isEmpty()) {
 			return UNSPECIFIED;
 		}
-		SpecialOrganisation specialOrganisation = SpecialOrganisation.specialOrganisations
-				.get(key);
+		SpecialOrganisation specialOrganisation = SpecialOrganisation.specialOrganisations.get(key);
 		if (null == specialOrganisation) {
 			return UNKNOWN;
 		}

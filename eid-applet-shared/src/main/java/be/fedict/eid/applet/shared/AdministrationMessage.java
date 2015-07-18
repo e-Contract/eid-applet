@@ -32,8 +32,7 @@ import be.fedict.eid.applet.shared.annotation.StopResponseMessage;
 public class AdministrationMessage extends AbstractProtocolMessage {
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator
-	public static final String TYPE = AdministrationMessage.class
-			.getSimpleName();
+	public static final String TYPE = AdministrationMessage.class.getSimpleName();
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "ChangePin")
 	public boolean changePin;
@@ -54,8 +53,8 @@ public class AdministrationMessage extends AbstractProtocolMessage {
 		super();
 	}
 
-	public AdministrationMessage(boolean changePin, boolean unblockPin,
-			boolean logoff, boolean removeCard, boolean requireSecureReader) {
+	public AdministrationMessage(boolean changePin, boolean unblockPin, boolean logoff, boolean removeCard,
+			boolean requireSecureReader) {
 		this.changePin = changePin;
 		this.unblockPin = unblockPin;
 		this.logoff = logoff;

@@ -53,10 +53,8 @@ public class JavascriptTest {
 		}
 	}
 
-	private boolean isJAppletMethod(Method method) throws SecurityException,
-			NoSuchMethodException {
-		if (null == JApplet.class.getMethod(method.getName(), method
-				.getParameterTypes())) {
+	private boolean isJAppletMethod(Method method) throws SecurityException, NoSuchMethodException {
+		if (null == JApplet.class.getMethod(method.getName(), method.getParameterTypes())) {
 			return false;
 		}
 		return true;

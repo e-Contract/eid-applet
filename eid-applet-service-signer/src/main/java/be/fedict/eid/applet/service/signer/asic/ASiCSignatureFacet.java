@@ -58,21 +58,17 @@ public class ASiCSignatureFacet implements SignatureFacet {
 		this.digestAlgo = digestAlgo;
 	}
 
-	public void preSign(XMLSignatureFactory signatureFactory,
-			Document document, String signatureId,
-			List<X509Certificate> signingCertificateChain,
-			List<Reference> references, List<XMLObject> objects)
-			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+	public void preSign(XMLSignatureFactory signatureFactory, Document document, String signatureId,
+			List<X509Certificate> signingCertificateChain, List<Reference> references, List<XMLObject> objects)
+					throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		FileInputStream fileInputStream;
 		try {
 			fileInputStream = new FileInputStream(this.tmpZipFile);
 		} catch (FileNotFoundException e) {
-			throw new RuntimeException("tmp file not found: " + e.getMessage(),
-					e);
+			throw new RuntimeException("tmp file not found: " + e.getMessage(), e);
 		}
 
-		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				this.digestAlgo.getXmlAlgoId(), null);
+		DigestMethod digestMethod = signatureFactory.newDigestMethod(this.digestAlgo.getXmlAlgoId(), null);
 
 		ZipInputStream zipInputStream = new ZipInputStream(fileInputStream);
 		ZipEntry zipEntry;
@@ -82,8 +78,7 @@ public class ASiCSignatureFacet implements SignatureFacet {
 					continue;
 				}
 				String uri = URLEncoder.encode(zipEntry.getName(), "UTF-8");
-				Reference reference = signatureFactory.newReference(uri,
-						digestMethod);
+				Reference reference = signatureFactory.newReference(uri, digestMethod);
 				references.add(reference);
 			}
 		} catch (IOException e) {
@@ -91,8 +86,7 @@ public class ASiCSignatureFacet implements SignatureFacet {
 		}
 	}
 
-	public void postSign(Element signatureElement,
-			List<X509Certificate> signingCertificateChain) {
+	public void postSign(Element signatureElement, List<X509Certificate> signingCertificateChain) {
 		// empty
 	}
 }

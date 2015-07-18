@@ -46,8 +46,7 @@ public class Version {
 			 */
 			return;
 		}
-		ClassLoader classLoader = Thread.currentThread()
-				.getContextClassLoader();
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		InputStream applicationPropertiesInputStream = classLoader
 				.getResourceAsStream("be/fedict/eid/applet/application.properties");
 		if (null == applicationPropertiesInputStream) {

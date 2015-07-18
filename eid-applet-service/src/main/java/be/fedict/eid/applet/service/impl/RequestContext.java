@@ -40,20 +40,17 @@ public class RequestContext implements ProtocolStateListener {
 
 	private final HttpSession httpSession;
 
-	public final static String INCLUDE_IDENTITY_SESSION_ATTRIBUTE = RequestContext.class
-			.getName() + ".IncludeIdentity";
+	public final static String INCLUDE_IDENTITY_SESSION_ATTRIBUTE = RequestContext.class.getName() + ".IncludeIdentity";
 
-	public final static String INCLUDE_ADDRESS_SESSION_ATTRIBUTE = RequestContext.class
-			.getName() + ".IncludeAddress";
+	public final static String INCLUDE_ADDRESS_SESSION_ATTRIBUTE = RequestContext.class.getName() + ".IncludeAddress";
 
-	public final static String INCLUDE_PHOTO_SESSION_ATTRIBUTE = RequestContext.class
-			.getName() + ".IncludePhoto";
+	public final static String INCLUDE_PHOTO_SESSION_ATTRIBUTE = RequestContext.class.getName() + ".IncludePhoto";
 
-	public final static String INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE = RequestContext.class
-			.getName() + ".IncludeCertificates";
+	public final static String INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE = RequestContext.class.getName()
+			+ ".IncludeCertificates";
 
-	public static final String TRANSACTION_MESSAGE_SESSION_ATTRIBUTE = RequestContext.class
-			.getName() + ".TransactionMessage";
+	public static final String TRANSACTION_MESSAGE_SESSION_ATTRIBUTE = RequestContext.class.getName()
+			+ ".TransactionMessage";
 
 	public RequestContext(HttpServletRequest request) {
 		this(request.getSession());
@@ -79,34 +76,28 @@ public class RequestContext implements ProtocolStateListener {
 		this.httpSession.removeAttribute(INCLUDE_IDENTITY_SESSION_ATTRIBUTE);
 		this.httpSession.removeAttribute(INCLUDE_ADDRESS_SESSION_ATTRIBUTE);
 		this.httpSession.removeAttribute(INCLUDE_PHOTO_SESSION_ATTRIBUTE);
-		this.httpSession
-				.removeAttribute(INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE);
+		this.httpSession.removeAttribute(INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE);
 		this.httpSession.removeAttribute(TRANSACTION_MESSAGE_SESSION_ATTRIBUTE);
 	}
 
 	public void setIncludeIdentity(boolean includeIdentity) {
-		this.httpSession.setAttribute(INCLUDE_IDENTITY_SESSION_ATTRIBUTE,
-				includeIdentity);
+		this.httpSession.setAttribute(INCLUDE_IDENTITY_SESSION_ATTRIBUTE, includeIdentity);
 	}
 
 	public void setIncludeAddress(boolean includeAddress) {
-		this.httpSession.setAttribute(INCLUDE_ADDRESS_SESSION_ATTRIBUTE,
-				includeAddress);
+		this.httpSession.setAttribute(INCLUDE_ADDRESS_SESSION_ATTRIBUTE, includeAddress);
 	}
 
 	public void setIncludePhoto(boolean includePhoto) {
-		this.httpSession.setAttribute(INCLUDE_PHOTO_SESSION_ATTRIBUTE,
-				includePhoto);
+		this.httpSession.setAttribute(INCLUDE_PHOTO_SESSION_ATTRIBUTE, includePhoto);
 	}
 
 	public void setIncludeCertificates(boolean includeCertificates) {
-		this.httpSession.setAttribute(INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE,
-				includeCertificates);
+		this.httpSession.setAttribute(INCLUDE_CERTIFICATES_SESSION_ATTRIBUTE, includeCertificates);
 	}
 
 	public void setTransactionMessage(String transactionMessage) {
-		this.httpSession.setAttribute(TRANSACTION_MESSAGE_SESSION_ATTRIBUTE,
-				transactionMessage);
+		this.httpSession.setAttribute(TRANSACTION_MESSAGE_SESSION_ATTRIBUTE, transactionMessage);
 	}
 
 	public boolean includeIdentity() {
@@ -134,8 +125,7 @@ public class RequestContext implements ProtocolStateListener {
 	}
 
 	public String getTransactionMessage() {
-		String transactionMessage = (String) this.httpSession
-				.getAttribute(TRANSACTION_MESSAGE_SESSION_ATTRIBUTE);
+		String transactionMessage = (String) this.httpSession.getAttribute(TRANSACTION_MESSAGE_SESSION_ATTRIBUTE);
 		return transactionMessage;
 	}
 }

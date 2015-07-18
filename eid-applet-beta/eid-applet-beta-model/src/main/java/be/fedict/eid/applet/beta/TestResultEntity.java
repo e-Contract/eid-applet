@@ -50,8 +50,7 @@ public class TestResultEntity implements Serializable {
 		super();
 	}
 
-	public TestResultEntity(String test, String result,
-			SessionContextEntity sessionContext) {
+	public TestResultEntity(String test, String result, SessionContextEntity sessionContext) {
 		this.test = test;
 		this.result = result;
 		this.sessionContext = sessionContext;

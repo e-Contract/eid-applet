@@ -55,9 +55,8 @@ public class IdentityRequest implements Serializable {
 	 *            Marks whether the eID card should be removed after eID
 	 *            operation.
 	 */
-	public IdentityRequest(boolean includeIdentity, boolean includeAddress,
-			boolean includePhoto, boolean includeCertificates,
-			boolean removeCard) {
+	public IdentityRequest(boolean includeIdentity, boolean includeAddress, boolean includePhoto,
+			boolean includeCertificates, boolean removeCard) {
 		super();
 		this.includeIdentity = includeIdentity;
 		this.includeAddress = includeAddress;
@@ -82,10 +81,9 @@ public class IdentityRequest implements Serializable {
 	 *            Marks whether the eID operation should also deliver the eID
 	 *            certificates.
 	 */
-	public IdentityRequest(boolean includeIdentity, boolean includeAddress,
-			boolean includePhoto, boolean includeCertificates) {
-		this(includeIdentity, includeAddress, includePhoto,
-				includeCertificates, false);
+	public IdentityRequest(boolean includeIdentity, boolean includeAddress, boolean includePhoto,
+			boolean includeCertificates) {
+		this(includeIdentity, includeAddress, includePhoto, includeCertificates, false);
 	}
 
 	public boolean includeIdentity() {

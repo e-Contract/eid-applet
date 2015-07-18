@@ -43,21 +43,17 @@ public class TransportTest {
 		identityDataMessage.addressFileSize = 10;
 		identityDataMessage.body = "hello world".getBytes();
 
-		HttpTransmitter mockHttpTransmitter = EasyMock
-				.createMock(HttpTransmitter.class);
+		HttpTransmitter mockHttpTransmitter = EasyMock.createMock(HttpTransmitter.class);
 
 		// expectations
 		EasyMock.expect(mockHttpTransmitter.isSecure()).andReturn(true);
 		mockHttpTransmitter.addHeader("X-AppletProtocol-Version", "1");
-		mockHttpTransmitter.addHeader("X-AppletProtocol-Type",
-				"IdentityDataMessage");
-		mockHttpTransmitter
-				.addHeader("X-AppletProtocol-IdentityFileSize", "20");
+		mockHttpTransmitter.addHeader("X-AppletProtocol-Type", "IdentityDataMessage");
+		mockHttpTransmitter.addHeader("X-AppletProtocol-IdentityFileSize", "20");
 		mockHttpTransmitter.addHeader("X-AppletProtocol-AddressFileSize", "10");
 		byte[] body = "hello world".getBytes();
 		mockHttpTransmitter.setBody(EasyMock.aryEq(body));
-		mockHttpTransmitter.addHeader("Content-Length", Integer
-				.toString(body.length));
+		mockHttpTransmitter.addHeader("Content-Length", Integer.toString(body.length));
 
 		// prepare
 		EasyMock.replay(mockHttpTransmitter);
@@ -74,14 +70,12 @@ public class TransportTest {
 		// setup
 		FinishedMessage finishedMessage = new FinishedMessage();
 
-		HttpTransmitter mockHttpTransmitter = EasyMock
-				.createMock(HttpTransmitter.class);
+		HttpTransmitter mockHttpTransmitter = EasyMock.createMock(HttpTransmitter.class);
 
 		// expectations
 		EasyMock.expect(mockHttpTransmitter.isSecure()).andReturn(true);
 		mockHttpTransmitter.addHeader("X-AppletProtocol-Version", "1");
-		mockHttpTransmitter.addHeader("X-AppletProtocol-Type",
-				"FinishedMessage");
+		mockHttpTransmitter.addHeader("X-AppletProtocol-Type", "FinishedMessage");
 		mockHttpTransmitter.addHeader("Content-Length", "0");
 
 		// prepare
@@ -97,19 +91,15 @@ public class TransportTest {
 	@Test
 	public void transmitFinishedMessageWithErrorCode() throws Exception {
 		// setup
-		FinishedMessage finishedMessage = new FinishedMessage(
-				ErrorCode.CERTIFICATE_EXPIRED);
+		FinishedMessage finishedMessage = new FinishedMessage(ErrorCode.CERTIFICATE_EXPIRED);
 
-		HttpTransmitter mockHttpTransmitter = EasyMock
-				.createMock(HttpTransmitter.class);
+		HttpTransmitter mockHttpTransmitter = EasyMock.createMock(HttpTransmitter.class);
 
 		// expectations
 		EasyMock.expect(mockHttpTransmitter.isSecure()).andReturn(true);
 		mockHttpTransmitter.addHeader("X-AppletProtocol-Version", "1");
-		mockHttpTransmitter.addHeader("X-AppletProtocol-Type",
-				"FinishedMessage");
-		mockHttpTransmitter.addHeader("X-AppletProtocol-ErrorCode",
-				ErrorCode.CERTIFICATE_EXPIRED.name());
+		mockHttpTransmitter.addHeader("X-AppletProtocol-Type", "FinishedMessage");
+		mockHttpTransmitter.addHeader("X-AppletProtocol-ErrorCode", ErrorCode.CERTIFICATE_EXPIRED.name());
 		mockHttpTransmitter.addHeader("Content-Length", "0");
 
 		// prepare
@@ -128,23 +118,18 @@ public class TransportTest {
 		IdentificationRequestMessage message = new IdentificationRequestMessage();
 		message.includePhoto = true;
 
-		HttpTransmitter mockHttpTransmitter = EasyMock
-				.createMock(HttpTransmitter.class);
+		HttpTransmitter mockHttpTransmitter = EasyMock.createMock(HttpTransmitter.class);
 
 		// expectations
 		EasyMock.expect(mockHttpTransmitter.isSecure()).andReturn(true);
 		mockHttpTransmitter.addHeader("X-AppletProtocol-Version", "1");
-		mockHttpTransmitter.addHeader("X-AppletProtocol-Type",
-				"IdentificationRequestMessage");
-		mockHttpTransmitter.addHeader("X-AppletProtocol-IncludeAddress",
-				"false");
+		mockHttpTransmitter.addHeader("X-AppletProtocol-Type", "IdentificationRequestMessage");
+		mockHttpTransmitter.addHeader("X-AppletProtocol-IncludeAddress", "false");
 		mockHttpTransmitter.addHeader("X-AppletProtocol-IncludePhoto", "true");
 
 		// TODO: protocol optimization: next could be omitted
-		mockHttpTransmitter.addHeader("X-AppletProtocol-IncludeIntegrityData",
-				"false");
-		mockHttpTransmitter.addHeader("X-AppletProtocol-IncludeCertificates",
-				"false");
+		mockHttpTransmitter.addHeader("X-AppletProtocol-IncludeIntegrityData", "false");
+		mockHttpTransmitter.addHeader("X-AppletProtocol-IncludeCertificates", "false");
 		mockHttpTransmitter.addHeader("X-AppletProtocol-RemoveCard", "false");
 		mockHttpTransmitter.addHeader("Content-Length", "0");
 
@@ -171,14 +156,12 @@ public class TransportTest {
 		message.readerList.add("Reader 1");
 		message.readerList.add("Reader 2");
 
-		HttpTransmitter mockHttpTransmitter = EasyMock
-				.createMock(HttpTransmitter.class);
+		HttpTransmitter mockHttpTransmitter = EasyMock.createMock(HttpTransmitter.class);
 
 		// expectations
 		EasyMock.expect(mockHttpTransmitter.isSecure()).andReturn(true);
 		mockHttpTransmitter.addHeader("X-AppletProtocol-Version", "1");
-		mockHttpTransmitter.addHeader("X-AppletProtocol-Type",
-				"ClientEnvironmentMessage");
+		mockHttpTransmitter.addHeader("X-AppletProtocol-Type", "ClientEnvironmentMessage");
 
 		mockHttpTransmitter.addHeader("X-AppletProtocol-JavaVersion", "1.6");
 		mockHttpTransmitter.addHeader("X-AppletProtocol-JavaVendor", "Sun");
@@ -186,11 +169,9 @@ public class TransportTest {
 		mockHttpTransmitter.addHeader("X-AppletProtocol-OSArch", "i386");
 		mockHttpTransmitter.addHeader("X-AppletProtocol-OSVersion", "2.6");
 		String lineSeparator = System.getProperty("line.separator");
-		byte[] body = ("Reader 1" + lineSeparator + "Reader 2" + lineSeparator)
-				.getBytes();
+		byte[] body = ("Reader 1" + lineSeparator + "Reader 2" + lineSeparator).getBytes();
 		mockHttpTransmitter.setBody(EasyMock.aryEq(body));
-		mockHttpTransmitter.addHeader("Content-Length", Integer
-				.toString(body.length));
+		mockHttpTransmitter.addHeader("Content-Length", Integer.toString(body.length));
 
 		// prepare
 		EasyMock.replay(mockHttpTransmitter);
@@ -207,8 +188,7 @@ public class TransportTest {
 		// setup
 		IdentityDataMessage identityDataMessage = new IdentityDataMessage();
 
-		HttpTransmitter mockHttpTransmitter = EasyMock
-				.createMock(HttpTransmitter.class);
+		HttpTransmitter mockHttpTransmitter = EasyMock.createMock(HttpTransmitter.class);
 
 		// stubs
 		EasyMock.expect(mockHttpTransmitter.isSecure()).andReturn(false);
@@ -231,8 +211,7 @@ public class TransportTest {
 		// setup
 		IdentityDataMessage identityDataMessage = new IdentityDataMessage();
 
-		HttpTransmitter mockHttpTransmitter = EasyMock
-				.createMock(HttpTransmitter.class);
+		HttpTransmitter mockHttpTransmitter = EasyMock.createMock(HttpTransmitter.class);
 
 		// stubs
 		EasyMock.expect(mockHttpTransmitter.isSecure()).andReturn(true);

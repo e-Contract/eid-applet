@@ -18,7 +18,6 @@
 
 package be.fedict.eid.applet.shared.protocol;
 
-
 /**
  * Exception class thrown by a semantic validator.
  * 

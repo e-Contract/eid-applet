@@ -61,8 +61,7 @@ import be.fedict.eid.applet.service.spi.SignatureService;
  * @author Frank Cornelis.
  * 
  */
-public class AbstractASiCSignatureService extends AbstractXmlSignatureService
-		implements SignatureService {
+public class AbstractASiCSignatureService extends AbstractXmlSignatureService implements SignatureService {
 
 	private final TemporaryDataStorage temporaryDataStorage;
 
@@ -70,11 +69,9 @@ public class AbstractASiCSignatureService extends AbstractXmlSignatureService
 
 	private final OutputStream documentOutputStream;
 
-	public AbstractASiCSignatureService(InputStream documentInputStream,
-			DigestAlgo digestAlgo, RevocationDataService revocationDataService,
-			TimeStampService timeStampService, String claimedRole,
-			IdentityDTO identity, byte[] photo,
-			TemporaryDataStorage temporaryDataStorage,
+	public AbstractASiCSignatureService(InputStream documentInputStream, DigestAlgo digestAlgo,
+			RevocationDataService revocationDataService, TimeStampService timeStampService, String claimedRole,
+			IdentityDTO identity, byte[] photo, TemporaryDataStorage temporaryDataStorage,
 			OutputStream documentOutputStream) throws IOException {
 		super(digestAlgo);
 		this.temporaryDataStorage = temporaryDataStorage;
@@ -86,18 +83,17 @@ public class AbstractASiCSignatureService extends AbstractXmlSignatureService
 		IOUtils.copy(documentInputStream, fileOutputStream);
 
 		addSignatureFacet(new ASiCSignatureFacet(this.tmpFile, digestAlgo));
-		XAdESSignatureFacet xadesSignatureFacet = new XAdESSignatureFacet(
-				getSignatureDigestAlgorithm());
+		XAdESSignatureFacet xadesSignatureFacet = new XAdESSignatureFacet(getSignatureDigestAlgorithm());
 		xadesSignatureFacet.setRole(claimedRole);
 		xadesSignatureFacet.setXadesNamespacePrefix("xades");
 		addSignatureFacet(xadesSignatureFacet);
-		addSignatureFacet(new XAdESXLSignatureFacet(timeStampService,
-				revocationDataService, getSignatureDigestAlgorithm()));
+		addSignatureFacet(
+				new XAdESXLSignatureFacet(timeStampService, revocationDataService, getSignatureDigestAlgorithm()));
 		addSignatureFacet(new KeyInfoSignatureFacet(true, false, false));
 
 		if (null != identity) {
-			IdentitySignatureFacet identitySignatureFacet = new IdentitySignatureFacet(
-					identity, photo, getSignatureDigestAlgorithm());
+			IdentitySignatureFacet identitySignatureFacet = new IdentitySignatureFacet(identity, photo,
+					getSignatureDigestAlgorithm());
 			addSignatureFacet(identitySignatureFacet);
 		}
 	}
@@ -124,8 +120,7 @@ public class AbstractASiCSignatureService extends AbstractXmlSignatureService
 	@Override
 	protected OutputStream getSignedDocumentOutputStream() {
 		return new ASiCSignatureOutputStream(this.tmpFile,
-				new CloseActionOutputStream(this.documentOutputStream,
-						new CloseAction()));
+				new CloseActionOutputStream(this.documentOutputStream, new CloseAction()));
 	}
 
 	private class CloseAction implements Runnable {
@@ -135,24 +130,19 @@ public class AbstractASiCSignatureService extends AbstractXmlSignatureService
 	}
 
 	@Override
-	public DigestInfo preSign(List<DigestInfo> digestInfos,
-			List<X509Certificate> signingCertificateChain,
-			IdentityDTO identity, AddressDTO address, byte[] photo)
-			throws NoSuchAlgorithmException {
-		return super.preSign(digestInfos, signingCertificateChain, identity,
-				address, photo);
+	public DigestInfo preSign(List<DigestInfo> digestInfos, List<X509Certificate> signingCertificateChain,
+			IdentityDTO identity, AddressDTO address, byte[] photo) throws NoSuchAlgorithmException {
+		return super.preSign(digestInfos, signingCertificateChain, identity, address, photo);
 	}
 
 	@Override
-	protected Document getEnvelopingDocument()
-			throws ParserConfigurationException, IOException, SAXException {
+	protected Document getEnvelopingDocument() throws ParserConfigurationException, IOException, SAXException {
 		FileInputStream fileInputStream = new FileInputStream(this.tmpFile);
 		ZipInputStream zipInputStream = new ZipInputStream(fileInputStream);
 		ZipEntry zipEntry;
 		while (null != (zipEntry = zipInputStream.getNextEntry())) {
 			if (ASiCUtil.isSignatureZipEntry(zipEntry)) {
-				Document documentSignaturesDocument = ODFUtil
-						.loadDocument(zipInputStream);
+				Document documentSignaturesDocument = ODFUtil.loadDocument(zipInputStream);
 				return documentSignaturesDocument;
 			}
 		}

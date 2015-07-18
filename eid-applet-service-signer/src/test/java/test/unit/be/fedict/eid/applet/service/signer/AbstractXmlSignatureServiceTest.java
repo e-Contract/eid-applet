@@ -36,13 +36,52 @@
 
 package test.unit.be.fedict.eid.applet.service.signer;
 
-import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
-import be.fedict.eid.applet.service.signer.DigestAlgo;
-import be.fedict.eid.applet.service.signer.SignatureFacet;
-import be.fedict.eid.applet.service.signer.TemporaryDataStorage;
-import be.fedict.eid.applet.service.signer.facets.EnvelopedSignatureFacet;
-import be.fedict.eid.applet.service.signer.odf.ApacheNodeSetData;
-import be.fedict.eid.applet.service.spi.DigestInfo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.KeyPair;
+import java.security.MessageDigest;
+import java.security.cert.X509Certificate;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.crypto.Cipher;
+import javax.xml.crypto.Data;
+import javax.xml.crypto.KeySelector;
+import javax.xml.crypto.OctetStreamData;
+import javax.xml.crypto.URIDereferencer;
+import javax.xml.crypto.URIReference;
+import javax.xml.crypto.URIReferenceException;
+import javax.xml.crypto.XMLCryptoContext;
+import javax.xml.crypto.dom.DOMCryptoContext;
+import javax.xml.crypto.dsig.CanonicalizationMethod;
+import javax.xml.crypto.dsig.DigestMethod;
+import javax.xml.crypto.dsig.Reference;
+import javax.xml.crypto.dsig.SignatureMethod;
+import javax.xml.crypto.dsig.SignedInfo;
+import javax.xml.crypto.dsig.Transform;
+import javax.xml.crypto.dsig.XMLSignContext;
+import javax.xml.crypto.dsig.XMLSignature;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.dom.DOMSignContext;
+import javax.xml.crypto.dsig.dom.DOMValidateContext;
+import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.crypto.dsig.spec.TransformParameterSpec;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -63,37 +102,28 @@ import org.apache.xpath.XPathAPI;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.crypto.Cipher;
-import javax.xml.crypto.*;
-import javax.xml.crypto.dom.DOMCryptoContext;
-import javax.xml.crypto.dsig.*;
-import javax.xml.crypto.dsig.dom.DOMSignContext;
-import javax.xml.crypto.dsig.dom.DOMValidateContext;
-import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
-import javax.xml.crypto.dsig.spec.TransformParameterSpec;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
-import java.security.KeyPair;
-import java.security.MessageDigest;
-import java.security.cert.X509Certificate;
-import java.util.*;
-
-import static org.junit.Assert.*;
+import be.fedict.eid.applet.service.signer.AbstractXmlSignatureService;
+import be.fedict.eid.applet.service.signer.DigestAlgo;
+import be.fedict.eid.applet.service.signer.SignatureFacet;
+import be.fedict.eid.applet.service.signer.TemporaryDataStorage;
+import be.fedict.eid.applet.service.signer.facets.EnvelopedSignatureFacet;
+import be.fedict.eid.applet.service.signer.odf.ApacheNodeSetData;
+import be.fedict.eid.applet.service.spi.DigestInfo;
 
 public class AbstractXmlSignatureServiceTest {
 
-	private static final Log LOG = LogFactory
-			.getLog(AbstractXmlSignatureServiceTest.class);
+	private static final Log LOG = LogFactory.getLog(AbstractXmlSignatureServiceTest.class);
 
-	private static class XmlSignatureTestService extends
-			AbstractXmlSignatureService {
+	private static class XmlSignatureTestService extends AbstractXmlSignatureService {
 
 		private Document envelopingDocument;
 
@@ -167,15 +197,12 @@ public class AbstractXmlSignatureServiceTest {
 	@Test
 	public void testSignEnvelopingDocument() throws Exception {
 		// setup
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.newDocument();
 		Element rootElement = document.createElementNS("urn:test", "tns:root");
-		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
-				"urn:test");
+		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns", "urn:test");
 		document.appendChild(rootElement);
 		Element dataElement = document.createElementNS("urn:test", "tns:data");
 		dataElement.setAttributeNS(null, "Id", "id-1234");
@@ -185,14 +212,12 @@ public class AbstractXmlSignatureServiceTest {
 
 		SignatureTestFacet signatureFacet = new SignatureTestFacet();
 		signatureFacet.addReferenceUri("#id-1234");
-		XmlSignatureTestService testedInstance = new XmlSignatureTestService(
-				signatureFacet);
+		XmlSignatureTestService testedInstance = new XmlSignatureTestService(signatureFacet);
 		testedInstance.setEnvelopingDocument(document);
 		testedInstance.setSignatureDescription("test-signature-description");
 
 		// operate
-		DigestInfo digestInfo = testedInstance.preSign(null, null, null, null,
-				null);
+		DigestInfo digestInfo = testedInstance.preSign(null, null, null, null, null);
 
 		// verify
 		assertNotNull(digestInfo);
@@ -211,10 +236,8 @@ public class AbstractXmlSignatureServiceTest {
 
 		LOG.debug("tmp document: " + PkiTestUtils.toString(tmpDocument));
 		Element nsElement = tmpDocument.createElement("ns");
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds",
-				Constants.SignatureSpecNS);
-		Node digestValueNode = XPathAPI.selectSingleNode(tmpDocument,
-				"//ds:DigestValue", nsElement);
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS);
+		Node digestValueNode = XPathAPI.selectSingleNode(tmpDocument, "//ds:DigestValue", nsElement);
 		assertNotNull(digestValueNode);
 		String digestValueTextContent = digestValueNode.getTextContent();
 		LOG.debug("digest value text content: " + digestValueTextContent);
@@ -226,43 +249,33 @@ public class AbstractXmlSignatureServiceTest {
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
-		byte[] digestInfoValue = ArrayUtils.addAll(
-				PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
+		byte[] digestInfoValue = ArrayUtils.addAll(PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
 		byte[] signatureValue = cipher.doFinal(digestInfoValue);
 
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
-				.getPrivate(), true, 0, null, null, new KeyUsage(
-				KeyUsage.nonRepudiation));
+		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair.getPublic(), "CN=Test", notBefore,
+				notAfter, null, keyPair.getPrivate(), true, 0, null, null, new KeyUsage(KeyUsage.nonRepudiation));
 
 		/*
 		 * Operate: postSign
 		 */
-		testedInstance.postSign(signatureValue,
-				Collections.singletonList(certificate));
+		testedInstance.postSign(signatureValue, Collections.singletonList(certificate));
 
 		byte[] signedDocumentData = testedInstance.getSignedDocumentData();
 		assertNotNull(signedDocumentData);
-		Document signedDocument = PkiTestUtils
-				.loadDocument(new ByteArrayInputStream(signedDocumentData));
+		Document signedDocument = PkiTestUtils.loadDocument(new ByteArrayInputStream(signedDocumentData));
 		LOG.debug("signed document: " + PkiTestUtils.toString(signedDocument));
 
-		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(
-				XMLSignature.XMLNS, "Signature");
+		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 		assertEquals(1, signatureNodeList.getLength());
 		Node signatureNode = signatureNodeList.item(0);
 
 		DOMValidateContext domValidateContext = new DOMValidateContext(
-				KeySelector.singletonKeySelector(keyPair.getPublic()),
-				signatureNode);
-		domValidateContext.setIdAttributeNS((Element) signedDocument
-				.getDocumentElement().getFirstChild(), null, "Id");
-		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-				.getInstance();
-		XMLSignature xmlSignature = xmlSignatureFactory
-				.unmarshalXMLSignature(domValidateContext);
+				KeySelector.singletonKeySelector(keyPair.getPublic()), signatureNode);
+		domValidateContext.setIdAttributeNS((Element) signedDocument.getDocumentElement().getFirstChild(), null, "Id");
+		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
+		XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
 		boolean validity = xmlSignature.validate(domValidateContext);
 		assertTrue(validity);
 	}
@@ -279,8 +292,8 @@ public class AbstractXmlSignatureServiceTest {
 			this.resources.put(uri, data);
 		}
 
-		public Data dereference(URIReference uriReference,
-				XMLCryptoContext xmlCryptoContext) throws URIReferenceException {
+		public Data dereference(URIReference uriReference, XMLCryptoContext xmlCryptoContext)
+				throws URIReferenceException {
 			String uri = uriReference.getURI();
 			byte[] data = this.resources.get(uri);
 			if (null == data) {
@@ -293,17 +306,14 @@ public class AbstractXmlSignatureServiceTest {
 	@Test
 	public void testSignExternalUri() throws Exception {
 		// setup
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.newDocument();
 
 		SignatureTestFacet signatureFacet = new SignatureTestFacet();
 		signatureFacet.addReferenceUri("external-uri");
-		XmlSignatureTestService testedInstance = new XmlSignatureTestService(
-				signatureFacet);
+		XmlSignatureTestService testedInstance = new XmlSignatureTestService(signatureFacet);
 		testedInstance.setEnvelopingDocument(document);
 		testedInstance.setSignatureDescription("test-signature-description");
 		UriTestDereferencer uriDereferencer = new UriTestDereferencer();
@@ -311,8 +321,7 @@ public class AbstractXmlSignatureServiceTest {
 		testedInstance.setUriDereferencer(uriDereferencer);
 
 		// operate
-		DigestInfo digestInfo = testedInstance.preSign(null, null, null, null,
-				null);
+		DigestInfo digestInfo = testedInstance.preSign(null, null, null, null, null);
 
 		// verify
 		assertNotNull(digestInfo);
@@ -331,10 +340,8 @@ public class AbstractXmlSignatureServiceTest {
 
 		LOG.debug("tmp document: " + PkiTestUtils.toString(tmpDocument));
 		Element nsElement = tmpDocument.createElement("ns");
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds",
-				Constants.SignatureSpecNS);
-		Node digestValueNode = XPathAPI.selectSingleNode(tmpDocument,
-				"//ds:DigestValue", nsElement);
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS);
+		Node digestValueNode = XPathAPI.selectSingleNode(tmpDocument, "//ds:DigestValue", nsElement);
 		assertNotNull(digestValueNode);
 		String digestValueTextContent = digestValueNode.getTextContent();
 		LOG.debug("digest value text content: " + digestValueTextContent);
@@ -346,59 +353,46 @@ public class AbstractXmlSignatureServiceTest {
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
-		byte[] digestInfoValue = ArrayUtils.addAll(
-				PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
+		byte[] digestInfoValue = ArrayUtils.addAll(PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
 		byte[] signatureValue = cipher.doFinal(digestInfoValue);
 
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
-				.getPrivate(), true, 0, null, null, new KeyUsage(
-				KeyUsage.nonRepudiation));
+		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair.getPublic(), "CN=Test", notBefore,
+				notAfter, null, keyPair.getPrivate(), true, 0, null, null, new KeyUsage(KeyUsage.nonRepudiation));
 
 		/*
 		 * Operate: postSign
 		 */
-		testedInstance.postSign(signatureValue,
-				Collections.singletonList(certificate));
+		testedInstance.postSign(signatureValue, Collections.singletonList(certificate));
 
 		byte[] signedDocumentData = testedInstance.getSignedDocumentData();
 		assertNotNull(signedDocumentData);
-		Document signedDocument = PkiTestUtils
-				.loadDocument(new ByteArrayInputStream(signedDocumentData));
+		Document signedDocument = PkiTestUtils.loadDocument(new ByteArrayInputStream(signedDocumentData));
 		LOG.debug("signed document: " + PkiTestUtils.toString(signedDocument));
 
-		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(
-				XMLSignature.XMLNS, "Signature");
+		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 		assertEquals(1, signatureNodeList.getLength());
 		Node signatureNode = signatureNodeList.item(0);
 
 		DOMValidateContext domValidateContext = new DOMValidateContext(
-				KeySelector.singletonKeySelector(keyPair.getPublic()),
-				signatureNode);
+				KeySelector.singletonKeySelector(keyPair.getPublic()), signatureNode);
 		domValidateContext.setURIDereferencer(uriDereferencer);
-		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-				.getInstance();
-		XMLSignature xmlSignature = xmlSignatureFactory
-				.unmarshalXMLSignature(domValidateContext);
+		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
+		XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
 		boolean validity = xmlSignature.validate(domValidateContext);
 		assertTrue(validity);
 	}
 
 	@Test
-	public void testSignEnvelopingDocumentWithExternalDigestInfo()
-			throws Exception {
+	public void testSignEnvelopingDocumentWithExternalDigestInfo() throws Exception {
 		// setup
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.newDocument();
 		Element rootElement = document.createElementNS("urn:test", "tns:root");
-		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
-				"urn:test");
+		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns", "urn:test");
 		document.appendChild(rootElement);
 
 		XmlSignatureTestService testedInstance = new XmlSignatureTestService();
@@ -409,12 +403,10 @@ public class AbstractXmlSignatureServiceTest {
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
 		messageDigest.update(refData);
 		byte[] digestValue = messageDigest.digest();
-		DigestInfo refDigestInfo = new DigestInfo(digestValue, "SHA-1",
-				"urn:test:ref");
+		DigestInfo refDigestInfo = new DigestInfo(digestValue, "SHA-1", "urn:test:ref");
 
 		// operate
-		DigestInfo digestInfo = testedInstance.preSign(
-				Collections.singletonList(refDigestInfo), null, null, null,
+		DigestInfo digestInfo = testedInstance.preSign(Collections.singletonList(refDigestInfo), null, null, null,
 				null);
 
 		// verify
@@ -434,10 +426,8 @@ public class AbstractXmlSignatureServiceTest {
 
 		LOG.debug("tmp document: " + PkiTestUtils.toString(tmpDocument));
 		Element nsElement = tmpDocument.createElement("ns");
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds",
-				Constants.SignatureSpecNS);
-		Node digestValueNode = XPathAPI.selectSingleNode(tmpDocument,
-				"//ds:DigestValue", nsElement);
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS);
+		Node digestValueNode = XPathAPI.selectSingleNode(tmpDocument, "//ds:DigestValue", nsElement);
 		assertNotNull(digestValueNode);
 		String digestValueTextContent = digestValueNode.getTextContent();
 		LOG.debug("digest value text content: " + digestValueTextContent);
@@ -449,43 +439,34 @@ public class AbstractXmlSignatureServiceTest {
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
-		byte[] digestInfoValue = ArrayUtils.addAll(
-				PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
+		byte[] digestInfoValue = ArrayUtils.addAll(PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
 		byte[] signatureValue = cipher.doFinal(digestInfoValue);
 
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
-				.getPrivate(), true, 0, null, null, new KeyUsage(
-				KeyUsage.nonRepudiation));
+		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair.getPublic(), "CN=Test", notBefore,
+				notAfter, null, keyPair.getPrivate(), true, 0, null, null, new KeyUsage(KeyUsage.nonRepudiation));
 
 		/*
 		 * Operate: postSign
 		 */
-		testedInstance.postSign(signatureValue,
-				Collections.singletonList(certificate));
+		testedInstance.postSign(signatureValue, Collections.singletonList(certificate));
 
 		byte[] signedDocumentData = testedInstance.getSignedDocumentData();
 		assertNotNull(signedDocumentData);
-		Document signedDocument = PkiTestUtils
-				.loadDocument(new ByteArrayInputStream(signedDocumentData));
+		Document signedDocument = PkiTestUtils.loadDocument(new ByteArrayInputStream(signedDocumentData));
 		LOG.debug("signed document: " + PkiTestUtils.toString(signedDocument));
 
-		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(
-				XMLSignature.XMLNS, "Signature");
+		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 		assertEquals(1, signatureNodeList.getLength());
 		Node signatureNode = signatureNodeList.item(0);
 
 		DOMValidateContext domValidateContext = new DOMValidateContext(
-				KeySelector.singletonKeySelector(keyPair.getPublic()),
-				signatureNode);
+				KeySelector.singletonKeySelector(keyPair.getPublic()), signatureNode);
 		URIDereferencer dereferencer = new URITest2Dereferencer();
 		domValidateContext.setURIDereferencer(dereferencer);
-		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-				.getInstance();
-		XMLSignature xmlSignature = xmlSignatureFactory
-				.unmarshalXMLSignature(domValidateContext);
+		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
+		XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
 		boolean validity = xmlSignature.validate(domValidateContext);
 		assertTrue(validity);
 	}
@@ -493,11 +474,9 @@ public class AbstractXmlSignatureServiceTest {
 	@Test
 	public void testSignExternalDigestInfo() throws Exception {
 		// setup
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.newDocument();
 
 		XmlSignatureTestService testedInstance = new XmlSignatureTestService();
@@ -508,12 +487,10 @@ public class AbstractXmlSignatureServiceTest {
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
 		messageDigest.update(refData);
 		byte[] digestValue = messageDigest.digest();
-		DigestInfo refDigestInfo = new DigestInfo(digestValue, "SHA-1",
-				"urn:test:ref");
+		DigestInfo refDigestInfo = new DigestInfo(digestValue, "SHA-1", "urn:test:ref");
 
 		// operate
-		DigestInfo digestInfo = testedInstance.preSign(
-				Collections.singletonList(refDigestInfo), null, null, null,
+		DigestInfo digestInfo = testedInstance.preSign(Collections.singletonList(refDigestInfo), null, null, null,
 				null);
 
 		// verify
@@ -533,10 +510,8 @@ public class AbstractXmlSignatureServiceTest {
 
 		LOG.debug("tmp document: " + PkiTestUtils.toString(tmpDocument));
 		Element nsElement = tmpDocument.createElement("ns");
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds",
-				Constants.SignatureSpecNS);
-		Node digestValueNode = XPathAPI.selectSingleNode(tmpDocument,
-				"//ds:DigestValue", nsElement);
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS);
+		Node digestValueNode = XPathAPI.selectSingleNode(tmpDocument, "//ds:DigestValue", nsElement);
 		assertNotNull(digestValueNode);
 		String digestValueTextContent = digestValueNode.getTextContent();
 		LOG.debug("digest value text content: " + digestValueTextContent);
@@ -548,57 +523,45 @@ public class AbstractXmlSignatureServiceTest {
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
-		byte[] digestInfoValue = ArrayUtils.addAll(
-				PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
+		byte[] digestInfoValue = ArrayUtils.addAll(PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
 		byte[] signatureValue = cipher.doFinal(digestInfoValue);
 
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
-				.getPrivate(), true, 0, null, null, new KeyUsage(
-				KeyUsage.nonRepudiation));
+		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair.getPublic(), "CN=Test", notBefore,
+				notAfter, null, keyPair.getPrivate(), true, 0, null, null, new KeyUsage(KeyUsage.nonRepudiation));
 
 		/*
 		 * Operate: postSign
 		 */
-		testedInstance.postSign(signatureValue,
-				Collections.singletonList(certificate));
+		testedInstance.postSign(signatureValue, Collections.singletonList(certificate));
 
 		byte[] signedDocumentData = testedInstance.getSignedDocumentData();
 		assertNotNull(signedDocumentData);
-		Document signedDocument = PkiTestUtils
-				.loadDocument(new ByteArrayInputStream(signedDocumentData));
+		Document signedDocument = PkiTestUtils.loadDocument(new ByteArrayInputStream(signedDocumentData));
 		LOG.debug("signed document: " + PkiTestUtils.toString(signedDocument));
 
-		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(
-				XMLSignature.XMLNS, "Signature");
+		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 		assertEquals(1, signatureNodeList.getLength());
 		Node signatureNode = signatureNodeList.item(0);
 
 		DOMValidateContext domValidateContext = new DOMValidateContext(
-				KeySelector.singletonKeySelector(keyPair.getPublic()),
-				signatureNode);
+				KeySelector.singletonKeySelector(keyPair.getPublic()), signatureNode);
 		URIDereferencer dereferencer = new URITest2Dereferencer();
 		domValidateContext.setURIDereferencer(dereferencer);
-		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-				.getInstance();
-		XMLSignature xmlSignature = xmlSignatureFactory
-				.unmarshalXMLSignature(domValidateContext);
+		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
+		XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
 		boolean validity = xmlSignature.validate(domValidateContext);
 		assertTrue(validity);
 	}
 
 	private static class URITest2Dereferencer implements URIDereferencer {
 
-		private static final Log LOG = LogFactory
-				.getLog(URITest2Dereferencer.class);
+		private static final Log LOG = LogFactory.getLog(URITest2Dereferencer.class);
 
-		public Data dereference(URIReference uriReference,
-				XMLCryptoContext context) throws URIReferenceException {
+		public Data dereference(URIReference uriReference, XMLCryptoContext context) throws URIReferenceException {
 			LOG.debug("dereference: " + uriReference.getURI());
-			return new OctetStreamData(new ByteArrayInputStream(
-					"hello world".getBytes()));
+			return new OctetStreamData(new ByteArrayInputStream("hello world".getBytes()));
 		}
 	}
 
@@ -606,15 +569,12 @@ public class AbstractXmlSignatureServiceTest {
 	public void testJsr105Signature() throws Exception {
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.newDocument();
 		Element rootElement = document.createElementNS("urn:test", "tns:root");
-		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
-				"urn:test");
+		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns", "urn:test");
 		document.appendChild(rootElement);
 		Element dataElement = document.createElementNS("urn:test", "tns:data");
 		dataElement.setAttributeNS(null, "Id", "id-1234");
@@ -622,47 +582,34 @@ public class AbstractXmlSignatureServiceTest {
 		dataElement.setTextContent("data to be signed");
 		rootElement.appendChild(dataElement);
 
-		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
-				"DOM", new XMLDSigRI());
+		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM", new XMLDSigRI());
 
-		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(),
-				document.getDocumentElement());
-		signContext.putNamespacePrefix(
-				javax.xml.crypto.dsig.XMLSignature.XMLNS, "ds");
+		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(), document.getDocumentElement());
+		signContext.putNamespacePrefix(javax.xml.crypto.dsig.XMLSignature.XMLNS, "ds");
 
-		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				DigestMethod.SHA1, null);
-		Reference reference = signatureFactory.newReference("#id-1234",
-				digestMethod);
+		DigestMethod digestMethod = signatureFactory.newDigestMethod(DigestMethod.SHA1, null);
+		Reference reference = signatureFactory.newReference("#id-1234", digestMethod);
 		DOMReference domReference = (DOMReference) reference;
 		assertNull(domReference.getCalculatedDigestValue());
 		assertNull(domReference.getDigestValue());
 
-		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(
-				SignatureMethod.RSA_SHA1, null);
-		CanonicalizationMethod canonicalizationMethod = signatureFactory
-				.newCanonicalizationMethod(
-						CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
-						(C14NMethodParameterSpec) null);
-		SignedInfo signedInfo = signatureFactory.newSignedInfo(
-				canonicalizationMethod, signatureMethod,
+		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(SignatureMethod.RSA_SHA1, null);
+		CanonicalizationMethod canonicalizationMethod = signatureFactory.newCanonicalizationMethod(
+				CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null);
+		SignedInfo signedInfo = signatureFactory.newSignedInfo(canonicalizationMethod, signatureMethod,
 				Collections.singletonList(reference));
 
-		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory
-				.newXMLSignature(signedInfo, null);
+		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory.newXMLSignature(signedInfo, null);
 
 		DOMXMLSignature domXmlSignature = (DOMXMLSignature) xmlSignature;
-		domXmlSignature.marshal(document.getDocumentElement(), "ds",
-				(DOMCryptoContext) signContext);
+		domXmlSignature.marshal(document.getDocumentElement(), "ds", (DOMCryptoContext) signContext);
 		domReference.digest(signContext);
 		// xmlSignature.sign(signContext);
 		// LOG.debug("signed document: " + toString(document));
 
 		Element nsElement = document.createElement("ns");
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds",
-				Constants.SignatureSpecNS);
-		Node digestValueNode = XPathAPI.selectSingleNode(document,
-				"//ds:DigestValue", nsElement);
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS);
+		Node digestValueNode = XPathAPI.selectSingleNode(document, "//ds:DigestValue", nsElement);
 		assertNotNull(digestValueNode);
 		String digestValueTextContent = digestValueNode.getTextContent();
 		LOG.debug("digest value text content: " + digestValueTextContent);
@@ -673,70 +620,53 @@ public class AbstractXmlSignatureServiceTest {
 	public void testJsr105SignatureExternalXML() throws Exception {
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.newDocument();
 		Element rootElement = document.createElementNS("urn:test", "tns:root");
-		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
-				"urn:test");
+		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns", "urn:test");
 		document.appendChild(rootElement);
 		Element dataElement = document.createElementNS("urn:test", "tns:data");
 		dataElement.setAttributeNS(null, "Id", "id-1234");
 		dataElement.setTextContent("data to be signed");
 		rootElement.appendChild(dataElement);
 
-		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
-				"DOM", new XMLDSigRI());
+		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM", new XMLDSigRI());
 
-		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(),
-				document.getDocumentElement());
+		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(), document.getDocumentElement());
 		signContext.setURIDereferencer(new MyURIDereferencer());
-		signContext.putNamespacePrefix(
-				javax.xml.crypto.dsig.XMLSignature.XMLNS, "ds");
+		signContext.putNamespacePrefix(javax.xml.crypto.dsig.XMLSignature.XMLNS, "ds");
 
-		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				DigestMethod.SHA1, null);
+		DigestMethod digestMethod = signatureFactory.newDigestMethod(DigestMethod.SHA1, null);
 
 		List<Transform> transforms = new LinkedList<Transform>();
-		Transform transform = signatureFactory
-				.newTransform(CanonicalizationMethod.INCLUSIVE,
-						(TransformParameterSpec) null);
+		Transform transform = signatureFactory.newTransform(CanonicalizationMethod.INCLUSIVE,
+				(TransformParameterSpec) null);
 		transforms.add(transform);
-		Reference reference = signatureFactory.newReference("/helloworld.xml",
-				digestMethod, transforms, null, null);
+		Reference reference = signatureFactory.newReference("/helloworld.xml", digestMethod, transforms, null, null);
 
 		DOMReference domReference = (DOMReference) reference;
 		assertNull(domReference.getCalculatedDigestValue());
 		assertNull(domReference.getDigestValue());
 
-		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(
-				SignatureMethod.RSA_SHA1, null);
-		CanonicalizationMethod canonicalizationMethod = signatureFactory
-				.newCanonicalizationMethod(
-						CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
-						(C14NMethodParameterSpec) null);
-		SignedInfo signedInfo = signatureFactory.newSignedInfo(
-				canonicalizationMethod, signatureMethod,
+		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(SignatureMethod.RSA_SHA1, null);
+		CanonicalizationMethod canonicalizationMethod = signatureFactory.newCanonicalizationMethod(
+				CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null);
+		SignedInfo signedInfo = signatureFactory.newSignedInfo(canonicalizationMethod, signatureMethod,
 				Collections.singletonList(reference));
 
-		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory
-				.newXMLSignature(signedInfo, null);
+		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory.newXMLSignature(signedInfo, null);
 
 		DOMXMLSignature domXmlSignature = (DOMXMLSignature) xmlSignature;
-		domXmlSignature.marshal(document.getDocumentElement(), "ds",
-				(DOMCryptoContext) signContext);
+		domXmlSignature.marshal(document.getDocumentElement(), "ds", (DOMCryptoContext) signContext);
 		domReference.digest(signContext);
 		// xmlSignature.sign(signContext);
 		// LOG.debug("signed document: " + toString(document));
 
 		Element nsElement = document.createElement("ns");
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds",
-				Constants.SignatureSpecNS);
-		Node digestValueNode = XPathAPI.selectSingleNode(document,
-				"//ds:DigestValue", nsElement);
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS);
+		Node digestValueNode = XPathAPI.selectSingleNode(document, "//ds:DigestValue", nsElement);
 		assertNotNull(digestValueNode);
 		String digestValueTextContent = digestValueNode.getTextContent();
 		LOG.debug("digest value text content: " + digestValueTextContent);
@@ -747,71 +677,54 @@ public class AbstractXmlSignatureServiceTest {
 	public void testJsr105SignatureExternalXMLWithDTD() throws Exception {
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.newDocument();
 		Element rootElement = document.createElementNS("urn:test", "tns:root");
-		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
-				"urn:test");
+		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns", "urn:test");
 		document.appendChild(rootElement);
 		Element dataElement = document.createElementNS("urn:test", "tns:data");
 		dataElement.setAttributeNS(null, "Id", "id-1234");
 		dataElement.setTextContent("data to be signed");
 		rootElement.appendChild(dataElement);
 
-		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
-				"DOM", new XMLDSigRI());
+		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM", new XMLDSigRI());
 
-		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(),
-				document.getDocumentElement());
+		XMLSignContext signContext = new DOMSignContext(keyPair.getPrivate(), document.getDocumentElement());
 		signContext.setURIDereferencer(new MyURIDereferencer());
-		signContext.putNamespacePrefix(
-				javax.xml.crypto.dsig.XMLSignature.XMLNS, "ds");
+		signContext.putNamespacePrefix(javax.xml.crypto.dsig.XMLSignature.XMLNS, "ds");
 
-		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				DigestMethod.SHA1, null);
+		DigestMethod digestMethod = signatureFactory.newDigestMethod(DigestMethod.SHA1, null);
 
 		List<Transform> transforms = new LinkedList<Transform>();
-		Transform transform = signatureFactory
-				.newTransform(CanonicalizationMethod.INCLUSIVE,
-						(TransformParameterSpec) null);
+		Transform transform = signatureFactory.newTransform(CanonicalizationMethod.INCLUSIVE,
+				(TransformParameterSpec) null);
 		LOG.debug("transform type: " + transform.getClass().getName());
 		transforms.add(transform);
-		Reference reference = signatureFactory.newReference("/bookstore.xml",
-				digestMethod, transforms, null, null);
+		Reference reference = signatureFactory.newReference("/bookstore.xml", digestMethod, transforms, null, null);
 
 		DOMReference domReference = (DOMReference) reference;
 		assertNull(domReference.getCalculatedDigestValue());
 		assertNull(domReference.getDigestValue());
 
-		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(
-				SignatureMethod.RSA_SHA1, null);
-		CanonicalizationMethod canonicalizationMethod = signatureFactory
-				.newCanonicalizationMethod(
-						CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
-						(C14NMethodParameterSpec) null);
-		SignedInfo signedInfo = signatureFactory.newSignedInfo(
-				canonicalizationMethod, signatureMethod,
+		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(SignatureMethod.RSA_SHA1, null);
+		CanonicalizationMethod canonicalizationMethod = signatureFactory.newCanonicalizationMethod(
+				CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null);
+		SignedInfo signedInfo = signatureFactory.newSignedInfo(canonicalizationMethod, signatureMethod,
 				Collections.singletonList(reference));
 
-		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory
-				.newXMLSignature(signedInfo, null);
+		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory.newXMLSignature(signedInfo, null);
 
 		DOMXMLSignature domXmlSignature = (DOMXMLSignature) xmlSignature;
-		domXmlSignature.marshal(document.getDocumentElement(), "ds",
-				(DOMCryptoContext) signContext);
+		domXmlSignature.marshal(document.getDocumentElement(), "ds", (DOMCryptoContext) signContext);
 		domReference.digest(signContext);
 		// xmlSignature.sign(signContext);
 		// LOG.debug("signed document: " + toString(document));
 
 		Element nsElement = document.createElement("ns");
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds",
-				Constants.SignatureSpecNS);
-		Node digestValueNode = XPathAPI.selectSingleNode(document,
-				"//ds:DigestValue", nsElement);
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS);
+		Node digestValueNode = XPathAPI.selectSingleNode(document, "//ds:DigestValue", nsElement);
 		assertNotNull(digestValueNode);
 		String digestValueTextContent = digestValueNode.getTextContent();
 		LOG.debug("digest value text content: " + digestValueTextContent);
@@ -820,15 +733,12 @@ public class AbstractXmlSignatureServiceTest {
 
 	@Test
 	public void testLoadXMLFileWithDTD() throws Exception {
-		InputStream documentInputStream = AbstractXmlSignatureServiceTest.class
-				.getResourceAsStream("/bookstore.xml");
+		InputStream documentInputStream = AbstractXmlSignatureServiceTest.class.getResourceAsStream("/bookstore.xml");
 
 		InputSource inputSource = new InputSource(documentInputStream);
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		EntityResolver entityResolver = new MyEntityResolver();
 		documentBuilder.setEntityResolver(entityResolver);
 		Document document = documentBuilder.parse(inputSource);
@@ -837,17 +747,14 @@ public class AbstractXmlSignatureServiceTest {
 
 	private static class MyEntityResolver implements EntityResolver {
 
-		private static final Log LOG = LogFactory
-				.getLog(MyEntityResolver.class);
+		private static final Log LOG = LogFactory.getLog(MyEntityResolver.class);
 
-		public InputSource resolveEntity(String publicId, String systemId)
-				throws SAXException, IOException {
+		public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
 			LOG.debug("resolve entity");
 			LOG.debug("publicId: " + publicId);
 			LOG.debug("systemId: " + systemId);
 			if ("http://webserver/bookstore.dtd".equals(systemId)) {
-				InputStream dtdInputStream = MyEntityResolver.class
-						.getResourceAsStream("/bookstore.dtd");
+				InputStream dtdInputStream = MyEntityResolver.class.getResourceAsStream("/bookstore.dtd");
 				InputSource inputSource = new InputSource(dtdInputStream);
 				return inputSource;
 			}
@@ -858,28 +765,23 @@ public class AbstractXmlSignatureServiceTest {
 	@Test
 	public void testSignEnvelopingDocumentWithDTD() throws Exception {
 		// setup
-		InputStream documentInputStream = AbstractXmlSignatureServiceTest.class
-				.getResourceAsStream("/bookstore.xml");
+		InputStream documentInputStream = AbstractXmlSignatureServiceTest.class.getResourceAsStream("/bookstore.xml");
 
 		InputSource inputSource = new InputSource(documentInputStream);
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		EntityResolver entityResolver = new MyEntityResolver();
 		documentBuilder.setEntityResolver(entityResolver);
 		Document document = documentBuilder.parse(inputSource);
 
 		SignatureFacet signatureFacet = new EnvelopedSignatureFacet();
-		XmlSignatureTestService testedInstance = new XmlSignatureTestService(
-				signatureFacet);
+		XmlSignatureTestService testedInstance = new XmlSignatureTestService(signatureFacet);
 		testedInstance.setEnvelopingDocument(document);
 		testedInstance.setSignatureDescription("test-signature-description");
 
 		// operate
-		DigestInfo digestInfo = testedInstance.preSign(null, null, null, null,
-				null);
+		DigestInfo digestInfo = testedInstance.preSign(null, null, null, null, null);
 
 		// verify
 		assertNotNull(digestInfo);
@@ -898,10 +800,8 @@ public class AbstractXmlSignatureServiceTest {
 
 		LOG.debug("tmp document: " + PkiTestUtils.toString(tmpDocument));
 		Element nsElement = tmpDocument.createElement("ns");
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds",
-				Constants.SignatureSpecNS);
-		Node digestValueNode = XPathAPI.selectSingleNode(tmpDocument,
-				"//ds:DigestValue", nsElement);
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS);
+		Node digestValueNode = XPathAPI.selectSingleNode(tmpDocument, "//ds:DigestValue", nsElement);
 		assertNotNull(digestValueNode);
 		String digestValueTextContent = digestValueNode.getTextContent();
 		LOG.debug("digest value text content: " + digestValueTextContent);
@@ -913,41 +813,32 @@ public class AbstractXmlSignatureServiceTest {
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
-		byte[] digestInfoValue = ArrayUtils.addAll(
-				PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
+		byte[] digestInfoValue = ArrayUtils.addAll(PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
 		byte[] signatureValue = cipher.doFinal(digestInfoValue);
 
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
-				.getPrivate(), true, 0, null, null, new KeyUsage(
-				KeyUsage.nonRepudiation));
+		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair.getPublic(), "CN=Test", notBefore,
+				notAfter, null, keyPair.getPrivate(), true, 0, null, null, new KeyUsage(KeyUsage.nonRepudiation));
 
 		/*
 		 * Operate: postSign
 		 */
-		testedInstance.postSign(signatureValue,
-				Collections.singletonList(certificate));
+		testedInstance.postSign(signatureValue, Collections.singletonList(certificate));
 
 		byte[] signedDocumentData = testedInstance.getSignedDocumentData();
 		assertNotNull(signedDocumentData);
-		Document signedDocument = PkiTestUtils
-				.loadDocument(new ByteArrayInputStream(signedDocumentData));
+		Document signedDocument = PkiTestUtils.loadDocument(new ByteArrayInputStream(signedDocumentData));
 		LOG.debug("signed document: " + PkiTestUtils.toString(signedDocument));
 
-		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(
-				XMLSignature.XMLNS, "Signature");
+		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 		assertEquals(1, signatureNodeList.getLength());
 		Node signatureNode = signatureNodeList.item(0);
 
 		DOMValidateContext domValidateContext = new DOMValidateContext(
-				KeySelector.singletonKeySelector(keyPair.getPublic()),
-				signatureNode);
-		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-				.getInstance();
-		XMLSignature xmlSignature = xmlSignatureFactory
-				.unmarshalXMLSignature(domValidateContext);
+				KeySelector.singletonKeySelector(keyPair.getPublic()), signatureNode);
+		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
+		XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
 		boolean validity = xmlSignature.validate(domValidateContext);
 		assertTrue(validity);
 	}
@@ -955,29 +846,24 @@ public class AbstractXmlSignatureServiceTest {
 	@Test
 	public void testSignExternalXMLDocument() throws Exception {
 		// setup
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.newDocument();
 		Element rootElement = document.createElementNS("urn:test", "tns:root");
-		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
-				"urn:test");
+		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns", "urn:test");
 		document.appendChild(rootElement);
 
 		SignatureTestFacet signatureFacet = new SignatureTestFacet();
 		signatureFacet.addReferenceUri("/bookstore.xml");
-		XmlSignatureTestService testedInstance = new XmlSignatureTestService(
-				signatureFacet);
+		XmlSignatureTestService testedInstance = new XmlSignatureTestService(signatureFacet);
 
 		testedInstance.setUriDereferencer(new MyURIDereferencer());
 		testedInstance.setEnvelopingDocument(document);
 		testedInstance.setSignatureDescription("test-signature-description");
 
 		// operate
-		DigestInfo digestInfo = testedInstance.preSign(null, null, null, null,
-				null);
+		DigestInfo digestInfo = testedInstance.preSign(null, null, null, null, null);
 
 		// verify
 		assertNotNull(digestInfo);
@@ -996,10 +882,8 @@ public class AbstractXmlSignatureServiceTest {
 
 		LOG.debug("tmp document: " + PkiTestUtils.toString(tmpDocument));
 		Element nsElement = tmpDocument.createElement("ns");
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds",
-				Constants.SignatureSpecNS);
-		Node digestValueNode = XPathAPI.selectSingleNode(tmpDocument,
-				"//ds:DigestValue", nsElement);
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS);
+		Node digestValueNode = XPathAPI.selectSingleNode(tmpDocument, "//ds:DigestValue", nsElement);
 		assertNotNull(digestValueNode);
 		String digestValueTextContent = digestValueNode.getTextContent();
 		LOG.debug("digest value text content: " + digestValueTextContent);
@@ -1011,77 +895,62 @@ public class AbstractXmlSignatureServiceTest {
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
-		byte[] digestInfoValue = ArrayUtils.addAll(
-				PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
+		byte[] digestInfoValue = ArrayUtils.addAll(PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
 		byte[] signatureValue = cipher.doFinal(digestInfoValue);
 
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=Test", notBefore, notAfter, null, keyPair
-				.getPrivate(), true, 0, null, null, new KeyUsage(
-				KeyUsage.nonRepudiation));
+		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair.getPublic(), "CN=Test", notBefore,
+				notAfter, null, keyPair.getPrivate(), true, 0, null, null, new KeyUsage(KeyUsage.nonRepudiation));
 
 		/*
 		 * Operate: postSign
 		 */
-		testedInstance.postSign(signatureValue,
-				Collections.singletonList(certificate));
+		testedInstance.postSign(signatureValue, Collections.singletonList(certificate));
 
 		byte[] signedDocumentData = testedInstance.getSignedDocumentData();
 		assertNotNull(signedDocumentData);
-		Document signedDocument = PkiTestUtils
-				.loadDocument(new ByteArrayInputStream(signedDocumentData));
+		Document signedDocument = PkiTestUtils.loadDocument(new ByteArrayInputStream(signedDocumentData));
 		LOG.debug("signed document: " + PkiTestUtils.toString(signedDocument));
 
-		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(
-				XMLSignature.XMLNS, "Signature");
+		NodeList signatureNodeList = signedDocument.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 		assertEquals(1, signatureNodeList.getLength());
 		Node signatureNode = signatureNodeList.item(0);
 
 		DOMValidateContext domValidateContext = new DOMValidateContext(
-				KeySelector.singletonKeySelector(keyPair.getPublic()),
-				signatureNode);
+				KeySelector.singletonKeySelector(keyPair.getPublic()), signatureNode);
 
 		/*
 		 * Required to resolve the external XML document.
 		 */
 		domValidateContext.setURIDereferencer(new MyURIDereferencer());
 
-		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-				.getInstance();
-		XMLSignature xmlSignature = xmlSignatureFactory
-				.unmarshalXMLSignature(domValidateContext);
+		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
+		XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
 		boolean validity = xmlSignature.validate(domValidateContext);
 		assertTrue(validity);
 	}
 
 	private static class MyURIDereferencer implements URIDereferencer {
 
-		private static final Log LOG = LogFactory
-				.getLog(MyURIDereferencer.class);
+		private static final Log LOG = LogFactory.getLog(MyURIDereferencer.class);
 
-		public Data dereference(URIReference uriReference,
-				XMLCryptoContext context) throws URIReferenceException {
+		public Data dereference(URIReference uriReference, XMLCryptoContext context) throws URIReferenceException {
 			String uri = uriReference.getURI();
 			LOG.debug("dereference URI: " + uri);
 			LOG.debug("dereference Type: " + uriReference.getType());
 			if ("/helloworld.xml".equals(uri)) {
-				InputStream dataInputStream = MyURIDereferencer.class
-						.getResourceAsStream("/helloworld.xml");
+				InputStream dataInputStream = MyURIDereferencer.class.getResourceAsStream("/helloworld.xml");
 				return new OctetStreamData(dataInputStream, uri, null);
 			}
 			if ("/bookstore.xml".equals(uri)) {
-				InputStream dataInputStream = MyURIDereferencer.class
-						.getResourceAsStream("/bookstore.xml");
+				InputStream dataInputStream = MyURIDereferencer.class.getResourceAsStream("/bookstore.xml");
 				InputSource inputSource = new InputSource(dataInputStream);
-				DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-						.newInstance();
+				DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 				documentBuilderFactory.setNamespaceAware(true);
 				DocumentBuilder documentBuilder;
 				try {
-					documentBuilder = documentBuilderFactory
-							.newDocumentBuilder();
+					documentBuilder = documentBuilderFactory.newDocumentBuilder();
 				} catch (ParserConfigurationException e) {
 					throw new URIReferenceException(e);
 				}
@@ -1095,10 +964,8 @@ public class AbstractXmlSignatureServiceTest {
 				} catch (IOException e) {
 					throw new URIReferenceException(e);
 				}
-				XMLSignatureInput xmlSignatureInput = new XMLSignatureInput(
-						document);
-				ApacheNodeSetData apacheNodeSetData = new ApacheNodeSetData(
-						xmlSignatureInput);
+				XMLSignatureInput xmlSignatureInput = new XMLSignatureInput(document);
+				ApacheNodeSetData apacheNodeSetData = new ApacheNodeSetData(xmlSignatureInput);
 				return apacheNodeSetData;
 			}
 			throw new URIReferenceException("cannot dereference: " + uri);
@@ -1111,40 +978,32 @@ public class AbstractXmlSignatureServiceTest {
 		Init.init();
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.newDocument();
 		Element rootElement = document.createElementNS("urn:test", "tns:root");
-		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
-				"urn:test");
+		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns", "urn:test");
 		document.appendChild(rootElement);
 		Element dataElement = document.createElementNS("urn:test", "tns:data");
 		dataElement.setAttributeNS(null, "Id", "id-1234");
 		dataElement.setTextContent("data to be signed");
 		rootElement.appendChild(dataElement);
 
-		Element data2Element = document
-				.createElementNS("urn:test", "tns:data2");
+		Element data2Element = document.createElementNS("urn:test", "tns:data2");
 		rootElement.appendChild(data2Element);
 		data2Element.setTextContent("hello world");
 		data2Element.setAttribute("name", "value");
-		Element data3Element = document
-				.createElementNS("urn:test", "tns:data3");
+		Element data3Element = document.createElementNS("urn:test", "tns:data3");
 		data2Element.appendChild(data3Element);
 		data3Element.setTextContent("data 3");
 		data3Element.appendChild(document.createComment("some comments"));
 
-		Element emptyElement = document
-				.createElementNS("urn:test", "tns:empty");
+		Element emptyElement = document.createElementNS("urn:test", "tns:empty");
 		rootElement.appendChild(emptyElement);
 
 		org.apache.xml.security.signature.XMLSignature xmlSignature = new org.apache.xml.security.signature.XMLSignature(
-				document,
-				"",
-				org.apache.xml.security.signature.XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1);
+				document, "", org.apache.xml.security.signature.XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1);
 		rootElement.appendChild(xmlSignature.getElement());
 
 		Transforms transforms = new Transforms(document);
@@ -1156,8 +1015,7 @@ public class AbstractXmlSignatureServiceTest {
 		xmlSignature.sign(keyPair.getPrivate());
 
 		NodeList signatureNodeList = document.getDocumentElement()
-				.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#",
-						"Signature");
+				.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
 		Element signatureElement = (Element) signatureNodeList.item(0);
 
 		// operate & verify
@@ -1172,15 +1030,12 @@ public class AbstractXmlSignatureServiceTest {
 		Init.init();
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();
 
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.newDocument();
 		Element rootElement = document.createElementNS("urn:test", "tns:root");
-		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
-				"urn:test");
+		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns", "urn:test");
 		document.appendChild(rootElement);
 		Element dataElement = document.createElementNS("urn:test", "tns:data");
 		dataElement.setAttributeNS(null, "Id", "id-1234");
@@ -1188,38 +1043,31 @@ public class AbstractXmlSignatureServiceTest {
 		dataElement.setTextContent("data to be signed");
 		rootElement.appendChild(dataElement);
 
-		Element data2Element = document
-				.createElementNS("urn:test", "tns:data2");
+		Element data2Element = document.createElementNS("urn:test", "tns:data2");
 		rootElement.appendChild(data2Element);
 		data2Element.setTextContent("hello world");
 		data2Element.setAttributeNS(null, "name", "value");
-		Element data3Element = document
-				.createElementNS("urn:test", "tns:data3");
+		Element data3Element = document.createElementNS("urn:test", "tns:data3");
 		data2Element.appendChild(data3Element);
 		data3Element.setTextContent("data 3");
 		data3Element.appendChild(document.createComment("some comments"));
 
-		Element emptyElement = document
-				.createElementNS("urn:test", "tns:empty");
+		Element emptyElement = document.createElementNS("urn:test", "tns:empty");
 		rootElement.appendChild(emptyElement);
 
 		org.apache.xml.security.signature.XMLSignature xmlSignature = new org.apache.xml.security.signature.XMLSignature(
-				document,
-				"",
-				org.apache.xml.security.signature.XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1);
+				document, "", org.apache.xml.security.signature.XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1);
 		rootElement.appendChild(xmlSignature.getElement());
 
 		Transforms transforms = new Transforms(document);
 		transforms.addTransform(Transforms.TRANSFORM_C14N_WITH_COMMENTS);
-		xmlSignature.addDocument("#id-1234", transforms,
-				Constants.ALGO_ID_DIGEST_SHA1);
+		xmlSignature.addDocument("#id-1234", transforms, Constants.ALGO_ID_DIGEST_SHA1);
 
 		xmlSignature.addKeyInfo(keyPair.getPublic());
 		xmlSignature.sign(keyPair.getPrivate());
 
 		NodeList signatureNodeList = document.getDocumentElement()
-				.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#",
-						"Signature");
+				.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
 		Element signatureElement = (Element) signatureNodeList.item(0);
 
 		// operate & verify
@@ -1227,13 +1075,11 @@ public class AbstractXmlSignatureServiceTest {
 		assertFalse(isDigested(data2Element, signatureElement));
 	}
 
-	private static class VerifyReference extends
-			org.apache.xml.security.signature.Reference {
+	private static class VerifyReference extends org.apache.xml.security.signature.Reference {
 
 		private static final Log LOG = LogFactory.getLog(VerifyReference.class);
 
-		public VerifyReference(Element element, Manifest manifest)
-				throws XMLSecurityException {
+		public VerifyReference(Element element, Manifest manifest) throws XMLSecurityException {
 			super(element, "", manifest);
 		}
 
@@ -1255,16 +1101,13 @@ public class AbstractXmlSignatureServiceTest {
 
 	private boolean isDigested(Element dataElement, Element signatureElement)
 			throws XMLSignatureException, XMLSecurityException {
-		NodeList referenceNodeList = signatureElement.getElementsByTagNameNS(
-				"http://www.w3.org/2000/09/xmldsig#", "Reference");
+		NodeList referenceNodeList = signatureElement.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#",
+				"Reference");
 		Manifest manifest = new Manifest(dataElement.getOwnerDocument());
-		VerifyReference[] references = new VerifyReference[referenceNodeList
-				.getLength()];
+		VerifyReference[] references = new VerifyReference[referenceNodeList.getLength()];
 		for (int referenceIdx = 0; referenceIdx < referenceNodeList.getLength(); referenceIdx++) {
-			Element referenceElement = (Element) referenceNodeList
-					.item(referenceIdx);
-			VerifyReference reference = new VerifyReference(referenceElement,
-					manifest);
+			Element referenceElement = (Element) referenceNodeList.item(referenceIdx);
+			VerifyReference reference = new VerifyReference(referenceElement, manifest);
 			reference.init();
 			references[referenceIdx] = reference;
 		}
@@ -1312,13 +1155,10 @@ public class AbstractXmlSignatureServiceTest {
 				Element element = (Element) node;
 
 				NamedNodeMap attributes = element.getAttributes();
-				for (int attributeIdx = 0; attributeIdx < attributes
-						.getLength(); attributeIdx++) {
+				for (int attributeIdx = 0; attributeIdx < attributes.getLength(); attributeIdx++) {
 					Node attributeNode = attributes.item(attributeIdx);
-					String originalAttributeValue = attributeNode
-							.getNodeValue();
-					String changedAttributeValue = originalAttributeValue
-							+ "foobar";
+					String originalAttributeValue = attributeNode.getNodeValue();
+					String changedAttributeValue = originalAttributeValue + "foobar";
 					attributeNode.setNodeValue(changedAttributeValue);
 					for (int referenceIdx = 0; referenceIdx < references.length; referenceIdx++) {
 						VerifyReference reference = references[referenceIdx];
@@ -1331,8 +1171,7 @@ public class AbstractXmlSignatureServiceTest {
 			} else if (node.getNodeType() == Node.COMMENT_NODE) {
 				// not always digested
 			} else {
-				throw new RuntimeException("unsupported node type: "
-						+ node.getNodeType());
+				throw new RuntimeException("unsupported node type: " + node.getNodeType());
 			}
 			if (false == changed) {
 				return false;

@@ -43,14 +43,14 @@ public class XmlSignatureServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		LOG.debug("doGet");
 		HttpSession httpSession = request.getSession();
 		String documentStr = (String) httpSession.getAttribute("xmlDocument");
 		response.setContentType("text/xml");
-		response.setHeader("Cache-Control",
-				"no-cache, no-store, must-revalidate, max-age=-1"); // http 1.1
+		response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=-1"); // http
+																								// 1.1
 		response.setHeader("Pragma", "no-cache, no-store"); // http 1.0
 		response.setDateHeader("Expires", -1);
 		ServletOutputStream out = response.getOutputStream();

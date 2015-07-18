@@ -49,9 +49,9 @@ public class UserIdentifierUtilTest {
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
 		String userId = "1234";
-		X509Certificate certificate = MiscTestUtils.generateCertificate(keyPair
-				.getPublic(), "CN=Test, SERIALNUMBER=" + userId, notBefore,
-				notAfter, null, keyPair.getPrivate(), true, 0, null, null);
+		X509Certificate certificate = MiscTestUtils.generateCertificate(keyPair.getPublic(),
+				"CN=Test, SERIALNUMBER=" + userId, notBefore, notAfter, null, keyPair.getPrivate(), true, 0, null,
+				null);
 
 		// operate
 		String result = UserIdentifierUtil.getUserId(certificate);
@@ -87,8 +87,7 @@ public class UserIdentifierUtilTest {
 
 		// operate & verify
 		try {
-			UserIdentifierUtil.getNonReversibleCitizenIdentifier(userId, orgId,
-					appId, secret);
+			UserIdentifierUtil.getNonReversibleCitizenIdentifier(userId, orgId, appId, secret);
 			fail();
 		} catch (IllegalArgumentException e) {
 			// expected
@@ -105,8 +104,7 @@ public class UserIdentifierUtilTest {
 
 		// operate & verify
 		try {
-			UserIdentifierUtil.getNonReversibleCitizenIdentifier(userId, orgId,
-					appId, secret);
+			UserIdentifierUtil.getNonReversibleCitizenIdentifier(userId, orgId, appId, secret);
 			fail();
 		} catch (IllegalArgumentException e) {
 			// expected
@@ -115,15 +113,12 @@ public class UserIdentifierUtilTest {
 
 	@Test
 	public void testHexadecimalEncoding() throws Exception {
-		char[] encodedMessage = Hex
-				.encodeHex("hello world. this is a long message.".getBytes());
+		char[] encodedMessage = Hex.encodeHex("hello world. this is a long message.".getBytes());
 		LOG.debug("encoded message: " + new String(encodedMessage));
 		byte[] result = Hex.decodeHex(encodedMessage);
 		LOG.debug("decoded message: " + new String(result));
 
-		Hex
-				.decodeHex("123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0"
-						.trim().toCharArray());
+		Hex.decodeHex("123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0".trim().toCharArray());
 	}
 
 	@Test
@@ -136,10 +131,8 @@ public class UserIdentifierUtilTest {
 		String secret = "123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0";
 
 		// operate
-		String result1 = UserIdentifierUtil.getNonReversibleCitizenIdentifier(
-				userId1, orgId, appId, secret);
-		String result2 = UserIdentifierUtil.getNonReversibleCitizenIdentifier(
-				userId2, orgId, appId, secret);
+		String result1 = UserIdentifierUtil.getNonReversibleCitizenIdentifier(userId1, orgId, appId, secret);
+		String result2 = UserIdentifierUtil.getNonReversibleCitizenIdentifier(userId2, orgId, appId, secret);
 
 		// verify
 		assertNotNull(result1);
@@ -151,18 +144,14 @@ public class UserIdentifierUtilTest {
 		assertFalse(result1.contains(userId1));
 
 		// verify stability
-		String result1b = UserIdentifierUtil.getNonReversibleCitizenIdentifier(
-				userId1, orgId, appId, secret);
+		String result1b = UserIdentifierUtil.getNonReversibleCitizenIdentifier(userId1, orgId, appId, secret);
 		assertEquals(result1, result1b);
 
-		assertFalse(result1.equals(UserIdentifierUtil
-				.getNonReversibleCitizenIdentifier(userId1, orgId, appId,
-						secret + "1234")));
-		assertFalse(result1.equals(UserIdentifierUtil
-				.getNonReversibleCitizenIdentifier(userId1, orgId + "foobar",
-						appId, secret)));
-		assertFalse(result1.equals(UserIdentifierUtil
-				.getNonReversibleCitizenIdentifier(userId1, orgId, appId
-						+ "foobar", secret)));
+		assertFalse(result1
+				.equals(UserIdentifierUtil.getNonReversibleCitizenIdentifier(userId1, orgId, appId, secret + "1234")));
+		assertFalse(result1.equals(
+				UserIdentifierUtil.getNonReversibleCitizenIdentifier(userId1, orgId + "foobar", appId, secret)));
+		assertFalse(result1.equals(
+				UserIdentifierUtil.getNonReversibleCitizenIdentifier(userId1, orgId, appId + "foobar", secret)));
 	}
 }

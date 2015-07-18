@@ -38,10 +38,8 @@ public class MSCAPITest {
 		while (aliases.hasMoreElements()) {
 			String alias = aliases.nextElement();
 			LOG.debug("alias: " + alias);
-			X509Certificate certificate = (X509Certificate) keyStore
-					.getCertificate(alias);
-			LOG.debug("certificate subject: "
-					+ certificate.getSubjectX500Principal());
+			X509Certificate certificate = (X509Certificate) keyStore.getCertificate(alias);
+			LOG.debug("certificate subject: " + certificate.getSubjectX500Principal());
 		}
 	}
 }

@@ -41,5 +41,5 @@ public @interface ValidateSemanticalIntegrity {
 	 * 
 	 * @return
 	 */
-	Class<? extends SemanticValidator<?>> value();
+	Class<? extends SemanticValidator<?>>value();
 }

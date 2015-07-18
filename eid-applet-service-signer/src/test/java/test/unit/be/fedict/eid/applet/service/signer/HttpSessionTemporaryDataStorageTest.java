@@ -45,27 +45,16 @@ public class HttpSessionTemporaryDataStorageTest {
 		HttpSessionTemporaryDataStorage testedInstance = new HttpSessionTemporaryDataStorage();
 		byte[] data = "hello world".getBytes();
 
-		HttpServletRequest mockHttpServletRequest = EasyMock
-				.createMock(HttpServletRequest.class);
-		PolicyContextHandler policyContextHandler = new HttpServletRequestPolicyContextHandler(
-				mockHttpServletRequest);
-		PolicyContext.registerHandler(
-				HttpServletRequestPolicyContextHandler.KEY,
-				policyContextHandler, false);
+		HttpServletRequest mockHttpServletRequest = EasyMock.createMock(HttpServletRequest.class);
+		PolicyContextHandler policyContextHandler = new HttpServletRequestPolicyContextHandler(mockHttpServletRequest);
+		PolicyContext.registerHandler(HttpServletRequestPolicyContextHandler.KEY, policyContextHandler, false);
 
 		HttpSession mockHttpSession = EasyMock.createMock(HttpSession.class);
-		EasyMock.expect(mockHttpServletRequest.getSession()).andStubReturn(
-				mockHttpSession);
+		EasyMock.expect(mockHttpServletRequest.getSession()).andStubReturn(mockHttpSession);
 		final Capture<OutputStream> tempOutputStreamCapture = new Capture<OutputStream>();
-		mockHttpSession
-				.setAttribute(
-						EasyMock
-								.eq(HttpSessionTemporaryDataStorage.TEMP_OUTPUT_STREAM_ATTRIBUTE),
-						EasyMock.capture(tempOutputStreamCapture));
-		EasyMock
-				.expect(
-						mockHttpSession
-								.getAttribute(HttpSessionTemporaryDataStorage.TEMP_OUTPUT_STREAM_ATTRIBUTE))
+		mockHttpSession.setAttribute(EasyMock.eq(HttpSessionTemporaryDataStorage.TEMP_OUTPUT_STREAM_ATTRIBUTE),
+				EasyMock.capture(tempOutputStreamCapture));
+		EasyMock.expect(mockHttpSession.getAttribute(HttpSessionTemporaryDataStorage.TEMP_OUTPUT_STREAM_ATTRIBUTE))
 				.andAnswer(new IAnswer<OutputStream>() {
 					public OutputStream answer() throws Throwable {
 						return tempOutputStreamCapture.getValue();
@@ -87,20 +76,17 @@ public class HttpSessionTemporaryDataStorageTest {
 		assertArrayEquals(data, resultData);
 	}
 
-	public static class HttpServletRequestPolicyContextHandler implements
-			PolicyContextHandler {
+	public static class HttpServletRequestPolicyContextHandler implements PolicyContextHandler {
 
 		public static final String KEY = "javax.servlet.http.HttpServletRequest";
 
 		private final HttpServletRequest httpServletRequest;
 
-		private HttpServletRequestPolicyContextHandler(
-				HttpServletRequest httpServletRequest) {
+		private HttpServletRequestPolicyContextHandler(HttpServletRequest httpServletRequest) {
 			this.httpServletRequest = httpServletRequest;
 		}
 
-		public Object getContext(String key, Object data)
-				throws PolicyContextException {
+		public Object getContext(String key, Object data) throws PolicyContextException {
 			if (false == KEY.equals(key)) {
 				return null;
 			}

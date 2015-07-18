@@ -38,11 +38,9 @@ import be.fedict.eid.applet.service.spi.SecureClientEnvironmentService;
 
 @Stateless
 @EJB(name = "java:global/beta/SecureClientEnvironmentBean", beanInterface = SecureClientEnvironmentService.class)
-public class SecureClientEnvironmentBean implements
-		SecureClientEnvironmentService {
+public class SecureClientEnvironmentBean implements SecureClientEnvironmentService {
 
-	private static final Log LOG = LogFactory
-			.getLog(SecureClientEnvironmentBean.class);
+	private static final Log LOG = LogFactory.getLog(SecureClientEnvironmentBean.class);
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -50,34 +48,26 @@ public class SecureClientEnvironmentBean implements
 	@EJB
 	private SessionContextManager sessionContextManager;
 
-	public void checkSecureClientEnvironment(String javaVersion,
-			String javaVendor, String osName, String osArch, String osVersion,
-			String userAgent, String navigatorAppName,
-			String navigatorAppVersion, String navigatorUserAgent,
-			String remoteAddress, Integer sslKeySize, String sslCipherSuite,
+	public void checkSecureClientEnvironment(String javaVersion, String javaVendor, String osName, String osArch,
+			String osVersion, String userAgent, String navigatorAppName, String navigatorAppVersion,
+			String navigatorUserAgent, String remoteAddress, Integer sslKeySize, String sslCipherSuite,
 			List<String> readerList) throws InsecureClientEnvironmentException {
-		String clientEnviromentResult = "java version: " + javaVersion + "\n"
-				+ "java vendor: " + javaVendor + "\n" + "OS name: " + osName
-				+ "\n" + "OS arch: " + osArch + "\n" + "OS version: "
-				+ osVersion + "\n" + "user agent: " + userAgent + "\n"
-				+ "navigator app name: " + navigatorAppName + "\n"
-				+ "navigator app version: " + navigatorAppVersion + "\n"
-				+ "navigator user agent: " + navigatorUserAgent + "\n"
-				+ "remote address: " + remoteAddress + "\n" + "ssl key size: "
-				+ sslKeySize + "\n" + "ssl cipher suite: " + sslCipherSuite
-				+ "\n" + "readers: " + readerList;
+		String clientEnviromentResult = "java version: " + javaVersion + "\n" + "java vendor: " + javaVendor + "\n"
+				+ "OS name: " + osName + "\n" + "OS arch: " + osArch + "\n" + "OS version: " + osVersion + "\n"
+				+ "user agent: " + userAgent + "\n" + "navigator app name: " + navigatorAppName + "\n"
+				+ "navigator app version: " + navigatorAppVersion + "\n" + "navigator user agent: " + navigatorUserAgent
+				+ "\n" + "remote address: " + remoteAddress + "\n" + "ssl key size: " + sslKeySize + "\n"
+				+ "ssl cipher suite: " + sslCipherSuite + "\n" + "readers: " + readerList;
 		LOG.debug(clientEnviromentResult);
 
-		SessionContextEntity sessionContext = this.sessionContextManager
-				.getSessionContext();
-		TestResultEntity testResultEntity = new TestResultEntity(
-				"Client Environment", clientEnviromentResult, sessionContext);
+		SessionContextEntity sessionContext = this.sessionContextManager.getSessionContext();
+		TestResultEntity testResultEntity = new TestResultEntity("Client Environment", clientEnviromentResult,
+				sessionContext);
 		this.entityManager.persist(testResultEntity);
 
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}
@@ -93,16 +83,12 @@ public class SecureClientEnvironmentBean implements
 		httpSession.setAttribute("clientSslCipherSuite", sslCipherSuite);
 		httpSession.setAttribute("clientRemoteAddress", remoteAddress);
 		httpSession.setAttribute("clientSslKeySize", sslKeySize);
-		httpSession
-				.setAttribute("clientNavigatorUserAgent", navigatorUserAgent);
+		httpSession.setAttribute("clientNavigatorUserAgent", navigatorUserAgent);
 		httpSession.setAttribute("clientNavigatorAppName", navigatorAppName);
-		httpSession.setAttribute("clientNavigatorAppVersion",
-				navigatorAppVersion);
+		httpSession.setAttribute("clientNavigatorAppVersion", navigatorAppVersion);
 
-		TestReportFactory testReportFactory = new TestReportFactory(
-				this.entityManager);
-		testReportFactory.startTestReport(javaVersion, javaVendor, osName,
-				osArch, osVersion, userAgent, navigatorAppName,
-				navigatorAppVersion, navigatorUserAgent);
+		TestReportFactory testReportFactory = new TestReportFactory(this.entityManager);
+		testReportFactory.startTestReport(javaVersion, javaVendor, osName, osArch, osVersion, userAgent,
+				navigatorAppName, navigatorAppVersion, navigatorUserAgent);
 	}
 }

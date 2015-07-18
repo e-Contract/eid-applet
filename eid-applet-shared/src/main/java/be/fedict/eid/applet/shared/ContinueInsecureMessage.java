@@ -32,13 +32,10 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
  * 
  */
 @ProtocolStateAllowed(ProtocolState.INSECURE)
-@ResponsesAllowed({ IdentificationRequestMessage.class,
-		AuthenticationRequestMessage.class, AdministrationMessage.class,
-		SignRequestMessage.class, FilesDigestRequestMessage.class,
-		FinishedMessage.class })
+@ResponsesAllowed({ IdentificationRequestMessage.class, AuthenticationRequestMessage.class, AdministrationMessage.class,
+		SignRequestMessage.class, FilesDigestRequestMessage.class, FinishedMessage.class })
 public class ContinueInsecureMessage extends AbstractProtocolMessage {
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator
-	public static final String TYPE = ContinueInsecureMessage.class
-			.getSimpleName();
+	public static final String TYPE = ContinueInsecureMessage.class.getSimpleName();
 }

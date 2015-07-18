@@ -43,5 +43,5 @@ public @interface HandlesMessage {
 	 * 
 	 * @return
 	 */
-	Class<? extends AbstractProtocolMessage> value();
+	Class<? extends AbstractProtocolMessage>value();
 }

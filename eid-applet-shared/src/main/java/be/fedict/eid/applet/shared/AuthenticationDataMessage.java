@@ -48,8 +48,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator
-	public static final String TYPE = AuthenticationDataMessage.class
-			.getSimpleName();
+	public static final String TYPE = AuthenticationDataMessage.class.getSimpleName();
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "SignatureValueSize")
 	@NotNull
@@ -129,13 +128,11 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 	 * @throws IOException
 	 * @throws CertificateEncodingException
 	 */
-	public AuthenticationDataMessage(byte[] saltValue, byte[] sessionId,
-			byte[] signatureValue, byte[] authnCertFile, byte[] citCaCertFile,
-			byte[] rootCaCertFile, byte[] signCertFile, byte[] identityData,
-			byte[] addressData, byte[] photoData, byte[] identitySignatureData,
-			byte[] addressSignatureData, byte[] rrnCertData,
+	public AuthenticationDataMessage(byte[] saltValue, byte[] sessionId, byte[] signatureValue, byte[] authnCertFile,
+			byte[] citCaCertFile, byte[] rootCaCertFile, byte[] signCertFile, byte[] identityData, byte[] addressData,
+			byte[] photoData, byte[] identitySignatureData, byte[] addressSignatureData, byte[] rrnCertData,
 			byte[] serverCertData, byte[] transactionMessageSignature)
-			throws IOException, CertificateEncodingException {
+					throws IOException, CertificateEncodingException {
 		this.saltValueSize = saltValue.length;
 		this.signatureValueSize = signatureValue.length;
 		this.authnCertFileSize = authnCertFile.length;
@@ -194,18 +191,14 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 		this.body = baos.toByteArray();
 	}
 
-	public AuthenticationDataMessage(byte[] saltValue, byte[] sessionId,
-			byte[] signatureValue, List<X509Certificate> authnCertChain,
-			byte[] signCertFile, byte[] identityData, byte[] addressData,
-			byte[] photoData, byte[] identitySignatureData,
-			byte[] addressSignatureData, byte[] rrnCertData,
+	public AuthenticationDataMessage(byte[] saltValue, byte[] sessionId, byte[] signatureValue,
+			List<X509Certificate> authnCertChain, byte[] signCertFile, byte[] identityData, byte[] addressData,
+			byte[] photoData, byte[] identitySignatureData, byte[] addressSignatureData, byte[] rrnCertData,
 			byte[] serverCertData, byte[] transactionMessageSignature)
-			throws IOException, CertificateEncodingException {
-		this(saltValue, sessionId, signatureValue, authnCertChain.get(0)
-				.getEncoded(), authnCertChain.get(1).getEncoded(),
-				authnCertChain.get(2).getEncoded(), signCertFile, identityData,
-				addressData, photoData, identitySignatureData,
-				addressSignatureData, rrnCertData, serverCertData,
+					throws IOException, CertificateEncodingException {
+		this(saltValue, sessionId, signatureValue, authnCertChain.get(0).getEncoded(),
+				authnCertChain.get(1).getEncoded(), authnCertChain.get(2).getEncoded(), signCertFile, identityData,
+				addressData, photoData, identitySignatureData, addressSignatureData, rrnCertData, serverCertData,
 				transactionMessageSignature);
 	}
 
@@ -266,14 +259,12 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 		}
 
 		if (null != this.identitySignatureFileSize) {
-			this.identitySignatureData = copy(this.body, idx,
-					this.identitySignatureFileSize);
+			this.identitySignatureData = copy(this.body, idx, this.identitySignatureFileSize);
 			idx += this.identitySignatureFileSize;
 		}
 
 		if (null != this.addressSignatureFileSize) {
-			this.addressSignatureData = copy(this.body, idx,
-					this.addressSignatureFileSize);
+			this.addressSignatureData = copy(this.body, idx, this.addressSignatureFileSize);
 			idx += this.addressSignatureFileSize;
 		}
 
@@ -284,16 +275,14 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 		}
 
 		if (null != this.serverCertFileSize) {
-			byte[] serverCertData = copy(this.body, idx,
-					this.serverCertFileSize);
+			byte[] serverCertData = copy(this.body, idx, this.serverCertFileSize);
 			this.encodedServerCertificate = serverCertData;
 			this.serverCertificate = getCertificate(serverCertData);
 			idx += this.serverCertFileSize;
 		}
 
 		if (null != this.transactionMessageSignatureSize) {
-			this.transactionMessageSignature = copy(this.body, idx,
-					this.transactionMessageSignatureSize);
+			this.transactionMessageSignature = copy(this.body, idx, this.transactionMessageSignatureSize);
 			idx += this.transactionMessageSignatureSize;
 		}
 	}
@@ -303,8 +292,7 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 		try {
 			certificateFactory = CertificateFactory.getInstance("X.509");
 		} catch (CertificateException e) {
-			throw new RuntimeException("cert factory error: " + e.getMessage(),
-					e);
+			throw new RuntimeException("cert factory error: " + e.getMessage(), e);
 		}
 		try {
 			X509Certificate certificate = (X509Certificate) certificateFactory

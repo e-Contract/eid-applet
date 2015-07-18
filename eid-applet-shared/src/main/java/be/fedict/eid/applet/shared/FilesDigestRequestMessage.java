@@ -34,8 +34,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 public class FilesDigestRequestMessage extends AbstractProtocolMessage {
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator
-	public static final String TYPE = FilesDigestRequestMessage.class
-			.getSimpleName();
+	public static final String TYPE = FilesDigestRequestMessage.class.getSimpleName();
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "DigestAlgo")
 	@NotNull

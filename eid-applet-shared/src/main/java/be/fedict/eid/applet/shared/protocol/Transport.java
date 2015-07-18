@@ -48,8 +48,7 @@ public class Transport {
 	 * @param httpTransmitter
 	 *            the transport component.
 	 */
-	public static void transfer(Object dataObject,
-			HttpTransmitter httpTransmitter) {
+	public static void transfer(Object dataObject, HttpTransmitter httpTransmitter) {
 		/*
 		 * Secure channel validation.
 		 */
@@ -82,15 +81,13 @@ public class Transport {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static void addBody(Object dataObject,
-			HttpTransmitter httpTransmitter, Field bodyField) {
+	private static void addBody(Object dataObject, HttpTransmitter httpTransmitter, Field bodyField) {
 		if (null != bodyField) {
 			Object bodyValue;
 			try {
 				bodyValue = bodyField.get(dataObject);
 			} catch (Exception e) {
-				throw new RuntimeException("error reading field: "
-						+ bodyField.getName());
+				throw new RuntimeException("error reading field: " + bodyField.getName());
 			}
 			byte[] body;
 			if (bodyValue instanceof List<?>) {
@@ -107,16 +104,14 @@ public class Transport {
 			/*
 			 * The Content-Length header is required for IIS 6 and 7.
 			 */
-			httpTransmitter.addHeader("Content-Length", Integer
-					.toString(body.length));
+			httpTransmitter.addHeader("Content-Length", Integer.toString(body.length));
 			httpTransmitter.setBody(body);
 		} else {
 			httpTransmitter.addHeader("Content-Length", "0");
 		}
 	}
 
-	private static Field addHeaders(Object dataObject,
-			HttpTransmitter httpTransmitter, Field[] fields) {
+	private static Field addHeaders(Object dataObject, HttpTransmitter httpTransmitter, Field[] fields) {
 		Field bodyField = null;
 		for (Field field : fields) {
 			HttpBody httpBodyAnnotation = field.getAnnotation(HttpBody.class);
@@ -124,12 +119,10 @@ public class Transport {
 				if (null == bodyField) {
 					bodyField = field;
 				} else {
-					throw new RuntimeException(
-							"multiple @HttpBody fields detected");
+					throw new RuntimeException("multiple @HttpBody fields detected");
 				}
 			}
-			HttpHeader httpHeaderAnnotation = field
-					.getAnnotation(HttpHeader.class);
+			HttpHeader httpHeaderAnnotation = field.getAnnotation(HttpHeader.class);
 			if (null == httpHeaderAnnotation) {
 				continue;
 			}
@@ -137,26 +130,22 @@ public class Transport {
 			try {
 				fieldValue = field.get(dataObject);
 			} catch (Exception e) {
-				throw new RuntimeException("error reading field: "
-						+ field.getName());
+				throw new RuntimeException("error reading field: " + field.getName());
 			}
 			if (null != fieldValue) {
 				String httpHeaderName = httpHeaderAnnotation.value();
 				String httpHeaderValue;
 				if (String.class.equals(field.getType())) {
 					httpHeaderValue = (String) fieldValue;
-				} else if (Integer.TYPE.equals(field.getType())
-						|| Integer.class.equals(field.getType())) {
+				} else if (Integer.TYPE.equals(field.getType()) || Integer.class.equals(field.getType())) {
 					httpHeaderValue = ((Integer) fieldValue).toString();
 					// TODO: make this more generic
-				} else if (Boolean.TYPE.equals(field.getType())
-						|| Boolean.class.equals(field.getType())) {
+				} else if (Boolean.TYPE.equals(field.getType()) || Boolean.class.equals(field.getType())) {
 					httpHeaderValue = ((Boolean) fieldValue).toString();
 				} else if (field.getType().isEnum()) {
 					httpHeaderValue = ((Enum<?>) fieldValue).name();
 				} else {
-					throw new RuntimeException("unsupported field type: "
-							+ field.getType().getName());
+					throw new RuntimeException("unsupported field type: " + field.getType().getName());
 				}
 				httpTransmitter.addHeader(httpHeaderName, httpHeaderValue);
 			}
@@ -173,9 +162,7 @@ public class Transport {
 			}
 			Object fieldValue = field.get(dataObject);
 			if (null == fieldValue) {
-				throw new IllegalArgumentException(
-						"input validation error: empty field: "
-								+ field.getName());
+				throw new IllegalArgumentException("input validation error: empty field: " + field.getName());
 			}
 		}
 	}

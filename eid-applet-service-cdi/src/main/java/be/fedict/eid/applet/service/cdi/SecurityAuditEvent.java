@@ -32,8 +32,7 @@ public class SecurityAuditEvent {
 
 	private final byte[] data;
 
-	public SecurityAuditEvent(Incident incident, X509Certificate subject,
-			byte[] data) {
+	public SecurityAuditEvent(Incident incident, X509Certificate subject, byte[] data) {
 		this.incident = incident;
 		this.subject = subject;
 		this.data = data;

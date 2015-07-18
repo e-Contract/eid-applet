@@ -58,8 +58,8 @@ public class KmlServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		LOG.debug("doGet");
 
 		HttpSession httpSession = request.getSession();
@@ -69,12 +69,11 @@ public class KmlServlet extends HttpServlet {
 		try {
 			document = this.kmlGenerator.generateKml(eIdData);
 		} catch (IOException e) {
-			throw new ServletException(
-					"KML generator error: " + e.getMessage(), e);
+			throw new ServletException("KML generator error: " + e.getMessage(), e);
 		}
 
-		response.setHeader("Cache-Control",
-				"no-cache, no-store, must-revalidate, max-age=-1"); // http 1.1
+		response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=-1"); // http
+																								// 1.1
 		if (false == request.getScheme().equals("https")) {
 			// else the download fails in IE
 			response.setHeader("Pragma", "no-cache"); // http 1.0

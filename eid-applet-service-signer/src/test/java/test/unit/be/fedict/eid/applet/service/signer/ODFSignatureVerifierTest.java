@@ -43,14 +43,12 @@ import be.fedict.eid.applet.service.signer.odf.ODFSignatureVerifier;
  */
 public class ODFSignatureVerifierTest {
 
-	private static final Log LOG = LogFactory
-			.getLog(ODFSignatureVerifierTest.class);
+	private static final Log LOG = LogFactory.getLog(ODFSignatureVerifierTest.class);
 
 	@Test
 	public void testODFWithoutSignature() throws Exception {
 		// setup
-		URL odfUrl = ODFSignatureVerifierTest.class
-				.getResource("/hello-world.odt");
+		URL odfUrl = ODFSignatureVerifierTest.class.getResource("/hello-world.odt");
 
 		// operate
 		boolean result = ODFSignatureVerifier.hasOdfSignature(odfUrl);
@@ -62,8 +60,7 @@ public class ODFSignatureVerifierTest {
 	@Test
 	public void testODFSignature() throws Exception {
 		// setup
-		URL odfUrl = ODFSignatureVerifierTest.class
-				.getResource("/hello-world-signed.odt");
+		URL odfUrl = ODFSignatureVerifierTest.class.getResource("/hello-world-signed.odt");
 		assertNotNull(odfUrl);
 
 		// operate
@@ -76,8 +73,7 @@ public class ODFSignatureVerifierTest {
 	@Test
 	public void testODFCoSignature() throws Exception {
 		// setup
-		URL odfUrl = ODFSignatureVerifierTest.class
-				.getResource("/hello-world-signed-twice.odt");
+		URL odfUrl = ODFSignatureVerifierTest.class.getResource("/hello-world-signed-twice.odt");
 		assertNotNull(odfUrl);
 
 		// operate
@@ -90,8 +86,7 @@ public class ODFSignatureVerifierTest {
 	@Test
 	public void testGetSignersEmptyList() throws Exception {
 		// setup
-		URL odfUrl = ODFSignatureVerifierTest.class
-				.getResource("/hello-world.odt");
+		URL odfUrl = ODFSignatureVerifierTest.class.getResource("/hello-world.odt");
 		assertNotNull(odfUrl);
 
 		// operate
@@ -105,8 +100,7 @@ public class ODFSignatureVerifierTest {
 	@Test
 	public void testGetSigners() throws Exception {
 		// setup
-		URL odfUrl = ODFSignatureVerifierTest.class
-				.getResource("/hello-world-signed.odt");
+		URL odfUrl = ODFSignatureVerifierTest.class.getResource("/hello-world-signed.odt");
 		assertNotNull(odfUrl);
 
 		// operate
@@ -122,8 +116,7 @@ public class ODFSignatureVerifierTest {
 	@Test
 	public void testGetSigners2() throws Exception {
 		// setup
-		URL odfUrl = ODFSignatureVerifierTest.class
-				.getResource("/hello-world-signed-twice.odt");
+		URL odfUrl = ODFSignatureVerifierTest.class.getResource("/hello-world-signed-twice.odt");
 		assertNotNull(odfUrl);
 
 		// operate
@@ -170,8 +163,7 @@ public class ODFSignatureVerifierTest {
 	@Test
 	public void testIsODF() throws Exception {
 		// setup
-		URL odfUrl = ODFSignatureVerifierTest.class
-				.getResource("/hello-world.odt");
+		URL odfUrl = ODFSignatureVerifierTest.class.getResource("/hello-world.odt");
 
 		// operate
 		boolean result = ODFSignatureVerifier.isODF(odfUrl);

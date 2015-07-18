@@ -58,8 +58,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Frank Cornelis
  * 
  */
-public class KeyInfoKeySelector extends KeySelector implements
-		KeySelectorResult {
+public class KeyInfoKeySelector extends KeySelector implements KeySelectorResult {
 
 	private static final Log LOG = LogFactory.getLog(KeyInfoKeySelector.class);
 
@@ -67,8 +66,7 @@ public class KeyInfoKeySelector extends KeySelector implements
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public KeySelectorResult select(KeyInfo keyInfo, Purpose purpose,
-			AlgorithmMethod method, XMLCryptoContext context)
+	public KeySelectorResult select(KeyInfo keyInfo, Purpose purpose, AlgorithmMethod method, XMLCryptoContext context)
 			throws KeySelectorException {
 		LOG.debug("select key");
 		if (null == keyInfo) {
@@ -87,15 +85,13 @@ public class KeyInfoKeySelector extends KeySelector implements
 					continue;
 				}
 				X509Certificate certificate = (X509Certificate) x509DataObject;
-				LOG.debug("certificate: "
-						+ certificate.getSubjectX500Principal());
+				LOG.debug("certificate: " + certificate.getSubjectX500Principal());
 				if (null == this.certificate) {
 					/*
 					 * The first certificate is presumably the signer.
 					 */
 					this.certificate = certificate;
-					LOG.debug("signer certificate: "
-							+ certificate.getSubjectX500Principal());
+					LOG.debug("signer certificate: " + certificate.getSubjectX500Principal());
 				}
 			}
 			if (null != this.certificate) {

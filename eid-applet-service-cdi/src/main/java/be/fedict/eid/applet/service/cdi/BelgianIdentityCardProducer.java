@@ -41,15 +41,13 @@ public class BelgianIdentityCardProducer {
 
 	@Produces
 	public Identity createIdentity() {
-		Identity identity = getSessionAttribute(Identity.class,
-				IdentityDataMessageHandler.IDENTITY_SESSION_ATTRIBUTE);
+		Identity identity = getSessionAttribute(Identity.class, IdentityDataMessageHandler.IDENTITY_SESSION_ATTRIBUTE);
 		return identity;
 	}
 
 	@Produces
 	public Address createAddress() {
-		Address address = getSessionAttribute(Address.class,
-				IdentityDataMessageHandler.ADDRESS_SESSION_ATTRIBUTE);
+		Address address = getSessionAttribute(Address.class, IdentityDataMessageHandler.ADDRESS_SESSION_ATTRIBUTE);
 		return address;
 	}
 
@@ -88,14 +86,12 @@ public class BelgianIdentityCardProducer {
 	@Produces
 	@BelgianCitizen
 	public String createAuthenticatedBelgianCitizenIdentifier() {
-		String userId = (String) getSessionAttribute(
-				String.class,
+		String userId = (String) getSessionAttribute(String.class,
 				AuthenticationDataMessageHandler.AUTHENTICATED_USER_IDENTIFIER_SESSION_ATTRIBUTE);
 		return userId;
 	}
 
-	private <T> T getSessionAttribute(Class<? extends T> clazz,
-			String attributeName) {
+	private <T> T getSessionAttribute(Class<? extends T> clazz, String attributeName) {
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		ExternalContext externalContext = facesContext.getExternalContext();
 		Map<String, Object> sessionMap = externalContext.getSessionMap();

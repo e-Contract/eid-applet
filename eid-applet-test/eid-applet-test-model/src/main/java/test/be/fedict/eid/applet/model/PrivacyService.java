@@ -18,7 +18,6 @@
 
 package test.be.fedict.eid.applet.model;
 
-public interface PrivacyService extends
-		be.fedict.eid.applet.service.spi.PrivacyService {
+public interface PrivacyService extends be.fedict.eid.applet.service.spi.PrivacyService {
 
 }

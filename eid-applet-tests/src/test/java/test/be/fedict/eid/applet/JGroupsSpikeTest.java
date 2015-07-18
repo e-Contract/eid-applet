@@ -50,8 +50,7 @@ public class JGroupsSpikeTest {
 		// setup
 		JChannel channel;
 		if (true) {
-			URL udpFedictConfig = JGroupsSpikeTest.class
-					.getResource("/udp.xml");
+			URL udpFedictConfig = JGroupsSpikeTest.class.getResource("/udp.xml");
 			assertNotNull(udpFedictConfig);
 			channel = new JChannel(udpFedictConfig);
 		} else {
@@ -131,8 +130,7 @@ public class JGroupsSpikeTest {
 		RunnableReceiver[] agents = new RunnableReceiver[AGENT_COUNT];
 		AgentContext context = new AgentContext();
 		for (int idx = 0; idx < agents.length; idx++) {
-			RunnableReceiver agent = new RunnableReceiver("/udp.xml",
-					"channel-name", context, idx);
+			RunnableReceiver agent = new RunnableReceiver("/udp.xml", "channel-name", context, idx);
 			agent.start();
 			agents[idx] = agent;
 		}
@@ -154,8 +152,7 @@ public class JGroupsSpikeTest {
 			this.receivedMessages = new HashMap<String, Set<Integer>>();
 		}
 
-		public void waitForReceivedMessage(String msg, int agentCount)
-				throws InterruptedException {
+		public void waitForReceivedMessage(String msg, int agentCount) throws InterruptedException {
 			synchronized (this) {
 				while (true) {
 					Set<Integer> agentIds = this.receivedMessages.get(msg);
@@ -169,8 +166,7 @@ public class JGroupsSpikeTest {
 			}
 		}
 
-		public synchronized void notifyReceivedMessage(int agentId,
-				String message) {
+		public synchronized void notifyReceivedMessage(int agentId, String message) {
 			Set<Integer> agentIds = this.receivedMessages.get(message);
 			if (null == agentIds) {
 				agentIds = new HashSet<Integer>();
@@ -183,8 +179,7 @@ public class JGroupsSpikeTest {
 
 	public static class RunnableReceiver implements Receiver, Runnable {
 
-		private static final Log LOG = LogFactory
-				.getLog(RunnableReceiver.class);
+		private static final Log LOG = LogFactory.getLog(RunnableReceiver.class);
 
 		private final String jgroupsConfigResourceName;
 
@@ -201,9 +196,9 @@ public class JGroupsSpikeTest {
 		private final List<String> outgoingMessages;
 
 		private boolean ready;
-		
-		public RunnableReceiver(String jgroupsConfigResourceName,
-				String channelName, AgentContext context, int agentId) {
+
+		public RunnableReceiver(String jgroupsConfigResourceName, String channelName, AgentContext context,
+				int agentId) {
 			this.jgroupsConfigResourceName = jgroupsConfigResourceName;
 			this.channelName = channelName;
 			this.outgoingMessages = new LinkedList<String>();
@@ -213,14 +208,11 @@ public class JGroupsSpikeTest {
 
 		public void sendMessage(String message) {
 			synchronized (this) {
-				LOG.debug("agent " + this.agentId
-						+ ": queing message for sending :" + message);
+				LOG.debug("agent " + this.agentId + ": queing message for sending :" + message);
 				this.outgoingMessages.add(message);
 				this.notify();
 			}
 		}
-		
-		
 
 		@Override
 		public void receive(Message msg) {
@@ -278,21 +270,17 @@ public class JGroupsSpikeTest {
 			LOG.debug("run");
 			this.running = true;
 			JChannel channel;
-			URL udpFedictConfig = RunnableReceiver.class
-					.getResource(this.jgroupsConfigResourceName);
+			URL udpFedictConfig = RunnableReceiver.class.getResource(this.jgroupsConfigResourceName);
 			try {
 				channel = new JChannel(udpFedictConfig);
 			} catch (ChannelException e) {
-				throw new RuntimeException("JGroups channel exception: "
-						+ e.getMessage(), e);
+				throw new RuntimeException("JGroups channel exception: " + e.getMessage(), e);
 			}
 			channel.setReceiver(this);
 			try {
 				channel.connect(this.channelName);
 			} catch (ChannelException e) {
-				throw new RuntimeException(
-						"JGroups channel connect exception: " + e.getMessage(),
-						e);
+				throw new RuntimeException("JGroups channel connect exception: " + e.getMessage(), e);
 			}
 			LOG.debug("connected to channel");
 			while (this.running) {
@@ -301,8 +289,7 @@ public class JGroupsSpikeTest {
 						this.ready = true;
 						this.wait();
 					} catch (InterruptedException e) {
-						throw new RuntimeException("wait error: "
-								+ e.getMessage(), e);
+						throw new RuntimeException("wait error: " + e.getMessage(), e);
 					}
 					LOG.debug("agent " + this.agentId + ": waking up");
 					if (false == this.running) {
@@ -311,17 +298,13 @@ public class JGroupsSpikeTest {
 					}
 					while (false == this.outgoingMessages.isEmpty()) {
 						String message = this.outgoingMessages.remove(0);
-						LOG.debug("agent " + this.agentId
-								+ ": sending message: " + message);
+						LOG.debug("agent " + this.agentId + ": sending message: " + message);
 						try {
 							channel.send(new Message(null, null, message));
 						} catch (ChannelNotConnectedException e) {
-							throw new RuntimeException(
-									"channel not connected: " + e.getMessage(),
-									e);
+							throw new RuntimeException("channel not connected: " + e.getMessage(), e);
 						} catch (ChannelClosedException e) {
-							throw new RuntimeException("channel closed: "
-									+ e.getMessage(), e);
+							throw new RuntimeException("channel closed: " + e.getMessage(), e);
 						}
 					}
 				}

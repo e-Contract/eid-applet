@@ -160,8 +160,7 @@ public class StartEvent {
 			return this;
 		}
 
-		public AuthenticationRequest setTransactionMessage(
-				String transactionMessage) {
+		public AuthenticationRequest setTransactionMessage(String transactionMessage) {
 			this.transactionMessage = transactionMessage;
 			return this;
 		}
@@ -251,8 +250,7 @@ public class StartEvent {
 			return this.removeCard;
 		}
 
-		public IdentificationRequest setIdentityDataUsage(
-				String identityDataUsage) {
+		public IdentificationRequest setIdentityDataUsage(String identityDataUsage) {
 			this.identityDataUsage = identityDataUsage;
 			return this;
 		}

@@ -32,14 +32,11 @@ import be.fedict.eid.applet.service.spi.TrustCertificateSecurityException;
 
 @Stateless
 @EJB(name = "java:global/test/AuthenticationUntrustedServiceBean", beanInterface = AuthenticationUntrustedService.class)
-public class AuthenticationUntrustedServiceBean implements
-		AuthenticationUntrustedService {
+public class AuthenticationUntrustedServiceBean implements AuthenticationUntrustedService {
 
-	private static final Log LOG = LogFactory
-			.getLog(AuthenticationUntrustedServiceBean.class);
+	private static final Log LOG = LogFactory.getLog(AuthenticationUntrustedServiceBean.class);
 
-	public void validateCertificateChain(List<X509Certificate> certificateChain)
-			throws SecurityException {
+	public void validateCertificateChain(List<X509Certificate> certificateChain) throws SecurityException {
 		LOG.debug("validate certificate chain: " + certificateChain);
 		throw new TrustCertificateSecurityException();
 	}

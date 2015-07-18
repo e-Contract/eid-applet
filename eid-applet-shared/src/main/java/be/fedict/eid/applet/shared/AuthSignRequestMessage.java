@@ -38,8 +38,7 @@ public class AuthSignRequestMessage extends AbstractProtocolMessage {
 
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator
-	public static final String TYPE = AuthSignRequestMessage.class
-			.getSimpleName();
+	public static final String TYPE = AuthSignRequestMessage.class.getSimpleName();
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "DigestAlgo")
 	@NotNull
@@ -60,8 +59,7 @@ public class AuthSignRequestMessage extends AbstractProtocolMessage {
 		super();
 	}
 
-	public AuthSignRequestMessage(byte[] computedDigestValue,
-			String digestAlgo, String message, boolean logoff) {
+	public AuthSignRequestMessage(byte[] computedDigestValue, String digestAlgo, String message, boolean logoff) {
 		this.computedDigestValue = computedDigestValue;
 		this.digestAlgo = digestAlgo;
 		this.message = message;

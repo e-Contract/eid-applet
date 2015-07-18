@@ -23,15 +23,12 @@ import java.util.GregorianCalendar;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class DateOfProtectionDataConvertor implements
-		DataConvertor<GregorianCalendar> {
+public class DateOfProtectionDataConvertor implements DataConvertor<GregorianCalendar> {
 
-	private static final Log LOG = LogFactory
-			.getLog(DateOfProtectionDataConvertor.class);
+	private static final Log LOG = LogFactory.getLog(DateOfProtectionDataConvertor.class);
 
 	@Override
-	public GregorianCalendar convert(byte[] value)
-			throws DataConvertorException {
+	public GregorianCalendar convert(byte[] value) throws DataConvertorException {
 		LOG.debug("DateAndCountryOfProtection size: " + value.length);
 		if (0 == value.length) {
 			return null;
@@ -42,8 +39,7 @@ public class DateOfProtectionDataConvertor implements
 			int day = Integer.parseInt(dateStr.substring(0, 2));
 			int month = Integer.parseInt(dateStr.substring(3, 5));
 			int year = Integer.parseInt(dateStr.substring(6, 10));
-			GregorianCalendar calendar = new GregorianCalendar(year, month - 1,
-					day);
+			GregorianCalendar calendar = new GregorianCalendar(year, month - 1, day);
 			return calendar;
 		} catch (Exception e) {
 			LOG.error("error parsing DateOfProtection: " + e.getMessage(), e);

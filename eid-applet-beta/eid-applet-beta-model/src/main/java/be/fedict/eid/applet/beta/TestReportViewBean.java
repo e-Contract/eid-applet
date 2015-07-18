@@ -32,8 +32,7 @@ public class TestReportViewBean {
 	private EntityManager entityManager;
 
 	public List<TestReportEntity> getReport() {
-		Query query = this.entityManager
-				.createNamedQuery(TestReportEntity.QUERY_TEST_REPORT);
+		Query query = this.entityManager.createNamedQuery(TestReportEntity.QUERY_TEST_REPORT);
 		return query.getResultList();
 	}
 }

@@ -26,8 +26,7 @@ import be.fedict.eid.applet.service.Gender;
  * @author Frank Cornelis
  * 
  */
-public class GenderToFemaleValueConvertor implements
-		ValueConvertor<Gender, Boolean> {
+public class GenderToFemaleValueConvertor implements ValueConvertor<Gender, Boolean> {
 
 	public Boolean convert(Gender value) throws ValueConvertorException {
 		if (Gender.FEMALE == value) {
@@ -35,5 +34,4 @@ public class GenderToFemaleValueConvertor implements
 		}
 		return false;
 	}
-
 }

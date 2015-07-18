@@ -18,7 +18,6 @@
 
 package test.be.fedict.eid.applet.model;
 
-public interface AuthenticationService extends
-		be.fedict.eid.applet.service.spi.AuthenticationService {
+public interface AuthenticationService extends be.fedict.eid.applet.service.spi.AuthenticationService {
 
 }

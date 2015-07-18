@@ -52,8 +52,7 @@ import be.fedict.eid.applet.service.spi.SignatureService;
  */
 public class SignatureServiceImpl implements SignatureService {
 
-	private static final Log LOG = LogFactory
-			.getLog(SignatureServiceImpl.class);
+	private static final Log LOG = LogFactory.getLog(SignatureServiceImpl.class);
 
 	private static Map<String, String> digestAlgoToSignAlgo;
 
@@ -72,8 +71,7 @@ public class SignatureServiceImpl implements SignatureService {
 		digestAlgoToSignAlgo.put("RIPEMD256", "RIPEMD256withRSA");
 	}
 
-	public void postSign(byte[] signatureValue,
-			List<X509Certificate> signingCertificateChain) {
+	public void postSign(byte[] signatureValue, List<X509Certificate> signingCertificateChain) {
 		LOG.debug("postSign");
 
 		String signatureValueStr = new String(Hex.encodeHex(signatureValue));
@@ -89,8 +87,7 @@ public class SignatureServiceImpl implements SignatureService {
 		String signAlgo = digestAlgoToSignAlgo.get(digestAlgo);
 
 		try {
-			Signature signature = Signature.getInstance(signAlgo,
-					BouncyCastleProvider.PROVIDER_NAME);
+			Signature signature = Signature.getInstance(signAlgo, BouncyCastleProvider.PROVIDER_NAME);
 			signature.initVerify(signingCertificateChain.get(0).getPublicKey());
 			signature.update(toBeSigned.getBytes());
 			signatureValid = signature.verify(signatureValue);
@@ -101,10 +98,8 @@ public class SignatureServiceImpl implements SignatureService {
 		session.setAttribute("SignatureValid", signatureValid);
 	}
 
-	public DigestInfo preSign(List<DigestInfo> digestInfos,
-			List<X509Certificate> signingCertificateChain,
-			IdentityDTO identity, AddressDTO address, byte[] photo)
-			throws NoSuchAlgorithmException {
+	public DigestInfo preSign(List<DigestInfo> digestInfos, List<X509Certificate> signingCertificateChain,
+			IdentityDTO identity, AddressDTO address, byte[] photo) throws NoSuchAlgorithmException {
 		LOG.debug("preSign");
 
 		HttpSession session = getHttpSession();
@@ -116,17 +111,14 @@ public class SignatureServiceImpl implements SignatureService {
 		String javaDigestAlgo = digestAlgo;
 		if (digestAlgo.endsWith("-PSS")) {
 			LOG.debug("RSA/PSS detected");
-			javaDigestAlgo = digestAlgo
-					.substring(0, digestAlgo.indexOf("-PSS"));
+			javaDigestAlgo = digestAlgo.substring(0, digestAlgo.indexOf("-PSS"));
 			LOG.debug("java digest algo: " + javaDigestAlgo);
 		}
 		MessageDigest messageDigest;
 		try {
-			messageDigest = MessageDigest.getInstance(javaDigestAlgo,
-					BouncyCastleProvider.PROVIDER_NAME);
+			messageDigest = MessageDigest.getInstance(javaDigestAlgo, BouncyCastleProvider.PROVIDER_NAME);
 		} catch (NoSuchProviderException e) {
-			throw new RuntimeException("bouncycastle error: " + e.getMessage(),
-					e);
+			throw new RuntimeException("bouncycastle error: " + e.getMessage(), e);
 		}
 		byte[] digestValue = messageDigest.digest(toBeSigned.getBytes());
 
@@ -137,8 +129,7 @@ public class SignatureServiceImpl implements SignatureService {
 	private HttpSession getHttpSession() {
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}

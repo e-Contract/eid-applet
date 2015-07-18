@@ -53,8 +53,7 @@ public class UnmarshallerTest {
 	private static final Log LOG = LogFactory.getLog(UnmarshallerTest.class);
 
 	@Test
-	public void receiveIdentityDataMessageWithoutRequiredHeaders()
-			throws Exception {
+	public void receiveIdentityDataMessageWithoutRequiredHeaders() throws Exception {
 		// setup
 		ProtocolMessageCatalog catalog = new AppletProtocolMessageCatalog();
 		Unmarshaller unmarshaller = new Unmarshaller(catalog);
@@ -63,16 +62,10 @@ public class UnmarshallerTest {
 
 		// stubs
 		EasyMock.expect(mockHttpReceiver.isSecure()).andStubReturn(true);
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version"))
-				.andStubReturn("1");
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type"))
-				.andStubReturn("IdentityDataMessage");
-		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(
-				new LinkedList<String>());
-		EasyMock.expect(mockHttpReceiver.getBody()).andStubReturn(
-				"hello world".getBytes());
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version")).andStubReturn("1");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type")).andStubReturn("IdentityDataMessage");
+		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(new LinkedList<String>());
+		EasyMock.expect(mockHttpReceiver.getBody()).andStubReturn("hello world".getBytes());
 
 		// prepare
 		EasyMock.replay(mockHttpReceiver);
@@ -99,9 +92,7 @@ public class UnmarshallerTest {
 
 		// stubs
 		EasyMock.expect(mockHttpReceiver.isSecure()).andStubReturn(true);
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version"))
-				.andStubReturn(null);
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version")).andStubReturn(null);
 
 		// prepare
 		EasyMock.replay(mockHttpReceiver);
@@ -135,24 +126,12 @@ public class UnmarshallerTest {
 		testHeaderNames.add("X-AppletProtocol-Type");
 		testHeaderNames.add("X-AppletProtocol-IdentityFileSize");
 		testHeaderNames.add("X-AppletProtocol-AddressFileSize");
-		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(
-				testHeaderNames);
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version"))
-				.andStubReturn("1");
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type"))
-				.andStubReturn("IdentityDataMessage");
-		EasyMock.expect(
-				mockHttpReceiver
-						.getHeaderValue("X-AppletProtocol-IdentityFileSize"))
-				.andStubReturn("10");
-		EasyMock.expect(
-				mockHttpReceiver
-						.getHeaderValue("X-AppletProtocol-AddressFileSize"))
-				.andStubReturn("1");
-		EasyMock.expect(mockHttpReceiver.getBody()).andStubReturn(
-				"hello world".getBytes());
+		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(testHeaderNames);
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version")).andStubReturn("1");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type")).andStubReturn("IdentityDataMessage");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-IdentityFileSize")).andStubReturn("10");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-AddressFileSize")).andStubReturn("1");
+		EasyMock.expect(mockHttpReceiver.getBody()).andStubReturn("hello world".getBytes());
 
 		// prepare
 		EasyMock.replay(mockHttpReceiver);
@@ -167,12 +146,10 @@ public class UnmarshallerTest {
 		assertTrue(result instanceof IdentityDataMessage);
 		IdentityDataMessage identityDataMessageResult = (IdentityDataMessage) result;
 		assertNotNull(identityDataMessageResult.body);
-		assertArrayEquals("hello world".getBytes(),
-				identityDataMessageResult.body);
+		assertArrayEquals("hello world".getBytes(), identityDataMessageResult.body);
 		assertEquals((Integer) 10, identityDataMessageResult.identityFileSize);
 		assertEquals((Integer) 1, identityDataMessageResult.addressFileSize);
-		assertArrayEquals("hello worl".getBytes(),
-				identityDataMessageResult.idFile);
+		assertArrayEquals("hello worl".getBytes(), identityDataMessageResult.idFile);
 		assertArrayEquals("d".getBytes(), identityDataMessageResult.addressFile);
 	}
 
@@ -191,18 +168,11 @@ public class UnmarshallerTest {
 		testHeaderNames.add("X-AppletProtocol-Version");
 		testHeaderNames.add("X-AppletProtocol-Type");
 		testHeaderNames.add("X-AppletProtocol-IncludePhoto");
-		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(
-				testHeaderNames);
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version"))
-				.andStubReturn("1");
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type"))
+		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(testHeaderNames);
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version")).andStubReturn("1");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type"))
 				.andStubReturn("IdentificationRequestMessage");
-		EasyMock.expect(
-				mockHttpReceiver
-						.getHeaderValue("X-AppletProtocol-IncludePhoto"))
-				.andStubReturn("true");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-IncludePhoto")).andStubReturn("true");
 
 		// prepare
 		EasyMock.replay(mockHttpReceiver);
@@ -232,14 +202,9 @@ public class UnmarshallerTest {
 		List<String> testHeaderNames = new LinkedList<String>();
 		testHeaderNames.add("X-AppletProtocol-Version");
 		testHeaderNames.add("X-AppletProtocol-Type");
-		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(
-				testHeaderNames);
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version"))
-				.andStubReturn("1");
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type"))
-				.andStubReturn("FinishedMessage");
+		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(testHeaderNames);
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version")).andStubReturn("1");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type")).andStubReturn("FinishedMessage");
 
 		// prepare
 		EasyMock.replay(mockHttpReceiver);
@@ -270,16 +235,10 @@ public class UnmarshallerTest {
 		testHeaderNames.add("X-AppletProtocol-Version");
 		testHeaderNames.add("X-AppletProtocol-Type");
 		testHeaderNames.add("X-AppletProtocol-ErrorCode");
-		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(
-				testHeaderNames);
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version"))
-				.andStubReturn("1");
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type"))
-				.andStubReturn("FinishedMessage");
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-ErrorCode"))
+		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(testHeaderNames);
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version")).andStubReturn("1");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type")).andStubReturn("FinishedMessage");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-ErrorCode"))
 				.andStubReturn(ErrorCode.CERTIFICATE_EXPIRED.name());
 
 		// prepare
@@ -340,13 +299,9 @@ public class UnmarshallerTest {
 		testHeaderNames.add("foo-bar");
 		testHeaderNames.add("X-AppletProtocol-Version");
 		testHeaderNames.add("X-AppletProtocol-Type");
-		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(
-				testHeaderNames);
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version"))
-				.andStubReturn("1");
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type"))
+		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(testHeaderNames);
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version")).andStubReturn("1");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type"))
 				.andStubReturn(TestMessage.class.getSimpleName());
 
 		// prepare
@@ -383,34 +338,17 @@ public class UnmarshallerTest {
 		testHeaderNames.add("X-AppletProtocol-OSName");
 		testHeaderNames.add("X-AppletProtocol-OSArch");
 		testHeaderNames.add("X-AppletProtocol-OSVersion");
-		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(
-				testHeaderNames);
+		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(testHeaderNames);
 
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version"))
-				.andStubReturn("1");
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type"))
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version")).andStubReturn("1");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type"))
 				.andStubReturn("ClientEnvironmentMessage");
-		EasyMock
-				.expect(
-						mockHttpReceiver
-								.getHeaderValue("X-AppletProtocol-JavaVersion"))
-				.andStubReturn("1.6");
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-JavaVendor"))
-				.andStubReturn("Sun");
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-OSName"))
-				.andStubReturn("Linux");
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-OSArch"))
-				.andStubReturn("i386");
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-OSVersion"))
-				.andStubReturn("2.6");
-		EasyMock.expect(mockHttpReceiver.getBody()).andStubReturn(
-				"Reader 1\nReader 2\n".getBytes());
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-JavaVersion")).andStubReturn("1.6");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-JavaVendor")).andStubReturn("Sun");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-OSName")).andStubReturn("Linux");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-OSArch")).andStubReturn("i386");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-OSVersion")).andStubReturn("2.6");
+		EasyMock.expect(mockHttpReceiver.getBody()).andStubReturn("Reader 1\nReader 2\n".getBytes());
 
 		// prepare
 		EasyMock.replay(mockHttpReceiver);
@@ -433,8 +371,7 @@ public class UnmarshallerTest {
 	}
 
 	@Test
-	public void receiveIdentityDataMessageCaseInsensitiveHeaders()
-			throws Exception {
+	public void receiveIdentityDataMessageCaseInsensitiveHeaders() throws Exception {
 		// setup
 		ProtocolMessageCatalog catalog = new AppletProtocolMessageCatalog();
 		Unmarshaller unmarshaller = new Unmarshaller(catalog);
@@ -443,9 +380,7 @@ public class UnmarshallerTest {
 
 		// stubs
 		EasyMock.expect(mockHttpReceiver.isSecure()).andStubReturn(true);
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type"))
-				.andStubReturn("IdentityDataMessage");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type")).andStubReturn("IdentityDataMessage");
 
 		List<String> testHeaderNames = new LinkedList<String>();
 		testHeaderNames.add("foo-bar");
@@ -453,27 +388,13 @@ public class UnmarshallerTest {
 		testHeaderNames.add("x-appletprotocol-type");
 		testHeaderNames.add("x-appletprotocol-identityfilesize");
 		testHeaderNames.add("x-appletprotocol-addressfilesize");
-		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(
-				testHeaderNames);
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version"))
-				.andStubReturn("1");
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("x-appletprotocol-version"))
-				.andStubReturn("1");
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("x-appletprotocol-type"))
-				.andStubReturn("IdentityDataMessage");
-		EasyMock.expect(
-				mockHttpReceiver
-						.getHeaderValue("x-appletprotocol-identityfilesize"))
-				.andStubReturn("10");
-		EasyMock.expect(
-				mockHttpReceiver
-						.getHeaderValue("x-appletprotocol-addressfilesize"))
-				.andStubReturn("1");
-		EasyMock.expect(mockHttpReceiver.getBody()).andStubReturn(
-				"hello world".getBytes());
+		EasyMock.expect(mockHttpReceiver.getHeaderNames()).andStubReturn(testHeaderNames);
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version")).andStubReturn("1");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("x-appletprotocol-version")).andStubReturn("1");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("x-appletprotocol-type")).andStubReturn("IdentityDataMessage");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("x-appletprotocol-identityfilesize")).andStubReturn("10");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("x-appletprotocol-addressfilesize")).andStubReturn("1");
+		EasyMock.expect(mockHttpReceiver.getBody()).andStubReturn("hello world".getBytes());
 
 		// prepare
 		EasyMock.replay(mockHttpReceiver);
@@ -488,8 +409,7 @@ public class UnmarshallerTest {
 		assertTrue(result instanceof IdentityDataMessage);
 		IdentityDataMessage identityDataMessageResult = (IdentityDataMessage) result;
 		assertNotNull(identityDataMessageResult.body);
-		assertArrayEquals("hello world".getBytes(),
-				identityDataMessageResult.body);
+		assertArrayEquals("hello world".getBytes(), identityDataMessageResult.body);
 		assertEquals((Integer) 10, identityDataMessageResult.identityFileSize);
 		assertEquals((Integer) 1, identityDataMessageResult.addressFileSize);
 	}
@@ -504,12 +424,8 @@ public class UnmarshallerTest {
 
 		// stubs
 		EasyMock.expect(mockHttpReceiver.isSecure()).andStubReturn(true);
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version"))
-				.andStubReturn("1");
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type"))
-				.andStubReturn("foo-bar");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version")).andStubReturn("1");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Type")).andStubReturn("foo-bar");
 
 		// prepare
 		EasyMock.replay(mockHttpReceiver);
@@ -562,9 +478,7 @@ public class UnmarshallerTest {
 
 		// stubs
 		EasyMock.expect(mockHttpReceiver.isSecure()).andStubReturn(true);
-		EasyMock.expect(
-				mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version"))
-				.andStubReturn("007");
+		EasyMock.expect(mockHttpReceiver.getHeaderValue("X-AppletProtocol-Version")).andStubReturn("007");
 
 		// prepare
 		EasyMock.replay(mockHttpReceiver);

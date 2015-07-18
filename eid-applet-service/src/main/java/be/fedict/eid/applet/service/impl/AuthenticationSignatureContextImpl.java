@@ -28,13 +28,11 @@ import be.fedict.eid.applet.service.spi.AuthenticationSignatureContext;
  * @author Frank Cornelis
  * 
  */
-public class AuthenticationSignatureContextImpl implements
-		AuthenticationSignatureContext {
+public class AuthenticationSignatureContextImpl implements AuthenticationSignatureContext {
 
 	private final HttpSession httpSession;
 
-	private static final String PREFIX = AuthenticationSignatureContextImpl.class
-			.getName() + ".";
+	private static final String PREFIX = AuthenticationSignatureContextImpl.class.getName() + ".";
 
 	/**
 	 * Main constructor.

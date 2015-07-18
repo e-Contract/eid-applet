@@ -68,8 +68,7 @@ public class PdfServletTest {
 
 		// verify
 		assertEquals(HttpServletResponse.SC_OK, statusCode);
-		String resultContentType = getMethod.getResponseHeader("content-type")
-				.getValue();
+		String resultContentType = getMethod.getResponseHeader("content-type").getValue();
 		assertEquals("application/pdf", resultContentType);
 		assertTrue(getMethod.getResponseBody().length > 0);
 	}

@@ -104,8 +104,7 @@ public class TSPTimeStampService implements TimeStampService {
 
 	private String digestAlgoOid;
 
-	public TSPTimeStampService(String tspServiceUrl,
-			TimeStampServiceValidator validator) {
+	public TSPTimeStampService(String tspServiceUrl, TimeStampServiceValidator validator) {
 		this(tspServiceUrl, validator, null, null);
 	}
 
@@ -122,8 +121,7 @@ public class TSPTimeStampService implements TimeStampService {
 	 * @param userAgent
 	 *            the optional User-Agent TSP request header value.
 	 */
-	public TSPTimeStampService(String tspServiceUrl,
-			TimeStampServiceValidator validator, String requestPolicy,
+	public TSPTimeStampService(String tspServiceUrl, TimeStampServiceValidator validator, String requestPolicy,
 			String userAgent) {
 		if (null == tspServiceUrl) {
 			throw new IllegalArgumentException("TSP service URL required");
@@ -192,8 +190,7 @@ public class TSPTimeStampService implements TimeStampService {
 		} else if ("SHA-512".equals(digestAlgo)) {
 			this.digestAlgoOid = TSPAlgorithms.SHA512;
 		} else {
-			throw new IllegalArgumentException("unsupported digest algo: "
-					+ digestAlgo);
+			throw new IllegalArgumentException("unsupported digest algo: " + digestAlgo);
 		}
 		this.digestAlgo = digestAlgo;
 	}
@@ -218,11 +215,9 @@ public class TSPTimeStampService implements TimeStampService {
 		this.proxyPort = 0;
 	}
 
-	public byte[] timeStamp(byte[] data, RevocationData revocationData)
-			throws Exception {
+	public byte[] timeStamp(byte[] data, RevocationData revocationData) throws Exception {
 		// digest the message
-		MessageDigest messageDigest = MessageDigest
-				.getInstance(this.digestAlgo);
+		MessageDigest messageDigest = MessageDigest.getInstance(this.digestAlgo);
 		byte[] digest = messageDigest.digest(data);
 
 		// generate the TSP request
@@ -232,26 +227,22 @@ public class TSPTimeStampService implements TimeStampService {
 		if (null != this.requestPolicy) {
 			requestGenerator.setReqPolicy(this.requestPolicy);
 		}
-		TimeStampRequest request = requestGenerator.generate(
-				this.digestAlgoOid, digest, nonce);
+		TimeStampRequest request = requestGenerator.generate(this.digestAlgoOid, digest, nonce);
 		byte[] encodedRequest = request.getEncoded();
 
 		// create the HTTP client
 		HttpClient httpClient = new HttpClient();
 		if (null != this.username) {
-			Credentials credentials = new UsernamePasswordCredentials(
-					this.username, this.password);
+			Credentials credentials = new UsernamePasswordCredentials(this.username, this.password);
 			httpClient.getState().setCredentials(AuthScope.ANY, credentials);
 		}
 		if (null != this.proxyHost) {
-			httpClient.getHostConfiguration().setProxy(this.proxyHost,
-					this.proxyPort);
+			httpClient.getHostConfiguration().setProxy(this.proxyHost, this.proxyPort);
 		}
 
 		// create the HTTP POST request
 		PostMethod postMethod = new PostMethod(this.tspServiceUrl);
-		RequestEntity requestEntity = new ByteArrayRequestEntity(
-				encodedRequest, "application/timestamp-query");
+		RequestEntity requestEntity = new ByteArrayRequestEntity(encodedRequest, "application/timestamp-query");
 		postMethod.addRequestHeader("User-Agent", this.userAgent);
 		postMethod.setRequestEntity(requestEntity);
 
@@ -259,20 +250,17 @@ public class TSPTimeStampService implements TimeStampService {
 		int statusCode = httpClient.executeMethod(postMethod);
 		if (HttpStatus.SC_OK != statusCode) {
 			LOG.error("Error contacting TSP server " + this.tspServiceUrl);
-			throw new Exception("Error contacting TSP server "
-					+ this.tspServiceUrl);
+			throw new Exception("Error contacting TSP server " + this.tspServiceUrl);
 		}
 
 		// HTTP input validation
-		Header responseContentTypeHeader = postMethod
-				.getResponseHeader("Content-Type");
+		Header responseContentTypeHeader = postMethod.getResponseHeader("Content-Type");
 		if (null == responseContentTypeHeader) {
 			throw new RuntimeException("missing Content-Type header");
 		}
 		String contentType = responseContentTypeHeader.getValue();
 		if (!contentType.startsWith("application/timestamp-reply")) {
-			LOG.debug("response content: "
-					+ postMethod.getResponseBodyAsString());
+			LOG.debug("response content: " + postMethod.getResponseBodyAsString());
 			throw new RuntimeException("invalid Content-Type: " + contentType);
 		}
 		if (0 == postMethod.getResponseContentLength()) {
@@ -294,8 +282,7 @@ public class TSPTimeStampService implements TimeStampService {
 					LOG.debug("unaccepted policy");
 				}
 			}
-			throw new RuntimeException("timestamp response status != 0: "
-					+ timeStampResponse.getStatus());
+			throw new RuntimeException("timestamp response status != 0: " + timeStampResponse.getStatus());
 		}
 		TimeStampToken timeStampToken = timeStampResponse.getTimeStampToken();
 		SignerId signerId = timeStampToken.getSID();
@@ -305,40 +292,31 @@ public class TSPTimeStampService implements TimeStampService {
 		LOG.debug("signer cert issuer: " + signerCertIssuer);
 
 		// TSP signer certificates retrieval
-		CertStore certStore = timeStampToken.getCertificatesAndCRLs(
-				"Collection", BouncyCastleProvider.PROVIDER_NAME);
-		Collection<? extends Certificate> certificates = certStore
-				.getCertificates(null);
+		CertStore certStore = timeStampToken.getCertificatesAndCRLs("Collection", BouncyCastleProvider.PROVIDER_NAME);
+		Collection<? extends Certificate> certificates = certStore.getCertificates(null);
 		X509Certificate signerCert = null;
 		Map<String, X509Certificate> certificateMap = new HashMap<String, X509Certificate>();
 		for (Certificate certificate : certificates) {
 			X509Certificate x509Certificate = (X509Certificate) certificate;
-			if (signerCertIssuer.equals(x509Certificate
-					.getIssuerX500Principal())
-					&& signerCertSerialNumber.equals(x509Certificate
-							.getSerialNumber())) {
+			if (signerCertIssuer.equals(x509Certificate.getIssuerX500Principal())
+					&& signerCertSerialNumber.equals(x509Certificate.getSerialNumber())) {
 				signerCert = x509Certificate;
 			}
 			String ski = Hex.encodeHexString(getSubjectKeyId(x509Certificate));
 			certificateMap.put(ski, x509Certificate);
-			LOG.debug("embedded certificate: "
-					+ x509Certificate.getSubjectX500Principal() + "; SKI="
-					+ ski);
+			LOG.debug("embedded certificate: " + x509Certificate.getSubjectX500Principal() + "; SKI=" + ski);
 		}
 
 		// TSP signer cert path building
 		if (null == signerCert) {
-			throw new RuntimeException(
-					"TSP response token has no signer certificate");
+			throw new RuntimeException("TSP response token has no signer certificate");
 		}
 		List<X509Certificate> tspCertificateChain = new LinkedList<X509Certificate>();
 		X509Certificate certificate = signerCert;
 		do {
-			LOG.debug("adding to certificate chain: "
-					+ certificate.getSubjectX500Principal());
+			LOG.debug("adding to certificate chain: " + certificate.getSubjectX500Principal());
 			tspCertificateChain.add(certificate);
-			if (certificate.getSubjectX500Principal().equals(
-					certificate.getIssuerX500Principal())) {
+			if (certificate.getSubjectX500Principal().equals(certificate.getIssuerX500Principal())) {
 				break;
 			}
 			String aki = Hex.encodeHexString(getAuthorityKeyId(certificate));
@@ -346,45 +324,37 @@ public class TSPTimeStampService implements TimeStampService {
 		} while (null != certificate);
 
 		// verify TSP signer signature
-		timeStampToken.validate(tspCertificateChain.get(0),
-				BouncyCastleProvider.PROVIDER_NAME);
+		timeStampToken.validate(tspCertificateChain.get(0), BouncyCastleProvider.PROVIDER_NAME);
 
 		// verify TSP signer certificate
 		this.validator.validate(tspCertificateChain, revocationData);
 
-		LOG.debug("time-stamp token time: "
-				+ timeStampToken.getTimeStampInfo().getGenTime());
+		LOG.debug("time-stamp token time: " + timeStampToken.getTimeStampInfo().getGenTime());
 
 		byte[] timestamp = timeStampToken.getEncoded();
 		return timestamp;
 	}
 
 	private byte[] getSubjectKeyId(X509Certificate cert) throws IOException {
-		byte[] extvalue = cert
-				.getExtensionValue(X509Extensions.SubjectKeyIdentifier.getId());
+		byte[] extvalue = cert.getExtensionValue(X509Extensions.SubjectKeyIdentifier.getId());
 		if (extvalue == null) {
 			return null;
 		}
-		ASN1OctetString str = ASN1OctetString.getInstance(new ASN1InputStream(
-				new ByteArrayInputStream(extvalue)).readObject());
+		ASN1OctetString str = ASN1OctetString
+				.getInstance(new ASN1InputStream(new ByteArrayInputStream(extvalue)).readObject());
 		SubjectKeyIdentifier keyId = SubjectKeyIdentifier
-				.getInstance(new ASN1InputStream(new ByteArrayInputStream(str
-						.getOctets())).readObject());
+				.getInstance(new ASN1InputStream(new ByteArrayInputStream(str.getOctets())).readObject());
 		return keyId.getKeyIdentifier();
 	}
 
 	private byte[] getAuthorityKeyId(X509Certificate cert) throws IOException {
-		byte[] extvalue = cert
-				.getExtensionValue(X509Extensions.AuthorityKeyIdentifier
-						.getId());
+		byte[] extvalue = cert.getExtensionValue(X509Extensions.AuthorityKeyIdentifier.getId());
 		if (extvalue == null) {
 			return null;
 		}
-		DEROctetString oct = (DEROctetString) (new ASN1InputStream(
-				new ByteArrayInputStream(extvalue)).readObject());
+		DEROctetString oct = (DEROctetString) (new ASN1InputStream(new ByteArrayInputStream(extvalue)).readObject());
 		AuthorityKeyIdentifier keyId = new AuthorityKeyIdentifier(
-				(ASN1Sequence) new ASN1InputStream(new ByteArrayInputStream(
-						oct.getOctets())).readObject());
+				(ASN1Sequence) new ASN1InputStream(new ByteArrayInputStream(oct.getOctets())).readObject());
 		return keyId.getKeyIdentifier();
 	}
 }

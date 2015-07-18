@@ -44,8 +44,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolStateListener;
  */
 public class CleanSessionProtocolStateListener implements ProtocolStateListener {
 
-	private static final Log LOG = LogFactory
-			.getLog(CleanSessionProtocolStateListener.class);
+	private static final Log LOG = LogFactory.getLog(CleanSessionProtocolStateListener.class);
 
 	private final HttpSession httpSession;
 
@@ -62,20 +61,13 @@ public class CleanSessionProtocolStateListener implements ProtocolStateListener 
 		switch (newProtocolState) {
 		case IDENTIFY: {
 			LOG.debug("cleaning up the identity session attributes...");
-			this.httpSession
-					.removeAttribute(IdentityDataMessageHandler.IDENTITY_SESSION_ATTRIBUTE);
-			this.httpSession
-					.removeAttribute(IdentityDataMessageHandler.ADDRESS_SESSION_ATTRIBUTE);
-			this.httpSession
-					.removeAttribute(IdentityDataMessageHandler.PHOTO_SESSION_ATTRIBUTE);
-			this.httpSession
-					.removeAttribute(IdentityDataMessageHandler.EID_CERTS_SESSION_ATTRIBUTE);
-			this.httpSession
-					.removeAttribute(IdentityDataMessageHandler.EID_DATA_IDENTITY_SESSION_ATTRIBUTE);
-			this.httpSession
-					.removeAttribute(IdentityDataMessageHandler.EID_DATA_ADDRESS_SESSION_ATTRIBUTE);
-			EIdData eidData = (EIdData) this.httpSession
-					.getAttribute(IdentityDataMessageHandler.EID_SESSION_ATTRIBUTE);
+			this.httpSession.removeAttribute(IdentityDataMessageHandler.IDENTITY_SESSION_ATTRIBUTE);
+			this.httpSession.removeAttribute(IdentityDataMessageHandler.ADDRESS_SESSION_ATTRIBUTE);
+			this.httpSession.removeAttribute(IdentityDataMessageHandler.PHOTO_SESSION_ATTRIBUTE);
+			this.httpSession.removeAttribute(IdentityDataMessageHandler.EID_CERTS_SESSION_ATTRIBUTE);
+			this.httpSession.removeAttribute(IdentityDataMessageHandler.EID_DATA_IDENTITY_SESSION_ATTRIBUTE);
+			this.httpSession.removeAttribute(IdentityDataMessageHandler.EID_DATA_ADDRESS_SESSION_ATTRIBUTE);
+			EIdData eidData = (EIdData) this.httpSession.getAttribute(IdentityDataMessageHandler.EID_SESSION_ATTRIBUTE);
 			if (null != eidData) {
 				/*
 				 * First time eidData is null.
@@ -91,18 +83,12 @@ public class CleanSessionProtocolStateListener implements ProtocolStateListener 
 			LOG.debug("cleaning up the authn session attributes...");
 			this.httpSession
 					.removeAttribute(AuthenticationDataMessageHandler.AUTHENTICATED_USER_IDENTIFIER_SESSION_ATTRIBUTE);
-			this.httpSession
-					.removeAttribute(IdentityDataMessageHandler.IDENTITY_SESSION_ATTRIBUTE);
-			this.httpSession
-					.removeAttribute(IdentityDataMessageHandler.ADDRESS_SESSION_ATTRIBUTE);
-			this.httpSession
-					.removeAttribute(IdentityDataMessageHandler.PHOTO_SESSION_ATTRIBUTE);
-			this.httpSession
-					.removeAttribute(IdentityDataMessageHandler.EID_DATA_IDENTITY_SESSION_ATTRIBUTE);
-			this.httpSession
-					.removeAttribute(IdentityDataMessageHandler.EID_DATA_ADDRESS_SESSION_ATTRIBUTE);
-			EIdData eidData = (EIdData) this.httpSession
-					.getAttribute(IdentityDataMessageHandler.EID_SESSION_ATTRIBUTE);
+			this.httpSession.removeAttribute(IdentityDataMessageHandler.IDENTITY_SESSION_ATTRIBUTE);
+			this.httpSession.removeAttribute(IdentityDataMessageHandler.ADDRESS_SESSION_ATTRIBUTE);
+			this.httpSession.removeAttribute(IdentityDataMessageHandler.PHOTO_SESSION_ATTRIBUTE);
+			this.httpSession.removeAttribute(IdentityDataMessageHandler.EID_DATA_IDENTITY_SESSION_ATTRIBUTE);
+			this.httpSession.removeAttribute(IdentityDataMessageHandler.EID_DATA_ADDRESS_SESSION_ATTRIBUTE);
+			EIdData eidData = (EIdData) this.httpSession.getAttribute(IdentityDataMessageHandler.EID_SESSION_ATTRIBUTE);
 			if (null != eidData) {
 				eidData.identifier = null;
 				eidData.identity = null;

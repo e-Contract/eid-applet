@@ -75,12 +75,10 @@ public class RSATest {
 	@Test
 	public void testManualEncryption() throws Exception {
 		while (true) {
-			KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(
-					"RSA", BouncyCastleProvider.PROVIDER_NAME);
+			KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", BouncyCastleProvider.PROVIDER_NAME);
 			SecureRandom random = new SecureRandom();
 			int keySize = 128;
-			keyPairGenerator.initialize(new RSAKeyGenParameterSpec(keySize,
-					RSAKeyGenParameterSpec.F0), random);
+			keyPairGenerator.initialize(new RSAKeyGenParameterSpec(keySize, RSAKeyGenParameterSpec.F0), random);
 			KeyPair keyPair = keyPairGenerator.generateKeyPair();
 			PrivateKey privateKey = keyPair.getPrivate();
 			PublicKey publicKey = keyPair.getPublic();
@@ -88,10 +86,8 @@ public class RSATest {
 			LOG.debug("private key modulus: " + rsaPrivateKey.getModulus());
 			RSAPublicKey rsaPublicKey = (RSAPublicKey) publicKey;
 			LOG.debug("public key modulus: " + rsaPublicKey.getModulus());
-			LOG.debug("public key exponent: "
-					+ rsaPublicKey.getPublicExponent());
-			LOG.debug("modulus size: "
-					+ rsaPublicKey.getModulus().toByteArray().length);
+			LOG.debug("public key exponent: " + rsaPublicKey.getPublicExponent());
+			LOG.debug("modulus size: " + rsaPublicKey.getModulus().toByteArray().length);
 
 			Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 			cipher.init(Cipher.ENCRYPT_MODE, privateKey);
@@ -117,31 +113,23 @@ public class RSATest {
 
 			BigInteger sigBigInt1 = new BigInteger(signatureValue1);
 			BigInteger sigBigInt2 = new BigInteger(signatureValue2);
-			BigInteger msgBigInt1 = sigBigInt1
-					.modPow(rsaPublicKey.getPublicExponent(),
-							rsaPublicKey.getModulus());
-			BigInteger msgBigInt2 = sigBigInt2
-					.modPow(rsaPublicKey.getPublicExponent(),
-							rsaPublicKey.getModulus());
+			BigInteger msgBigInt1 = sigBigInt1.modPow(rsaPublicKey.getPublicExponent(), rsaPublicKey.getModulus());
+			BigInteger msgBigInt2 = sigBigInt2.modPow(rsaPublicKey.getPublicExponent(), rsaPublicKey.getModulus());
 			LOG.debug("msg big int: " + msgBigInt1);
 			byte[] msgBytes1 = msgBigInt1.toByteArray();
 			LOG.debug("original message size: " + msgBytes1.length);
-			LOG.debug("original message1: "
-					+ new String(Hex.encodeHex(msgBytes1)));
-			LOG.debug("original message2: "
-					+ new String(Hex.encodeHex(msgBigInt2.toByteArray())));
+			LOG.debug("original message1: " + new String(Hex.encodeHex(msgBytes1)));
+			LOG.debug("original message2: " + new String(Hex.encodeHex(msgBigInt2.toByteArray())));
 
 			LOG.debug("msg1 prime: " + msgBigInt1.isProbablePrime(100));
 			LOG.debug("msg2 prime: " + msgBigInt2.isProbablePrime(100));
 
 			// BigInteger.pow offers a very naive implementation
 			LOG.debug("calculating s1^e...");
-			BigInteger s1_e = sigBigInt1.pow(rsaPublicKey.getPublicExponent()
-					.intValue());
+			BigInteger s1_e = sigBigInt1.pow(rsaPublicKey.getPublicExponent().intValue());
 			LOG.debug("s1^e: " + s1_e);
 			LOG.debug("calculating s2^e...");
-			BigInteger s2_e = sigBigInt2.pow(rsaPublicKey.getPublicExponent()
-					.intValue());
+			BigInteger s2_e = sigBigInt2.pow(rsaPublicKey.getPublicExponent().intValue());
 			LOG.debug("s2^e: " + s2_e);
 
 			LOG.debug("calculating GCD...");
@@ -153,15 +141,13 @@ public class RSATest {
 			LOG.debug("b: " + b);
 			BigInteger candidateModulus = a.gcd(b);
 			LOG.debug("candidate modulus: " + candidateModulus);
-			LOG.debug("candidate modulus size: "
-					+ candidateModulus.toByteArray().length);
+			LOG.debug("candidate modulus size: " + candidateModulus.toByteArray().length);
 			BigInteger s_e = s1_e.multiply(s2_e);
 			BigInteger m = msgBigInt1.multiply(msgBigInt2);
 			while (false == rsaPublicKey.getModulus().equals(candidateModulus)) {
 				LOG.error("incorrect candidate modulus");
 				LOG.debug("modulus | candidate modulus: "
-						+ candidateModulus.remainder(rsaPublicKey.getModulus())
-								.equals(BigInteger.ZERO));
+						+ candidateModulus.remainder(rsaPublicKey.getModulus()).equals(BigInteger.ZERO));
 				s_e = s_e.multiply(s1_e);
 				m = m.multiply(msgBigInt1);
 				BigInteger n1 = s_e.subtract(m).gcd(a);
@@ -180,8 +166,7 @@ public class RSATest {
 	public void testPSS() throws Exception {
 		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
 		SecureRandom random = new SecureRandom();
-		keyPairGenerator.initialize(new RSAKeyGenParameterSpec(1024,
-				RSAKeyGenParameterSpec.F4), random);
+		keyPairGenerator.initialize(new RSAKeyGenParameterSpec(1024, RSAKeyGenParameterSpec.F4), random);
 		KeyPair keyPair = keyPairGenerator.generateKeyPair();
 		PrivateKey privateKey = keyPair.getPrivate();
 		PublicKey publicKey = keyPair.getPublic();
@@ -196,8 +181,7 @@ public class RSATest {
 
 		LOG.debug("signature size: " + signatureValue.length);
 
-		LOG.debug("signature value: "
-				+ new String(Hex.encodeHex(signatureValue)));
+		LOG.debug("signature value: " + new String(Hex.encodeHex(signatureValue)));
 
 		signature.initVerify(publicKey);
 		signature.update(data);
@@ -210,18 +194,15 @@ public class RSATest {
 
 		LOG.debug("signature size: " + signatureValue2.length);
 
-		LOG.debug("signature value: "
-				+ new String(Hex.encodeHex(signatureValue2)));
+		LOG.debug("signature value: " + new String(Hex.encodeHex(signatureValue2)));
 
 		assertFalse(Arrays.equals(signatureValue, signatureValue2));
 
-		MessageDigest messageDigest = MessageDigest
-				.getInstance("SHA-256", "BC");
+		MessageDigest messageDigest = MessageDigest.getInstance("SHA-256", "BC");
 		byte[] digest = messageDigest.digest(data);
 
 		signature = Signature.getInstance("RAWRSASSA-PSS", "BC");
-		signature.setParameter(new PSSParameterSpec("SHA-256", "MGF1",
-				new MGF1ParameterSpec("SHA-256"), 32, 1));
+		signature.setParameter(new PSSParameterSpec("SHA-256", "MGF1", new MGF1ParameterSpec("SHA-256"), 32, 1));
 		signature.initVerify(publicKey);
 		signature.update(digest);
 		result = signature.verify(signatureValue);

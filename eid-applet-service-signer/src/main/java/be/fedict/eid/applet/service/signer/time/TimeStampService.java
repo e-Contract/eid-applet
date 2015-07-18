@@ -42,6 +42,5 @@ public interface TimeStampService {
 	 * @throws Exception
 	 *             in case something went wrong.
 	 */
-	byte[] timeStamp(byte[] data, RevocationData revocationData)
-			throws Exception;
+	byte[] timeStamp(byte[] data, RevocationData revocationData) throws Exception;
 }

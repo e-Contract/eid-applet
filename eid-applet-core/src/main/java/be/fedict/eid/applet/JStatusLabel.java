@@ -22,7 +22,6 @@ import java.awt.Font;
 
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
-
 import javax.swing.JLabel;
 
 /**

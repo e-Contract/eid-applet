@@ -51,8 +51,6 @@ public interface AuthenticationService {
 	 *             in case the certificate chain is invalid/not accepted.
 	 */
 	void validateCertificateChain(List<X509Certificate> certificateChain)
-			throws ExpiredCertificateSecurityException,
-			RevokedCertificateSecurityException,
-			TrustCertificateSecurityException, CertificateSecurityException,
-			SecurityException;
+			throws ExpiredCertificateSecurityException, RevokedCertificateSecurityException,
+			TrustCertificateSecurityException, CertificateSecurityException, SecurityException;
 }

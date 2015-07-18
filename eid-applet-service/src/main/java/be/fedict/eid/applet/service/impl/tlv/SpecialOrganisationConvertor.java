@@ -31,14 +31,11 @@ import be.fedict.eid.applet.service.SpecialOrganisation;
  * @author Frank Cornelis
  * 
  */
-public class SpecialOrganisationConvertor implements
-		DataConvertor<SpecialOrganisation> {
+public class SpecialOrganisationConvertor implements DataConvertor<SpecialOrganisation> {
 
-	private static final Log LOG = LogFactory
-			.getLog(SpecialOrganisationConvertor.class);
+	private static final Log LOG = LogFactory.getLog(SpecialOrganisationConvertor.class);
 
-	public SpecialOrganisation convert(byte[] value)
-			throws DataConvertorException {
+	public SpecialOrganisation convert(byte[] value) throws DataConvertorException {
 		if (null == value) {
 			return SpecialOrganisation.UNSPECIFIED;
 		}
@@ -49,8 +46,7 @@ public class SpecialOrganisationConvertor implements
 			throw new DataConvertorException("string error: " + e.getMessage());
 		}
 		LOG.debug("key: \"" + key + "\"");
-		SpecialOrganisation specialOrganisation = SpecialOrganisation
-				.toSpecialOrganisation(key);
+		SpecialOrganisation specialOrganisation = SpecialOrganisation.toSpecialOrganisation(key);
 		return specialOrganisation;
 	}
 }

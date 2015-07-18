@@ -62,8 +62,7 @@ import be.fedict.eid.applet.shared.SignCertificatesDataMessage;
 import be.fedict.eid.applet.shared.SignRequestMessage;
 
 @Handles(SignCertificatesDataMessage.class)
-public class SignCertificatesDataMessageHandler implements
-		MessageHandler<SignCertificatesDataMessage>, Serializable {
+public class SignCertificatesDataMessageHandler implements MessageHandler<SignCertificatesDataMessage>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -83,21 +82,17 @@ public class SignCertificatesDataMessageHandler implements
 	private Event<SecurityAuditEvent> securityAuditEvent;
 
 	@Override
-	public Object handleMessage(SignCertificatesDataMessage message,
-			Map<String, String> httpHeaders, HttpServletRequest request,
-			HttpSession session) throws ServletException {
-		BeIDContextQualifier contextQualifier = new BeIDContextQualifier(
-				request);
+	public Object handleMessage(SignCertificatesDataMessage message, Map<String, String> httpHeaders,
+			HttpServletRequest request, HttpSession session) throws ServletException {
+		BeIDContextQualifier contextQualifier = new BeIDContextQualifier(request);
 		if (null != message.identityData) {
 			List<X509Certificate> rrnCertificateChain = new LinkedList<X509Certificate>();
 			rrnCertificateChain.add(message.rrnCertificate);
 			rrnCertificateChain.add(message.rootCertificate);
 
-			IdentificationEvent identificationEvent = new IdentificationEvent(
-					rrnCertificateChain);
+			IdentificationEvent identificationEvent = new IdentificationEvent(rrnCertificateChain);
 			try {
-				this.identificationEvent.select(contextQualifier).fire(
-						identificationEvent);
+				this.identificationEvent.select(contextQualifier).fire(identificationEvent);
 			} catch (ExpiredCertificateSecurityException e) {
 				return new FinishedMessage(ErrorCode.CERTIFICATE_EXPIRED);
 			} catch (RevokedCertificateSecurityException e) {
@@ -108,36 +103,26 @@ public class SignCertificatesDataMessageHandler implements
 				return new FinishedMessage(ErrorCode.CERTIFICATE);
 			}
 			if (false == identificationEvent.isValid()) {
-				SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
-						Incident.TRUST, message.rrnCertificate);
-				this.securityAuditEvent.select(contextQualifier).fire(
-						securityAuditEvent);
-				throw new SecurityException(
-						"invalid national registry certificate chain");
+				SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(Incident.TRUST, message.rrnCertificate);
+				this.securityAuditEvent.select(contextQualifier).fire(securityAuditEvent);
+				throw new SecurityException("invalid national registry certificate chain");
 			}
 
-			verifySignature(contextQualifier,
-					message.rrnCertificate.getSigAlgName(),
-					message.identitySignatureData, message.rrnCertificate,
-					request, message.identityData);
+			verifySignature(contextQualifier, message.rrnCertificate.getSigAlgName(), message.identitySignatureData,
+					message.rrnCertificate, request, message.identityData);
 
-			Identity identity = TlvParser.parse(message.identityData,
-					Identity.class);
+			Identity identity = TlvParser.parse(message.identityData, Identity.class);
 
 			if (null != message.photoData) {
 				/*
 				 * Photo integrity check.
 				 */
 				byte[] expectedPhotoDigest = identity.photoDigest;
-				byte[] actualPhotoDigest = digestPhoto(
-						getDigestAlgo(expectedPhotoDigest.length),
-						message.photoData);
-				if (false == Arrays.equals(expectedPhotoDigest,
-						actualPhotoDigest)) {
-					SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
-							Incident.DATA_INTEGRITY, message.photoData);
-					this.securityAuditEvent.select(contextQualifier).fire(
-							securityAuditEvent);
+				byte[] actualPhotoDigest = digestPhoto(getDigestAlgo(expectedPhotoDigest.length), message.photoData);
+				if (false == Arrays.equals(expectedPhotoDigest, actualPhotoDigest)) {
+					SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(Incident.DATA_INTEGRITY,
+							message.photoData);
+					this.securityAuditEvent.select(contextQualifier).fire(securityAuditEvent);
 					throw new ServletException("photo digest incorrect");
 				}
 			}
@@ -145,10 +130,8 @@ public class SignCertificatesDataMessageHandler implements
 			Address address;
 			if (null != message.addressData) {
 				byte[] addressFile = trimRight(message.addressData);
-				verifySignature(contextQualifier,
-						message.rrnCertificate.getSigAlgName(),
-						message.addressSignatureData, message.rrnCertificate,
-						request, addressFile, message.identitySignatureData);
+				verifySignature(contextQualifier, message.rrnCertificate.getSigAlgName(), message.addressSignatureData,
+						message.rrnCertificate, request, addressFile, message.identitySignatureData);
 				address = TlvParser.parse(message.addressData, Address.class);
 			} else {
 				address = null;
@@ -157,30 +140,24 @@ public class SignCertificatesDataMessageHandler implements
 			/*
 			 * Check the validity of the identity data as good as possible.
 			 */
-			GregorianCalendar cardValidityDateEndGregorianCalendar = identity
-					.getCardValidityDateEnd();
+			GregorianCalendar cardValidityDateEndGregorianCalendar = identity.getCardValidityDateEnd();
 			if (null != cardValidityDateEndGregorianCalendar) {
 				Date now = new Date();
-				Date cardValidityDateEndDate = cardValidityDateEndGregorianCalendar
-						.getTime();
+				Date cardValidityDateEndDate = cardValidityDateEndGregorianCalendar.getTime();
 				if (now.after(cardValidityDateEndDate)) {
-					SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
-							Incident.DATA_INTEGRITY, message.identityData);
-					this.securityAuditEvent.select(contextQualifier).fire(
-							securityAuditEvent);
+					SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(Incident.DATA_INTEGRITY,
+							message.identityData);
+					this.securityAuditEvent.select(contextQualifier).fire(securityAuditEvent);
 					throw new SecurityException("eID card has expired");
 				}
 			}
 
-			this.identityEvent.select(contextQualifier).fire(
-					new IdentityEvent(identity, address, message.photoData));
+			this.identityEvent.select(contextQualifier).fire(new IdentityEvent(identity, address, message.photoData));
 		}
 
-		SignatureDigestEvent signatureDigestEvent = new SignatureDigestEvent(
-				message.certificateChain);
+		SignatureDigestEvent signatureDigestEvent = new SignatureDigestEvent(message.certificateChain);
 		try {
-			this.signatureDigestEvent.select(contextQualifier).fire(
-					signatureDigestEvent);
+			this.signatureDigestEvent.select(contextQualifier).fire(signatureDigestEvent);
 		} catch (AuthorizationException e) {
 			return new FinishedMessage(ErrorCode.AUTHORIZATION);
 		}
@@ -195,17 +172,15 @@ public class SignCertificatesDataMessageHandler implements
 		this.signatureState.setDigestValue(digestValue);
 		this.signatureState.setDigestAlgo(digestAlgo);
 
-		return new SignRequestMessage(digestValue, digestAlgo, description,
-				logoff, removeCard, requireSecureReader);
+		return new SignRequestMessage(digestValue, digestAlgo, description, logoff, removeCard, requireSecureReader);
 	}
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 	}
 
-	private void verifySignature(BeIDContextQualifier contextQualifier,
-			String signAlgo, byte[] signatureData, X509Certificate certificate,
-			HttpServletRequest request, byte[]... data) throws ServletException {
+	private void verifySignature(BeIDContextQualifier contextQualifier, String signAlgo, byte[] signatureData,
+			X509Certificate certificate, HttpServletRequest request, byte[]... data) throws ServletException {
 		Signature signature;
 		try {
 			signature = Signature.getInstance(signAlgo);
@@ -224,17 +199,15 @@ public class SignCertificatesDataMessageHandler implements
 			}
 			boolean result = signature.verify(signatureData);
 			if (false == result) {
-				SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
-						Incident.DATA_INTEGRITY, certificate, signatureData);
-				this.securityAuditEvent.select(contextQualifier).fire(
-						securityAuditEvent);
+				SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(Incident.DATA_INTEGRITY, certificate,
+						signatureData);
+				this.securityAuditEvent.select(contextQualifier).fire(securityAuditEvent);
 				throw new ServletException("signature incorrect");
 			}
 		} catch (SignatureException e) {
-			SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
-					Incident.DATA_INTEGRITY, certificate, signatureData);
-			this.securityAuditEvent.select(contextQualifier).fire(
-					securityAuditEvent);
+			SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(Incident.DATA_INTEGRITY, certificate,
+					signatureData);
+			this.securityAuditEvent.select(contextQualifier).fire(securityAuditEvent);
 			throw new ServletException("signature error: " + e.getMessage(), e);
 		}
 	}
@@ -263,9 +236,7 @@ public class SignCertificatesDataMessageHandler implements
 		case 64:
 			return "SHA-512";
 		}
-		throw new RuntimeException(
-				"Failed to find guess algorithm for hash size of " + hashSize
-						+ " bytes");
+		throw new RuntimeException("Failed to find guess algorithm for hash size of " + hashSize + " bytes");
 	}
 
 	private byte[] trimRight(byte[] addressFile) {

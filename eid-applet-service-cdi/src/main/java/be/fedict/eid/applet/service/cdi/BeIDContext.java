@@ -27,8 +27,7 @@ import javax.inject.Qualifier;
 
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD, ElementType.TYPE, ElementType.FIELD,
-		ElementType.PARAMETER })
+@Target({ ElementType.METHOD, ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER })
 public @interface BeIDContext {
 
 	String value();

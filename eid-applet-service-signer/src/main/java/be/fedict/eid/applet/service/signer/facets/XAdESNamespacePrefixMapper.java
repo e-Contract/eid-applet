@@ -45,8 +45,7 @@ public class XAdESNamespacePrefixMapper extends NamespacePrefixMapper {
 	}
 
 	@Override
-	public String getPreferredPrefix(String namespaceUri, String suggestion,
-			boolean requirePrefix) {
+	public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
 		if (XMLSignature.XMLNS.equals(namespaceUri)) {
 			return "ds";
 		}

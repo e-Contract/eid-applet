@@ -66,10 +66,8 @@ public interface SecureClientEnvironmentService {
 	 * @throws InsecureClientEnvironmentException
 	 *             if the client env is found not to be secure enough.
 	 */
-	void checkSecureClientEnvironment(String javaVersion, String javaVendor,
-			String osName, String osArch, String osVersion, String userAgent,
-			String navigatorAppName, String navigatorAppVersion,
-			String navigatorUserAgent, String remoteAddress,
-			Integer sslKeySize, String sslCipherSuite, List<String> readerList)
-			throws InsecureClientEnvironmentException;
+	void checkSecureClientEnvironment(String javaVersion, String javaVendor, String osName, String osArch,
+			String osVersion, String userAgent, String navigatorAppName, String navigatorAppVersion,
+			String navigatorUserAgent, String remoteAddress, Integer sslKeySize, String sslCipherSuite,
+			List<String> readerList) throws InsecureClientEnvironmentException;
 }

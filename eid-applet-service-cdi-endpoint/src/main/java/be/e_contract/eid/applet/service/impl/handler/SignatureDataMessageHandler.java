@@ -54,45 +54,35 @@ import be.fedict.eid.applet.shared.FinishedMessage;
 import be.fedict.eid.applet.shared.SignatureDataMessage;
 
 @Handles(SignatureDataMessage.class)
-public class SignatureDataMessageHandler implements
-		MessageHandler<SignatureDataMessage>, Serializable {
+public class SignatureDataMessageHandler implements MessageHandler<SignatureDataMessage>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Log LOG = LogFactory
-			.getLog(SignatureDataMessageHandler.class);
+	private static final Log LOG = LogFactory.getLog(SignatureDataMessageHandler.class);
 
-	public static final byte[] SHA1_DIGEST_INFO_PREFIX = new byte[] { 0x30,
-			0x21, 0x30, 0x09, 0x06, 0x05, 0x2b, 0x0e, 0x03, 0x02, 0x1a, 0x05,
-			0x00, 0x04, 0x14 };
+	public static final byte[] SHA1_DIGEST_INFO_PREFIX = new byte[] { 0x30, 0x21, 0x30, 0x09, 0x06, 0x05, 0x2b, 0x0e,
+			0x03, 0x02, 0x1a, 0x05, 0x00, 0x04, 0x14 };
 
-	public static final byte[] SHA224_DIGEST_INFO_PREFIX = new byte[] { 0x30,
-			0x2d, 0x30, 0x0d, 0x06, 0x09, 0x60, (byte) 0x86, 0x48, 0x01, 0x65,
-			0x03, 0x04, 0x02, 0x04, 0x05, 0x00, 0x04, 0x1c };
+	public static final byte[] SHA224_DIGEST_INFO_PREFIX = new byte[] { 0x30, 0x2d, 0x30, 0x0d, 0x06, 0x09, 0x60,
+			(byte) 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x04, 0x05, 0x00, 0x04, 0x1c };
 
-	public static final byte[] SHA256_DIGEST_INFO_PREFIX = new byte[] { 0x30,
-			0x31, 0x30, 0x0d, 0x06, 0x09, 0x60, (byte) 0x86, 0x48, 0x01, 0x65,
-			0x03, 0x04, 0x02, 0x01, 0x05, 0x00, 0x04, 0x20 };
+	public static final byte[] SHA256_DIGEST_INFO_PREFIX = new byte[] { 0x30, 0x31, 0x30, 0x0d, 0x06, 0x09, 0x60,
+			(byte) 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01, 0x05, 0x00, 0x04, 0x20 };
 
-	public static final byte[] SHA384_DIGEST_INFO_PREFIX = new byte[] { 0x30,
-			0x41, 0x30, 0x0d, 0x06, 0x09, 0x60, (byte) 0x86, 0x48, 0x01, 0x65,
-			0x03, 0x04, 0x02, 0x02, 0x05, 0x00, 0x04, 0x30 };
+	public static final byte[] SHA384_DIGEST_INFO_PREFIX = new byte[] { 0x30, 0x41, 0x30, 0x0d, 0x06, 0x09, 0x60,
+			(byte) 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x02, 0x05, 0x00, 0x04, 0x30 };
 
-	public static final byte[] SHA512_DIGEST_INFO_PREFIX = new byte[] { 0x30,
-			0x51, 0x30, 0x0d, 0x06, 0x09, 0x60, (byte) 0x86, 0x48, 0x01, 0x65,
-			0x03, 0x04, 0x02, 0x03, 0x05, 0x00, 0x04, 0x40 };
+	public static final byte[] SHA512_DIGEST_INFO_PREFIX = new byte[] { 0x30, 0x51, 0x30, 0x0d, 0x06, 0x09, 0x60,
+			(byte) 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x03, 0x05, 0x00, 0x04, 0x40 };
 
-	public static final byte[] RIPEMD160_DIGEST_INFO_PREFIX = new byte[] {
-			0x30, 0x21, 0x30, 0x09, 0x06, 0x05, 0x2b, 0x24, 0x03, 0x02, 0x01,
-			0x05, 0x00, 0x04, 0x14 };
+	public static final byte[] RIPEMD160_DIGEST_INFO_PREFIX = new byte[] { 0x30, 0x21, 0x30, 0x09, 0x06, 0x05, 0x2b,
+			0x24, 0x03, 0x02, 0x01, 0x05, 0x00, 0x04, 0x14 };
 
-	public static final byte[] RIPEMD128_DIGEST_INFO_PREFIX = new byte[] {
-			0x30, 0x1d, 0x30, 0x09, 0x06, 0x05, 0x2b, 0x24, 0x03, 0x02, 0x02,
-			0x05, 0x00, 0x04, 0x10 };
+	public static final byte[] RIPEMD128_DIGEST_INFO_PREFIX = new byte[] { 0x30, 0x1d, 0x30, 0x09, 0x06, 0x05, 0x2b,
+			0x24, 0x03, 0x02, 0x02, 0x05, 0x00, 0x04, 0x10 };
 
-	public static final byte[] RIPEMD256_DIGEST_INFO_PREFIX = new byte[] {
-			0x30, 0x2d, 0x30, 0x09, 0x06, 0x05, 0x2b, 0x24, 0x03, 0x02, 0x03,
-			0x05, 0x00, 0x04, 0x20 };
+	public static final byte[] RIPEMD256_DIGEST_INFO_PREFIX = new byte[] { 0x30, 0x2d, 0x30, 0x09, 0x06, 0x05, 0x2b,
+			0x24, 0x03, 0x02, 0x03, 0x05, 0x00, 0x04, 0x20 };
 
 	@Inject
 	private SignatureState signatureState;
@@ -104,9 +94,8 @@ public class SignatureDataMessageHandler implements
 	private Event<SecurityAuditEvent> securityAuditEvent;
 
 	@Override
-	public Object handleMessage(SignatureDataMessage message,
-			Map<String, String> httpHeaders, HttpServletRequest request,
-			HttpSession session) throws ServletException {
+	public Object handleMessage(SignatureDataMessage message, Map<String, String> httpHeaders,
+			HttpServletRequest request, HttpSession session) throws ServletException {
 		byte[] signatureValue = message.signatureValue;
 		List<X509Certificate> certificateChain = message.certificateChain;
 		if (certificateChain.isEmpty()) {
@@ -116,12 +105,10 @@ public class SignatureDataMessageHandler implements
 		if (null == signingCertificate) {
 			throw new ServletException("non-repudiation certificate missing");
 		}
-		LOG.debug("non-repudiation signing certificate: "
-				+ signingCertificate.getSubjectX500Principal());
+		LOG.debug("non-repudiation signing certificate: " + signingCertificate.getSubjectX500Principal());
 		PublicKey signingPublicKey = signingCertificate.getPublicKey();
 
-		BeIDContextQualifier contextQualifier = new BeIDContextQualifier(
-				request);
+		BeIDContextQualifier contextQualifier = new BeIDContextQualifier(request);
 
 		/*
 		 * Verify the signature.
@@ -131,37 +118,31 @@ public class SignatureDataMessageHandler implements
 		if (digestAlgo.endsWith("-PSS")) {
 			LOG.debug("verifying RSA/PSS signature");
 			try {
-				Signature signature = Signature.getInstance("RAWRSASSA-PSS",
-						BouncyCastleProvider.PROVIDER_NAME);
+				Signature signature = Signature.getInstance("RAWRSASSA-PSS", BouncyCastleProvider.PROVIDER_NAME);
 				if ("SHA-256-PSS".equals(digestAlgo)) {
 					LOG.debug("RSA/PSS SHA256");
-					signature.setParameter(new PSSParameterSpec("SHA-256",
-							"MGF1", new MGF1ParameterSpec("SHA-256"), 32, 1));
+					signature.setParameter(
+							new PSSParameterSpec("SHA-256", "MGF1", new MGF1ParameterSpec("SHA-256"), 32, 1));
 				}
 				signature.initVerify(signingPublicKey);
 				signature.update(expectedDigestValue);
 				boolean result = signature.verify(signatureValue);
 				if (false == result) {
-					SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
-							Incident.SIGNATURE, signingCertificate,
-							signatureValue);
-					this.securityAuditEvent.select(contextQualifier).fire(
-							securityAuditEvent);
+					SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(Incident.SIGNATURE,
+							signingCertificate, signatureValue);
+					this.securityAuditEvent.select(contextQualifier).fire(securityAuditEvent);
 					throw new SecurityException("signature incorrect");
 				}
 			} catch (Exception e) {
 				LOG.debug("signature verification error: " + e.getMessage(), e);
-				SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
-						Incident.SIGNATURE, signingCertificate, signatureValue);
-				this.securityAuditEvent.select(contextQualifier).fire(
-						securityAuditEvent);
-				throw new ServletException("signature verification error: "
-						+ e.getMessage(), e);
+				SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(Incident.SIGNATURE, signingCertificate,
+						signatureValue);
+				this.securityAuditEvent.select(contextQualifier).fire(securityAuditEvent);
+				throw new ServletException("signature verification error: " + e.getMessage(), e);
 			}
 		} else {
 			try {
-				Signature signature = Signature.getInstance("RawRSA",
-						BouncyCastleProvider.PROVIDER_NAME);
+				Signature signature = Signature.getInstance("RawRSA", BouncyCastleProvider.PROVIDER_NAME);
 				signature.initVerify(signingPublicKey);
 				ByteArrayOutputStream digestInfo = new ByteArrayOutputStream();
 				if ("SHA-1".equals(digestAlgo) || "SHA1".equals(digestAlgo)) {
@@ -185,26 +166,21 @@ public class SignatureDataMessageHandler implements
 				signature.update(digestInfo.toByteArray());
 				boolean result = signature.verify(signatureValue);
 				if (false == result) {
-					SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
-							Incident.SIGNATURE, signingCertificate,
-							signatureValue);
-					this.securityAuditEvent.select(contextQualifier).fire(
-							securityAuditEvent);
+					SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(Incident.SIGNATURE,
+							signingCertificate, signatureValue);
+					this.securityAuditEvent.select(contextQualifier).fire(securityAuditEvent);
 					throw new SecurityException("signature incorrect");
 				}
 			} catch (Exception e) {
 				LOG.debug("signature verification error: " + e.getMessage());
-				SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
-						Incident.SIGNATURE, signingCertificate, signatureValue);
-				this.securityAuditEvent.select(contextQualifier).fire(
-						securityAuditEvent);
-				throw new ServletException("signature verification error: "
-						+ e.getMessage(), e);
+				SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(Incident.SIGNATURE, signingCertificate,
+						signatureValue);
+				this.securityAuditEvent.select(contextQualifier).fire(securityAuditEvent);
+				throw new ServletException("signature verification error: " + e.getMessage(), e);
 			}
 		}
 
-		SignatureEvent signatureEvent = new SignatureEvent(signatureValue,
-				certificateChain);
+		SignatureEvent signatureEvent = new SignatureEvent(signatureValue, certificateChain);
 		try {
 			this.signatureEvent.select(contextQualifier).fire(signatureEvent);
 		} catch (ExpiredCertificateSecurityException e) {
@@ -218,10 +194,8 @@ public class SignatureDataMessageHandler implements
 		}
 
 		if (null != signatureEvent.getError()) {
-			SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(
-					Incident.TRUST, signingCertificate);
-			this.securityAuditEvent.select(contextQualifier).fire(
-					securityAuditEvent);
+			SecurityAuditEvent securityAuditEvent = new SecurityAuditEvent(Incident.TRUST, signingCertificate);
+			this.securityAuditEvent.select(contextQualifier).fire(securityAuditEvent);
 			return new FinishedMessage(signatureEvent.getError());
 		}
 		return new FinishedMessage();

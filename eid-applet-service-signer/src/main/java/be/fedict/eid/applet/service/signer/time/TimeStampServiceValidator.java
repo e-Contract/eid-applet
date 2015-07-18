@@ -42,6 +42,5 @@ public interface TimeStampServiceValidator {
 	 * @throws Exception
 	 *             in case the certificate chain is invalid.
 	 */
-	void validate(List<X509Certificate> certificateChain,
-			RevocationData revocationData) throws Exception;
+	void validate(List<X509Certificate> certificateChain, RevocationData revocationData) throws Exception;
 }

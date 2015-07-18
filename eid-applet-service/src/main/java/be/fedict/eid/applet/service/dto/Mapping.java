@@ -35,5 +35,5 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Mapping {
 
-	public MapsTo[] value();
+	public MapsTo[]value();
 }

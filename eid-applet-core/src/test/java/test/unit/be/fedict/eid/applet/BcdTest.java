@@ -18,7 +18,7 @@
 
 package test.unit.be.fedict.eid.applet;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 

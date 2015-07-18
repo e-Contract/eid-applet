@@ -39,11 +39,9 @@ import be.fedict.eid.applet.service.spi.TrustCertificateSecurityException;
 @EJB(name = "java:global/test/UntrustedSignatureServiceBean", beanInterface = UntrustedSignatureService.class)
 public class UntrustedSignatureServiceBean implements UntrustedSignatureService {
 
-	private static final Log LOG = LogFactory
-			.getLog(UntrustedSignatureServiceBean.class);
+	private static final Log LOG = LogFactory.getLog(UntrustedSignatureServiceBean.class);
 
-	public void postSign(byte[] signatureValue,
-			List<X509Certificate> signingCertificateChain)
+	public void postSign(byte[] signatureValue, List<X509Certificate> signingCertificateChain)
 			throws TrustCertificateSecurityException {
 		LOG.debug("postSign");
 
@@ -53,10 +51,8 @@ public class UntrustedSignatureServiceBean implements UntrustedSignatureService 
 		throw new TrustCertificateSecurityException();
 	}
 
-	public DigestInfo preSign(List<DigestInfo> digestInfos,
-			List<X509Certificate> signingCertificateChain,
-			IdentityDTO identity, AddressDTO address, byte[] photo)
-			throws NoSuchAlgorithmException {
+	public DigestInfo preSign(List<DigestInfo> digestInfos, List<X509Certificate> signingCertificateChain,
+			IdentityDTO identity, AddressDTO address, byte[] photo) throws NoSuchAlgorithmException {
 		LOG.debug("preSign");
 
 		String toBeSigned = "to be signed";

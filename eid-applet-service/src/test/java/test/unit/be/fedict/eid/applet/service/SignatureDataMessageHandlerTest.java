@@ -58,8 +58,7 @@ import be.fedict.eid.applet.shared.SignatureDataMessage;
 
 public class SignatureDataMessageHandlerTest {
 
-	private static final Log LOG = LogFactory
-			.getLog(SignatureDataMessageHandlerTest.class);
+	private static final Log LOG = LogFactory.getLog(SignatureDataMessageHandlerTest.class);
 
 	private SignatureDataMessageHandler testedInstance;
 
@@ -80,37 +79,26 @@ public class SignatureDataMessageHandlerTest {
 		KeyPair keyPair = MiscTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = MiscTestUtils.generateCertificate(
-				keyPair.getPublic(), "CN=Test", notBefore, notAfter, null,
-				keyPair.getPrivate(), true, 0, null, null);
+		X509Certificate certificate = MiscTestUtils.generateCertificate(keyPair.getPublic(), "CN=Test", notBefore,
+				notAfter, null, keyPair.getPrivate(), true, 0, null, null);
 
-		ServletConfig mockServletConfig = EasyMock
-				.createMock(ServletConfig.class);
+		ServletConfig mockServletConfig = EasyMock.createMock(ServletConfig.class);
 		Map<String, String> httpHeaders = new HashMap<String, String>();
 		HttpSession mockHttpSession = EasyMock.createMock(HttpSession.class);
-		HttpServletRequest mockServletRequest = EasyMock
-				.createMock(HttpServletRequest.class);
+		HttpServletRequest mockServletRequest = EasyMock.createMock(HttpServletRequest.class);
 
-		EasyMock.expect(mockServletConfig.getInitParameter("AuditService"))
-				.andStubReturn(null);
-		EasyMock.expect(mockServletConfig.getInitParameter("AuditServiceClass"))
-				.andStubReturn(null);
-		EasyMock.expect(mockServletConfig.getInitParameter("SignatureService"))
-				.andStubReturn(null);
-		EasyMock.expect(
-				mockServletConfig.getInitParameter("SignatureServiceClass"))
+		EasyMock.expect(mockServletConfig.getInitParameter("AuditService")).andStubReturn(null);
+		EasyMock.expect(mockServletConfig.getInitParameter("AuditServiceClass")).andStubReturn(null);
+		EasyMock.expect(mockServletConfig.getInitParameter("SignatureService")).andStubReturn(null);
+		EasyMock.expect(mockServletConfig.getInitParameter("SignatureServiceClass"))
 				.andStubReturn(SignatureTestService.class.getName());
 
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
 		byte[] document = "hello world".getBytes();
 		byte[] digestValue = messageDigest.digest(document);
-		EasyMock.expect(
-				mockHttpSession
-						.getAttribute(SignatureDataMessageHandler.DIGEST_VALUE_SESSION_ATTRIBUTE))
+		EasyMock.expect(mockHttpSession.getAttribute(SignatureDataMessageHandler.DIGEST_VALUE_SESSION_ATTRIBUTE))
 				.andStubReturn(digestValue);
-		EasyMock.expect(
-				mockHttpSession
-						.getAttribute(SignatureDataMessageHandler.DIGEST_ALGO_SESSION_ATTRIBUTE))
+		EasyMock.expect(mockHttpSession.getAttribute(SignatureDataMessageHandler.DIGEST_ALGO_SESSION_ATTRIBUTE))
 				.andStubReturn("SHA-1");
 
 		SignatureDataMessage message = new SignatureDataMessage();
@@ -127,11 +115,9 @@ public class SignatureDataMessageHandlerTest {
 		EasyMock.replay(mockServletConfig, mockHttpSession, mockServletRequest);
 
 		// operate
-		AppletServiceServlet.injectInitParams(mockServletConfig,
-				this.testedInstance);
+		AppletServiceServlet.injectInitParams(mockServletConfig, this.testedInstance);
 		this.testedInstance.init(mockServletConfig);
-		this.testedInstance.handleMessage(message, httpHeaders,
-				mockServletRequest, mockHttpSession);
+		this.testedInstance.handleMessage(message, httpHeaders, mockServletRequest, mockHttpSession);
 
 		// verify
 		EasyMock.verify(mockServletConfig, mockHttpSession, mockServletRequest);
@@ -144,37 +130,26 @@ public class SignatureDataMessageHandlerTest {
 		KeyPair keyPair = MiscTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = MiscTestUtils.generateCertificate(
-				keyPair.getPublic(), "CN=Test", notBefore, notAfter, null,
-				keyPair.getPrivate(), true, 0, null, null);
+		X509Certificate certificate = MiscTestUtils.generateCertificate(keyPair.getPublic(), "CN=Test", notBefore,
+				notAfter, null, keyPair.getPrivate(), true, 0, null, null);
 
-		ServletConfig mockServletConfig = EasyMock
-				.createMock(ServletConfig.class);
+		ServletConfig mockServletConfig = EasyMock.createMock(ServletConfig.class);
 		Map<String, String> httpHeaders = new HashMap<String, String>();
 		HttpSession mockHttpSession = EasyMock.createMock(HttpSession.class);
-		HttpServletRequest mockServletRequest = EasyMock
-				.createMock(HttpServletRequest.class);
+		HttpServletRequest mockServletRequest = EasyMock.createMock(HttpServletRequest.class);
 
-		EasyMock.expect(mockServletConfig.getInitParameter("AuditService"))
-				.andStubReturn(null);
-		EasyMock.expect(mockServletConfig.getInitParameter("AuditServiceClass"))
-				.andStubReturn(null);
-		EasyMock.expect(mockServletConfig.getInitParameter("SignatureService"))
-				.andStubReturn(null);
-		EasyMock.expect(
-				mockServletConfig.getInitParameter("SignatureServiceClass"))
+		EasyMock.expect(mockServletConfig.getInitParameter("AuditService")).andStubReturn(null);
+		EasyMock.expect(mockServletConfig.getInitParameter("AuditServiceClass")).andStubReturn(null);
+		EasyMock.expect(mockServletConfig.getInitParameter("SignatureService")).andStubReturn(null);
+		EasyMock.expect(mockServletConfig.getInitParameter("SignatureServiceClass"))
 				.andStubReturn(SignatureTestService.class.getName());
 
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
 		byte[] document = "hello world".getBytes();
 		byte[] digestValue = messageDigest.digest(document);
-		EasyMock.expect(
-				mockHttpSession
-						.getAttribute(SignatureDataMessageHandler.DIGEST_VALUE_SESSION_ATTRIBUTE))
+		EasyMock.expect(mockHttpSession.getAttribute(SignatureDataMessageHandler.DIGEST_VALUE_SESSION_ATTRIBUTE))
 				.andStubReturn(digestValue);
-		EasyMock.expect(
-				mockHttpSession
-						.getAttribute(SignatureDataMessageHandler.DIGEST_ALGO_SESSION_ATTRIBUTE))
+		EasyMock.expect(mockHttpSession.getAttribute(SignatureDataMessageHandler.DIGEST_ALGO_SESSION_ATTRIBUTE))
 				.andStubReturn("SHA-1-PSS");
 
 		SignatureDataMessage message = new SignatureDataMessage();
@@ -191,11 +166,9 @@ public class SignatureDataMessageHandlerTest {
 		EasyMock.replay(mockServletConfig, mockHttpSession, mockServletRequest);
 
 		// operate
-		AppletServiceServlet.injectInitParams(mockServletConfig,
-				this.testedInstance);
+		AppletServiceServlet.injectInitParams(mockServletConfig, this.testedInstance);
 		this.testedInstance.init(mockServletConfig);
-		this.testedInstance.handleMessage(message, httpHeaders,
-				mockServletRequest, mockHttpSession);
+		this.testedInstance.handleMessage(message, httpHeaders, mockServletRequest, mockHttpSession);
 
 		// verify
 		EasyMock.verify(mockServletConfig, mockHttpSession, mockServletRequest);
@@ -208,37 +181,26 @@ public class SignatureDataMessageHandlerTest {
 		KeyPair keyPair = MiscTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = MiscTestUtils.generateCertificate(
-				keyPair.getPublic(), "CN=Test", notBefore, notAfter, null,
-				keyPair.getPrivate(), true, 0, null, null);
+		X509Certificate certificate = MiscTestUtils.generateCertificate(keyPair.getPublic(), "CN=Test", notBefore,
+				notAfter, null, keyPair.getPrivate(), true, 0, null, null);
 
-		ServletConfig mockServletConfig = EasyMock
-				.createMock(ServletConfig.class);
+		ServletConfig mockServletConfig = EasyMock.createMock(ServletConfig.class);
 		Map<String, String> httpHeaders = new HashMap<String, String>();
 		HttpSession mockHttpSession = EasyMock.createMock(HttpSession.class);
-		HttpServletRequest mockServletRequest = EasyMock
-				.createMock(HttpServletRequest.class);
+		HttpServletRequest mockServletRequest = EasyMock.createMock(HttpServletRequest.class);
 
-		EasyMock.expect(mockServletConfig.getInitParameter("AuditService"))
-				.andStubReturn(null);
-		EasyMock.expect(mockServletConfig.getInitParameter("AuditServiceClass"))
-				.andStubReturn(null);
-		EasyMock.expect(mockServletConfig.getInitParameter("SignatureService"))
-				.andStubReturn(null);
-		EasyMock.expect(
-				mockServletConfig.getInitParameter("SignatureServiceClass"))
+		EasyMock.expect(mockServletConfig.getInitParameter("AuditService")).andStubReturn(null);
+		EasyMock.expect(mockServletConfig.getInitParameter("AuditServiceClass")).andStubReturn(null);
+		EasyMock.expect(mockServletConfig.getInitParameter("SignatureService")).andStubReturn(null);
+		EasyMock.expect(mockServletConfig.getInitParameter("SignatureServiceClass"))
 				.andStubReturn(SignatureTestService.class.getName());
 
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA256");
 		byte[] document = "hello world".getBytes();
 		byte[] digestValue = messageDigest.digest(document);
-		EasyMock.expect(
-				mockHttpSession
-						.getAttribute(SignatureDataMessageHandler.DIGEST_VALUE_SESSION_ATTRIBUTE))
+		EasyMock.expect(mockHttpSession.getAttribute(SignatureDataMessageHandler.DIGEST_VALUE_SESSION_ATTRIBUTE))
 				.andStubReturn(digestValue);
-		EasyMock.expect(
-				mockHttpSession
-						.getAttribute(SignatureDataMessageHandler.DIGEST_ALGO_SESSION_ATTRIBUTE))
+		EasyMock.expect(mockHttpSession.getAttribute(SignatureDataMessageHandler.DIGEST_ALGO_SESSION_ATTRIBUTE))
 				.andStubReturn("SHA-256-PSS");
 
 		SignatureDataMessage message = new SignatureDataMessage();
@@ -255,11 +217,9 @@ public class SignatureDataMessageHandlerTest {
 		EasyMock.replay(mockServletConfig, mockHttpSession, mockServletRequest);
 
 		// operate
-		AppletServiceServlet.injectInitParams(mockServletConfig,
-				this.testedInstance);
+		AppletServiceServlet.injectInitParams(mockServletConfig, this.testedInstance);
 		this.testedInstance.init(mockServletConfig);
-		this.testedInstance.handleMessage(message, httpHeaders,
-				mockServletRequest, mockHttpSession);
+		this.testedInstance.handleMessage(message, httpHeaders, mockServletRequest, mockHttpSession);
 
 		// verify
 		EasyMock.verify(mockServletConfig, mockHttpSession, mockServletRequest);
@@ -272,37 +232,27 @@ public class SignatureDataMessageHandlerTest {
 		KeyPair keyPair = MiscTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = MiscTestUtils.generateCertificate(
-				keyPair.getPublic(), "CN=Test,SERIALNUMBER=1234", notBefore,
-				notAfter, null, keyPair.getPrivate(), true, 0, null, null);
+		X509Certificate certificate = MiscTestUtils.generateCertificate(keyPair.getPublic(),
+				"CN=Test,SERIALNUMBER=1234", notBefore, notAfter, null, keyPair.getPrivate(), true, 0, null, null);
 
-		ServletConfig mockServletConfig = EasyMock
-				.createMock(ServletConfig.class);
+		ServletConfig mockServletConfig = EasyMock.createMock(ServletConfig.class);
 		Map<String, String> httpHeaders = new HashMap<String, String>();
 		HttpSession mockHttpSession = EasyMock.createMock(HttpSession.class);
-		HttpServletRequest mockServletRequest = EasyMock
-				.createMock(HttpServletRequest.class);
+		HttpServletRequest mockServletRequest = EasyMock.createMock(HttpServletRequest.class);
 
-		EasyMock.expect(mockServletConfig.getInitParameter("AuditService"))
-				.andStubReturn(null);
+		EasyMock.expect(mockServletConfig.getInitParameter("AuditService")).andStubReturn(null);
 		EasyMock.expect(mockServletConfig.getInitParameter("AuditServiceClass"))
 				.andStubReturn(AuditTestService.class.getName());
-		EasyMock.expect(mockServletConfig.getInitParameter("SignatureService"))
-				.andStubReturn(null);
-		EasyMock.expect(
-				mockServletConfig.getInitParameter("SignatureServiceClass"))
+		EasyMock.expect(mockServletConfig.getInitParameter("SignatureService")).andStubReturn(null);
+		EasyMock.expect(mockServletConfig.getInitParameter("SignatureServiceClass"))
 				.andStubReturn(SignatureTestService.class.getName());
 
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
 		byte[] document = "hello world".getBytes();
 		byte[] digestValue = messageDigest.digest(document);
-		EasyMock.expect(
-				mockHttpSession
-						.getAttribute(SignatureDataMessageHandler.DIGEST_VALUE_SESSION_ATTRIBUTE))
+		EasyMock.expect(mockHttpSession.getAttribute(SignatureDataMessageHandler.DIGEST_VALUE_SESSION_ATTRIBUTE))
 				.andStubReturn(digestValue);
-		EasyMock.expect(
-				mockHttpSession
-						.getAttribute(SignatureDataMessageHandler.DIGEST_ALGO_SESSION_ATTRIBUTE))
+		EasyMock.expect(mockHttpSession.getAttribute(SignatureDataMessageHandler.DIGEST_ALGO_SESSION_ATTRIBUTE))
 				.andStubReturn("SHA-1");
 
 		SignatureDataMessage message = new SignatureDataMessage();
@@ -319,11 +269,9 @@ public class SignatureDataMessageHandlerTest {
 		EasyMock.replay(mockServletConfig, mockHttpSession, mockServletRequest);
 
 		// operate
-		AppletServiceServlet.injectInitParams(mockServletConfig,
-				this.testedInstance);
+		AppletServiceServlet.injectInitParams(mockServletConfig, this.testedInstance);
 		this.testedInstance.init(mockServletConfig);
-		this.testedInstance.handleMessage(message, httpHeaders,
-				mockServletRequest, mockHttpSession);
+		this.testedInstance.handleMessage(message, httpHeaders, mockServletRequest, mockHttpSession);
 
 		// verify
 		EasyMock.verify(mockServletConfig, mockHttpSession, mockServletRequest);
@@ -337,40 +285,29 @@ public class SignatureDataMessageHandlerTest {
 		KeyPair keyPair = MiscTestUtils.generateKeyPair();
 		DateTime notBefore = new DateTime();
 		DateTime notAfter = notBefore.plusYears(1);
-		X509Certificate certificate = MiscTestUtils.generateCertificate(
-				keyPair.getPublic(), "CN=Test", notBefore, notAfter, null,
-				keyPair.getPrivate(), true, 0, null, null);
+		X509Certificate certificate = MiscTestUtils.generateCertificate(keyPair.getPublic(), "CN=Test", notBefore,
+				notAfter, null, keyPair.getPrivate(), true, 0, null, null);
 
-		ServletConfig mockServletConfig = EasyMock
-				.createMock(ServletConfig.class);
+		ServletConfig mockServletConfig = EasyMock.createMock(ServletConfig.class);
 		Map<String, String> httpHeaders = new HashMap<String, String>();
 		HttpSession mockHttpSession = EasyMock.createMock(HttpSession.class);
-		HttpServletRequest mockServletRequest = EasyMock
-				.createMock(HttpServletRequest.class);
+		HttpServletRequest mockServletRequest = EasyMock.createMock(HttpServletRequest.class);
 
-		EasyMock.expect(mockServletConfig.getInitParameter("AuditService"))
-				.andStubReturn(null);
+		EasyMock.expect(mockServletConfig.getInitParameter("AuditService")).andStubReturn(null);
 		EasyMock.expect(mockServletConfig.getInitParameter("AuditServiceClass"))
 				.andStubReturn(AuditTestService.class.getName());
-		EasyMock.expect(mockServletConfig.getInitParameter("SignatureService"))
-				.andStubReturn(null);
-		EasyMock.expect(
-				mockServletConfig.getInitParameter("SignatureServiceClass"))
+		EasyMock.expect(mockServletConfig.getInitParameter("SignatureService")).andStubReturn(null);
+		EasyMock.expect(mockServletConfig.getInitParameter("SignatureServiceClass"))
 				.andStubReturn(SignatureTestService.class.getName());
 
-		EasyMock.expect(mockServletRequest.getRemoteAddr()).andStubReturn(
-				"remote-address");
+		EasyMock.expect(mockServletRequest.getRemoteAddr()).andStubReturn("remote-address");
 
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
 		byte[] document = "hello world".getBytes();
 		byte[] digestValue = messageDigest.digest(document);
-		EasyMock.expect(
-				mockHttpSession
-						.getAttribute(SignatureDataMessageHandler.DIGEST_VALUE_SESSION_ATTRIBUTE))
+		EasyMock.expect(mockHttpSession.getAttribute(SignatureDataMessageHandler.DIGEST_VALUE_SESSION_ATTRIBUTE))
 				.andStubReturn(digestValue);
-		EasyMock.expect(
-				mockHttpSession
-						.getAttribute(SignatureDataMessageHandler.DIGEST_ALGO_SESSION_ATTRIBUTE))
+		EasyMock.expect(mockHttpSession.getAttribute(SignatureDataMessageHandler.DIGEST_ALGO_SESSION_ATTRIBUTE))
 				.andStubReturn("SHA-1");
 
 		SignatureDataMessage message = new SignatureDataMessage();
@@ -387,23 +324,18 @@ public class SignatureDataMessageHandlerTest {
 		EasyMock.replay(mockServletConfig, mockHttpSession, mockServletRequest);
 
 		// operate
-		AppletServiceServlet.injectInitParams(mockServletConfig,
-				this.testedInstance);
+		AppletServiceServlet.injectInitParams(mockServletConfig, this.testedInstance);
 		this.testedInstance.init(mockServletConfig);
 		try {
-			this.testedInstance.handleMessage(message, httpHeaders,
-					mockServletRequest, mockHttpSession);
+			this.testedInstance.handleMessage(message, httpHeaders, mockServletRequest, mockHttpSession);
 			fail();
 		} catch (ServletException e) {
 			LOG.debug("expected exception: " + e.getMessage());
 			// verify
-			EasyMock.verify(mockServletConfig, mockHttpSession,
-					mockServletRequest);
+			EasyMock.verify(mockServletConfig, mockHttpSession, mockServletRequest);
 			assertNull(SignatureTestService.getSignatureValue());
-			assertEquals("remote-address",
-					AuditTestService.getAuditSignatureRemoteAddress());
-			assertEquals(certificate,
-					AuditTestService.getAuditSignatureClientCertificate());
+			assertEquals("remote-address", AuditTestService.getAuditSignatureRemoteAddress());
+			assertEquals(certificate, AuditTestService.getAuditSignatureClientCertificate());
 		}
 	}
 
@@ -423,15 +355,12 @@ public class SignatureDataMessageHandlerTest {
 			return null;
 		}
 
-		public void postSign(byte[] signatureValue,
-				List<X509Certificate> signingCertificateChain) {
+		public void postSign(byte[] signatureValue, List<X509Certificate> signingCertificateChain) {
 			SignatureTestService.signatureValue = signatureValue;
 		}
 
-		public DigestInfo preSign(List<DigestInfo> digestInfos,
-				List<X509Certificate> signingCertificateChain,
-				IdentityDTO identity, AddressDTO address, byte[] photo)
-				throws NoSuchAlgorithmException {
+		public DigestInfo preSign(List<DigestInfo> digestInfos, List<X509Certificate> signingCertificateChain,
+				IdentityDTO identity, AddressDTO address, byte[] photo) throws NoSuchAlgorithmException {
 			return null;
 		}
 	}

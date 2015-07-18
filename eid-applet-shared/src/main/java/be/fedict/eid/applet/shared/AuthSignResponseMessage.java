@@ -40,8 +40,7 @@ public class AuthSignResponseMessage extends AbstractProtocolMessage {
 
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator
-	public static final String TYPE = AuthSignResponseMessage.class
-			.getSimpleName();
+	public static final String TYPE = AuthSignResponseMessage.class.getSimpleName();
 
 	@HttpBody
 	@NotNull

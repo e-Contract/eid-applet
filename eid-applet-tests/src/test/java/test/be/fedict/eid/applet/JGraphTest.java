@@ -78,16 +78,14 @@ public class JGraphTest {
 	@Test
 	public void testJGraph() throws Exception {
 		GraphModel model = new DefaultGraphModel();
-		GraphLayoutCache view = new GraphLayoutCache(model,
-				new DefaultCellViewFactory());
+		GraphLayoutCache view = new GraphLayoutCache(model, new DefaultCellViewFactory());
 		JGraph graph = new JGraph(model, view);
 
 		DefaultGraphCell[] cells = new DefaultGraphCell[3];
 		cells[0] = createCell("hello", true);
 		cells[1] = createCell("world", false);
 		DefaultEdge edge = new DefaultEdge();
-		GraphConstants.setLineStyle(edge.getAttributes(),
-				GraphConstants.ARROW_LINE);
+		GraphConstants.setLineStyle(edge.getAttributes(), GraphConstants.ARROW_LINE);
 		edge.setSource(cells[0].getChildAt(0));
 		edge.setTarget(cells[1].getChildAt(0));
 		cells[2] = edge;
@@ -99,8 +97,7 @@ public class JGraphTest {
 	private DefaultGraphCell createCell(String name, boolean raised) {
 		DefaultGraphCell cell = new DefaultGraphCell(name);
 		cell.addPort();
-		GraphConstants.setBorder(cell.getAttributes(),
-				BorderFactory.createRaisedBevelBorder());
+		GraphConstants.setBorder(cell.getAttributes(), BorderFactory.createRaisedBevelBorder());
 		return cell;
 	}
 
@@ -118,16 +115,12 @@ public class JGraphTest {
 		graph.addEdge("edge 3", "state 1", "state 4", EdgeType.DIRECTED);
 		graph.addEdge("edge 4", "state 3", "state 4", EdgeType.DIRECTED);
 
-		CircleLayout<String, String> layout = new CircleLayout<String, String>(
-				graph);
+		CircleLayout<String, String> layout = new CircleLayout<String, String>(graph);
 		layout.setSize(new Dimension(300, 300));
 
-		BasicVisualizationServer<String, String> visualization = new BasicVisualizationServer<String, String>(
-				layout);
-		visualization.getRenderContext().setVertexLabelTransformer(
-				new ToStringLabeller<String>());
-		visualization.getRenderContext().setEdgeLabelTransformer(
-				new ToStringLabeller<String>());
+		BasicVisualizationServer<String, String> visualization = new BasicVisualizationServer<String, String>(layout);
+		visualization.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<String>());
+		visualization.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller<String>());
 		visualization.setPreferredSize(new Dimension(350, 350));
 
 		JOptionPane.showMessageDialog(null, visualization);
@@ -154,17 +147,14 @@ public class JGraphTest {
 
 		Graph<String, String> graph = new SparseMultigraph<String, String>();
 		for (Class<?> messageClass : catalogClasses) {
-			StartRequestMessage startRequestMessageAnnotation = messageClass
-					.getAnnotation(StartRequestMessage.class);
+			StartRequestMessage startRequestMessageAnnotation = messageClass.getAnnotation(StartRequestMessage.class);
 			if (null != startRequestMessageAnnotation) {
 				if (null != startMessage) {
-					throw new RuntimeException(
-							"only one single entry point possible");
+					throw new RuntimeException("only one single entry point possible");
 				}
 				startMessage = messageClass.getSimpleName();
 			}
-			StopResponseMessage stopResponseMessageAnnotation = messageClass
-					.getAnnotation(StopResponseMessage.class);
+			StopResponseMessage stopResponseMessageAnnotation = messageClass.getAnnotation(StopResponseMessage.class);
 			if (null != stopResponseMessageAnnotation) {
 				stopMessages.add(messageClass.getSimpleName());
 			}
@@ -172,10 +162,8 @@ public class JGraphTest {
 			ProtocolStateAllowed protocolStateAllowedAnnotation = messageClass
 					.getAnnotation(ProtocolStateAllowed.class);
 			if (null != protocolStateAllowedAnnotation) {
-				ProtocolState protocolState = protocolStateAllowedAnnotation
-						.value();
-				List<String> messages = allowedProtocolStates
-						.get(protocolState);
+				ProtocolState protocolState = protocolStateAllowedAnnotation.value();
+				List<String> messages = allowedProtocolStates.get(protocolState);
 				if (null == messages) {
 					messages = new LinkedList<String>();
 					allowedProtocolStates.put(protocolState, messages);
@@ -188,27 +176,21 @@ public class JGraphTest {
 
 		int edgeIdx = 0;
 		for (Class<?> messageClass : catalogClasses) {
-			ResponsesAllowed responsesAllowedAnnotation = messageClass
-					.getAnnotation(ResponsesAllowed.class);
+			ResponsesAllowed responsesAllowedAnnotation = messageClass.getAnnotation(ResponsesAllowed.class);
 			if (null != responsesAllowedAnnotation) {
 				Class<?>[] responseClasses = responsesAllowedAnnotation.value();
 				for (Class<?> responseClass : responseClasses) {
-					graph.addEdge("edge-" + edgeIdx,
-							messageClass.getSimpleName(),
-							responseClass.getSimpleName(), EdgeType.DIRECTED);
+					graph.addEdge("edge-" + edgeIdx, messageClass.getSimpleName(), responseClass.getSimpleName(),
+							EdgeType.DIRECTED);
 					edgeIdx++;
 				}
 			}
-			StateTransition stateTransitionAnnotation = messageClass
-					.getAnnotation(StateTransition.class);
+			StateTransition stateTransitionAnnotation = messageClass.getAnnotation(StateTransition.class);
 			if (null != stateTransitionAnnotation) {
 				ProtocolState protocolState = stateTransitionAnnotation.value();
-				List<String> messages = allowedProtocolStates
-						.get(protocolState);
+				List<String> messages = allowedProtocolStates.get(protocolState);
 				for (String message : messages) {
-					graph.addEdge("edge-" + edgeIdx,
-							messageClass.getSimpleName(), message,
-							EdgeType.DIRECTED);
+					graph.addEdge("edge-" + edgeIdx, messageClass.getSimpleName(), message, EdgeType.DIRECTED);
 					edgeIdx++;
 				}
 			}
@@ -217,34 +199,25 @@ public class JGraphTest {
 		Layout<String, String> layout = new CircleLayout<String, String>(graph);
 		layout.setSize(new Dimension(900, 650));
 
-		BasicVisualizationServer<String, String> visualization = new BasicVisualizationServer<String, String>(
-				layout);
-		visualization.getRenderContext().setVertexLabelTransformer(
-				new ToStringLabeller<String>());
-		Transformer<String, Paint> myVertexTransformer = new MyVertexTransformer(
-				startMessage, stopMessages);
-		visualization.getRenderContext().setVertexFillPaintTransformer(
-				myVertexTransformer);
-		visualization.getRenderer().getVertexLabelRenderer()
-				.setPosition(Position.AUTO);
+		BasicVisualizationServer<String, String> visualization = new BasicVisualizationServer<String, String>(layout);
+		visualization.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<String>());
+		Transformer<String, Paint> myVertexTransformer = new MyVertexTransformer(startMessage, stopMessages);
+		visualization.getRenderContext().setVertexFillPaintTransformer(myVertexTransformer);
+		visualization.getRenderer().getVertexLabelRenderer().setPosition(Position.AUTO);
 		visualization.setPreferredSize(new Dimension(900, 650));
 		visualization.setBackground(Color.WHITE);
 		return visualization;
 	}
 
-	private void graphToFile(
-			BasicVisualizationServer<String, String> visualization, File file)
-			throws IOException {
+	private void graphToFile(BasicVisualizationServer<String, String> visualization, File file) throws IOException {
 		Dimension size = visualization.getSize();
 		int width = (int) (size.getWidth() + 1);
 		int height = (int) (size.getHeight() + 1);
 		LOG.debug("width: " + width);
 		LOG.debug("height: " + height);
-		BufferedImage bufferedImage = new BufferedImage(width, height,
-				BufferedImage.TYPE_INT_ARGB);
+		BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphics = bufferedImage.createGraphics();
-		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
+		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		graphics.setColor(Color.WHITE);
 		graphics.fillRect(0, 0, 900, 650);
 		visualization.setBounds(0, 0, 900, 650);
@@ -253,15 +226,13 @@ public class JGraphTest {
 		ImageIO.write(bufferedImage, "png", file);
 	}
 
-	public static class MyVertexTransformer implements
-			Transformer<String, Paint> {
+	public static class MyVertexTransformer implements Transformer<String, Paint> {
 
 		private final String startMessage;
 
 		private final List<String> stopMessages;
 
-		public MyVertexTransformer(String startMessage,
-				List<String> stopMessages) {
+		public MyVertexTransformer(String startMessage, List<String> stopMessages) {
 			this.startMessage = startMessage;
 			this.stopMessages = stopMessages;
 		}

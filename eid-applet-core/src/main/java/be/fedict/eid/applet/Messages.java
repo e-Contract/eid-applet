@@ -175,26 +175,20 @@ public class Messages {
 		this.locale = locale;
 		ResourceBundle bundle;
 		try {
-			bundle = ResourceBundle
-					.getBundle(RESOURCE_BUNDLE_NAME, this.locale);
+			bundle = ResourceBundle.getBundle(RESOURCE_BUNDLE_NAME, this.locale);
 		} catch (MissingResourceException e) {
 			/*
 			 * In case the selected locale and default system locale are not
 			 * supported we default to english.
 			 */
-			bundle = ResourceBundle.getBundle(RESOURCE_BUNDLE_NAME,
-					Locale.ENGLISH);
+			bundle = ResourceBundle.getBundle(RESOURCE_BUNDLE_NAME, Locale.ENGLISH);
 		}
 		this.resourceBundle = bundle;
 
-		UIManager.put("OptionPane.cancelButtonText",
-				getMessage(MESSAGE_ID.CANCEL_BUTTON));
-		UIManager.put("OptionPane.noButtonText",
-				getMessage(MESSAGE_ID.NO_BUTTON));
-		UIManager.put("OptionPane.okButtonText",
-				getMessage(MESSAGE_ID.OK_BUTTON));
-		UIManager.put("OptionPane.yesButtonText",
-				getMessage(MESSAGE_ID.YES_BUTTON));
+		UIManager.put("OptionPane.cancelButtonText", getMessage(MESSAGE_ID.CANCEL_BUTTON));
+		UIManager.put("OptionPane.noButtonText", getMessage(MESSAGE_ID.NO_BUTTON));
+		UIManager.put("OptionPane.okButtonText", getMessage(MESSAGE_ID.OK_BUTTON));
+		UIManager.put("OptionPane.yesButtonText", getMessage(MESSAGE_ID.YES_BUTTON));
 	}
 
 	public String getMessage(MESSAGE_ID messageId) {

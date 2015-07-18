@@ -36,8 +36,7 @@ import be.fedict.eid.applet.service.signer.xps.XPSSignatureVerifier;
 
 public class XPSSignatureVerifierTest {
 
-	private static final Log LOG = LogFactory
-			.getLog(XPSSignatureVerifierTest.class);
+	private static final Log LOG = LogFactory.getLog(XPSSignatureVerifierTest.class);
 
 	@BeforeClass
 	public static void setUp() {
@@ -46,8 +45,7 @@ public class XPSSignatureVerifierTest {
 
 	@Test
 	public void testUnsignedXPS() throws Exception {
-		URL documentUrl = XPSSignatureVerifierTest.class
-				.getResource("/hello-world.xps");
+		URL documentUrl = XPSSignatureVerifierTest.class.getResource("/hello-world.xps");
 		assertNotNull(documentUrl);
 
 		// operate
@@ -61,8 +59,7 @@ public class XPSSignatureVerifierTest {
 
 	@Test
 	public void testSignedXPS() throws Exception {
-		URL documentUrl = XPSSignatureVerifierTest.class
-				.getResource("/hello-world-signed.xps");
+		URL documentUrl = XPSSignatureVerifierTest.class.getResource("/hello-world-signed.xps");
 		assertNotNull(documentUrl);
 
 		// operate
@@ -74,7 +71,6 @@ public class XPSSignatureVerifierTest {
 		assertEquals(1, result.size());
 		X509Certificate signer = result.get(0);
 		LOG.debug("signer: " + signer.getSubjectX500Principal());
-		assertTrue(signer.getSubjectX500Principal().toString()
-				.contains("Frank Cornelis (Signature"));
+		assertTrue(signer.getSubjectX500Principal().toString().contains("Frank Cornelis (Signature"));
 	}
 }

@@ -71,31 +71,26 @@ public class ODFURIDereferencer implements URIDereferencer {
 			throw new IllegalArgumentException("odfUrl and odfData are null");
 		}
 		if (null != odfUrl && null != odfData) {
-			throw new IllegalArgumentException(
-					"odfUrl and odfData are both not null");
+			throw new IllegalArgumentException("odfUrl and odfData are both not null");
 		}
 		this.odfUrl = odfUrl;
 		this.odfData = odfData;
-		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-				.getInstance();
+		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
 		this.baseUriDereferener = xmlSignatureFactory.getURIDereferencer();
 
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
 
 		try {
 			this.documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(
-					"parser config error: " + e.getMessage(), e);
+			throw new RuntimeException("parser config error: " + e.getMessage(), e);
 		}
 		EntityResolver entityResolver = new ODFEntityResolver();
 		this.documentBuilder.setEntityResolver(entityResolver);
 	}
 
-	public Data dereference(URIReference uriReference, XMLCryptoContext context)
-			throws URIReferenceException {
+	public Data dereference(URIReference uriReference, XMLCryptoContext context) throws URIReferenceException {
 		if (null == uriReference) {
 			throw new NullPointerException("URIReference cannot be null");
 		}
@@ -113,11 +108,8 @@ public class ODFURIDereferencer implements URIDereferencer {
 		try {
 			InputStream dataInputStream = findDataInputStream(uri);
 			if (null == dataInputStream) {
-				LOG
-						.debug("cannot resolve, delegating to base DOM URI dereferener: "
-								+ uri);
-				return this.baseUriDereferener.dereference(uriReference,
-						context);
+				LOG.debug("cannot resolve, delegating to base DOM URI dereferener: " + uri);
+				return this.baseUriDereferener.dereference(uriReference, context);
 			}
 			if (uri.endsWith(".xml")) {
 				/*
@@ -128,12 +120,9 @@ public class ODFURIDereferencer implements URIDereferencer {
 				if (0 == data.length) {
 					return new OctetStreamData(dataInputStream, uri, null);
 				}
-				Document document = documentBuilder
-						.parse(new ByteArrayInputStream(data));
-				XMLSignatureInput xmlSignatureInput = new XMLSignatureInput(
-						document);
-				ApacheNodeSetData apacheNodeSetData = new ApacheNodeSetData(
-						xmlSignatureInput);
+				Document document = documentBuilder.parse(new ByteArrayInputStream(data));
+				XMLSignatureInput xmlSignatureInput = new XMLSignatureInput(document);
+				ApacheNodeSetData apacheNodeSetData = new ApacheNodeSetData(xmlSignatureInput);
 				return apacheNodeSetData;
 			}
 			return new OctetStreamData(dataInputStream, uri, null);

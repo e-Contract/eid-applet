@@ -72,10 +72,8 @@ public class OPCKeySelector extends KeyInfoKeySelector {
 		this.signatureResourceName = signatureResourceName;
 
 		try {
-			JAXBContext relationshipsJAXBContext = JAXBContext
-					.newInstance(ObjectFactory.class);
-			this.relationshipsUnmarshaller = relationshipsJAXBContext
-					.createUnmarshaller();
+			JAXBContext relationshipsJAXBContext = JAXBContext.newInstance(ObjectFactory.class);
+			this.relationshipsUnmarshaller = relationshipsJAXBContext.createUnmarshaller();
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
 		}
@@ -83,14 +81,12 @@ public class OPCKeySelector extends KeyInfoKeySelector {
 		try {
 			this.certificateFactory = CertificateFactory.getInstance("X.509");
 		} catch (CertificateException e) {
-			throw new RuntimeException("CertificateFactory error: "
-					+ e.getMessage(), e);
+			throw new RuntimeException("CertificateFactory error: " + e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public KeySelectorResult select(KeyInfo keyInfo, Purpose purpose,
-			AlgorithmMethod method, XMLCryptoContext context)
+	public KeySelectorResult select(KeyInfo keyInfo, Purpose purpose, AlgorithmMethod method, XMLCryptoContext context)
 			throws KeySelectorException {
 		try {
 			return super.select(keyInfo, purpose, method, context);
@@ -98,29 +94,23 @@ public class OPCKeySelector extends KeyInfoKeySelector {
 			LOG.debug("no key found via ds:KeyInfo key selector");
 		}
 		LOG.debug("signature resource name: " + this.signatureResourceName);
-		String signatureSegment = this.signatureResourceName.substring(0,
-				this.signatureResourceName.lastIndexOf("/"));
+		String signatureSegment = this.signatureResourceName.substring(0, this.signatureResourceName.lastIndexOf("/"));
 		LOG.debug("signature segment: " + signatureSegment);
-		String signatureBase = this.signatureResourceName
-				.substring(this.signatureResourceName.lastIndexOf("/") + 1);
+		String signatureBase = this.signatureResourceName.substring(this.signatureResourceName.lastIndexOf("/") + 1);
 		LOG.debug("signature base: " + signatureBase);
-		String signatureRelationshipResourceName = signatureSegment + "/_rels/"
-				+ signatureBase + ".rels";
-		LOG.debug("signature relationship resource name: "
-				+ signatureRelationshipResourceName);
+		String signatureRelationshipResourceName = signatureSegment + "/_rels/" + signatureBase + ".rels";
+		LOG.debug("signature relationship resource name: " + signatureRelationshipResourceName);
 
 		ZipArchiveInputStream zipInputStream;
 		try {
-			zipInputStream = new ZipArchiveInputStream(
-					this.opcUrl.openStream(), "UTF8", true, true);
+			zipInputStream = new ZipArchiveInputStream(this.opcUrl.openStream(), "UTF8", true, true);
 		} catch (IOException e) {
 			throw new KeySelectorException(e);
 		}
 		ZipArchiveEntry zipEntry;
 		try {
 			while (null != (zipEntry = zipInputStream.getNextZipEntry())) {
-				if (signatureRelationshipResourceName
-						.equals(zipEntry.getName())) {
+				if (signatureRelationshipResourceName.equals(zipEntry.getName())) {
 					break;
 				}
 			}
@@ -128,8 +118,7 @@ public class OPCKeySelector extends KeyInfoKeySelector {
 			throw new KeySelectorException(e);
 		}
 		if (null == zipEntry) {
-			LOG.warn("relationship part not present: "
-					+ signatureRelationshipResourceName);
+			LOG.warn("relationship part not present: " + signatureRelationshipResourceName);
 			throw new KeySelectorException("no key found");
 		}
 		LOG.debug("signature relationship part found");
@@ -141,16 +130,12 @@ public class OPCKeySelector extends KeyInfoKeySelector {
 		} catch (JAXBException e) {
 			throw new KeySelectorException(e);
 		}
-		CTRelationships signatureRelationships = signatureRelationshipsElement
-				.getValue();
-		List<CTRelationship> signatureRelationshipList = signatureRelationships
-				.getRelationship();
+		CTRelationships signatureRelationships = signatureRelationshipsElement.getValue();
+		List<CTRelationship> signatureRelationshipList = signatureRelationships.getRelationship();
 		List<String> certificateResourceNames = new LinkedList<String>();
 		for (CTRelationship signatureRelationship : signatureRelationshipList) {
-			if (DIGITAL_SIGNATURE_CERTIFICATE_REL_TYPE
-					.equals(signatureRelationship.getType())) {
-				String certificateResourceName = signatureRelationship
-						.getTarget().substring(1);
+			if (DIGITAL_SIGNATURE_CERTIFICATE_REL_TYPE.equals(signatureRelationship.getType())) {
+				String certificateResourceName = signatureRelationship.getTarget().substring(1);
 				certificateResourceNames.add(certificateResourceName);
 			}
 		}
@@ -159,8 +144,7 @@ public class OPCKeySelector extends KeyInfoKeySelector {
 
 		for (String certificateResourceName : certificateResourceNames) {
 			try {
-				zipInputStream = new ZipArchiveInputStream(
-						this.opcUrl.openStream(), "UTF8", true, true);
+				zipInputStream = new ZipArchiveInputStream(this.opcUrl.openStream(), "UTF8", true, true);
 			} catch (IOException e) {
 				throw new KeySelectorException(e);
 			}
@@ -174,26 +158,22 @@ public class OPCKeySelector extends KeyInfoKeySelector {
 				throw new KeySelectorException(e);
 			}
 			if (null == zipEntry) {
-				LOG.warn("certificate part not present: "
-						+ certificateResourceName);
+				LOG.warn("certificate part not present: " + certificateResourceName);
 				continue;
 			}
 			X509Certificate certificate;
 			try {
-				certificate = (X509Certificate) this.certificateFactory
-						.generateCertificate(zipInputStream);
+				certificate = (X509Certificate) this.certificateFactory.generateCertificate(zipInputStream);
 			} catch (CertificateException e) {
 				throw new KeySelectorException(e);
 			}
-			LOG.debug("certificate subject: "
-					+ certificate.getSubjectX500Principal());
+			LOG.debug("certificate subject: " + certificate.getSubjectX500Principal());
 			if (-1 != certificate.getBasicConstraints()) {
 				LOG.debug("skipping CA certificate");
 				continue;
 			}
 			if (null != endEntityCertificate) {
-				throw new KeySelectorException(
-						"two possible end entity certificates");
+				throw new KeySelectorException("two possible end entity certificates");
 			}
 			endEntityCertificate = certificate;
 		}

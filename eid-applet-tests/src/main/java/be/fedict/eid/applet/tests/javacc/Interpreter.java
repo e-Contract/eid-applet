@@ -35,8 +35,7 @@ public class Interpreter {
 		this.state = new State();
 		while (this.state.isRunning()) {
 			int instructionPointer = this.state.getInstructionPointer();
-			Instruction instruction = this.program.getInstructions().get(
-					instructionPointer);
+			Instruction instruction = this.program.getInstructions().get(instructionPointer);
 			instruction.execute(this.state, this.runtime);
 		}
 	}

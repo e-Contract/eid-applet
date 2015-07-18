@@ -64,10 +64,9 @@ public interface SignatureService {
 	 * @throws NoSuchAlgorithmException
 	 * @throws AuthorizationException
 	 */
-	DigestInfo preSign(List<DigestInfo> digestInfos,
-			List<X509Certificate> signingCertificateChain,
+	DigestInfo preSign(List<DigestInfo> digestInfos, List<X509Certificate> signingCertificateChain,
 			IdentityDTO identity, AddressDTO address, byte[] photo)
-			throws NoSuchAlgorithmException, AuthorizationException;
+					throws NoSuchAlgorithmException, AuthorizationException;
 
 	/**
 	 * Post-sign callback method. Received the signature value. Depending on the
@@ -77,10 +76,7 @@ public interface SignatureService {
 	 * @param signingCertificateChain
 	 *            the optional chain of signing certificates.
 	 */
-	void postSign(byte[] signatureValue,
-			List<X509Certificate> signingCertificateChain)
-			throws ExpiredCertificateSecurityException,
-			RevokedCertificateSecurityException,
-			TrustCertificateSecurityException, CertificateSecurityException,
-			SecurityException;
+	void postSign(byte[] signatureValue, List<X509Certificate> signingCertificateChain)
+			throws ExpiredCertificateSecurityException, RevokedCertificateSecurityException,
+			TrustCertificateSecurityException, CertificateSecurityException, SecurityException;
 }

@@ -59,10 +59,8 @@ public class TSPTimeStampServiceTest {
 	@Test
 	public void testGetTimeStamp() throws Exception {
 		// setup
-		TimeStampServiceValidator validator = new TimeStampServiceTestValidator(
-				PROXY_HOST, PROXY_PORT);
-		TSPTimeStampService service = new TSPTimeStampService(TSP_URL,
-				validator, null, null);
+		TimeStampServiceValidator validator = new TimeStampServiceTestValidator(PROXY_HOST, PROXY_PORT);
+		TSPTimeStampService service = new TSPTimeStampService(TSP_URL, validator, null, null);
 		service.setProxy(PROXY_HOST, PROXY_PORT);
 		service.setDigestAlgo("SHA-1");
 
@@ -78,16 +76,14 @@ public class TSPTimeStampServiceTest {
 	@Test
 	public void testGetTimeStampVerisign() throws Exception {
 		// setup
-		TimeStampServiceValidator validator = new TimeStampServiceTestValidator(
-				PROXY_HOST, PROXY_PORT);
+		TimeStampServiceValidator validator = new TimeStampServiceTestValidator(PROXY_HOST, PROXY_PORT);
 		// NOK: http://timestamp.verisign.com/scripts/timstamp.dll
 		// NOK: http://timestamp.verisign.com/scripts/timestamp.dll
 		// OK: http://timestamp.globalsign.com/scripts/timstamp.dll
 		// NOK: http://www.trustcenter.de/codesigning/timestamp
 		// http://timestamp.comodoca.com/authenticode
-		TSPTimeStampService service = new TSPTimeStampService(
-				"http://timestamp.comodoca.com/authenticode",
-				validator, null, null);
+		TSPTimeStampService service = new TSPTimeStampService("http://timestamp.comodoca.com/authenticode", validator,
+				null, null);
 		service.setProxy(PROXY_HOST, PROXY_PORT);
 		service.setDigestAlgo("SHA-1");
 
@@ -103,10 +99,8 @@ public class TSPTimeStampServiceTest {
 	@Test
 	public void testGetTimeStampSHA256() throws Exception {
 		// setup
-		TimeStampServiceValidator validator = new TimeStampServiceTestValidator(
-				PROXY_HOST, PROXY_PORT);
-		TSPTimeStampService service = new TSPTimeStampService(TSP_URL,
-				validator, null, null);
+		TimeStampServiceValidator validator = new TimeStampServiceTestValidator(PROXY_HOST, PROXY_PORT);
+		TSPTimeStampService service = new TSPTimeStampService(TSP_URL, validator, null, null);
 		service.setProxy(PROXY_HOST, PROXY_PORT);
 		service.setDigestAlgo("SHA-256");
 
@@ -122,10 +116,8 @@ public class TSPTimeStampServiceTest {
 	@Test
 	public void testGetTimeStampSHA384() throws Exception {
 		// setup
-		TimeStampServiceValidator validator = new TimeStampServiceTestValidator(
-				PROXY_HOST, PROXY_PORT);
-		TSPTimeStampService service = new TSPTimeStampService(TSP_URL,
-				validator, null, null);
+		TimeStampServiceValidator validator = new TimeStampServiceTestValidator(PROXY_HOST, PROXY_PORT);
+		TSPTimeStampService service = new TSPTimeStampService(TSP_URL, validator, null, null);
 		service.setProxy(PROXY_HOST, PROXY_PORT);
 		service.setDigestAlgo("SHA-384");
 
@@ -141,10 +133,8 @@ public class TSPTimeStampServiceTest {
 	@Test
 	public void testGetTimeStampSHA512() throws Exception {
 		// setup
-		TimeStampServiceValidator validator = new TimeStampServiceTestValidator(
-				PROXY_HOST, PROXY_PORT);
-		TSPTimeStampService service = new TSPTimeStampService(TSP_URL,
-				validator, null, null);
+		TimeStampServiceValidator validator = new TimeStampServiceTestValidator(PROXY_HOST, PROXY_PORT);
+		TSPTimeStampService service = new TSPTimeStampService(TSP_URL, validator, null, null);
 		service.setProxy(PROXY_HOST, PROXY_PORT);
 		service.setDigestAlgo("SHA-512");
 
@@ -160,10 +150,8 @@ public class TSPTimeStampServiceTest {
 	@Test
 	public void testGetTimeStampPolicy() throws Exception {
 		// setup
-		TimeStampServiceValidator validator = new TimeStampServiceTestValidator(
-				PROXY_HOST, PROXY_PORT);
-		TSPTimeStampService service = new TSPTimeStampService(TSP_URL,
-				validator, "2.16.56.9.3.1", null);
+		TimeStampServiceValidator validator = new TimeStampServiceTestValidator(PROXY_HOST, PROXY_PORT);
+		TSPTimeStampService service = new TSPTimeStampService(TSP_URL, validator, "2.16.56.9.3.1", null);
 		service.setProxy(PROXY_HOST, PROXY_PORT);
 		service.setDigestAlgo("SHA-512");
 
@@ -176,11 +164,9 @@ public class TSPTimeStampServiceTest {
 		assertNotNull(result);
 	}
 
-	private static class TimeStampServiceTestValidator implements
-			TimeStampServiceValidator {
+	private static class TimeStampServiceTestValidator implements TimeStampServiceValidator {
 
-		private static final Log LOG = LogFactory
-				.getLog(TimeStampServiceTestValidator.class);
+		private static final Log LOG = LogFactory.getLog(TimeStampServiceTestValidator.class);
 
 		private final TrustValidator trustValidator;
 
@@ -191,18 +177,14 @@ public class TSPTimeStampServiceTest {
 			} else {
 				networkConfig = null;
 			}
-			this.trustValidator = BelgianTrustValidatorFactory
-					.createTSATrustValidator(networkConfig, null);
+			this.trustValidator = BelgianTrustValidatorFactory.createTSATrustValidator(networkConfig, null);
 		}
 
 		@Override
-		public void validate(List<X509Certificate> certificateChain,
-				RevocationData revocationData) throws Exception {
+		public void validate(List<X509Certificate> certificateChain, RevocationData revocationData) throws Exception {
 			for (X509Certificate certificate : certificateChain) {
-				LOG.debug("certificate: "
-						+ certificate.getSubjectX500Principal());
-				LOG.debug("validity: " + certificate.getNotBefore() + " - "
-						+ certificate.getNotAfter());
+				LOG.debug("certificate: " + certificate.getSubjectX500Principal());
+				LOG.debug("validity: " + certificate.getNotBefore() + " - " + certificate.getNotAfter());
 			}
 			this.trustValidator.isTrusted(certificateChain);
 		}

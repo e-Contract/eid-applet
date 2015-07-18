@@ -52,13 +52,10 @@ public class ASiCUtil {
 		return zipEntry.getName().equals(SIGNATURE_FILE);
 	}
 
-	public static Document createNewSignatureDocument()
-			throws ParserConfigurationException {
+	public static Document createNewSignatureDocument() throws ParserConfigurationException {
 		Document document = ODFUtil.getNewDocument();
-		Element rootElement = document.createElementNS(ASIC_NS, ASIC_NS_PREFIX
-				+ ":" + SIGNATURE_ELEMENT);
-		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:"
-				+ ASIC_NS_PREFIX, ASIC_NS);
+		Element rootElement = document.createElementNS(ASIC_NS, ASIC_NS_PREFIX + ":" + SIGNATURE_ELEMENT);
+		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:" + ASIC_NS_PREFIX, ASIC_NS);
 		document.appendChild(rootElement);
 		return document;
 	}

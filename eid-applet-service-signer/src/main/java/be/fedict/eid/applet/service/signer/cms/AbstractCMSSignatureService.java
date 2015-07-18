@@ -56,10 +56,8 @@ public abstract class AbstractCMSSignatureService implements SignatureService {
 		return null;
 	}
 
-	public DigestInfo preSign(List<DigestInfo> digestInfos,
-			List<X509Certificate> signingCertificateChain,
-			IdentityDTO identity, AddressDTO address, byte[] photo)
-			throws NoSuchAlgorithmException {
+	public DigestInfo preSign(List<DigestInfo> digestInfos, List<X509Certificate> signingCertificateChain,
+			IdentityDTO identity, AddressDTO address, byte[] photo) throws NoSuchAlgorithmException {
 		CMSSignedDataGenerator generator = createCMSSignedDataGenerator(signingCertificateChain);
 		byte[] toBeSigned = getToBeSigned();
 		CMSProcessable content = new CMSProcessableByteArray(toBeSigned);
@@ -77,8 +75,7 @@ public abstract class AbstractCMSSignatureService implements SignatureService {
 		return digestInfo;
 	}
 
-	public void postSign(byte[] signatureValue,
-			List<X509Certificate> signingCertificateChain) {
+	public void postSign(byte[] signatureValue, List<X509Certificate> signingCertificateChain) {
 		CMSSignedDataGenerator generator;
 		try {
 			generator = createCMSSignedDataGenerator(signingCertificateChain);
@@ -109,21 +106,18 @@ public abstract class AbstractCMSSignatureService implements SignatureService {
 		this.storeCMSSignature(cmsSignature);
 	}
 
-	private CMSSignedDataGenerator createCMSSignedDataGenerator(
-			List<X509Certificate> signingCertificateChain)
+	private CMSSignedDataGenerator createCMSSignedDataGenerator(List<X509Certificate> signingCertificateChain)
 			throws NoSuchAlgorithmException {
 		CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
 		if (null != signingCertificateChain) {
 			X509Certificate signerCertificate = signingCertificateChain.get(0);
 			PrivateKey dummyPrivateKey = new DummyPrivateKey();
-			generator.addSigner(dummyPrivateKey, signerCertificate,
-					CMSSignedDataGenerator.DIGEST_SHA1);
+			generator.addSigner(dummyPrivateKey, signerCertificate, CMSSignedDataGenerator.DIGEST_SHA1);
 			List<X509Certificate> certList = new LinkedList<X509Certificate>();
 			certList.add(signerCertificate);
 			CertStore certStore;
 			try {
-				certStore = CertStore.getInstance("Collection",
-						new CollectionCertStoreParameters(certList));
+				certStore = CertStore.getInstance("Collection", new CollectionCertStoreParameters(certList));
 			} catch (InvalidAlgorithmParameterException e) {
 				throw new NoSuchAlgorithmException(e);
 			}

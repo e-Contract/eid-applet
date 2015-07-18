@@ -33,14 +33,11 @@ import be.fedict.eid.applet.service.spi.InsecureClientEnvironmentException;
 @EJB(name = "java:global/test/InsecureClientEnvironmentBean", beanInterface = InsecureClientEnvironment.class)
 public class InsecureClientEnvironmentBean implements InsecureClientEnvironment {
 
-	private static final Log LOG = LogFactory
-			.getLog(InsecureClientEnvironmentBean.class);
+	private static final Log LOG = LogFactory.getLog(InsecureClientEnvironmentBean.class);
 
-	public void checkSecureClientEnvironment(String javaVersion,
-			String javaVendor, String osName, String osArch, String osVersion,
-			String userAgent, String navigatorAppName,
-			String navigatorAppVersion, String navigatorUserAgent,
-			String remoteAddress, Integer sslKeySize, String sslCipherSuite,
+	public void checkSecureClientEnvironment(String javaVersion, String javaVendor, String osName, String osArch,
+			String osVersion, String userAgent, String navigatorAppName, String navigatorAppVersion,
+			String navigatorUserAgent, String remoteAddress, Integer sslKeySize, String sslCipherSuite,
 			List<String> readerList) throws InsecureClientEnvironmentException {
 		LOG.debug("checking secure client environment");
 		throw new InsecureClientEnvironmentException();

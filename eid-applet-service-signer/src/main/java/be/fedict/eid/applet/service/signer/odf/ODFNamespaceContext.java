@@ -17,7 +17,6 @@
  */
 package be.fedict.eid.applet.service.signer.odf;
 
-
 import java.util.Iterator;
 
 import javax.xml.namespace.NamespaceContext;
@@ -28,30 +27,32 @@ import javax.xml.namespace.NamespaceContext;
  * @author Bart Hanssens
  */
 public class ODFNamespaceContext implements NamespaceContext {
-    /* Not required for XPath processing */
-    public String getPrefix(String uri) {
-        throw new UnsupportedOperationException();
-    }
-    public Iterator getPrefixes(String uri) {
-        throw new UnsupportedOperationException();
-    }
+	/* Not required for XPath processing */
+	public String getPrefix(String uri) {
+		throw new UnsupportedOperationException();
+	}
 
-    /**
-     * Get namespace URI for a given prefix
-     *
-     * @param prefix
-     * @return
-     */
-    public String getNamespaceURI(String prefix) {
-        /* Currently, draw: and xlink are the only prefixes we care about,
-         * since they are used to link to OLE objects
-         */
-        if ("draw".equals(prefix)) {
-            return "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0";
-        }
-        if ("xlink".equals(prefix)) {
-            return "http://www.w3.org/1999/xlink";
-        }
-        return "";
-    }
+	public Iterator getPrefixes(String uri) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Get namespace URI for a given prefix
+	 *
+	 * @param prefix
+	 * @return
+	 */
+	public String getNamespaceURI(String prefix) {
+		/*
+		 * Currently, draw: and xlink are the only prefixes we care about, since
+		 * they are used to link to OLE objects
+		 */
+		if ("draw".equals(prefix)) {
+			return "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0";
+		}
+		if ("xlink".equals(prefix)) {
+			return "http://www.w3.org/1999/xlink";
+		}
+		return "";
+	}
 }

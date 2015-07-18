@@ -35,9 +35,8 @@ import be.fedict.eid.applet.service.impl.VcardGenerator;
 import be.fedict.eid.applet.service.util.VcardLight;
 
 /**
- * Servlet that outputs the eID identity data from the HTTP session to a 
- * vCard 3.0
- * Can be used by address books
+ * Servlet that outputs the eID identity data from the HTTP session to a vCard
+ * 3.0 Can be used by address books
  *
  * @see http://www.ietf.org/rfc/rfc2426.txt
  *
@@ -59,8 +58,8 @@ public class VcardServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		LOG.debug("doGet");
 
 		HttpSession httpSession = request.getSession();
@@ -68,15 +67,13 @@ public class VcardServlet extends HttpServlet {
 
 		byte[] document;
 		try {
-                    document = this.vcardGenerator.generateVcard(eIdData);
+			document = this.vcardGenerator.generateVcard(eIdData);
 		} catch (IOException e) {
-			throw new ServletException(
-				"vCard generator error: " + e.getMessage(), e);
+			throw new ServletException("vCard generator error: " + e.getMessage(), e);
 		}
 
 		response.setHeader("Expires", "0");
-		response.setHeader("Cache-Control",
-				"must-revalidate, post-check=0, pre-check=0");
+		response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
 		response.setHeader("Pragma", "public");
 
 		response.setContentType(VcardLight.MIME_TYPE);

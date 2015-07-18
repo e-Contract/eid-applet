@@ -28,11 +28,9 @@ import be.fedict.eid.applet.shared.protocol.SemanticValidatorException;
  * @author Frank Cornelis
  * 
  */
-public class IdentityDataMessageSemanticValidator implements
-		SemanticValidator<IdentityDataMessage> {
+public class IdentityDataMessageSemanticValidator implements SemanticValidator<IdentityDataMessage> {
 
-	public void validate(IdentityDataMessage object)
-			throws SemanticValidatorException {
+	public void validate(IdentityDataMessage object) throws SemanticValidatorException {
 		int expectedSize = object.identityFileSize;
 		if (null != object.addressFileSize) {
 			expectedSize += object.addressFileSize;
@@ -62,9 +60,9 @@ public class IdentityDataMessageSemanticValidator implements
 			expectedSize += object.rootCertFileSize;
 		}
 		if (expectedSize != object.body.length) {
-			//throw new SemanticValidatorException(
-			//		"body size incorrect. expected: " + expectedSize
-			//				+ "; actual: " + object.body.length);
+			// throw new SemanticValidatorException(
+			// "body size incorrect. expected: " + expectedSize
+			// + "; actual: " + object.body.length);
 		}
 	}
 }

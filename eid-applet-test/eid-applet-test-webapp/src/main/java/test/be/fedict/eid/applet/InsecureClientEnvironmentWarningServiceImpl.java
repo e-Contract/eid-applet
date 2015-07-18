@@ -31,17 +31,13 @@ import org.apache.commons.logging.LogFactory;
 import be.fedict.eid.applet.service.spi.InsecureClientEnvironmentException;
 import be.fedict.eid.applet.service.spi.SecureClientEnvironmentService;
 
-public class InsecureClientEnvironmentWarningServiceImpl implements
-		SecureClientEnvironmentService {
+public class InsecureClientEnvironmentWarningServiceImpl implements SecureClientEnvironmentService {
 
-	private static final Log LOG = LogFactory
-			.getLog(InsecureClientEnvironmentWarningServiceImpl.class);
+	private static final Log LOG = LogFactory.getLog(InsecureClientEnvironmentWarningServiceImpl.class);
 
-	public void checkSecureClientEnvironment(String javaVersion,
-			String javaVendor, String osName, String osArch, String osVersion,
-			String userAgent, String navigatorAppName,
-			String navigatorAppVersion, String navigatorUserAgent,
-			String remoteAddress, Integer sslKeySize, String sslCipherSuite,
+	public void checkSecureClientEnvironment(String javaVersion, String javaVendor, String osName, String osArch,
+			String osVersion, String userAgent, String navigatorAppName, String navigatorAppVersion,
+			String navigatorUserAgent, String remoteAddress, Integer sslKeySize, String sslCipherSuite,
 			List<String> readerList) throws InsecureClientEnvironmentException {
 		LOG.debug("insecure warning");
 
@@ -61,8 +57,7 @@ public class InsecureClientEnvironmentWarningServiceImpl implements
 
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}
@@ -78,11 +73,9 @@ public class InsecureClientEnvironmentWarningServiceImpl implements
 		httpSession.setAttribute("ClientSslCipherSuite", sslCipherSuite);
 		httpSession.setAttribute("ClientRemoteAddress", remoteAddress);
 		httpSession.setAttribute("ClientSslKeySize", sslKeySize);
-		httpSession
-				.setAttribute("ClientNavigatorUserAgent", navigatorUserAgent);
+		httpSession.setAttribute("ClientNavigatorUserAgent", navigatorUserAgent);
 		httpSession.setAttribute("ClientNavigatorAppName", navigatorAppName);
-		httpSession.setAttribute("ClientNavigatorAppVersion",
-				navigatorAppVersion);
+		httpSession.setAttribute("ClientNavigatorAppVersion", navigatorAppVersion);
 
 		throw new InsecureClientEnvironmentException(true);
 	}

@@ -36,23 +36,19 @@ import org.apache.commons.logging.LogFactory;
 @EJB(name = "java:global/test/AuthenticationServiceBean", beanInterface = AuthenticationService.class)
 public class AuthenticationServiceBean implements AuthenticationService {
 
-	private static final Log LOG = LogFactory
-			.getLog(AuthenticationServiceBean.class);
+	private static final Log LOG = LogFactory.getLog(AuthenticationServiceBean.class);
 
-	public void validateCertificateChain(List<X509Certificate> certificateChain)
-			throws SecurityException {
+	public void validateCertificateChain(List<X509Certificate> certificateChain) throws SecurityException {
 		LOG.debug("validate certificate chain: " + certificateChain);
 
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}
 
 		HttpSession httpSession = httpServletRequest.getSession();
-		httpSession.setAttribute("AuthenticationCertificateChain",
-				certificateChain);
+		httpSession.setAttribute("AuthenticationCertificateChain", certificateChain);
 	}
 }

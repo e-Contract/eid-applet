@@ -32,14 +32,11 @@ import be.fedict.eid.applet.service.spi.RevokedCertificateSecurityException;
 
 @Stateless
 @EJB(name = "java:global/test/AuthenticationRevokeServiceBean", beanInterface = AuthenticationRevokeService.class)
-public class AuthenticationRevokeServiceBean implements
-		AuthenticationRevokeService {
+public class AuthenticationRevokeServiceBean implements AuthenticationRevokeService {
 
-	private static final Log LOG = LogFactory
-			.getLog(AuthenticationRevokeServiceBean.class);
+	private static final Log LOG = LogFactory.getLog(AuthenticationRevokeServiceBean.class);
 
-	public void validateCertificateChain(List<X509Certificate> certificateChain)
-			throws SecurityException {
+	public void validateCertificateChain(List<X509Certificate> certificateChain) throws SecurityException {
 		LOG.debug("validate certificate chain: " + certificateChain);
 		throw new RevokedCertificateSecurityException();
 	}

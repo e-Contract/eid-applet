@@ -33,8 +33,7 @@ public interface View {
 
 	void setStatusMessage(Status status, Messages.MESSAGE_ID messageId);
 
-	boolean privacyQuestion(boolean includeAddress, boolean includePhoto,
-			String identityDataUsage);
+	boolean privacyQuestion(boolean includeAddress, boolean includePhoto, String identityDataUsage);
 
 	Component getParentComponent();
 

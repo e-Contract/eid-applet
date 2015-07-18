@@ -48,26 +48,20 @@ import be.fedict.eid.applet.service.signer.facets.XAdESXLSignatureFacet;
  */
 public class Office2010SignatureFacet implements SignatureFacet {
 
-	public void preSign(XMLSignatureFactory signatureFactory,
-			Document document, String signatureId,
-			List<X509Certificate> signingCertificateChain,
-			List<Reference> references, List<XMLObject> objects)
-			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+	public void preSign(XMLSignatureFactory signatureFactory, Document document, String signatureId,
+			List<X509Certificate> signingCertificateChain, List<Reference> references, List<XMLObject> objects)
+					throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 	}
 
-	public void postSign(Element signatureElement,
-			List<X509Certificate> signingCertificateChain) {
+	public void postSign(Element signatureElement, List<X509Certificate> signingCertificateChain) {
 		Document document = signatureElement.getOwnerDocument();
 		Element nsElement = document.createElement("nsElement");
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds",
-				Constants.SignatureSpecNS);
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:xades",
-				XAdESXLSignatureFacet.XADES_NAMESPACE);
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS);
+		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:xades", XAdESXLSignatureFacet.XADES_NAMESPACE);
 		Element qualifyingPropertiesElement;
 		try {
-			qualifyingPropertiesElement = (Element) XPathAPI.selectSingleNode(
-					signatureElement, "ds:Object/xades:QualifyingProperties",
-					nsElement);
+			qualifyingPropertiesElement = (Element) XPathAPI.selectSingleNode(signatureElement,
+					"ds:Object/xades:QualifyingProperties", nsElement);
 		} catch (TransformerException e) {
 			throw new RuntimeException("XPath error: " + e.getMessage(), e);
 		}
@@ -77,14 +71,11 @@ public class Office2010SignatureFacet implements SignatureFacet {
 		} else {
 			namespacePrefix = namespacePrefix + ":";
 		}
-		Element unsignedPropertiesElement = document.createElementNS(
-				XAdESXLSignatureFacet.XADES_NAMESPACE, namespacePrefix
-						+ "UnsignedProperties");
+		Element unsignedPropertiesElement = document.createElementNS(XAdESXLSignatureFacet.XADES_NAMESPACE,
+				namespacePrefix + "UnsignedProperties");
 		qualifyingPropertiesElement.appendChild(unsignedPropertiesElement);
-		Element unsignedSignaturePropertiesElement = document.createElementNS(
-				XAdESXLSignatureFacet.XADES_NAMESPACE, namespacePrefix
-						+ "UnsignedSignatureProperties");
-		unsignedPropertiesElement
-				.appendChild(unsignedSignaturePropertiesElement);
+		Element unsignedSignaturePropertiesElement = document.createElementNS(XAdESXLSignatureFacet.XADES_NAMESPACE,
+				namespacePrefix + "UnsignedSignatureProperties");
+		unsignedPropertiesElement.appendChild(unsignedSignaturePropertiesElement);
 	}
 }

@@ -43,20 +43,21 @@ public class LocalAppletProtocolContext implements ProtocolContext {
 
 	private ProtocolState protocolState;
 
+	@Override
 	public ProtocolState getProtocolState() {
-		this.view.addDetailMessage("current protocol state: "
-				+ this.protocolState);
+		this.view.addDetailMessage("current protocol state: " + this.protocolState);
 		return this.protocolState;
 	}
 
+	@Override
 	public void removeProtocolState() {
 		this.view.addDetailMessage("removing protocol state");
 		this.protocolState = null;
 	}
 
+	@Override
 	public void setProtocolState(ProtocolState protocolState) {
-		this.view.addDetailMessage("protocol state transition: "
-				+ protocolState);
+		this.view.addDetailMessage("protocol state transition: " + protocolState);
 		this.protocolState = protocolState;
 	}
 }

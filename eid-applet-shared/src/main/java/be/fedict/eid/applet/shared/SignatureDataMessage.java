@@ -49,8 +49,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
 public class SignatureDataMessage extends AbstractProtocolMessage {
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator
-	public static final String TYPE = SignatureDataMessage.class
-			.getSimpleName();
+	public static final String TYPE = SignatureDataMessage.class.getSimpleName();
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "SignatureValueSize")
 	@NotNull
@@ -76,16 +75,14 @@ public class SignatureDataMessage extends AbstractProtocolMessage {
 		super();
 	}
 
-	public SignatureDataMessage(byte[] signatureValue,
-			List<X509Certificate> signCertChain) throws IOException,
-			CertificateEncodingException {
-		this(signatureValue, signCertChain.get(0).getEncoded(), signCertChain
-				.get(1).getEncoded(), signCertChain.get(2).getEncoded());
+	public SignatureDataMessage(byte[] signatureValue, List<X509Certificate> signCertChain)
+			throws IOException, CertificateEncodingException {
+		this(signatureValue, signCertChain.get(0).getEncoded(), signCertChain.get(1).getEncoded(),
+				signCertChain.get(2).getEncoded());
 	}
 
-	public SignatureDataMessage(byte[] signatureValue, byte[] signCertFile,
-			byte[] citizenCaCertFile, byte[] rootCaCertFile)
-			throws IOException, CertificateEncodingException {
+	public SignatureDataMessage(byte[] signatureValue, byte[] signCertFile, byte[] citizenCaCertFile,
+			byte[] rootCaCertFile) throws IOException, CertificateEncodingException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		this.signatureValueSize = signatureValue.length;
 		baos.write(signatureValue);
@@ -134,8 +131,7 @@ public class SignatureDataMessage extends AbstractProtocolMessage {
 		try {
 			certificateFactory = CertificateFactory.getInstance("X.509");
 		} catch (CertificateException e) {
-			throw new RuntimeException("cert factory error: " + e.getMessage(),
-					e);
+			throw new RuntimeException("cert factory error: " + e.getMessage(), e);
 		}
 		try {
 			X509Certificate certificate = (X509Certificate) certificateFactory

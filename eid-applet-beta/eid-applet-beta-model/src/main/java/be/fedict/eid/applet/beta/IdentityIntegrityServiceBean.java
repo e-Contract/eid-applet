@@ -38,17 +38,14 @@ import be.fedict.eid.applet.service.spi.IdentityIntegrityService;
 @EJB(name = "java:global/beta/IdentityIntegrityServiceBean", beanInterface = IdentityIntegrityService.class)
 public class IdentityIntegrityServiceBean implements IdentityIntegrityService {
 
-	private static final Log LOG = LogFactory
-			.getLog(IdentityIntegrityServiceBean.class);
+	private static final Log LOG = LogFactory.getLog(IdentityIntegrityServiceBean.class);
 
-	public void checkNationalRegistrationCertificate(
-			List<X509Certificate> certificateChain) throws SecurityException {
+	public void checkNationalRegistrationCertificate(List<X509Certificate> certificateChain) throws SecurityException {
 		LOG.debug("checking national registry certificate...");
 
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}

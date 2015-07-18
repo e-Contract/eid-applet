@@ -36,16 +36,13 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
  * 
  */
 @ProtocolStateAllowed(ProtocolState.ENV_CHECK)
-@ResponsesAllowed({ IdentificationRequestMessage.class,
-		InsecureClientMessage.class, AuthenticationRequestMessage.class,
-		AdministrationMessage.class, SignRequestMessage.class,
-		FilesDigestRequestMessage.class, SignCertificatesRequestMessage.class,
-		FinishedMessage.class })
+@ResponsesAllowed({ IdentificationRequestMessage.class, InsecureClientMessage.class, AuthenticationRequestMessage.class,
+		AdministrationMessage.class, SignRequestMessage.class, FilesDigestRequestMessage.class,
+		SignCertificatesRequestMessage.class, FinishedMessage.class })
 public class ClientEnvironmentMessage extends AbstractProtocolMessage {
 	@HttpHeader(TYPE_HTTP_HEADER)
 	@MessageDiscriminator
-	public static final String TYPE = ClientEnvironmentMessage.class
-			.getSimpleName();
+	public static final String TYPE = ClientEnvironmentMessage.class.getSimpleName();
 
 	@HttpHeader(HTTP_HEADER_PREFIX + "JavaVersion")
 	@NotNull

@@ -58,8 +58,7 @@ public abstract class AbstractAppletServiceServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Log LOG = LogFactory
-			.getLog(AbstractAppletServiceServlet.class);
+	private static final Log LOG = LogFactory.getLog(AbstractAppletServiceServlet.class);
 
 	private Unmarshaller unmarshaller;
 
@@ -80,19 +79,16 @@ public abstract class AbstractAppletServiceServlet extends HttpServlet {
 
 		this.unmarshaller = new Unmarshaller(new AppletProtocolMessageCatalog());
 
-		String skipSecureConnectionCheck = config
-				.getInitParameter(SKIP_SECURE_CONNECTION_CHECK_INIT_PARAM);
+		String skipSecureConnectionCheck = config.getInitParameter(SKIP_SECURE_CONNECTION_CHECK_INIT_PARAM);
 		if (null != skipSecureConnectionCheck) {
-			this.skipSecureConnectionCheck = Boolean
-					.parseBoolean(skipSecureConnectionCheck);
-			LOG.debug("skipping secure connection check: "
-					+ this.skipSecureConnectionCheck);
+			this.skipSecureConnectionCheck = Boolean.parseBoolean(skipSecureConnectionCheck);
+			LOG.debug("skipping secure connection check: " + this.skipSecureConnectionCheck);
 		}
 	}
 
 	@Override
-	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		LOG.debug("doGet");
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
@@ -112,13 +108,12 @@ public abstract class AbstractAppletServiceServlet extends HttpServlet {
 	 * @param messageClass
 	 * @return
 	 */
-	protected abstract <T> MessageHandler<T> getMessageHandler(
-			Class<T> messageClass);
+	protected abstract <T> MessageHandler<T> getMessageHandler(Class<T> messageClass);
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		LOG.debug("doPost");
 
 		/*
@@ -134,28 +129,24 @@ public abstract class AbstractAppletServiceServlet extends HttpServlet {
 		/*
 		 * Incoming message unmarshaller.
 		 */
-		HttpServletRequestHttpReceiver httpReceiver = new HttpServletRequestHttpReceiver(
-				request, this.skipSecureConnectionCheck);
+		HttpServletRequestHttpReceiver httpReceiver = new HttpServletRequestHttpReceiver(request,
+				this.skipSecureConnectionCheck);
 		Object transferObject;
 		try {
 			transferObject = this.unmarshaller.receive(httpReceiver);
 		} catch (Exception e) {
 			LOG.debug("unmarshaller error: " + e.getMessage(), e);
-			throw new RuntimeException("unmarshaller error: " + e.getMessage(),
-					e);
+			throw new RuntimeException("unmarshaller error: " + e.getMessage(), e);
 		}
 
 		/*
 		 * Protocol state checker for incoming message.
 		 */
-		HttpServletProtocolContext protocolContext = new HttpServletProtocolContext(
-				request);
-		ProtocolStateMachine protocolStateMachine = new ProtocolStateMachine(
-				protocolContext);
+		HttpServletProtocolContext protocolContext = new HttpServletProtocolContext(request);
+		ProtocolStateMachine protocolStateMachine = new ProtocolStateMachine(protocolContext);
 		CleanSessionProtocolStateListener cleanSessionProtocolStateListener = new CleanSessionProtocolStateListener(
 				request);
-		protocolStateMachine
-				.addProtocolStateListener(cleanSessionProtocolStateListener);
+		protocolStateMachine.addProtocolStateListener(cleanSessionProtocolStateListener);
 		RequestContext requestContext = new RequestContext(request);
 		protocolStateMachine.addProtocolStateListener(requestContext);
 		protocolStateMachine.checkRequestMessage(transferObject);
@@ -169,21 +160,18 @@ public abstract class AbstractAppletServiceServlet extends HttpServlet {
 			throw new ServletException("unsupported message");
 		}
 		HttpSession session = request.getSession();
-		Object responseMessage = messageHandler.handleMessage(transferObject,
-				httpHeaders, request, session);
+		Object responseMessage = messageHandler.handleMessage(transferObject, httpHeaders, request, session);
 
 		/*
 		 * Check outgoing messages for protocol constraints.
 		 */
-		ResponsesAllowed responsesAllowedAnnotation = messageClass
-				.getAnnotation(ResponsesAllowed.class);
+		ResponsesAllowed responsesAllowedAnnotation = messageClass.getAnnotation(ResponsesAllowed.class);
 		if (null != responsesAllowedAnnotation) {
 			/*
 			 * Make sure the message handlers respect the protocol.
 			 */
 			if (null == responseMessage) {
-				throw new ServletException(
-						"null response message while @ResponsesAllowed constraint was set");
+				throw new ServletException("null response message while @ResponsesAllowed constraint was set");
 			}
 			Class<?>[] responsesAllowed = responsesAllowedAnnotation.value();
 			if (false == isOfClass(responseMessage, responsesAllowed)) {
@@ -200,8 +188,7 @@ public abstract class AbstractAppletServiceServlet extends HttpServlet {
 		 * Marshall outgoing message.
 		 */
 		if (null != responseMessage) {
-			HttpServletResponseHttpTransmitter httpTransmitter = new HttpServletResponseHttpTransmitter(
-					response);
+			HttpServletResponseHttpTransmitter httpTransmitter = new HttpServletResponseHttpTransmitter(response);
 			Transport.transfer(responseMessage, httpTransmitter);
 		}
 	}

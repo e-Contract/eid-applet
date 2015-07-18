@@ -53,8 +53,7 @@ public class ProtocolStateMachine {
 	 * 
 	 * @param protocolStateListener
 	 */
-	public void addProtocolStateListener(
-			ProtocolStateListener protocolStateListener) {
+	public void addProtocolStateListener(ProtocolStateListener protocolStateListener) {
 		this.protocolStateListeners.add(protocolStateListener);
 	}
 
@@ -76,8 +75,7 @@ public class ProtocolStateMachine {
 			notifyProtocolListenersStopProtocolRun();
 			this.protocolContext.removeProtocolState();
 		}
-		StateTransition stateTransitionAnnotation = responseMessageClass
-				.getAnnotation(StateTransition.class);
+		StateTransition stateTransitionAnnotation = responseMessageClass.getAnnotation(StateTransition.class);
 		if (null != stateTransitionAnnotation) {
 			ProtocolState newProtocolState = stateTransitionAnnotation.value();
 			this.protocolContext.setProtocolState(newProtocolState);
@@ -85,8 +83,7 @@ public class ProtocolStateMachine {
 		}
 	}
 
-	private void notifyProtocolListenersProtocolStateTransition(
-			ProtocolState newProtocolState) {
+	private void notifyProtocolListenersProtocolStateTransition(ProtocolState newProtocolState) {
 		for (ProtocolStateListener protocolStateListener : this.protocolStateListeners) {
 			protocolStateListener.protocolStateTransition(newProtocolState);
 		}
@@ -124,16 +121,12 @@ public class ProtocolStateMachine {
 					.getAnnotation(ProtocolStateAllowed.class);
 			if (null == protocolStateAllowedAnnotation) {
 				throw new RuntimeException(
-						"cannot check protocol state for message: "
-								+ requestMessageClass.getSimpleName());
+						"cannot check protocol state for message: " + requestMessageClass.getSimpleName());
 			}
-			ProtocolState allowedProtocolState = protocolStateAllowedAnnotation
-					.value();
+			ProtocolState allowedProtocolState = protocolStateAllowedAnnotation.value();
 			if (protocolState != allowedProtocolState) {
 				throw new RuntimeException(
-						"protocol state incorrect. expected: "
-								+ allowedProtocolState + "; actual: "
-								+ protocolState);
+						"protocol state incorrect. expected: " + allowedProtocolState + "; actual: " + protocolState);
 			}
 		} else {
 			if (null != protocolState) {

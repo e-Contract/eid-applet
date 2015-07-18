@@ -66,8 +66,7 @@ import be.fedict.eid.applet.sc.PcscEid;
  */
 public class SecurePinPadReaderTest {
 
-	private static final Log LOG = LogFactory
-			.getLog(SecurePinPadReaderTest.class);
+	private static final Log LOG = LogFactory.getLog(SecurePinPadReaderTest.class);
 
 	private Messages messages;
 
@@ -93,29 +92,25 @@ public class SecurePinPadReaderTest {
 		/**
 		 * First test sample provided at 18/08/2011.
 		 */
-		V006Z,
-		/**
-		 * Second test sample provided at 13/10/2011.
-		 */
-		V010Z,
-		/**
-		 * Fourth test sample provided at 14/02/2012.
-		 */
-		V012Z,
-		/**
-		 * Fifth test sample provided at 05/2012.
-		 */
-		V015Z,
-		/**
-		 * Not applicable.
-		 */
+		V006Z, /**
+				 * Second test sample provided at 13/10/2011.
+				 */
+		V010Z, /**
+				 * Fourth test sample provided at 14/02/2012.
+				 */
+		V012Z, /**
+				 * Fifth test sample provided at 05/2012.
+				 */
+		V015Z, /**
+				 * Not applicable.
+				 */
 		NA
 	}
 
 	@Before
 	public void beforeTest() throws Exception {
-		this.messages = new Messages(new Locale("fr")); 
-				//new Messages(new Locale("nl"));
+		this.messages = new Messages(new Locale("fr"));
+		// new Messages(new Locale("nl"));
 		LOG.debug("locale: " + this.messages.getLocale());
 		this.pcscEid = new PcscEid(new TestView(), this.messages);
 		if (false == this.pcscEid.isEidPresent()) {
@@ -182,8 +177,7 @@ public class SecurePinPadReaderTest {
 		} else {
 			ioctl = 0x42000D48;
 		}
-		byte[] features = this.pcscEid.getCard().transmitControlCommand(ioctl,
-				new byte[0]);
+		byte[] features = this.pcscEid.getCard().transmitControlCommand(ioctl, new byte[0]);
 		int idx = 0;
 		while (idx < features.length) {
 			byte tag = features[idx];
@@ -197,8 +191,7 @@ public class SecurePinPadReaderTest {
 	@Test
 	@QualityAssurance(firmware = Firmware.V015Z, approved = true)
 	public void testRegularDigestValueWithAuth() throws Exception {
-		byte[] signatureValue = this.pcscEid
-				.signAuthn("hello world".getBytes());
+		byte[] signatureValue = this.pcscEid.signAuthn("hello world".getBytes());
 		LOG.debug("signature value size: " + signatureValue.length);
 		assertEquals(128, signatureValue.length);
 	}
@@ -208,25 +201,19 @@ public class SecurePinPadReaderTest {
 	public void testPlainTextAuthn() throws Exception {
 		// operate
 		String testMessage = "Test Application @ 14/2/2012 14:48:21";
-		byte[] signatureValue = this.pcscEid.sign(testMessage.getBytes(),
-				"2.16.56.1.2.1.3.1", (byte) 0x82, false);
+		byte[] signatureValue = this.pcscEid.sign(testMessage.getBytes(), "2.16.56.1.2.1.3.1", (byte) 0x82, false);
 
 		// verify
-		List<X509Certificate> authnCertChain = this.pcscEid
-				.getAuthnCertificateChain();
+		List<X509Certificate> authnCertChain = this.pcscEid.getAuthnCertificateChain();
 
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.DECRYPT_MODE, authnCertChain.get(0));
 		byte[] signatureDigestInfoValue = cipher.doFinal(signatureValue);
 		ASN1InputStream aIn = new ASN1InputStream(signatureDigestInfoValue);
-		DigestInfo signatureDigestInfo = new DigestInfo(
-				(ASN1Sequence) aIn.readObject());
-		LOG.debug("result algo Id: "
-				+ signatureDigestInfo.getAlgorithmId().getObjectId().getId());
-		assertEquals("2.16.56.1.2.1.3.1", signatureDigestInfo.getAlgorithmId()
-				.getObjectId().getId());
-		assertArrayEquals(testMessage.getBytes(),
-				signatureDigestInfo.getDigest());
+		DigestInfo signatureDigestInfo = new DigestInfo((ASN1Sequence) aIn.readObject());
+		LOG.debug("result algo Id: " + signatureDigestInfo.getAlgorithmId().getObjectId().getId());
+		assertEquals("2.16.56.1.2.1.3.1", signatureDigestInfo.getAlgorithmId().getObjectId().getId());
+		assertArrayEquals(testMessage.getBytes(), signatureDigestInfo.getDigest());
 	}
 
 	/**
@@ -248,8 +235,7 @@ public class SecurePinPadReaderTest {
 	public void testAuthnSignPlainText() throws Exception {
 		CardChannel cardChannel = this.pcscEid.getCardChannel();
 
-		List<X509Certificate> authnCertChain = this.pcscEid
-				.getAuthnCertificateChain();
+		List<X509Certificate> authnCertChain = this.pcscEid.getAuthnCertificateChain();
 		/*
 		 * Make sure that the PIN authorization is already OK.
 		 */
@@ -265,16 +251,12 @@ public class SecurePinPadReaderTest {
 		// assertEquals(0x9000, responseApdu.getSW());
 
 		String textMessage = "My Testcase";
-		AlgorithmIdentifier algoId = new AlgorithmIdentifier(
-				"2.16.56.1.2.1.3.1");
+		AlgorithmIdentifier algoId = new AlgorithmIdentifier("2.16.56.1.2.1.3.1");
 		DigestInfo digestInfo = new DigestInfo(algoId, textMessage.getBytes());
-		LOG.debug("DigestInfo DER encoded: "
-				+ new String(Hex.encodeHex(digestInfo.getDEREncoded())));
-		CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A,
-				0x9E, 0x9A, digestInfo.getDEREncoded());
+		LOG.debug("DigestInfo DER encoded: " + new String(Hex.encodeHex(digestInfo.getDEREncoded())));
+		CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A, 0x9E, 0x9A, digestInfo.getDEREncoded());
 
-		ResponseAPDU responseApdu2 = cardChannel
-				.transmit(computeDigitalSignatureApdu);
+		ResponseAPDU responseApdu2 = cardChannel.transmit(computeDigitalSignatureApdu);
 		assertEquals(0x9000, responseApdu2.getSW());
 		byte[] signatureValue = responseApdu2.getData();
 		LOG.debug("signature value size: " + signatureValue.length);
@@ -283,21 +265,17 @@ public class SecurePinPadReaderTest {
 		cipher.init(Cipher.DECRYPT_MODE, authnCertChain.get(0));
 		byte[] signatureDigestInfoValue = cipher.doFinal(signatureValue);
 		ASN1InputStream aIn = new ASN1InputStream(signatureDigestInfoValue);
-		DigestInfo signatureDigestInfo = new DigestInfo(
-				(ASN1Sequence) aIn.readObject());
-		LOG.debug("result algo Id: "
-				+ signatureDigestInfo.getAlgorithmId().getObjectId().getId());
-		assertEquals("2.16.56.1.2.1.3.1", signatureDigestInfo.getAlgorithmId()
-				.getObjectId().getId());
-		assertArrayEquals(textMessage.getBytes(),
-				signatureDigestInfo.getDigest());
+		DigestInfo signatureDigestInfo = new DigestInfo((ASN1Sequence) aIn.readObject());
+		LOG.debug("result algo Id: " + signatureDigestInfo.getAlgorithmId().getObjectId().getId());
+		assertEquals("2.16.56.1.2.1.3.1", signatureDigestInfo.getAlgorithmId().getObjectId().getId());
+		assertArrayEquals(textMessage.getBytes(), signatureDigestInfo.getDigest());
 	}
 
 	/**
 	 * Creates a non-repudiation signature with plain text.
 	 * <p/>
-	 * Remark: "Enter NonRep PIN" should maybe be replaced with
-	 * "Enter Sign PIN". Fixed in V010Z.
+	 * Remark: "Enter NonRep PIN" should maybe be replaced with "Enter Sign PIN"
+	 * . Fixed in V010Z.
 	 * 
 	 * @throws Exception
 	 */
@@ -306,8 +284,7 @@ public class SecurePinPadReaderTest {
 	public void testNonRepSignPlainText() throws Exception {
 		CardChannel cardChannel = this.pcscEid.getCardChannel();
 
-		List<X509Certificate> signCertChain = this.pcscEid
-				.getSignCertificateChain();
+		List<X509Certificate> signCertChain = this.pcscEid.getSignCertificateChain();
 
 		CommandAPDU setApdu = new CommandAPDU(0x00, 0x22, 0x41, 0xB6,
 				new byte[] { 0x04, // length of following data
@@ -321,11 +298,9 @@ public class SecurePinPadReaderTest {
 		this.pcscEid.verifyPin();
 
 		String textMessage = "My Testcase";
-		AlgorithmIdentifier algoId = new AlgorithmIdentifier(
-				"2.16.56.1.2.1.3.1");
+		AlgorithmIdentifier algoId = new AlgorithmIdentifier("2.16.56.1.2.1.3.1");
 		DigestInfo digestInfo = new DigestInfo(algoId, textMessage.getBytes());
-		CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A,
-				0x9E, 0x9A, digestInfo.getDEREncoded());
+		CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A, 0x9E, 0x9A, digestInfo.getDEREncoded());
 
 		responseApdu = cardChannel.transmit(computeDigitalSignatureApdu);
 		assertEquals(0x9000, responseApdu.getSW());
@@ -336,14 +311,10 @@ public class SecurePinPadReaderTest {
 		cipher.init(Cipher.DECRYPT_MODE, signCertChain.get(0));
 		byte[] signatureDigestInfoValue = cipher.doFinal(signatureValue);
 		ASN1InputStream aIn = new ASN1InputStream(signatureDigestInfoValue);
-		DigestInfo signatureDigestInfo = new DigestInfo(
-				(ASN1Sequence) aIn.readObject());
-		LOG.debug("result algo Id: "
-				+ signatureDigestInfo.getAlgorithmId().getObjectId().getId());
-		assertEquals("2.16.56.1.2.1.3.1", signatureDigestInfo.getAlgorithmId()
-				.getObjectId().getId());
-		assertArrayEquals(textMessage.getBytes(),
-				signatureDigestInfo.getDigest());
+		DigestInfo signatureDigestInfo = new DigestInfo((ASN1Sequence) aIn.readObject());
+		LOG.debug("result algo Id: " + signatureDigestInfo.getAlgorithmId().getObjectId().getId());
+		assertEquals("2.16.56.1.2.1.3.1", signatureDigestInfo.getAlgorithmId().getObjectId().getId());
+		assertArrayEquals(textMessage.getBytes(), signatureDigestInfo.getDigest());
 	}
 
 	/**
@@ -356,8 +327,7 @@ public class SecurePinPadReaderTest {
 	public void testLargePlainTextMessage() throws Exception {
 		CardChannel cardChannel = this.pcscEid.getCardChannel();
 
-		List<X509Certificate> signCertChain = this.pcscEid
-				.getSignCertificateChain();
+		List<X509Certificate> signCertChain = this.pcscEid.getSignCertificateChain();
 
 		CommandAPDU setApdu = new CommandAPDU(0x00, 0x22, 0x41, 0xB6,
 				new byte[] { 0x04, // length of following data
@@ -377,11 +347,9 @@ public class SecurePinPadReaderTest {
 		 */
 		SecureRandom secureRandom = new SecureRandom();
 		secureRandom.nextBytes(data);
-		AlgorithmIdentifier algoId = new AlgorithmIdentifier(
-				"2.16.56.1.2.1.3.1");
+		AlgorithmIdentifier algoId = new AlgorithmIdentifier("2.16.56.1.2.1.3.1");
 		DigestInfo digestInfo = new DigestInfo(algoId, data);
-		CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A,
-				0x9E, 0x9A, digestInfo.getDEREncoded());
+		CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A, 0x9E, 0x9A, digestInfo.getDEREncoded());
 
 		responseApdu = cardChannel.transmit(computeDigitalSignatureApdu);
 		assertEquals(0x9000, responseApdu.getSW());
@@ -392,12 +360,9 @@ public class SecurePinPadReaderTest {
 		cipher.init(Cipher.DECRYPT_MODE, signCertChain.get(0));
 		byte[] signatureDigestInfoValue = cipher.doFinal(signatureValue);
 		ASN1InputStream aIn = new ASN1InputStream(signatureDigestInfoValue);
-		DigestInfo signatureDigestInfo = new DigestInfo(
-				(ASN1Sequence) aIn.readObject());
-		LOG.debug("result algo Id: "
-				+ signatureDigestInfo.getAlgorithmId().getObjectId().getId());
-		assertEquals("2.16.56.1.2.1.3.1", signatureDigestInfo.getAlgorithmId()
-				.getObjectId().getId());
+		DigestInfo signatureDigestInfo = new DigestInfo((ASN1Sequence) aIn.readObject());
+		LOG.debug("result algo Id: " + signatureDigestInfo.getAlgorithmId().getObjectId().getId());
+		assertEquals("2.16.56.1.2.1.3.1", signatureDigestInfo.getAlgorithmId().getObjectId().getId());
 		assertArrayEquals(data, signatureDigestInfo.getDigest());
 	}
 
@@ -412,8 +377,7 @@ public class SecurePinPadReaderTest {
 	public void testNonRepSignPKCS1_SHA1() throws Exception {
 		CardChannel cardChannel = this.pcscEid.getCardChannel();
 
-		List<X509Certificate> signCertChain = this.pcscEid
-				.getSignCertificateChain();
+		List<X509Certificate> signCertChain = this.pcscEid.getSignCertificateChain();
 
 		CommandAPDU setApdu = new CommandAPDU(0x00, 0x22, 0x41, 0xB6,
 				new byte[] { 0x04, // length of following data
@@ -430,8 +394,7 @@ public class SecurePinPadReaderTest {
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
 		byte[] digestValue = messageDigest.digest(data);
 
-		CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A,
-				0x9E, 0x9A, digestValue);
+		CommandAPDU computeDigitalSignatureApdu = new CommandAPDU(0x00, 0x2A, 0x9E, 0x9A, digestValue);
 
 		responseApdu = cardChannel.transmit(computeDigitalSignatureApdu);
 		assertEquals(0x9000, responseApdu.getSW());
@@ -457,14 +420,12 @@ public class SecurePinPadReaderTest {
 			if (null == testAnnotation) {
 				continue;
 			}
-			QualityAssurance qualityAssuranceAnnotation = method
-					.getAnnotation(QualityAssurance.class);
+			QualityAssurance qualityAssuranceAnnotation = method.getAnnotation(QualityAssurance.class);
 			if (null == qualityAssuranceAnnotation) {
 				throw new RuntimeException("missing QualityAssurance status");
 			}
 			LOG.debug("Test: " + method.getName());
-			LOG.debug("\tFirmware version: "
-					+ qualityAssuranceAnnotation.firmware());
+			LOG.debug("\tFirmware version: " + qualityAssuranceAnnotation.firmware());
 			LOG.debug("\tApproved: " + qualityAssuranceAnnotation.approved());
 		}
 	}

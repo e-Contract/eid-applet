@@ -119,8 +119,7 @@ public class Controller {
 
 		String ppduNames = runtime.getParameter("PPDUNames");
 		if (null != ppduNames) {
-			StringTokenizer stringTokenizer = new StringTokenizer(ppduNames,
-					",");
+			StringTokenizer stringTokenizer = new StringTokenizer(ppduNames, ",");
 			while (stringTokenizer.hasMoreTokens()) {
 				String ppduName = stringTokenizer.nextToken();
 				view.addDetailMessage("PPDU name: " + ppduName.toLowerCase());
@@ -141,57 +140,45 @@ public class Controller {
 		if (osName.equals("Mac OS X")) {
 			boolean sandboxed = System.getenv("DIRHELPER_USER_DIR_SUFFIX") != null;
 			if (sandboxed) {
-				String safariMessage = this.messages
-						.getMessage(MESSAGE_ID.SAFARI_SANDBOX_1);
+				String safariMessage = this.messages.getMessage(MESSAGE_ID.SAFARI_SANDBOX_1);
 				safariMessage += this.runtime.getDocumentBase().getHost();
-				safariMessage += this.messages
-						.getMessage(MESSAGE_ID.SAFARI_SANDBOX_2);
-				JOptionPane.showMessageDialog(view.getParentComponent(),
-						safariMessage, "Safari Java Sandbox",
+				safariMessage += this.messages.getMessage(MESSAGE_ID.SAFARI_SANDBOX_2);
+				JOptionPane.showMessageDialog(view.getParentComponent(), safariMessage, "Safari Java Sandbox",
 						JOptionPane.WARNING_MESSAGE);
 			}
 		}
 	}
 
-	private <T> T sendMessage(Object message, Class<T> responseClass)
-			throws MalformedURLException, IOException {
+	private <T> T sendMessage(Object message, Class<T> responseClass) throws MalformedURLException, IOException {
 		Object responseObject = sendMessage(message);
 		if (false == responseClass.equals(responseObject.getClass())) {
-			throw new RuntimeException("response message not of type: "
-					+ responseClass.getName());
+			throw new RuntimeException("response message not of type: " + responseClass.getName());
 		}
 		@SuppressWarnings("unchecked")
 		T response = (T) responseObject;
 		return response;
 	}
 
-	private Object sendMessage(Object message) throws MalformedURLException,
-			IOException {
-		addDetailMessage("sending message: "
-				+ message.getClass().getSimpleName());
+	private Object sendMessage(Object message) throws MalformedURLException, IOException {
+		addDetailMessage("sending message: " + message.getClass().getSimpleName());
 		Class<?> messageClass = message.getClass();
-		ResponsesAllowed responsesAllowedAnnotation = messageClass
-				.getAnnotation(ResponsesAllowed.class);
+		ResponsesAllowed responsesAllowedAnnotation = messageClass.getAnnotation(ResponsesAllowed.class);
 		if (null == responsesAllowedAnnotation) {
-			throw new RuntimeException(
-					"message should have a @ResponsesAllowed constraint");
+			throw new RuntimeException("message should have a @ResponsesAllowed constraint");
 		}
 
 		this.protocolStateMachine.checkRequestMessage(message);
 
 		String userAgent = this.runtime.getParameter("UserAgent");
 		boolean noChunkedTransferEncoding = false;
-		String noChunkedTransferEncodingParam = this.runtime
-				.getParameter("NoChunkedTransferEncoding");
+		String noChunkedTransferEncodingParam = this.runtime.getParameter("NoChunkedTransferEncoding");
 		if (null != noChunkedTransferEncodingParam) {
-			noChunkedTransferEncoding = Boolean
-					.parseBoolean(noChunkedTransferEncodingParam);
-			addDetailMessage("no chunked transfer-encoding: "
-					+ noChunkedTransferEncoding);
+			noChunkedTransferEncoding = Boolean.parseBoolean(noChunkedTransferEncodingParam);
+			addDetailMessage("no chunked transfer-encoding: " + noChunkedTransferEncoding);
 		}
 		HttpURLConnection connection = getServerConnection();
-		HttpURLConnectionHttpTransmitter httpTransmitter = new HttpURLConnectionHttpTransmitter(
-				connection, userAgent, noChunkedTransferEncoding);
+		HttpURLConnectionHttpTransmitter httpTransmitter = new HttpURLConnectionHttpTransmitter(connection, userAgent,
+				noChunkedTransferEncoding);
 		Transport.transfer(message, httpTransmitter);
 		int responseCode = connection.getResponseCode();
 		if (HttpURLConnection.HTTP_OK != responseCode) {
@@ -203,23 +190,17 @@ public class Controller {
 			}
 			this.view.addDetailMessage("HTTP response code: " + msg);
 			printHttpResponseContent(connection);
-			throw new IOException(
-					"error sending message to service. HTTP status code: "
-							+ msg);
+			throw new IOException("error sending message to service. HTTP status code: " + msg);
 		}
-		Unmarshaller unmarshaller = new Unmarshaller(
-				new AppletProtocolMessageCatalog());
-		HttpURLConnectionHttpReceiver httpReceiver = new HttpURLConnectionHttpReceiver(
-				connection);
+		Unmarshaller unmarshaller = new Unmarshaller(new AppletProtocolMessageCatalog());
+		HttpURLConnectionHttpReceiver httpReceiver = new HttpURLConnectionHttpReceiver(connection);
 		Object responseObject = unmarshaller.receive(httpReceiver);
 
 		Class<?>[] responsesAllowed = responsesAllowedAnnotation.value();
 		if (false == isOfClass(responseObject, responsesAllowed)) {
-			throw new RuntimeException("response not of correct type: "
-					+ responseObject.getClass());
+			throw new RuntimeException("response not of correct type: " + responseObject.getClass());
 		}
-		addDetailMessage("response message: "
-				+ responseObject.getClass().getSimpleName());
+		addDetailMessage("response message: " + responseObject.getClass().getSimpleName());
 
 		this.protocolStateMachine.checkResponseMessage(responseObject);
 
@@ -231,8 +212,7 @@ public class Controller {
 		if (null == errorStream) {
 			return;
 		}
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				errorStream));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
 		String line;
 		try {
 			while (null != (line = reader.readLine())) {
@@ -263,48 +243,36 @@ public class Controller {
 			if (resultMessage instanceof CheckClientMessage) {
 				addDetailMessage("Need to check the client secure environment...");
 				ClientEnvironmentMessage clientEnvMessage = new ClientEnvironmentMessage();
-				clientEnvMessage.javaVersion = System
-						.getProperty("java.version");
+				clientEnvMessage.javaVersion = System.getProperty("java.version");
 				clientEnvMessage.javaVendor = System.getProperty("java.vendor");
 				clientEnvMessage.osName = System.getProperty("os.name");
 				clientEnvMessage.osArch = System.getProperty("os.arch");
 				clientEnvMessage.osVersion = System.getProperty("os.version");
 				clientEnvMessage.readerList = this.pcscEidSpi.getReaderList();
 
-				clientEnvMessage.navigatorAppName = this.runtime
-						.getParameter("NavigatorAppName");
-				clientEnvMessage.navigatorAppVersion = this.runtime
-						.getParameter("NavigatorAppVersion");
-				clientEnvMessage.navigatorUserAgent = this.runtime
-						.getParameter("NavigatorUserAgent");
+				clientEnvMessage.navigatorAppName = this.runtime.getParameter("NavigatorAppName");
+				clientEnvMessage.navigatorAppVersion = this.runtime.getParameter("NavigatorAppVersion");
+				clientEnvMessage.navigatorUserAgent = this.runtime.getParameter("NavigatorUserAgent");
 				resultMessage = sendMessage(clientEnvMessage);
 				if (resultMessage instanceof InsecureClientMessage) {
 					InsecureClientMessage insecureClientMessage = (InsecureClientMessage) resultMessage;
 					if (insecureClientMessage.warnOnly) {
-						int result = JOptionPane
-								.showConfirmDialog(
-										this.view.getParentComponent(),
-										"Your system has been marked as insecure client environment.\n"
-												+ "Do you want to continue the eID operation?",
-										"Insecure Client Environment",
-										JOptionPane.OK_CANCEL_OPTION,
-										JOptionPane.WARNING_MESSAGE);
+						int result = JOptionPane.showConfirmDialog(this.view.getParentComponent(),
+								"Your system has been marked as insecure client environment.\n"
+										+ "Do you want to continue the eID operation?",
+								"Insecure Client Environment", JOptionPane.OK_CANCEL_OPTION,
+								JOptionPane.WARNING_MESSAGE);
 						if (JOptionPane.OK_OPTION != result) {
-							setStatusMessage(Status.ERROR,
-									MESSAGE_ID.SECURITY_ERROR);
+							setStatusMessage(Status.ERROR, MESSAGE_ID.SECURITY_ERROR);
 							addDetailMessage("insecure client environment");
 							return null;
 						}
 						resultMessage = sendMessage(new ContinueInsecureMessage());
 					} else {
-						JOptionPane
-								.showMessageDialog(
-										this.view.getParentComponent(),
-										"Your system has been marked as insecure client environment.",
-										"Insecure Client Environment",
-										JOptionPane.ERROR_MESSAGE);
-						setStatusMessage(Status.ERROR,
-								MESSAGE_ID.SECURITY_ERROR);
+						JOptionPane.showMessageDialog(this.view.getParentComponent(),
+								"Your system has been marked as insecure client environment.",
+								"Insecure Client Environment", JOptionPane.ERROR_MESSAGE);
+						setStatusMessage(Status.ERROR, MESSAGE_ID.SECURITY_ERROR);
 						addDetailMessage("received an insecure client environment message");
 						return null;
 					}
@@ -321,10 +289,8 @@ public class Controller {
 				addDetailMessage("unblock pin: " + unblockPin);
 				addDetailMessage("remove card: " + removeCard);
 				addDetailMessage("logoff: " + logoff);
-				addDetailMessage("require secure reader: "
-						+ requireSecureReader);
-				administration(unblockPin, changePin, logoff, removeCard,
-						requireSecureReader);
+				addDetailMessage("require secure reader: " + requireSecureReader);
+				administration(unblockPin, changePin, logoff, removeCard, requireSecureReader);
 			}
 			if (resultMessage instanceof FilesDigestRequestMessage) {
 				FilesDigestRequestMessage filesDigestRequestMessage = (FilesDigestRequestMessage) resultMessage;
@@ -332,7 +298,8 @@ public class Controller {
 			}
 			if (resultMessage instanceof SignCertificatesRequestMessage) {
 				SignCertificatesRequestMessage signCertificatesRequestMessage = (SignCertificatesRequestMessage) resultMessage;
-				SignCertificatesDataMessage signCertificatesDataMessage = performSignCertificatesOperation(signCertificatesRequestMessage);
+				SignCertificatesDataMessage signCertificatesDataMessage = performSignCertificatesOperation(
+						signCertificatesRequestMessage);
 				resultMessage = sendMessage(signCertificatesDataMessage);
 			}
 			if (resultMessage instanceof SignRequestMessage) {
@@ -349,25 +316,16 @@ public class Controller {
 			}
 			if (resultMessage instanceof IdentificationRequestMessage) {
 				IdentificationRequestMessage identificationRequestMessage = (IdentificationRequestMessage) resultMessage;
-				addDetailMessage("include address: "
-						+ identificationRequestMessage.includeAddress);
-				addDetailMessage("include photo: "
-						+ identificationRequestMessage.includePhoto);
-				addDetailMessage("include integrity data: "
-						+ identificationRequestMessage.includeIntegrityData);
-				addDetailMessage("include certificates: "
-						+ identificationRequestMessage.includeCertificates);
-				addDetailMessage("remove card: "
-						+ identificationRequestMessage.removeCard);
-				addDetailMessage("identity data usage: "
-						+ identificationRequestMessage.identityDataUsage);
+				addDetailMessage("include address: " + identificationRequestMessage.includeAddress);
+				addDetailMessage("include photo: " + identificationRequestMessage.includePhoto);
+				addDetailMessage("include integrity data: " + identificationRequestMessage.includeIntegrityData);
+				addDetailMessage("include certificates: " + identificationRequestMessage.includeCertificates);
+				addDetailMessage("remove card: " + identificationRequestMessage.removeCard);
+				addDetailMessage("identity data usage: " + identificationRequestMessage.identityDataUsage);
 
-				resultMessage = performEidIdentificationOperation(
-						identificationRequestMessage.includeAddress,
-						identificationRequestMessage.includePhoto,
-						identificationRequestMessage.includeIntegrityData,
-						identificationRequestMessage.includeCertificates,
-						identificationRequestMessage.removeCard,
+				resultMessage = performEidIdentificationOperation(identificationRequestMessage.includeAddress,
+						identificationRequestMessage.includePhoto, identificationRequestMessage.includeIntegrityData,
+						identificationRequestMessage.includeCertificates, identificationRequestMessage.removeCard,
 						identificationRequestMessage.identityDataUsage);
 			}
 			if (resultMessage instanceof FinishedMessage) {
@@ -376,31 +334,25 @@ public class Controller {
 					switch (finishedMessage.errorCode) {
 					case CERTIFICATE:
 						addDetailMessage("something wrong with your certificate");
-						setStatusMessage(Status.ERROR,
-								MESSAGE_ID.SECURITY_ERROR);
+						setStatusMessage(Status.ERROR, MESSAGE_ID.SECURITY_ERROR);
 						return null;
 					case CERTIFICATE_EXPIRED:
-						setStatusMessage(Status.ERROR,
-								MESSAGE_ID.CERTIFICATE_EXPIRED_ERROR);
+						setStatusMessage(Status.ERROR, MESSAGE_ID.CERTIFICATE_EXPIRED_ERROR);
 						return null;
 					case CERTIFICATE_REVOKED:
-						setStatusMessage(Status.ERROR,
-								MESSAGE_ID.CERTIFICATE_REVOKED_ERROR);
+						setStatusMessage(Status.ERROR, MESSAGE_ID.CERTIFICATE_REVOKED_ERROR);
 						return null;
 					case CERTIFICATE_NOT_TRUSTED:
-						setStatusMessage(Status.ERROR,
-								MESSAGE_ID.CERTIFICATE_NOT_TRUSTED);
+						setStatusMessage(Status.ERROR, MESSAGE_ID.CERTIFICATE_NOT_TRUSTED);
 						return null;
 					case AUTHORIZATION:
-						setStatusMessage(Status.ERROR,
-								MESSAGE_ID.AUTHORIZATION_ERROR);
+						setStatusMessage(Status.ERROR, MESSAGE_ID.AUTHORIZATION_ERROR);
 						this.runtime.gotoAuthorizationErrorPage();
 						return null;
 					default:
 					}
 					setStatusMessage(Status.ERROR, MESSAGE_ID.GENERIC_ERROR);
-					addDetailMessage("error code @ finish: "
-							+ finishedMessage.errorCode);
+					addDetailMessage("error code @ finish: " + finishedMessage.errorCode);
 					return null;
 				}
 			}
@@ -413,19 +365,16 @@ public class Controller {
 			addDetailMessage("error type: " + e.getClass().getName());
 			StackTraceElement[] stackTrace = e.getStackTrace();
 			for (StackTraceElement stackTraceElement : stackTrace) {
-				addDetailMessage("at " + stackTraceElement.getClassName() + "."
-						+ stackTraceElement.getMethodName() + ":"
-						+ stackTraceElement.getLineNumber());
+				addDetailMessage("at " + stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName()
+						+ ":" + stackTraceElement.getLineNumber());
 			}
 			Throwable cause = e.getCause();
 			if (null != cause) {
-				addDetailMessage("Caused by: " + cause.getClass().getName()
-						+ ": " + cause.getMessage());
+				addDetailMessage("Caused by: " + cause.getClass().getName() + ": " + cause.getMessage());
 				stackTrace = cause.getStackTrace();
 				for (StackTraceElement stackTraceElement : stackTrace) {
-					addDetailMessage("at " + stackTraceElement.getClassName()
-							+ "." + stackTraceElement.getMethodName() + ":"
-							+ stackTraceElement.getLineNumber());
+					addDetailMessage("at " + stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName()
+							+ ":" + stackTraceElement.getLineNumber());
 				}
 				/*
 				 * Next is specific for the OpenSC PKCS#11 library.
@@ -450,8 +399,7 @@ public class Controller {
 			 * We don't refer to javax.smartcardio directly since this code also
 			 * need to work an a Java 5 runtime.
 			 */
-			if ("javax.smartcardio.CardException"
-					.equals(e.getClass().getName())) {
+			if ("javax.smartcardio.CardException".equals(e.getClass().getName())) {
 				setStatusMessage(Status.ERROR, MESSAGE_ID.CARD_ERROR);
 				addDetailMessage("card error: " + e.getMessage());
 				return null;
@@ -465,8 +413,7 @@ public class Controller {
 		return null;
 	}
 
-	private Object performAuthnSignOperation(
-			AuthSignRequestMessage authSignRequestMessage) throws Exception {
+	private Object performAuthnSignOperation(AuthSignRequestMessage authSignRequestMessage) throws Exception {
 		addDetailMessage("auth sign request...");
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
 		waitForEIdCardPcsc();
@@ -487,13 +434,11 @@ public class Controller {
 		}
 
 		try {
-			byte[] signatureValue = this.pcscEidSpi.sign(digestValue,
-					digestAlgo, PcscEid.AUTHN_KEY_ID, false);
+			byte[] signatureValue = this.pcscEidSpi.sign(digestValue, digestAlgo, PcscEid.AUTHN_KEY_ID, false);
 			if (logoff) {
 				this.pcscEidSpi.logoff();
 			}
-			AuthSignResponseMessage authSignResponseMessage = new AuthSignResponseMessage(
-					signatureValue);
+			AuthSignResponseMessage authSignResponseMessage = new AuthSignResponseMessage(signatureValue);
 			Object responseMessage = sendMessage(authSignResponseMessage);
 			return responseMessage;
 		} finally {
@@ -502,8 +447,7 @@ public class Controller {
 	}
 
 	private SignCertificatesDataMessage performSignCertificatesOperation(
-			SignCertificatesRequestMessage signCertificatesRequestMessage)
-			throws Exception {
+			SignCertificatesRequestMessage signCertificatesRequestMessage) throws Exception {
 		addDetailMessage("performing sign certificates retrieval operation...");
 
 		boolean includeIdentity = signCertificatesRequestMessage.includeIdentity;
@@ -528,18 +472,15 @@ public class Controller {
 			setStatusMessage(Status.NORMAL, MESSAGE_ID.READING_IDENTITY);
 
 			if (includeIdentity || includeAddress || includePhoto) {
-				boolean response = this.view.privacyQuestion(includeAddress,
-						includePhoto, null);
+				boolean response = this.view.privacyQuestion(includeAddress, includePhoto, null);
 				if (false == response) {
 					this.pcscEidSpi.close();
 					if (false == this.runtime.gotoCancelPage()) {
-						throw new SecurityException(
-								"user did not agree to release eID identity information");
+						throw new SecurityException("user did not agree to release eID identity information");
 					} else {
 						// TODO
 						// return new FinishedMessage(ErrorCode.USER_CANCELED);
-						throw new SecurityException(
-								"user did not agree to release eID identity information");
+						throw new SecurityException("user did not agree to release eID identity information");
 					}
 				}
 				// FIXME: repeat for screen reader, perhaps we need pre- and
@@ -550,32 +491,25 @@ public class Controller {
 
 			signCertFile = this.pcscEidSpi.readFile(PcscEid.SIGN_CERT_FILE_ID);
 			addDetailMessage("size sign cert file: " + signCertFile.length);
-			citizenCaCertFile = this.pcscEidSpi
-					.readFile(PcscEid.CA_CERT_FILE_ID);
-			addDetailMessage("size citizen CA cert file: "
-					+ citizenCaCertFile.length);
-			rootCaCertFile = this.pcscEidSpi
-					.readFile(PcscEid.ROOT_CERT_FILE_ID);
+			citizenCaCertFile = this.pcscEidSpi.readFile(PcscEid.CA_CERT_FILE_ID);
+			addDetailMessage("size citizen CA cert file: " + citizenCaCertFile.length);
+			rootCaCertFile = this.pcscEidSpi.readFile(PcscEid.ROOT_CERT_FILE_ID);
 			addDetailMessage("size root CA cert file: " + rootCaCertFile.length);
 			if (includeIdentity || includeAddress || includePhoto) {
 				if (includeIdentity) {
 					addDetailMessage("reading identity file");
-					identityFile = this.pcscEidSpi
-							.readFile(PcscEid.IDENTITY_FILE_ID);
+					identityFile = this.pcscEidSpi.readFile(PcscEid.IDENTITY_FILE_ID);
 					if (includeIntegrityData) {
 						addDetailMessage("reading identity sign file");
-						identitySignFile = this.pcscEidSpi
-								.readFile(PcscEid.IDENTITY_SIGN_FILE_ID);
+						identitySignFile = this.pcscEidSpi.readFile(PcscEid.IDENTITY_SIGN_FILE_ID);
 					}
 				}
 				if (includeAddress) {
 					addDetailMessage("reading address file");
-					addressFile = this.pcscEidSpi
-							.readFile(PcscEid.ADDRESS_FILE_ID);
+					addressFile = this.pcscEidSpi.readFile(PcscEid.ADDRESS_FILE_ID);
 					if (includeIntegrityData) {
 						addDetailMessage("reading address sign file");
-						addressSignFile = this.pcscEidSpi
-								.readFile(PcscEid.ADDRESS_SIGN_FILE_ID);
+						addressSignFile = this.pcscEidSpi.readFile(PcscEid.ADDRESS_SIGN_FILE_ID);
 					}
 				}
 				if (includePhoto) {
@@ -584,28 +518,25 @@ public class Controller {
 				}
 				if (null != identitySignFile || null != addressSignFile) {
 					addDetailMessage("reading NRN certificate file");
-					nrnCertFile = this.pcscEidSpi
-							.readFile(PcscEid.RRN_CERT_FILE_ID);
+					nrnCertFile = this.pcscEidSpi.readFile(PcscEid.RRN_CERT_FILE_ID);
 				}
 			}
 		} finally {
 			this.pcscEidSpi.close();
 		}
-		SignCertificatesDataMessage signCertificatesDataMessage = new SignCertificatesDataMessage(
-				signCertFile, citizenCaCertFile, rootCaCertFile, identityFile,
-				addressFile, photoFile, identitySignFile, addressSignFile,
-				nrnCertFile);
+		SignCertificatesDataMessage signCertificatesDataMessage = new SignCertificatesDataMessage(signCertFile,
+				citizenCaCertFile, rootCaCertFile, identityFile, addressFile, photoFile, identitySignFile,
+				addressSignFile, nrnCertFile);
 		return signCertificatesDataMessage;
 	}
 
 	/**
 	 * We're not accepting MD5.
 	 */
-	private final String[] SUPPORTED_FILES_DIGEST_ALGOS = new String[] {
-			"SHA1", "SHA-1", "SHA-256", "SHA-384", "SHA-512" };
+	private final String[] SUPPORTED_FILES_DIGEST_ALGOS = new String[] { "SHA1", "SHA-1", "SHA-256", "SHA-384",
+			"SHA-512" };
 
-	private Object performFilesDigestOperation(String filesDigestAlgo)
-			throws NoSuchAlgorithmException, IOException {
+	private Object performFilesDigestOperation(String filesDigestAlgo) throws NoSuchAlgorithmException, IOException {
 		addDetailMessage("files digest algorithm: " + filesDigestAlgo);
 
 		boolean isSupportedFilesDigestAlgo = false;
@@ -616,12 +547,10 @@ public class Controller {
 			}
 		}
 		if (false == isSupportedFilesDigestAlgo) {
-			throw new SecurityException("files digest algo not supported: "
-					+ filesDigestAlgo);
+			throw new SecurityException("files digest algo not supported: " + filesDigestAlgo);
 		}
 
-		MessageDigest messageDigest = MessageDigest
-				.getInstance(filesDigestAlgo);
+		MessageDigest messageDigest = MessageDigest.getInstance(filesDigestAlgo);
 
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.SELECT_FILES);
 		JFileChooser fileChooser = new JFileChooser();
@@ -644,16 +573,13 @@ public class Controller {
 		final int BUFFER_SIZE = 1024 * 10;
 		int progressMax = (int) (totalSize / BUFFER_SIZE);
 		this.view.resetProgress(progressMax);
-		addDetailMessage("total data size to digest: " + (totalSize / 1024)
-				+ " KiB");
+		addDetailMessage("total data size to digest: " + (totalSize / 1024) + " KiB");
 		for (File selectedFile : selectedFiles) {
 			fileDigestsDataMessage.fileDigestInfos.add(filesDigestAlgo);
 			long fileSize = selectedFile.length();
-			addDetailMessage(selectedFile.getAbsolutePath() + ": "
-					+ (fileSize / 1024) + " KiB");
+			addDetailMessage(selectedFile.getAbsolutePath() + ": " + (fileSize / 1024) + " KiB");
 			FileInputStream fileInputStream = new FileInputStream(selectedFile);
-			DigestInputStream digestInputStream = new DigestInputStream(
-					fileInputStream, messageDigest);
+			DigestInputStream digestInputStream = new DigestInputStream(fileInputStream, messageDigest);
 			byte[] buffer = new byte[BUFFER_SIZE];
 			while (-1 != digestInputStream.read(buffer)) {
 				this.view.increaseProgress();
@@ -700,15 +626,13 @@ public class Controller {
 
 	}
 
-	private FinishedMessage performEidSignOperation(
-			SignRequestMessage signRequestMessage) throws Exception {
+	private FinishedMessage performEidSignOperation(SignRequestMessage signRequestMessage) throws Exception {
 		boolean logoff = signRequestMessage.logoff;
 		boolean removeCard = signRequestMessage.removeCard;
 		boolean requireSecureReader = signRequestMessage.requireSecureReader;
 		addDetailMessage("logoff: " + logoff);
 		addDetailMessage("remove card: " + removeCard);
-		addDetailMessage("require secure smart card reader: "
-				+ requireSecureReader);
+		addDetailMessage("require secure smart card reader: " + requireSecureReader);
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
 
 		waitForEIdCardPcsc();
@@ -719,9 +643,7 @@ public class Controller {
 		byte[] citizenCaCertFile;
 		byte[] rootCaCertFile;
 		try {
-			int response = this.view.confirmSigning(
-					signRequestMessage.description,
-					signRequestMessage.digestAlgo);
+			int response = this.view.confirmSigning(signRequestMessage.description, signRequestMessage.digestAlgo);
 			if (JOptionPane.OK_OPTION != response) {
 				if (false == this.runtime.gotoCancelPage()) {
 					throw new SecurityException("sign operation aborted");
@@ -730,9 +652,8 @@ public class Controller {
 				}
 			}
 			try {
-				signatureValue = this.pcscEidSpi.sign(
-						signRequestMessage.digestValue,
-						signRequestMessage.digestAlgo, requireSecureReader);
+				signatureValue = this.pcscEidSpi.sign(signRequestMessage.digestValue, signRequestMessage.digestAlgo,
+						requireSecureReader);
 			} catch (UserCancelledException e) {
 				if (false == this.runtime.gotoCancelPage()) {
 					throw new SecurityException("sign operation aborted");
@@ -748,10 +669,8 @@ public class Controller {
 			this.view.resetProgress(maxProgress);
 
 			signCertFile = this.pcscEidSpi.readFile(PcscEid.SIGN_CERT_FILE_ID);
-			citizenCaCertFile = this.pcscEidSpi
-					.readFile(PcscEid.CA_CERT_FILE_ID);
-			rootCaCertFile = this.pcscEidSpi
-					.readFile(PcscEid.ROOT_CERT_FILE_ID);
+			citizenCaCertFile = this.pcscEidSpi.readFile(PcscEid.CA_CERT_FILE_ID);
+			rootCaCertFile = this.pcscEidSpi.readFile(PcscEid.ROOT_CERT_FILE_ID);
 
 			this.view.setProgressIndeterminate();
 
@@ -766,8 +685,8 @@ public class Controller {
 			this.pcscEidSpi.close();
 		}
 
-		SignatureDataMessage signatureDataMessage = new SignatureDataMessage(
-				signatureValue, signCertFile, citizenCaCertFile, rootCaCertFile);
+		SignatureDataMessage signatureDataMessage = new SignatureDataMessage(signatureValue, signCertFile,
+				citizenCaCertFile, rootCaCertFile);
 		Object responseMessage = sendMessage(signatureDataMessage);
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");
@@ -776,9 +695,8 @@ public class Controller {
 		return finishedMessage;
 	}
 
-	private void administration(boolean unblockPin, boolean changePin,
-			boolean logoff, boolean removeCard, boolean requireSecureReader)
-			throws Exception {
+	private void administration(boolean unblockPin, boolean changePin, boolean logoff, boolean removeCard,
+			boolean requireSecureReader) throws Exception {
 		waitForEIdCardPcsc();
 		try {
 			if (unblockPin) {
@@ -805,8 +723,7 @@ public class Controller {
 		}
 	}
 
-	private Object performEidAuthnOperation(
-			AuthenticationRequestMessage authnRequest) throws Exception {
+	private Object performEidAuthnOperation(AuthenticationRequestMessage authnRequest) throws Exception {
 		byte[] challenge = authnRequest.challenge;
 		boolean removeCard = authnRequest.removeCard;
 		boolean includeHostname = authnRequest.includeHostname;
@@ -823,26 +740,22 @@ public class Controller {
 		boolean requireSecureReader = authnRequest.requireSecureReader;
 		String transactionMessage = authnRequest.transactionMessage;
 		if (challenge.length < 20) {
-			throw new SecurityException(
-					"challenge should be at least 20 bytes long.");
+			throw new SecurityException("challenge should be at least 20 bytes long.");
 		}
 		addDetailMessage("include hostname: " + includeHostname);
 		addDetailMessage("include inet address: " + includeInetAddress);
 		addDetailMessage("remove card after authn: " + removeCard);
 		addDetailMessage("logoff: " + logoff);
 		addDetailMessage("pre-logoff: " + preLogoff);
-		addDetailMessage("TLS session Id channel binding: "
-				+ sessionIdChannelBinding);
-		addDetailMessage("server certificate channel binding: "
-				+ serverCertificateChannelBinding);
+		addDetailMessage("TLS session Id channel binding: " + sessionIdChannelBinding);
+		addDetailMessage("server certificate channel binding: " + serverCertificateChannelBinding);
 		addDetailMessage("include identity: " + includeIdentity);
 		addDetailMessage("include certificates: " + includeCertificates);
 		addDetailMessage("include address: " + includeAddress);
 		addDetailMessage("include photo: " + includePhoto);
 
 		addDetailMessage("include integrity data: " + includeIntegrityData);
-		addDetailMessage("require secure smart card reader: "
-				+ requireSecureReader);
+		addDetailMessage("require secure smart card reader: " + requireSecureReader);
 		addDetailMessage("transaction message: " + transactionMessage);
 
 		String hostname;
@@ -876,8 +789,7 @@ public class Controller {
 
 		byte[] encodedServerCertificate;
 		if (serverCertificateChannelBinding) {
-			encodedServerCertificate = AppletSSLSocketFactory
-					.getActualEncodedServerCertificate();
+			encodedServerCertificate = AppletSSLSocketFactory.getActualEncodedServerCertificate();
 		} else {
 			encodedServerCertificate = null;
 		}
@@ -889,19 +801,16 @@ public class Controller {
 
 		byte[] salt = this.pcscEidSpi.getChallenge(20);
 
-		AuthenticationContract authenticationContract = new AuthenticationContract(
-				salt, hostname, inetAddress, sessionId,
-				encodedServerCertificate, challenge);
+		AuthenticationContract authenticationContract = new AuthenticationContract(salt, hostname, inetAddress,
+				sessionId, encodedServerCertificate, challenge);
 		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
 
 		if (includeIdentity || includeAddress || includePhoto) {
-			boolean response = this.view.privacyQuestion(includeAddress,
-					includePhoto, null);
+			boolean response = this.view.privacyQuestion(includeAddress, includePhoto, null);
 			if (false == response) {
 				this.pcscEidSpi.close();
 				if (false == this.runtime.gotoCancelPage()) {
-					throw new SecurityException(
-							"user did not agree to release eID identity information");
+					throw new SecurityException("user did not agree to release eID identity information");
 				} else {
 					return new FinishedMessage(ErrorCode.USER_CANCELED);
 				}
@@ -930,8 +839,7 @@ public class Controller {
 				this.pcscEidSpi.logoff();
 			}
 			try {
-				signatureValue = this.pcscEidSpi.signAuthn(toBeSigned,
-						requireSecureReader);
+				signatureValue = this.pcscEidSpi.signAuthn(toBeSigned, requireSecureReader);
 			} catch (UserCancelledException e) {
 				if (false == this.runtime.gotoCancelPage()) {
 					throw e;
@@ -941,9 +849,8 @@ public class Controller {
 			}
 
 			if (null != transactionMessage) {
-				signedTransactionMessage = this.pcscEidSpi
-						.signTransactionMessage(transactionMessage,
-								requireSecureReader);
+				signedTransactionMessage = this.pcscEidSpi.signTransactionMessage(transactionMessage,
+						requireSecureReader);
 			}
 
 			int maxProgress = 0;
@@ -977,32 +884,27 @@ public class Controller {
 			TaskRunner taskRunner = new TaskRunner(this.pcscEidSpi, this.view);
 			authnCertFile = taskRunner.run(new Task<byte[]>() {
 				public byte[] run() throws Exception {
-					return Controller.this.pcscEidSpi
-							.readFile(PcscEid.AUTHN_CERT_FILE_ID);
+					return Controller.this.pcscEidSpi.readFile(PcscEid.AUTHN_CERT_FILE_ID);
 				}
 			});
 			citCaCertFile = taskRunner.run(new Task<byte[]>() {
 				public byte[] run() throws Exception {
-					return Controller.this.pcscEidSpi
-							.readFile(PcscEid.CA_CERT_FILE_ID);
+					return Controller.this.pcscEidSpi.readFile(PcscEid.CA_CERT_FILE_ID);
 				}
 			});
 			rootCaCertFile = taskRunner.run(new Task<byte[]>() {
 				public byte[] run() throws Exception {
-					return Controller.this.pcscEidSpi
-							.readFile(PcscEid.ROOT_CERT_FILE_ID);
+					return Controller.this.pcscEidSpi.readFile(PcscEid.ROOT_CERT_FILE_ID);
 				}
 			});
 			if (includeCertificates) {
 				addDetailMessage("reading sign certificate file...");
 				signCertFile = taskRunner.run(new Task<byte[]>() {
 					public byte[] run() throws Exception {
-						return Controller.this.pcscEidSpi
-								.readFile(PcscEid.SIGN_CERT_FILE_ID);
+						return Controller.this.pcscEidSpi.readFile(PcscEid.SIGN_CERT_FILE_ID);
 					}
 				});
-				addDetailMessage("size non-repud cert file: "
-						+ signCertFile.length);
+				addDetailMessage("size non-repud cert file: " + signCertFile.length);
 			}
 
 			if (includeIdentity || includeAddress || includePhoto) {
@@ -1012,24 +914,21 @@ public class Controller {
 			if (includeIdentity) {
 				identityData = taskRunner.run(new Task<byte[]>() {
 					public byte[] run() throws Exception {
-						return Controller.this.pcscEidSpi
-								.readFile(PcscEid.IDENTITY_FILE_ID);
+						return Controller.this.pcscEidSpi.readFile(PcscEid.IDENTITY_FILE_ID);
 					}
 				});
 			}
 			if (includeAddress) {
 				addressData = taskRunner.run(new Task<byte[]>() {
 					public byte[] run() throws Exception {
-						return Controller.this.pcscEidSpi
-								.readFile(PcscEid.ADDRESS_FILE_ID);
+						return Controller.this.pcscEidSpi.readFile(PcscEid.ADDRESS_FILE_ID);
 					}
 				});
 			}
 			if (includePhoto) {
 				photoData = taskRunner.run(new Task<byte[]>() {
 					public byte[] run() throws Exception {
-						return Controller.this.pcscEidSpi
-								.readFile(PcscEid.PHOTO_FILE_ID);
+						return Controller.this.pcscEidSpi.readFile(PcscEid.PHOTO_FILE_ID);
 					}
 				});
 			}
@@ -1037,23 +936,20 @@ public class Controller {
 				if (includeIdentity) {
 					identitySignatureData = taskRunner.run(new Task<byte[]>() {
 						public byte[] run() throws Exception {
-							return Controller.this.pcscEidSpi
-									.readFile(PcscEid.IDENTITY_SIGN_FILE_ID);
+							return Controller.this.pcscEidSpi.readFile(PcscEid.IDENTITY_SIGN_FILE_ID);
 						}
 					});
 				}
 				if (includeAddress) {
 					addressSignatureData = taskRunner.run(new Task<byte[]>() {
 						public byte[] run() throws Exception {
-							return Controller.this.pcscEidSpi
-									.readFile(PcscEid.ADDRESS_SIGN_FILE_ID);
+							return Controller.this.pcscEidSpi.readFile(PcscEid.ADDRESS_SIGN_FILE_ID);
 						}
 					});
 				}
 				rrnCertData = taskRunner.run(new Task<byte[]>() {
 					public byte[] run() throws Exception {
-						return Controller.this.pcscEidSpi
-								.readFile(PcscEid.RRN_CERT_FILE_ID);
+						return Controller.this.pcscEidSpi.readFile(PcscEid.RRN_CERT_FILE_ID);
 					}
 				});
 			}
@@ -1071,11 +967,10 @@ public class Controller {
 			this.pcscEidSpi.close();
 		}
 
-		AuthenticationDataMessage authenticationDataMessage = new AuthenticationDataMessage(
-				salt, sessionId, signatureValue, authnCertFile, citCaCertFile,
-				rootCaCertFile, signCertFile, identityData, addressData,
-				photoData, identitySignatureData, addressSignatureData,
-				rrnCertData, encodedServerCertificate, signedTransactionMessage);
+		AuthenticationDataMessage authenticationDataMessage = new AuthenticationDataMessage(salt, sessionId,
+				signatureValue, authnCertFile, citCaCertFile, rootCaCertFile, signCertFile, identityData, addressData,
+				photoData, identitySignatureData, addressSignatureData, rrnCertData, encodedServerCertificate,
+				signedTransactionMessage);
 		Object responseMessage = sendMessage(authenticationDataMessage);
 		return responseMessage;
 	}
@@ -1088,8 +983,7 @@ public class Controller {
 		addDetailMessage("OS: " + System.getProperty("os.name"));
 		addDetailMessage("OS version: " + System.getProperty("os.version"));
 		addDetailMessage("OS arch: " + System.getProperty("os.arch"));
-		addDetailMessage("Web application URL: "
-				+ this.runtime.getDocumentBase());
+		addDetailMessage("Web application URL: " + this.runtime.getDocumentBase());
 		addDetailMessage("Current time: " + new Date());
 
 		/*
@@ -1099,8 +993,7 @@ public class Controller {
 		if (null != cookieHandler) {
 			URL documentBase = this.runtime.getApplet().getDocumentBase();
 			try {
-				Map<String, List<String>> headers = cookieHandler.get(
-						documentBase.toURI(),
+				Map<String, List<String>> headers = cookieHandler.get(documentBase.toURI(),
 						new HashMap<String, List<String>>());
 				List<String> cookieHeaderValues = headers.get("Cookie");
 				if (null == cookieHeaderValues || cookieHeaderValues.isEmpty()) {
@@ -1128,21 +1021,18 @@ public class Controller {
 		}
 	}
 
-	private FinishedMessage performEidIdentificationOperation(
-			boolean includeAddress, boolean includePhoto,
-			boolean includeIntegrityData, boolean includeCertificates,
-			boolean removeCard, String identityDataUsage) throws Exception {
+	private FinishedMessage performEidIdentificationOperation(boolean includeAddress, boolean includePhoto,
+			boolean includeIntegrityData, boolean includeCertificates, boolean removeCard, String identityDataUsage)
+					throws Exception {
 		waitForEIdCardPcsc();
 
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.READING_IDENTITY);
 
-		boolean response = this.view.privacyQuestion(includeAddress,
-				includePhoto, identityDataUsage);
+		boolean response = this.view.privacyQuestion(includeAddress, includePhoto, identityDataUsage);
 		if (false == response) {
 			this.pcscEidSpi.close();
 			if (false == this.runtime.gotoCancelPage()) {
-				throw new SecurityException(
-						"user did not agree to release eID identity information");
+				throw new SecurityException("user did not agree to release eID identity information");
 			} else {
 				return new FinishedMessage(ErrorCode.USER_CANCELED);
 			}
@@ -1185,8 +1075,7 @@ public class Controller {
 		 */
 		byte[] idFile = taskRunner.run(new Task<byte[]>() {
 			public byte[] run() throws Exception {
-				return Controller.this.pcscEidSpi
-						.readFile(PcscEid.IDENTITY_FILE_ID);
+				return Controller.this.pcscEidSpi.readFile(PcscEid.IDENTITY_FILE_ID);
 			}
 		});
 		addDetailMessage("Size identity file: " + idFile.length);
@@ -1197,8 +1086,7 @@ public class Controller {
 			addressFile = taskRunner.run(new Task<byte[]>() {
 
 				public byte[] run() throws Exception {
-					return Controller.this.pcscEidSpi
-							.readFile(PcscEid.ADDRESS_FILE_ID);
+					return Controller.this.pcscEidSpi.readFile(PcscEid.ADDRESS_FILE_ID);
 				}
 			});
 			addDetailMessage("Size address file: " + addressFile.length);
@@ -1210,8 +1098,7 @@ public class Controller {
 			photoFile = taskRunner.run(new Task<byte[]>() {
 
 				public byte[] run() throws Exception {
-					return Controller.this.pcscEidSpi
-							.readFile(PcscEid.PHOTO_FILE_ID);
+					return Controller.this.pcscEidSpi.readFile(PcscEid.PHOTO_FILE_ID);
 				}
 			});
 		}
@@ -1224,32 +1111,28 @@ public class Controller {
 			addDetailMessage("Read identity signature file...");
 			identitySignatureFile = taskRunner.run(new Task<byte[]>() {
 				public byte[] run() throws Exception {
-					return Controller.this.pcscEidSpi
-							.readFile(PcscEid.IDENTITY_SIGN_FILE_ID);
+					return Controller.this.pcscEidSpi.readFile(PcscEid.IDENTITY_SIGN_FILE_ID);
 				}
 			});
 			if (includeAddress) {
 				addDetailMessage("Read address signature file...");
 				addressSignatureFile = taskRunner.run(new Task<byte[]>() {
 					public byte[] run() throws Exception {
-						return Controller.this.pcscEidSpi
-								.readFile(PcscEid.ADDRESS_SIGN_FILE_ID);
+						return Controller.this.pcscEidSpi.readFile(PcscEid.ADDRESS_SIGN_FILE_ID);
 					}
 				});
 			}
 			addDetailMessage("Read national registry certificate file...");
 			rrnCertFile = taskRunner.run(new Task<byte[]>() {
 				public byte[] run() throws Exception {
-					return Controller.this.pcscEidSpi
-							.readFile(PcscEid.RRN_CERT_FILE_ID);
+					return Controller.this.pcscEidSpi.readFile(PcscEid.RRN_CERT_FILE_ID);
 				}
 			});
 			addDetailMessage("size RRN cert file: " + rrnCertFile.length);
 			addDetailMessage("reading root certificate file...");
 			rootCertFile = taskRunner.run(new Task<byte[]>() {
 				public byte[] run() throws Exception {
-					return Controller.this.pcscEidSpi
-							.readFile(PcscEid.ROOT_CERT_FILE_ID);
+					return Controller.this.pcscEidSpi.readFile(PcscEid.ROOT_CERT_FILE_ID);
 				}
 			});
 			addDetailMessage("size Root CA cert file: " + rootCertFile.length);
@@ -1262,8 +1145,7 @@ public class Controller {
 			addDetailMessage("reading authn certificate file...");
 			authnCertFile = taskRunner.run(new Task<byte[]>() {
 				public byte[] run() throws Exception {
-					return Controller.this.pcscEidSpi
-							.readFile(PcscEid.AUTHN_CERT_FILE_ID);
+					return Controller.this.pcscEidSpi.readFile(PcscEid.AUTHN_CERT_FILE_ID);
 				}
 			});
 			addDetailMessage("size authn cert file: " + authnCertFile.length);
@@ -1271,8 +1153,7 @@ public class Controller {
 			addDetailMessage("reading sign certificate file...");
 			signCertFile = taskRunner.run(new Task<byte[]>() {
 				public byte[] run() throws Exception {
-					return Controller.this.pcscEidSpi
-							.readFile(PcscEid.SIGN_CERT_FILE_ID);
+					return Controller.this.pcscEidSpi.readFile(PcscEid.SIGN_CERT_FILE_ID);
 				}
 			});
 			addDetailMessage("size non-repud cert file: " + signCertFile.length);
@@ -1280,8 +1161,7 @@ public class Controller {
 			addDetailMessage("reading citizen CA certificate file...");
 			caCertFile = taskRunner.run(new Task<byte[]>() {
 				public byte[] run() throws Exception {
-					return Controller.this.pcscEidSpi
-							.readFile(PcscEid.CA_CERT_FILE_ID);
+					return Controller.this.pcscEidSpi.readFile(PcscEid.CA_CERT_FILE_ID);
 				}
 			});
 			addDetailMessage("size Cit CA cert file: " + caCertFile.length);
@@ -1290,12 +1170,10 @@ public class Controller {
 				addDetailMessage("reading root certificate file...");
 				rootCertFile = taskRunner.run(new Task<byte[]>() {
 					public byte[] run() throws Exception {
-						return Controller.this.pcscEidSpi
-								.readFile(PcscEid.ROOT_CERT_FILE_ID);
+						return Controller.this.pcscEidSpi.readFile(PcscEid.ROOT_CERT_FILE_ID);
 					}
 				});
-				addDetailMessage("size Root CA cert file: "
-						+ rootCertFile.length);
+				addDetailMessage("size Root CA cert file: " + rootCertFile.length);
 			}
 		}
 
@@ -1310,12 +1188,10 @@ public class Controller {
 
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.TRANSMITTING_IDENTITY);
 
-		IdentityDataMessage identityData = new IdentityDataMessage(idFile,
-				addressFile, photoFile, identitySignatureFile,
-				addressSignatureFile, rrnCertFile, rootCertFile, authnCertFile,
-				signCertFile, caCertFile);
-		FinishedMessage finishedMessage = sendMessage(identityData,
-				FinishedMessage.class);
+		IdentityDataMessage identityData = new IdentityDataMessage(idFile, addressFile, photoFile,
+				identitySignatureFile, addressSignatureFile, rrnCertFile, rootCertFile, authnCertFile, signCertFile,
+				caCertFile);
+		FinishedMessage finishedMessage = sendMessage(identityData, FinishedMessage.class);
 		return finishedMessage;
 	}
 
@@ -1333,25 +1209,20 @@ public class Controller {
 
 	public static final String APPLET_SERVICE_PARAM = "AppletService";
 
-	private HttpURLConnection getServerConnection()
-			throws MalformedURLException, IOException {
-		String appletServiceParam = this.runtime
-				.getParameter(APPLET_SERVICE_PARAM);
+	private HttpURLConnection getServerConnection() throws MalformedURLException, IOException {
+		String appletServiceParam = this.runtime.getParameter(APPLET_SERVICE_PARAM);
 		if (null == appletServiceParam) {
-			throw new IllegalArgumentException("no " + APPLET_SERVICE_PARAM
-					+ " parameter specified");
+			throw new IllegalArgumentException("no " + APPLET_SERVICE_PARAM + " parameter specified");
 		}
 
-		URL appletServiceUrl = new URL(this.runtime.getDocumentBase(),
-				appletServiceParam);
+		URL appletServiceUrl = new URL(this.runtime.getDocumentBase(), appletServiceParam);
 
 		/*
 		 * Install our SSL socket factory.
 		 */
 		AppletSSLSocketFactory.installSocketFactory(this.view);
 
-		HttpURLConnection connection = (HttpURLConnection) appletServiceUrl
-				.openConnection();
+		HttpURLConnection connection = (HttpURLConnection) appletServiceUrl.openConnection();
 		return connection;
 	}
 

@@ -162,8 +162,7 @@ public class XAdESSignatureFacet implements SignatureFacet {
 	 * @param signaturePolicyService
 	 *            the optional signature policy service used for XAdES-EPES.
 	 */
-	public XAdESSignatureFacet(DigestAlgo digestAlgorithm,
-			SignaturePolicyService signaturePolicyService) {
+	public XAdESSignatureFacet(DigestAlgo digestAlgorithm, SignaturePolicyService signaturePolicyService) {
 		this(new LocalClock(), digestAlgorithm, signaturePolicyService);
 	}
 
@@ -202,8 +201,7 @@ public class XAdESSignatureFacet implements SignatureFacet {
 	 * @param signaturePolicyService
 	 *            the optional signature policy service used for XAdES-EPES.
 	 */
-	public XAdESSignatureFacet(Clock clock, DigestAlgo digestAlgorithm,
-			SignaturePolicyService signaturePolicyService) {
+	public XAdESSignatureFacet(Clock clock, DigestAlgo digestAlgorithm, SignaturePolicyService signaturePolicyService) {
 		this.clock = clock;
 		this.digestAlgorithm = digestAlgorithm;
 		this.signaturePolicyService = signaturePolicyService;
@@ -211,45 +209,36 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		try {
 			this.datatypeFactory = DatatypeFactory.newInstance();
 		} catch (DatatypeConfigurationException e) {
-			throw new RuntimeException("datatype config error: "
-					+ e.getMessage(), e);
+			throw new RuntimeException("datatype config error: " + e.getMessage(), e);
 		}
 		this.xadesObjectFactory = new ObjectFactory();
 		this.xmldsigObjectFactory = new be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory();
 		this.xadesNamespacePrefixMapper = new XAdESNamespacePrefixMapper();
 		try {
-			JAXBContext jaxbContext = JAXBContext
-					.newInstance(ObjectFactory.class);
+			JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
 			this.marshaller = jaxbContext.createMarshaller();
-			this.marshaller.setProperty(
-					"com.sun.xml.bind.namespacePrefixMapper",
-					this.xadesNamespacePrefixMapper);
+			this.marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", this.xadesNamespacePrefixMapper);
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
 		}
 		this.dataObjectFormatMimeTypes = new HashMap<String, String>();
 	}
 
-	public void postSign(Element signatureElement,
-			List<X509Certificate> signingCertificateChain) {
+	public void postSign(Element signatureElement, List<X509Certificate> signingCertificateChain) {
 		LOG.debug("postSign");
 	}
 
-	public void preSign(XMLSignatureFactory signatureFactory,
-			Document document, String signatureId,
-			List<X509Certificate> signingCertificateChain,
-			List<Reference> references, List<XMLObject> objects)
-			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+	public void preSign(XMLSignatureFactory signatureFactory, Document document, String signatureId,
+			List<X509Certificate> signingCertificateChain, List<Reference> references, List<XMLObject> objects)
+					throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		LOG.debug("preSign");
 
 		// QualifyingProperties
-		QualifyingPropertiesType qualifyingProperties = this.xadesObjectFactory
-				.createQualifyingPropertiesType();
+		QualifyingPropertiesType qualifyingProperties = this.xadesObjectFactory.createQualifyingPropertiesType();
 		qualifyingProperties.setTarget("#" + signatureId);
 
 		// SignedProperties
-		SignedPropertiesType signedProperties = this.xadesObjectFactory
-				.createSignedPropertiesType();
+		SignedPropertiesType signedProperties = this.xadesObjectFactory.createSignedPropertiesType();
 		String signedPropertiesId;
 		if (null != this.idSignedProperties) {
 			signedPropertiesId = this.idSignedProperties;
@@ -262,40 +251,32 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		// SignedSignatureProperties
 		SignedSignaturePropertiesType signedSignatureProperties = this.xadesObjectFactory
 				.createSignedSignaturePropertiesType();
-		signedProperties
-				.setSignedSignatureProperties(signedSignatureProperties);
+		signedProperties.setSignedSignatureProperties(signedSignatureProperties);
 
 		// SigningTime
-		GregorianCalendar signingTime = new GregorianCalendar(
-				TimeZone.getTimeZone("Z"));
+		GregorianCalendar signingTime = new GregorianCalendar(TimeZone.getTimeZone("Z"));
 		Date currentClockValue = this.clock.getTime();
 		signingTime.setTime(currentClockValue);
-		XMLGregorianCalendar xmlGregorianCalendar = this.datatypeFactory
-				.newXMLGregorianCalendar(signingTime);
+		XMLGregorianCalendar xmlGregorianCalendar = this.datatypeFactory.newXMLGregorianCalendar(signingTime);
 		xmlGregorianCalendar.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
 		signedSignatureProperties.setSigningTime(xmlGregorianCalendar);
 
 		// SigningCertificate
-		if (null == signingCertificateChain
-				|| signingCertificateChain.isEmpty()) {
+		if (null == signingCertificateChain || signingCertificateChain.isEmpty()) {
 			throw new RuntimeException("no signing certificate chain available");
 		}
 		X509Certificate signingCertificate = signingCertificateChain.get(0);
-		CertIDType signingCertificateId = getCertID(signingCertificate,
-				this.xadesObjectFactory, this.xmldsigObjectFactory,
-				this.digestAlgorithm, this.issuerNameNoReverseOrder);
-		CertIDListType signingCertificates = this.xadesObjectFactory
-				.createCertIDListType();
+		CertIDType signingCertificateId = getCertID(signingCertificate, this.xadesObjectFactory,
+				this.xmldsigObjectFactory, this.digestAlgorithm, this.issuerNameNoReverseOrder);
+		CertIDListType signingCertificates = this.xadesObjectFactory.createCertIDListType();
 		signingCertificates.getCert().add(signingCertificateId);
 		signedSignatureProperties.setSigningCertificate(signingCertificates);
 
 		// ClaimedRole
 		if (null != this.role && false == this.role.isEmpty()) {
-			SignerRoleType signerRole = this.xadesObjectFactory
-					.createSignerRoleType();
+			SignerRoleType signerRole = this.xadesObjectFactory.createSignerRoleType();
 			signedSignatureProperties.setSignerRole(signerRole);
-			ClaimedRolesListType claimedRolesList = this.xadesObjectFactory
-					.createClaimedRolesListType();
+			ClaimedRolesListType claimedRolesList = this.xadesObjectFactory.createClaimedRolesListType();
 			signerRole.setClaimedRoles(claimedRolesList);
 			AnyType claimedRole = this.xadesObjectFactory.createAnyType();
 			claimedRole.getContent().add(this.role);
@@ -306,52 +287,39 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		if (null != this.signaturePolicyService) {
 			SignaturePolicyIdentifierType signaturePolicyIdentifier = this.xadesObjectFactory
 					.createSignaturePolicyIdentifierType();
-			signedSignatureProperties
-					.setSignaturePolicyIdentifier(signaturePolicyIdentifier);
+			signedSignatureProperties.setSignaturePolicyIdentifier(signaturePolicyIdentifier);
 
-			SignaturePolicyIdType signaturePolicyId = this.xadesObjectFactory
-					.createSignaturePolicyIdType();
+			SignaturePolicyIdType signaturePolicyId = this.xadesObjectFactory.createSignaturePolicyIdType();
 			signaturePolicyIdentifier.setSignaturePolicyId(signaturePolicyId);
 
-			ObjectIdentifierType objectIdentifier = this.xadesObjectFactory
-					.createObjectIdentifierType();
+			ObjectIdentifierType objectIdentifier = this.xadesObjectFactory.createObjectIdentifierType();
 			signaturePolicyId.setSigPolicyId(objectIdentifier);
-			IdentifierType identifier = this.xadesObjectFactory
-					.createIdentifierType();
+			IdentifierType identifier = this.xadesObjectFactory.createIdentifierType();
 			objectIdentifier.setIdentifier(identifier);
-			identifier.setValue(this.signaturePolicyService
-					.getSignaturePolicyIdentifier());
-			objectIdentifier.setDescription(this.signaturePolicyService
-					.getSignaturePolicyDescription());
+			identifier.setValue(this.signaturePolicyService.getSignaturePolicyIdentifier());
+			objectIdentifier.setDescription(this.signaturePolicyService.getSignaturePolicyDescription());
 
-			byte[] signaturePolicyDocumentData = this.signaturePolicyService
-					.getSignaturePolicyDocument();
-			DigestAlgAndValueType sigPolicyHash = getDigestAlgAndValue(
-					signaturePolicyDocumentData, this.xadesObjectFactory,
-					this.xmldsigObjectFactory, this.digestAlgorithm);
+			byte[] signaturePolicyDocumentData = this.signaturePolicyService.getSignaturePolicyDocument();
+			DigestAlgAndValueType sigPolicyHash = getDigestAlgAndValue(signaturePolicyDocumentData,
+					this.xadesObjectFactory, this.xmldsigObjectFactory, this.digestAlgorithm);
 			signaturePolicyId.setSigPolicyHash(sigPolicyHash);
 
-			String signaturePolicyDownloadUrl = this.signaturePolicyService
-					.getSignaturePolicyDownloadUrl();
+			String signaturePolicyDownloadUrl = this.signaturePolicyService.getSignaturePolicyDownloadUrl();
 			if (null != signaturePolicyDownloadUrl) {
 				SigPolicyQualifiersListType sigPolicyQualifiers = this.xadesObjectFactory
 						.createSigPolicyQualifiersListType();
 				signaturePolicyId.setSigPolicyQualifiers(sigPolicyQualifiers);
 
-				AnyType sigPolicyQualifier = this.xadesObjectFactory
-						.createAnyType();
-				sigPolicyQualifiers.getSigPolicyQualifier().add(
-						sigPolicyQualifier);
+				AnyType sigPolicyQualifier = this.xadesObjectFactory.createAnyType();
+				sigPolicyQualifiers.getSigPolicyQualifier().add(sigPolicyQualifier);
 
-				JAXBElement<String> spUriElement = this.xadesObjectFactory
-						.createSPURI(signaturePolicyDownloadUrl);
+				JAXBElement<String> spUriElement = this.xadesObjectFactory.createSPURI(signaturePolicyDownloadUrl);
 				sigPolicyQualifier.getContent().add(spUriElement);
 			}
 		} else if (this.signaturePolicyImplied) {
 			SignaturePolicyIdentifierType signaturePolicyIdentifier = this.xadesObjectFactory
 					.createSignaturePolicyIdentifierType();
-			signedSignatureProperties
-					.setSignaturePolicyIdentifier(signaturePolicyIdentifier);
+			signedSignatureProperties.setSignaturePolicyIdentifier(signaturePolicyIdentifier);
 
 			signaturePolicyIdentifier.setSignaturePolicyImplied("");
 		}
@@ -360,64 +328,49 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		if (false == this.dataObjectFormatMimeTypes.isEmpty()) {
 			SignedDataObjectPropertiesType signedDataObjectProperties = this.xadesObjectFactory
 					.createSignedDataObjectPropertiesType();
-			signedProperties
-					.setSignedDataObjectProperties(signedDataObjectProperties);
+			signedProperties.setSignedDataObjectProperties(signedDataObjectProperties);
 
-			List<DataObjectFormatType> dataObjectFormats = signedDataObjectProperties
-					.getDataObjectFormat();
-			for (Map.Entry<String, String> dataObjectFormatMimeType : this.dataObjectFormatMimeTypes
-					.entrySet()) {
-				DataObjectFormatType dataObjectFormat = this.xadesObjectFactory
-						.createDataObjectFormatType();
-				dataObjectFormat.setObjectReference("#"
-						+ dataObjectFormatMimeType.getKey());
-				dataObjectFormat.setMimeType(dataObjectFormatMimeType
-						.getValue());
+			List<DataObjectFormatType> dataObjectFormats = signedDataObjectProperties.getDataObjectFormat();
+			for (Map.Entry<String, String> dataObjectFormatMimeType : this.dataObjectFormatMimeTypes.entrySet()) {
+				DataObjectFormatType dataObjectFormat = this.xadesObjectFactory.createDataObjectFormatType();
+				dataObjectFormat.setObjectReference("#" + dataObjectFormatMimeType.getKey());
+				dataObjectFormat.setMimeType(dataObjectFormatMimeType.getValue());
 				dataObjectFormats.add(dataObjectFormat);
 			}
 		}
 
 		// marshall XAdES QualifyingProperties
-		Node qualifyingPropertiesNode = marshallQualifyingProperties(document,
-				this.xadesObjectFactory, qualifyingProperties);
+		Node qualifyingPropertiesNode = marshallQualifyingProperties(document, this.xadesObjectFactory,
+				qualifyingProperties);
 
 		// add XAdES ds:Object
 		List<XMLStructure> xadesObjectContent = new LinkedList<XMLStructure>();
 		xadesObjectContent.add(new DOMStructure(qualifyingPropertiesNode));
-		XMLObject xadesObject = signatureFactory.newXMLObject(
-				xadesObjectContent, null, null, null);
+		XMLObject xadesObject = signatureFactory.newXMLObject(xadesObjectContent, null, null, null);
 		objects.add(xadesObject);
 
 		// add XAdES ds:Reference
-		DigestMethod digestMethod = signatureFactory.newDigestMethod(
-				digestAlgorithm.getXmlAlgoId(), null);
+		DigestMethod digestMethod = signatureFactory.newDigestMethod(digestAlgorithm.getXmlAlgoId(), null);
 		List<Transform> transforms = new LinkedList<Transform>();
-		Transform exclusiveTransform = signatureFactory
-				.newTransform(CanonicalizationMethod.INCLUSIVE,
-						(TransformParameterSpec) null);
+		Transform exclusiveTransform = signatureFactory.newTransform(CanonicalizationMethod.INCLUSIVE,
+				(TransformParameterSpec) null);
 		transforms.add(exclusiveTransform);
-		Reference reference = signatureFactory.newReference("#"
-				+ signedPropertiesId, digestMethod, transforms, XADES_TYPE,
-				null);
+		Reference reference = signatureFactory.newReference("#" + signedPropertiesId, digestMethod, transforms,
+				XADES_TYPE, null);
 		references.add(reference);
 	}
 
-	private Node marshallQualifyingProperties(Document document,
-			ObjectFactory xadesObjectFactory,
+	private Node marshallQualifyingProperties(Document document, ObjectFactory xadesObjectFactory,
 			QualifyingPropertiesType qualifyingProperties) {
 		Node marshallNode = document.createElement("marshall-node");
 		try {
-			this.marshaller.marshal(xadesObjectFactory
-					.createQualifyingProperties(qualifyingProperties),
-					marshallNode);
+			this.marshaller.marshal(xadesObjectFactory.createQualifyingProperties(qualifyingProperties), marshallNode);
 		} catch (JAXBException e) {
 			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
 		}
-		Element qualifyingPropertiesElement = (Element) marshallNode
-				.getFirstChild();
+		Element qualifyingPropertiesElement = (Element) marshallNode.getFirstChild();
 		Element signedPropertiesElement = (Element) qualifyingPropertiesElement
-				.getElementsByTagNameNS("http://uri.etsi.org/01903/v1.3.2#",
-						"SignedProperties").item(0);
+				.getElementsByTagNameNS("http://uri.etsi.org/01903/v1.3.2#", "SignedProperties").item(0);
 		signedPropertiesElement.setIdAttribute("Id", true);
 		return qualifyingPropertiesElement;
 	}
@@ -431,26 +384,20 @@ public class XAdESSignatureFacet implements SignatureFacet {
 	 * @param digestAlgorithm
 	 * @return
 	 */
-	public static DigestAlgAndValueType getDigestAlgAndValue(
-			byte[] data,
-			ObjectFactory xadesObjectFactory,
+	public static DigestAlgAndValueType getDigestAlgAndValue(byte[] data, ObjectFactory xadesObjectFactory,
 			be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory xmldsigObjectFactory,
 			DigestAlgo digestAlgorithm) {
-		DigestAlgAndValueType digestAlgAndValue = xadesObjectFactory
-				.createDigestAlgAndValueType();
+		DigestAlgAndValueType digestAlgAndValue = xadesObjectFactory.createDigestAlgAndValueType();
 
-		DigestMethodType digestMethod = xmldsigObjectFactory
-				.createDigestMethodType();
+		DigestMethodType digestMethod = xmldsigObjectFactory.createDigestMethodType();
 		digestAlgAndValue.setDigestMethod(digestMethod);
 		digestMethod.setAlgorithm(digestAlgorithm.getXmlAlgoId());
 
 		MessageDigest messageDigest;
 		try {
-			messageDigest = MessageDigest.getInstance(digestAlgorithm
-					.getAlgoId());
+			messageDigest = MessageDigest.getInstance(digestAlgorithm.getAlgoId());
 		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("message digest algo error: "
-					+ e.getMessage(), e);
+			throw new RuntimeException("message digest algo error: " + e.getMessage(), e);
 		}
 		byte[] digestValue = messageDigest.digest(data);
 		digestAlgAndValue.setDigestValue(digestValue);
@@ -467,15 +414,12 @@ public class XAdESSignatureFacet implements SignatureFacet {
 	 * @param digestAlgorithm
 	 * @return
 	 */
-	public static CertIDType getCertID(
-			X509Certificate certificate,
-			ObjectFactory xadesObjectFactory,
+	public static CertIDType getCertID(X509Certificate certificate, ObjectFactory xadesObjectFactory,
 			be.fedict.eid.applet.service.signer.jaxb.xmldsig.ObjectFactory xmldsigObjectFactory,
 			DigestAlgo digestAlgorithm, boolean issuerNameNoReverseOrder) {
 		CertIDType certId = xadesObjectFactory.createCertIDType();
 
-		X509IssuerSerialType issuerSerial = xmldsigObjectFactory
-				.createX509IssuerSerialType();
+		X509IssuerSerialType issuerSerial = xmldsigObjectFactory.createX509IssuerSerialType();
 		certId.setIssuerSerial(issuerSerial);
 		String issuerName;
 		if (issuerNameNoReverseOrder) {
@@ -487,11 +431,9 @@ public class XAdESSignatureFacet implements SignatureFacet {
 				 * 
 				 * XXX: not correct according to RFC 4514.
 				 */
-				issuerName = PrincipalUtil.getIssuerX509Principal(certificate)
-						.getName().replace(",", ", ");
+				issuerName = PrincipalUtil.getIssuerX509Principal(certificate).getName().replace(",", ", ");
 			} catch (CertificateEncodingException e) {
-				throw new RuntimeException("cert encoding error: "
-						+ e.getMessage(), e);
+				throw new RuntimeException("cert encoding error: " + e.getMessage(), e);
 			}
 		} else {
 			issuerName = certificate.getIssuerX500Principal().toString();
@@ -503,12 +445,10 @@ public class XAdESSignatureFacet implements SignatureFacet {
 		try {
 			encodedCertificate = certificate.getEncoded();
 		} catch (CertificateEncodingException e) {
-			throw new RuntimeException("certificate encoding error: "
-					+ e.getMessage(), e);
+			throw new RuntimeException("certificate encoding error: " + e.getMessage(), e);
 		}
-		DigestAlgAndValueType certDigest = getDigestAlgAndValue(
-				encodedCertificate, xadesObjectFactory, xmldsigObjectFactory,
-				digestAlgorithm);
+		DigestAlgAndValueType certDigest = getDigestAlgAndValue(encodedCertificate, xadesObjectFactory,
+				xmldsigObjectFactory, digestAlgorithm);
 		certId.setCertDigest(certDigest);
 
 		return certId;
@@ -549,8 +489,7 @@ public class XAdESSignatureFacet implements SignatureFacet {
 	 * @param xadesNamespacePrefix
 	 */
 	public void setXadesNamespacePrefix(String xadesNamespacePrefix) {
-		this.xadesNamespacePrefixMapper
-				.setXAdESNamespacePrefix(xadesNamespacePrefix);
+		this.xadesNamespacePrefixMapper.setXAdESNamespacePrefix(xadesNamespacePrefix);
 	}
 
 	/**

@@ -25,8 +25,7 @@ import org.apache.commons.logging.LogFactory;
 
 import be.fedict.eid.applet.shared.AbstractProtocolMessage;
 
-public class HandlesQualifier extends AnnotationLiteral<Handles> implements
-		Handles {
+public class HandlesQualifier extends AnnotationLiteral<Handles>implements Handles {
 
 	private static final long serialVersionUID = 1L;
 
@@ -34,8 +33,7 @@ public class HandlesQualifier extends AnnotationLiteral<Handles> implements
 
 	private final Class<? extends AbstractProtocolMessage> messageClass;
 
-	public HandlesQualifier(
-			Class<? extends AbstractProtocolMessage> messageClass) {
+	public HandlesQualifier(Class<? extends AbstractProtocolMessage> messageClass) {
 		this.messageClass = messageClass;
 		LOG.debug("message class: " + this.messageClass.getName());
 	}
@@ -44,5 +42,4 @@ public class HandlesQualifier extends AnnotationLiteral<Handles> implements
 	public Class<? extends AbstractProtocolMessage> value() {
 		return this.messageClass;
 	}
-
 }

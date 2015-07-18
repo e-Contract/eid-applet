@@ -63,8 +63,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class OOXMLURIDereferencer implements URIDereferencer {
 
-	private static final Log LOG = LogFactory
-			.getLog(OOXMLURIDereferencer.class);
+	private static final Log LOG = LogFactory.getLog(OOXMLURIDereferencer.class);
 
 	private final URL ooxmlUrl;
 
@@ -82,18 +81,15 @@ public class OOXMLURIDereferencer implements URIDereferencer {
 
 	protected OOXMLURIDereferencer(byte[] ooxmlDocument, URL ooxmlUrl) {
 		if (null == ooxmlUrl && null == ooxmlDocument) {
-			throw new IllegalArgumentException(
-					"need some reference to the OOXML document");
+			throw new IllegalArgumentException("need some reference to the OOXML document");
 		}
 		this.ooxmlUrl = ooxmlUrl;
 		this.ooxmlDocument = ooxmlDocument;
-		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory
-				.getInstance();
+		XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
 		this.baseUriDereferencer = xmlSignatureFactory.getURIDereferencer();
 	}
 
-	public Data dereference(URIReference uriReference, XMLCryptoContext context)
-			throws URIReferenceException {
+	public Data dereference(URIReference uriReference, XMLCryptoContext context) throws URIReferenceException {
 		if (null == uriReference) {
 			throw new NullPointerException("URIReference cannot be null");
 		}
@@ -111,10 +107,8 @@ public class OOXMLURIDereferencer implements URIDereferencer {
 		try {
 			InputStream dataInputStream = findDataInputStream(uri);
 			if (null == dataInputStream) {
-				LOG.debug("cannot resolve, delegating to base DOM URI dereferencer: "
-						+ uri);
-				return this.baseUriDereferencer.dereference(uriReference,
-						context);
+				LOG.debug("cannot resolve, delegating to base DOM URI dereferencer: " + uri);
+				return this.baseUriDereferencer.dereference(uriReference, context);
 			}
 			return new OctetStreamData(dataInputStream, uri, null);
 		} catch (IOException e) {
@@ -140,8 +134,7 @@ public class OOXMLURIDereferencer implements URIDereferencer {
 		} else {
 			ooxmlInputStream = this.ooxmlUrl.openStream();
 		}
-		ZipArchiveInputStream ooxmlZipInputStream = new ZipArchiveInputStream(
-				ooxmlInputStream, "UTF8", true, true);
+		ZipArchiveInputStream ooxmlZipInputStream = new ZipArchiveInputStream(ooxmlInputStream, "UTF8", true, true);
 		ZipEntry zipEntry;
 		while (null != (zipEntry = ooxmlZipInputStream.getNextZipEntry())) {
 			if (zipEntry.getName().equals(entryName)) {

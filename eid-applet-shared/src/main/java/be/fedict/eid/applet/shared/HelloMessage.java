@@ -31,11 +31,9 @@ import be.fedict.eid.applet.shared.protocol.ProtocolState;
  * @author Frank Cornelis
  * 
  */
-@ResponsesAllowed({ IdentificationRequestMessage.class,
-		CheckClientMessage.class, AuthenticationRequestMessage.class,
-		AdministrationMessage.class, SignRequestMessage.class,
-		FilesDigestRequestMessage.class, SignCertificatesRequestMessage.class,
-		FinishedMessage.class })
+@ResponsesAllowed({ IdentificationRequestMessage.class, CheckClientMessage.class, AuthenticationRequestMessage.class,
+		AdministrationMessage.class, SignRequestMessage.class, FilesDigestRequestMessage.class,
+		SignCertificatesRequestMessage.class, FinishedMessage.class })
 @StartRequestMessage(ProtocolState.INIT)
 public class HelloMessage extends AbstractProtocolMessage {
 	@HttpHeader(TYPE_HTTP_HEADER)

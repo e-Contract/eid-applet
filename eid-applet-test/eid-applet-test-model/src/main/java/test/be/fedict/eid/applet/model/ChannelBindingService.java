@@ -18,7 +18,6 @@
 
 package test.be.fedict.eid.applet.model;
 
-public interface ChannelBindingService extends
-		be.fedict.eid.applet.service.spi.ChannelBindingService {
+public interface ChannelBindingService extends be.fedict.eid.applet.service.spi.ChannelBindingService {
 
 }

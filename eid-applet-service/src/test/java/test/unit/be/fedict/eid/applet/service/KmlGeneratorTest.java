@@ -130,11 +130,9 @@ public class KmlGeneratorTest {
 		address.zip = "1234";
 		address.municipality = "Test Municipality";
 
-		BufferedImage image = new BufferedImage(140, 200,
-				BufferedImage.TYPE_INT_RGB);
+		BufferedImage image = new BufferedImage(140, 200, BufferedImage.TYPE_INT_RGB);
 		Graphics2D graphics = (Graphics2D) image.getGraphics();
-		RenderingHints renderingHints = new RenderingHints(
-				RenderingHints.KEY_TEXT_ANTIALIASING,
+		RenderingHints renderingHints = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING,
 				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		graphics.setRenderingHints(renderingHints);
 		graphics.setColor(Color.WHITE);

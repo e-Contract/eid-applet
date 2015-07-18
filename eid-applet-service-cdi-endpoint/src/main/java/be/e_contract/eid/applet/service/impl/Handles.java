@@ -29,9 +29,8 @@ import be.fedict.eid.applet.shared.AbstractProtocolMessage;
 
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD, ElementType.TYPE, ElementType.FIELD,
-		ElementType.PARAMETER })
+@Target({ ElementType.METHOD, ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER })
 public @interface Handles {
 
-	Class<? extends AbstractProtocolMessage> value();
+	Class<? extends AbstractProtocolMessage>value();
 }

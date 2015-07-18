@@ -40,8 +40,7 @@ public class CCIDTerminal {
 	private int deviceNumber;
 	private byte sequenceNumber = 0;
 
-	public CCIDTerminal(usb_device usbDevice,
-			usb_interface_descriptor usbInterfaceDescriptor) {
+	public CCIDTerminal(usb_device usbDevice, usb_interface_descriptor usbInterfaceDescriptor) {
 		this.usbDevice = usbDevice;
 		this.usbInterfaceDescriptor = usbInterfaceDescriptor;
 		this.setEndPoints();
@@ -97,37 +96,30 @@ public class CCIDTerminal {
 		if (usbDevHandle == null)
 			usbDevHandle = LibUSB.libUSB.usb_open(usbDevice);
 		if (usbDevHandle == null) {
-			LOG.debug(String.format("usb_open device failed (%d/%d)",
-					busNumber, deviceNumber));
-			throw new RuntimeException(String.format(
-					"usb_open device failed (%d/%d)", busNumber, deviceNumber));
+			LOG.debug(String.format("usb_open device failed (%d/%d)", busNumber, deviceNumber));
+			throw new RuntimeException(String.format("usb_open device failed (%d/%d)", busNumber, deviceNumber));
 		}
 		rv = LibUSB.libUSB.usb_set_configuration(usbDevHandle, 1);
 		if (rv != 0) {
-			LOG.debug(String.format("set configuration failed (%d/%d): %d",
-					busNumber, deviceNumber, rv));
-			throw new RuntimeException(String.format(
-					"set configuration failed (%d/%d): %d", busNumber,
-					deviceNumber, rv));
+			LOG.debug(String.format("set configuration failed (%d/%d): %d", busNumber, deviceNumber, rv));
+			throw new RuntimeException(
+					String.format("set configuration failed (%d/%d): %d", busNumber, deviceNumber, rv));
 		}
 		/*
 		 * rv = LibUSB.libUSB.usb_set_altinterface(usbDevHandle,
 		 * usbInterfaceDescriptor.bAlternateSetting); if (rv != 0) {
-		 * LOG.debug(String
-		 * .format("set alternative interface failed (%d/%d): %d",
+		 * LOG.debug(String .format(
+		 * "set alternative interface failed (%d/%d): %d",
 		 * busNumber,deviceNumber,rv)); throw new
 		 * RuntimeException(String.format(
 		 * "set alternative interface failed (%d/%d): %d",
 		 * busNumber,deviceNumber,rv)); }
 		 */
-		rv = LibUSB.libUSB.usb_claim_interface(usbDevHandle,
-				usbInterfaceDescriptor.bInterfaceNumber);
+		rv = LibUSB.libUSB.usb_claim_interface(usbDevHandle, usbInterfaceDescriptor.bInterfaceNumber);
 		if (rv != 0) {
-			LOG.debug(String.format("claim interface failed (%d/%d): %d",
-					busNumber, deviceNumber, rv));
-			throw new RuntimeException(String.format(
-					"claim interface failed (%d/%d): %d", busNumber,
-					deviceNumber, rv));
+			LOG.debug(String.format("claim interface failed (%d/%d): %d", busNumber, deviceNumber, rv));
+			throw new RuntimeException(
+					String.format("claim interface failed (%d/%d): %d", busNumber, deviceNumber, rv));
 		}
 	}
 
@@ -139,11 +131,11 @@ public class CCIDTerminal {
 	// read from BulkIn Endpoint
 	public byte[] read() {
 		byte[] buffer = new byte[256];
-		int rv = LibUSB.libUSB.usb_bulk_read(usbDevHandle, endPointBulkIn,
-				buffer, buffer.length, 5000); // timeout: 5 secs
+		int rv = LibUSB.libUSB.usb_bulk_read(usbDevHandle, endPointBulkIn, buffer, buffer.length, 5000); // timeout:
+																											// 5
+																											// secs
 		if (rv < 0) {
-			LOG.debug(String.format("read failed (%d/%d): %d", busNumber,
-					deviceNumber, rv & 0xFF));
+			LOG.debug(String.format("read failed (%d/%d): %d", busNumber, deviceNumber, rv & 0xFF));
 			throw new RuntimeException("read failed");
 		}
 		return buffer;
@@ -151,11 +143,11 @@ public class CCIDTerminal {
 
 	// write to BulkOut Endpoint
 	public void write(byte[] buffer) {
-		int rv = LibUSB.libUSB.usb_bulk_write(usbDevHandle, endPointBulkOut,
-				buffer, buffer.length, 5000); // timeout: 5 secs
+		int rv = LibUSB.libUSB.usb_bulk_write(usbDevHandle, endPointBulkOut, buffer, buffer.length, 5000); // timeout:
+																											// 5
+																											// secs
 		if (rv < 0) {
-			LOG.debug(String.format("write failed (%d/%d): %d", busNumber,
-					deviceNumber, rv & 0xFF));
+			LOG.debug(String.format("write failed (%d/%d): %d", busNumber, deviceNumber, rv & 0xFF));
 			throw new RuntimeException("write failed");
 		}
 		LOG.debug(String.format("write. Buffer: %s", bytesToString(buffer)));
@@ -189,23 +181,19 @@ public class CCIDTerminal {
 			if ((answer[7] & (byte) 0x40) == (byte) 0x40) { // 01 0000 00
 															// bmCommandStatus
 															// 1: Error
-				LOG.debug(String.format("receive failed (%d/%d): %x",
-						busNumber, deviceNumber, answer[8]));
-				throw new RuntimeException(String.format(
-						"receive failed (%d/%d): %x", busNumber, deviceNumber,
-						answer[8]));
+				LOG.debug(String.format("receive failed (%d/%d): %x", busNumber, deviceNumber, answer[8]));
+				throw new RuntimeException(
+						String.format("receive failed (%d/%d): %x", busNumber, deviceNumber, answer[8]));
 			}
 			if ((answer[7] & (byte) 0x80) == (byte) 0x80)
 				;
 			{ // 10 0000 00 bmCommandStatus 1: Time extension requested
-				LOG.debug(String.format(
-						"receive: time extension requested (%d/%d)", busNumber,
-						deviceNumber));
+				LOG.debug(String.format("receive: time extension requested (%d/%d)", busNumber, deviceNumber));
 			}
 		} while ((answer[7] & (byte) 0x80) == (byte) 0x80);
 		LOG.debug(String.format("receive. Answer: %s", bytesToString(answer)));
-		int datalength = (answer[1] & 0xFF) + ((answer[2] & 0xFF) << 8)
-				+ ((answer[3] & 0xFF) << 16) + ((answer[4] & 0xFF) << 24);
+		int datalength = (answer[1] & 0xFF) + ((answer[2] & 0xFF) << 8) + ((answer[3] & 0xFF) << 16)
+				+ ((answer[4] & 0xFF) << 24);
 		byte[] data = new byte[datalength];
 		for (int i = 0; i < datalength; i++) {
 			data[i] = answer[10 + i];

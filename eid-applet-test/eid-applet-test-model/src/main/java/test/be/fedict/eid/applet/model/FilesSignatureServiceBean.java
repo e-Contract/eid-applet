@@ -44,17 +44,14 @@ import be.fedict.eid.applet.service.spi.IdentityDTO;
 @EJB(name = "java:global/test/FilesSignatureServiceBean", beanInterface = FilesSignatureService.class)
 public class FilesSignatureServiceBean implements FilesSignatureService {
 
-	private static final Log LOG = LogFactory
-			.getLog(FilesSignatureServiceBean.class);
+	private static final Log LOG = LogFactory.getLog(FilesSignatureServiceBean.class);
 
-	public void postSign(byte[] signatureValue,
-			List<X509Certificate> signingCertificateChain) {
+	public void postSign(byte[] signatureValue, List<X509Certificate> signingCertificateChain) {
 		LOG.debug("postSign");
 
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}
@@ -66,16 +63,13 @@ public class FilesSignatureServiceBean implements FilesSignatureService {
 		session.setAttribute("SigningCertificateChain", signingCertificateChain);
 	}
 
-	public DigestInfo preSign(List<DigestInfo> digestInfos,
-			List<X509Certificate> signingCertificateChain,
-			IdentityDTO identity, AddressDTO address, byte[] photo)
-			throws NoSuchAlgorithmException {
+	public DigestInfo preSign(List<DigestInfo> digestInfos, List<X509Certificate> signingCertificateChain,
+			IdentityDTO identity, AddressDTO address, byte[] photo) throws NoSuchAlgorithmException {
 		LOG.debug("preSign");
 
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}
@@ -106,15 +100,13 @@ public class FilesSignatureServiceBean implements FilesSignatureService {
 		LOG.debug("getFileDigestAlgoritm()");
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}
 
 		HttpSession session = httpServletRequest.getSession();
-		String filesDigestAlgo = (String) session
-				.getAttribute("filesDigestAlgo");
+		String filesDigestAlgo = (String) session.getAttribute("filesDigestAlgo");
 		LOG.debug("files digest algo: " + filesDigestAlgo);
 
 		return filesDigestAlgo;

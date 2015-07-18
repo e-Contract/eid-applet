@@ -112,8 +112,7 @@ public class Identity implements Serializable {
 
 	@TlvField(13)
 	@ConvertData(GenderDataConvertor.class)
-	@Mapping({
-			@MapsTo(value = IdentityDTO.class, field = "male", convertor = GenderToMaleValueConvertor.class),
+	@Mapping({ @MapsTo(value = IdentityDTO.class, field = "male", convertor = GenderToMaleValueConvertor.class),
 			@MapsTo(value = IdentityDTO.class, field = "female", convertor = GenderToFemaleValueConvertor.class) })
 	public Gender gender;
 

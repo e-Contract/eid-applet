@@ -33,17 +33,13 @@ import org.apache.commons.logging.LogFactory;
 
 @Stateless
 @EJB(name = "java:global/test/SecureClientEnvironmentCheckerBean", beanInterface = SecureClientEnvironmentChecker.class)
-public class SecureClientEnvironmentCheckerBean implements
-		SecureClientEnvironmentChecker {
+public class SecureClientEnvironmentCheckerBean implements SecureClientEnvironmentChecker {
 
-	private static final Log LOG = LogFactory
-			.getLog(SecureClientEnvironmentCheckerBean.class);
+	private static final Log LOG = LogFactory.getLog(SecureClientEnvironmentCheckerBean.class);
 
-	public void checkSecureClientEnvironment(String javaVersion,
-			String javaVendor, String osName, String osArch, String osVersion,
-			String userAgent, String navigatorAppName,
-			String navigatorAppVersion, String navigatorUserAgent,
-			String remoteAddress, Integer sslKeySize, String sslCipherSuite,
+	public void checkSecureClientEnvironment(String javaVersion, String javaVendor, String osName, String osArch,
+			String osVersion, String userAgent, String navigatorAppName, String navigatorAppVersion,
+			String navigatorUserAgent, String remoteAddress, Integer sslKeySize, String sslCipherSuite,
 			List<String> readerList) throws SecurityException {
 		LOG.debug("java version: " + javaVersion);
 		LOG.debug("java vendor: " + javaVendor);
@@ -61,8 +57,7 @@ public class SecureClientEnvironmentCheckerBean implements
 
 		HttpServletRequest httpServletRequest;
 		try {
-			httpServletRequest = (HttpServletRequest) PolicyContext
-					.getContext("javax.servlet.http.HttpServletRequest");
+			httpServletRequest = (HttpServletRequest) PolicyContext.getContext("javax.servlet.http.HttpServletRequest");
 		} catch (PolicyContextException e) {
 			throw new RuntimeException("JACC error: " + e.getMessage());
 		}
@@ -78,10 +73,8 @@ public class SecureClientEnvironmentCheckerBean implements
 		httpSession.setAttribute("ClientSslCipherSuite", sslCipherSuite);
 		httpSession.setAttribute("ClientRemoteAddress", remoteAddress);
 		httpSession.setAttribute("ClientSslKeySize", sslKeySize);
-		httpSession
-				.setAttribute("ClientNavigatorUserAgent", navigatorUserAgent);
+		httpSession.setAttribute("ClientNavigatorUserAgent", navigatorUserAgent);
 		httpSession.setAttribute("ClientNavigatorAppName", navigatorAppName);
-		httpSession.setAttribute("ClientNavigatorAppVersion",
-				navigatorAppVersion);
+		httpSession.setAttribute("ClientNavigatorAppVersion", navigatorAppVersion);
 	}
 }
