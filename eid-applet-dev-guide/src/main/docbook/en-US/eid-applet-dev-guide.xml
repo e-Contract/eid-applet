@@ -14,7 +14,7 @@
 			<year>2008-2013</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>2 April 2015</releaseinfo>
+		<releaseinfo>19 July 2015</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Frank</firstname>
@@ -120,6 +120,9 @@
 				Java 6 platform. We can only give advice on how to configure Java 6
 				on your operatings system.
 			</para>
+			<para>
+				On Mac OS X 10.10.4, the eID Applet runs out of the box using the Oracle JVM 1.8.
+			</para>
 		</section>
 		<section>
 			<title>Linux</title>
@@ -171,6 +174,10 @@
 					the SELinux error:
 					<prompt>sudo chcon -t $JAVA_HOME/jre/lib/i386/client/libjvm.so
 					</prompt>
+				</para>
+				<para>
+					Under Fedora 22 you probably also need to run:
+					<prompt>setsebool -P unconfined_mozilla_plugin_transition 0</prompt>
 				</para>
 			</section>
 		</section>
@@ -2108,6 +2115,20 @@ public class IdentifyCDIServlet extends AppletServiceCDIServlet {
 		</exclusion>
 	</exclusions>
 </dependency>]]></programlisting>
+		<para>
+			The <code>eid-applet-js</code> artifact offers easy integration for JSF web applications.
+			Simply add the following maven dependency:
+		</para>
+		<programlisting language="XML"><![CDATA[<dependency>
+	<groupId>be.fedict.eid-applet</groupId>
+	<artifactId>eid-applet-js</artifactId>
+</dependency>]]></programlisting>
+		<para>
+			And within your JSF pages you can use the following to include the required Javascripts:
+		</para>
+		<programlisting language="XML"><![CDATA[<h:outputScript library="eid-applet" name="deployJava.js" target="head" />
+<h:outputScript library="eid-applet" name="deploy-eid-applet.js"
+	target="head" />]]></programlisting>
 	</section>
 	<section>
 		<title>eID Applet Web Application Deployment</title>
