@@ -1,3 +1,9 @@
+1.2.3 - 19 Jul 2015
+	* Ubuntu/Debian fix for Oracle JVM
+	* various i18n fixes
+	* applet dialogs always stay on top
+	* JSF Javascript JAR support
+
 1.2.2 - 26 Apr 2015
 	* Ubuntu fix for Oracle JVM
 	* CDI API authorization support
