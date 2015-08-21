@@ -671,6 +671,23 @@ public class PcscEid extends Observable {
 				idx++;
 				ccidFeatures.put(tag, new CCIDFeature(tag, featureIoctl));
 			}
+			if (ccidFeatures.isEmpty() && onMsWindows && isPPDUCardTerminal(this.cardTerminal.getName())) {
+				// Windows 10 work-around
+				this.view.addDetailMessage("trying PPDU interface...");
+				ResponseAPDU responseAPDU = this.cardChannel
+						.transmit(new CommandAPDU((byte) 0xff, (byte) 0xc2, 0x01, 0x00, new byte[] {}, 32));
+				this.view.addDetailMessage("PPDU response: " + Integer.toHexString(responseAPDU.getSW()));
+				if (responseAPDU.getSW() == 0x9000) {
+					features = responseAPDU.getData();
+					for (byte feature : features) {
+						ccidFeatures.put(feature, new CCIDFeature(feature));
+						this.view.addDetailMessage("PPDU feature: " + feature);
+					}
+					return ccidFeatures;
+				} else {
+					return Collections.EMPTY_MAP;
+				}
+			}
 			return ccidFeatures;
 		} catch (CardException e) {
 			this.view.addDetailMessage("GET_FEATURES IOCTL error: " + e.getMessage());
