@@ -1,3 +1,6 @@
+1.2.5 - 4 Sep 2015
+	* fix SCARD_RESET issue on Windows 10
+
 1.2.4 - 23 Aug 2015
 	* fix for Digipass PPDU readers on Windows 10
 
