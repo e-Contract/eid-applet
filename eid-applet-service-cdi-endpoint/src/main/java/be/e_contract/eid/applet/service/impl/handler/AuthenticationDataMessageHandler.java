@@ -225,8 +225,13 @@ public class AuthenticationDataMessageHandler implements MessageHandler<Authenti
 					throw new SecurityException("eID card has expired");
 				}
 			}
+			
+			String userId = UserIdentifierUtil.getUserId(message.authnCert);
+			if (!userId.equals(identity.getNationalNumber())) {
+				throw new SecurityException("mismatch between identity data and auth cert");
+			}
 
-			this.identityEvent.select(contextQualifier).fire(new IdentityEvent(identity, address, message.photoData));
+			this.identityEvent.select(contextQualifier).fire(new IdentityEvent(identity, address, message.photoData, message.authnCert));
 		}
 
 		String userId = UserIdentifierUtil.getUserId(message.authnCert);

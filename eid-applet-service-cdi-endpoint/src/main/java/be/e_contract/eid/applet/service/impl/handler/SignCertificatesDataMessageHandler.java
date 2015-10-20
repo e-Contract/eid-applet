@@ -152,7 +152,7 @@ public class SignCertificatesDataMessageHandler implements MessageHandler<SignCe
 				}
 			}
 
-			this.identityEvent.select(contextQualifier).fire(new IdentityEvent(identity, address, message.photoData));
+			this.identityEvent.select(contextQualifier).fire(new IdentityEvent(identity, address, message.photoData, null));
 		}
 
 		SignatureDigestEvent signatureDigestEvent = new SignatureDigestEvent(message.certificateChain);

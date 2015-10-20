@@ -236,6 +236,9 @@ public class Controller implements Serializable {
 			if (this.removeCard) {
 				identificationRequest.removeCard();
 			}
+			if (this.includeCertificates) {
+				identificationRequest.includeCertificates();
+			}
 			break;
 		}
 		case AUTHENTICATION: {

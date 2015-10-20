@@ -18,6 +18,8 @@
 
 package be.fedict.eid.applet.service.cdi;
 
+import java.security.cert.X509Certificate;
+
 import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.Identity;
 
@@ -28,11 +30,14 @@ public class IdentityEvent {
 	private final Address address;
 
 	private final byte[] photo;
+	
+	private final X509Certificate authenticationCertificate;
 
-	public IdentityEvent(Identity identity, Address address, byte[] photo) {
+	public IdentityEvent(Identity identity, Address address, byte[] photo, X509Certificate authenticationCertificate) {
 		this.identity = identity;
 		this.address = address;
 		this.photo = photo;
+		this.authenticationCertificate = authenticationCertificate;
 	}
 
 	public Identity getIdentity() {
@@ -46,4 +51,8 @@ public class IdentityEvent {
 	public byte[] getPhoto() {
 		return this.photo;
 	}
+
+	public X509Certificate getAuthenticationCertificate() {
+		return this.authenticationCertificate;
+	}	
 }

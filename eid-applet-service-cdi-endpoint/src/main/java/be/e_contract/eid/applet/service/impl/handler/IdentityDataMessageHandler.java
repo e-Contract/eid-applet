@@ -54,6 +54,7 @@ import be.fedict.eid.applet.service.cdi.IdentificationEvent;
 import be.fedict.eid.applet.service.cdi.IdentityEvent;
 import be.fedict.eid.applet.service.cdi.SecurityAuditEvent;
 import be.fedict.eid.applet.service.cdi.SecurityAuditEvent.Incident;
+import be.fedict.eid.applet.service.impl.UserIdentifierUtil;
 import be.fedict.eid.applet.service.impl.handler.MessageHandler;
 import be.fedict.eid.applet.service.impl.tlv.TlvParser;
 import be.fedict.eid.applet.service.spi.CertificateSecurityException;
@@ -151,8 +152,19 @@ public class IdentityDataMessageHandler implements MessageHandler<IdentityDataMe
 				throw new SecurityException("eID card has expired");
 			}
 		}
+		
+		X509Certificate authCert = null;
+		if (null != message.authnCertFile) {
+			authCert = getCertificate(message.authnCertFile);
+			if (null != authCert) {
+				String userId = UserIdentifierUtil.getUserId(authCert);
+				if (!userId.equals(identity.getNationalNumber())) {
+					throw new SecurityException("mismatch between identity data and auth cert");
+				}
+			}
+		}
 
-		this.identityEvent.select(contextQualifier).fire(new IdentityEvent(identity, address, message.photoFile));
+		this.identityEvent.select(contextQualifier).fire(new IdentityEvent(identity, address, message.photoFile, authCert));
 		return new FinishedMessage();
 	}
 
