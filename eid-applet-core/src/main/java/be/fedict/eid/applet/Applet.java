@@ -494,7 +494,7 @@ public class Applet extends JApplet {
 	private class AppletThread implements Runnable {
 		public void run() {
 			addDetailMessage("eID Applet - Copyright (C) 2008-2013 FedICT.");
-			addDetailMessage("Copyright (C) 2014-2015 e-Contract.be BVBA.");
+			addDetailMessage("Copyright (C) 2014-2016 e-Contract.be BVBA.");
 			addDetailMessage("Released under GNU LGPL version 3.0 license.");
 			addDetailMessage("More info: https://github.com/e-Contract/eid-applet");
 			/*

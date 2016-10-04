@@ -1,7 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2010 FedICT.
- * Copyright (C) 2009-2015 e-Contract.be BVBA.
+ * Copyright (C) 2009-2016 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -135,14 +135,41 @@ public class Controller {
 		this.view = new ExclusiveAccessViewDecorator(view, this.pcscEidSpi);
 	}
 
+	private int getBrowserMajorVersion(String userAgent, String prefix) {
+		String majorVersionStr = userAgent.substring(userAgent.indexOf(prefix) + prefix.length());
+		majorVersionStr = majorVersionStr.substring(0, majorVersionStr.indexOf("."));
+		Integer majorVersion = Integer.parseInt(majorVersionStr);
+		return majorVersion;
+	}
+
+	private boolean isSafari10(String userAgent) {
+		if (null == userAgent) {
+			return false;
+		}
+		int majorVersion = getBrowserMajorVersion(userAgent, "Version/");
+		if (majorVersion >= 10) {
+			return true;
+		}
+		return false;
+	}
+
 	private void macosxSandboxDetection(View view) {
 		String osName = System.getProperty("os.name");
 		if (osName.equals("Mac OS X")) {
 			boolean sandboxed = System.getenv("DIRHELPER_USER_DIR_SUFFIX") != null;
 			if (sandboxed) {
-				String safariMessage = this.messages.getMessage(MESSAGE_ID.SAFARI_SANDBOX_1);
-				safariMessage += this.runtime.getDocumentBase().getHost();
-				safariMessage += this.messages.getMessage(MESSAGE_ID.SAFARI_SANDBOX_2);
+				String userAgent = this.runtime.getParameter("UserAgent");
+				String safariMessage;
+				if (isSafari10(userAgent)) {
+					safariMessage = this.messages.getMessage(MESSAGE_ID.SAFARI_SANDBOX_1);
+					safariMessage += this.messages.getMessage(MESSAGE_ID.SAFARI_SANDBOX_10);
+					safariMessage += this.runtime.getDocumentBase().getHost() + " ";
+					safariMessage += this.messages.getMessage(MESSAGE_ID.SAFARI_SANDBOX_2);
+				} else {
+					safariMessage = this.messages.getMessage(MESSAGE_ID.SAFARI_SANDBOX_1);
+					safariMessage += this.runtime.getDocumentBase().getHost() + " ";
+					safariMessage += this.messages.getMessage(MESSAGE_ID.SAFARI_SANDBOX_2);
+				}
 				JOptionPane.showMessageDialog(view.getParentComponent(), safariMessage, "Safari Java Sandbox",
 						JOptionPane.WARNING_MESSAGE);
 			}
@@ -1023,7 +1050,7 @@ public class Controller {
 
 	private FinishedMessage performEidIdentificationOperation(boolean includeAddress, boolean includePhoto,
 			boolean includeIntegrityData, boolean includeCertificates, boolean removeCard, String identityDataUsage)
-					throws Exception {
+			throws Exception {
 		waitForEIdCardPcsc();
 
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.READING_IDENTITY);

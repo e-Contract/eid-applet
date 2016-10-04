@@ -1,3 +1,6 @@
+1.2.7 - 4 Oct 2016
+	* fix sandbox message for Safari 10
+
 1.2.6 - 21 Oct 2015
 	* CDI API, retrieve auth cert during identification
 

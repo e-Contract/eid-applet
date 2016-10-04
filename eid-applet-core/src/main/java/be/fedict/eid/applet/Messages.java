@@ -1,7 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2008-2012 FedICT.
- * Copyright (C) 2014-2015 e-Contract.be BVBA.
+ * Copyright (C) 2014-2016 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -158,7 +158,9 @@ public class Messages {
 
 		SAFARI_SANDBOX_1("safariSandbox1"),
 
-		SAFARI_SANDBOX_2("safariSandBox2");
+		SAFARI_SANDBOX_2("safariSandBox2"),
+
+		SAFARI_SANDBOX_10("safariSandbox10");
 
 		private final String id;
 
