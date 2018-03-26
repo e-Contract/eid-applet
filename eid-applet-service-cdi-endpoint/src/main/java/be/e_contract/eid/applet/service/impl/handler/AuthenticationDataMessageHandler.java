@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2014-2015 e-Contract.be BVBA.
+ * Copyright (C) 2014-2018 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -110,6 +110,9 @@ public class AuthenticationDataMessageHandler implements MessageHandler<Authenti
 
 		BeIDContextQualifier contextQualifier = new BeIDContextQualifier(request);
 
+                if (message.authnCert == null) {
+                    throw new SecurityException("missing authentication certificate");
+                }
 		PublicKey signingKey = message.authnCert.getPublicKey();
 		byte[] signatureValue = message.signatureValue;
 		try {
